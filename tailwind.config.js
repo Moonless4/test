@@ -23,7 +23,7 @@ export default {
         line: '#E4E2DC',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        sans: ['Vazirmatn', 'system-ui', '-apple-system', 'Segoe UI', 'Tahoma', 'sans-serif'],
       },
       maxWidth: {
         shell: '1280px',

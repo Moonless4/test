@@ -12,47 +12,43 @@ export default function AboutPage() {
     <>
       <PageHero
         imageId={aboutImageIds.main}
-        label="About us"
-        title="A boutique agency for architecturally significant homes"
-        description="Horizon Properties advises a small number of clients each year on the purchase, sale and stewardship of exceptional residential property."
+        label="درباره ما"
+        title="آژانسی بوتیک برای خانه‌های شاخص معماری"
+        description="املاک افق هر سال به شماری محدود از مشتریان، در خرید، فروش و نگهداری املاک مسکونی استثنایی مشاوره می‌دهد."
       />
 
       <section className="bg-white py-20 sm:py-24 lg:py-32">
         <Container>
           <div className="grid gap-14 lg:grid-cols-[1.05fr_1fr] lg:gap-20">
             <Reveal>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-gold">
-                Who we are
-              </p>
-              <h2 className="mt-5 text-[clamp(1.8rem,3.6vw,2.7rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-ink">
-                Quietly connecting people with extraordinary homes
+              <p className="eyebrow">ما کی هستیم</p>
+              <h2 className="mt-5 text-[clamp(1.6rem,3.2vw,2.4rem)] font-bold leading-[1.45] text-ink">
+                پیوندی آرام میان مردم و خانه‌های استثنایی
               </h2>
-              <div className="mt-7 space-y-5 text-[15px] leading-relaxed text-muted">
+              <div className="mt-7 space-y-5 text-[15px] leading-[1.95] text-muted">
                 <p>
-                  Horizon Properties was founded on a simple belief: the best homes are not sold,
-                  they are placed. Our role is to understand a building, the street it sits on and
-                  the life it is being bought for — then to find the buyer who will value it most.
+                  املاک افق بر یک باور ساده بنا شد: بهترین خانه‌ها فروخته نمی‌شوند، واگذار
+                  می‌شوند. کار ما این است که یک بنا، خیابانی که در آن نشسته و زندگی‌ای که برایش
+                  خریداری می‌شود را بشناسیم — و سپس خریداری را بیابیم که بیشترین ارزش را برای آن
+                  قائل است.
                 </p>
                 <p>
-                  We deliberately represent a compact portfolio. Every instruction is handled by a
-                  senior advisor who knows the market, the comparables and the negotiation history
-                  rather than passing work down a chain.
+                  آگاهانه پرتفویی کوچک را نمایندگی می‌کنیم. هر سفارش را مشاوری ارشد پیش می‌برد که
+                  بازار، املاک قابل مقایسه و پیشینهٔ مذاکره را می‌شناسد؛ نه اینکه کار را در زنجیره‌ای
+                  به پایین بسپارد.
                 </p>
                 <p>
-                  For buyers, that same discipline works in reverse: patient, well-informed advice
-                  on where value sits, what a property will cost to own, and when to walk away.
+                  برای خریداران نیز همان نظم، در جهت معکوس کار می‌کند: مشاوره‌ای صبورانه و آگاهانه
+                  دربارهٔ اینکه ارزش کجاست، نگهداری یک ملک چه هزینه‌ای دارد و کجا باید از معامله
+                  گذشت.
                 </p>
               </div>
 
               <dl className="mt-12 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-line pt-10 sm:grid-cols-4">
                 {stats.map((stat) => (
                   <div key={stat.label}>
-                    <dd className="text-[26px] font-semibold tracking-tight text-navy">
-                      {stat.value}
-                    </dd>
-                    <dt className="mt-2 text-[11px] uppercase tracking-[0.18em] text-muted">
-                      {stat.label}
-                    </dt>
+                    <dd className="text-[25px] font-bold text-navy">{stat.value}</dd>
+                    <dt className="mt-2 text-[12px] text-muted">{stat.label}</dt>
                   </div>
                 ))}
               </dl>
@@ -65,7 +61,7 @@ export default function AboutPage() {
                     src={photo(aboutImageIds.main, 1200)}
                     srcSet={photoSrcSet(aboutImageIds.main, [640, 960, 1280])}
                     sizes="(min-width: 1024px) 42vw, 90vw"
-                    alt="A modern residence with timber cladding and landscaped garden"
+                    alt="اقامتگاهی مدرن با نمای چوبی و باغی محوطه‌سازی‌شده"
                     loading="lazy"
                     decoding="async"
                     className="aspect-[16/11] w-full object-cover"
@@ -77,7 +73,7 @@ export default function AboutPage() {
                       src={photo(aboutImageIds.secondary, 800)}
                       srcSet={photoSrcSet(aboutImageIds.secondary, [420, 640, 900])}
                       sizes="(min-width: 1024px) 20vw, 45vw"
-                      alt="Dark panelled facade lit from within at dusk"
+                      alt="نمای تیره و پانل‌دار که در غروب از درون روشن است"
                       loading="lazy"
                       decoding="async"
                       className="aspect-[4/3] w-full object-cover"
@@ -88,7 +84,7 @@ export default function AboutPage() {
                       src={photo('photo-1600585154340-be6161a56a0c', 800)}
                       srcSet={photoSrcSet('photo-1600585154340-be6161a56a0c', [420, 640, 900])}
                       sizes="(min-width: 1024px) 20vw, 45vw"
-                      alt="A modern home at blue hour with floor-to-ceiling glazing"
+                      alt="خانه‌ای مدرن در ساعت آبی با شیشه‌های تمام‌قد"
                       loading="lazy"
                       decoding="async"
                       className="aspect-[4/3] w-full object-cover"

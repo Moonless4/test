@@ -1,10 +1,12 @@
 export type PropertyType =
-  | 'Villa'
-  | 'Estate'
-  | 'Residence'
-  | 'Penthouse'
-  | 'Retreat'
-  | 'Lake House'
+  | 'ویلا'
+  | 'عمارت'
+  | 'خانه'
+  | 'پنت‌هاوس'
+  | 'اقامتگاه'
+  | 'ویلای ساحلی'
+
+export type PropertyStatus = 'برای فروش' | 'لیستینگ جدید' | 'اختصاصی' | 'ویژه'
 
 export interface PropertyImage {
   id: string
@@ -27,15 +29,18 @@ export interface Property {
   city: string
   region: string
   country: string
-  /** Price in US dollars. */
+  /** Price in Iranian Toman. */
   price: number
   type: PropertyType
-  status: 'For Sale' | 'New Listing' | 'Exclusive' | 'Featured'
+  status: PropertyStatus
   beds: number
   baths: number
-  sqft: number
+  /** Interior area in square metres. */
+  area: number
+  /** Plot / land area in square metres (0 for apartments). */
+  land: number
+  /** Construction year in the Jalali (Shamsi) calendar. */
   year: number
-  lotAcres: number
   featured: boolean
   summary: string
   description: string[]

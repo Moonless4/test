@@ -16,6 +16,7 @@ import {
   uniqueTypes,
   type FilterState,
 } from '@/lib/filters'
+import { toPersianDigits } from '@/lib/format'
 import { getAllProperties } from '@/lib/properties'
 
 export default function PropertiesPage() {
@@ -67,9 +68,9 @@ export default function PropertiesPage() {
   return (
     <>
       <PageHero
-        label="Portfolio"
-        title="Properties"
-        description="Browse our current collection of villas, estates and residences — filter by location, type, price and size to find the right address."
+        label="پرتفوی"
+        title="املاک"
+        description="مجموعهٔ کنونی ما از ویلاها، عمارت‌ها و اقامتگاه‌ها را مرور کنید — بر پایهٔ موقعیت، نوع، قیمت و متراژ جست‌وجو را دقیق‌تر کنید."
       />
 
       <section className="bg-white py-14 sm:py-20">
@@ -85,12 +86,12 @@ export default function PropertiesPage() {
               >
                 <span className="flex items-center gap-2.5">
                   <SlidersHorizontal className="h-4 w-4 text-gold" strokeWidth={1.8} aria-hidden="true" />
-                  Filters{activeCount ? ` (${activeCount})` : ''}
+                  فیلترها{activeCount ? ` (${toPersianDigits(activeCount)})` : ''}
                 </span>
                 {panelOpen ? (
                   <X className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
                 ) : (
-                  <span className="text-xs text-muted">Show</span>
+                  <span className="text-xs text-muted">نمایش</span>
                 )}
               </button>
 
@@ -113,8 +114,8 @@ export default function PropertiesPage() {
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                   {[
-                    { label: 'All homes', active: !featuredOnly, onClick: () => featuredOnly && toggleFeaturedOnly() },
-                    { label: 'Featured only', active: featuredOnly, onClick: () => !featuredOnly && toggleFeaturedOnly() },
+                    { label: 'همهٔ خانه‌ها', active: !featuredOnly, onClick: () => featuredOnly && toggleFeaturedOnly() },
+                    { label: 'فقط ویژه', active: featuredOnly, onClick: () => !featuredOnly && toggleFeaturedOnly() },
                   ].map((chip) => (
                     <button
                       key={chip.label}
@@ -122,7 +123,7 @@ export default function PropertiesPage() {
                       onClick={chip.onClick}
                       aria-pressed={chip.active}
                       className={clsx(
-                        'rounded-full px-4 py-2 text-xs font-medium transition-colors duration-500 ease-premium',
+                        'rounded-full px-4 py-2 text-[13px] font-medium transition-colors duration-500 ease-premium',
                         chip.active
                           ? 'bg-navy text-white'
                           : 'border border-line text-muted hover:border-navy hover:text-navy',
@@ -134,7 +135,7 @@ export default function PropertiesPage() {
                 </div>
 
                 <p className="text-sm text-muted">
-                  {results.length} {results.length === 1 ? 'home' : 'homes'} available
+                  {toPersianDigits(results.length)} ملک در دسترس
                 </p>
               </div>
 
@@ -151,19 +152,19 @@ export default function PropertiesPage() {
                 </div>
               ) : (
                 <div className="mt-10 rounded-card border border-line bg-mist/60 px-8 py-16 text-center">
-                  <h2 className="text-[19px] font-semibold tracking-tight text-ink">
-                    No properties match those filters
+                  <h2 className="text-[19px] font-bold text-ink">
+                    هیچ ملکی با این فیلترها همخوانی ندارد
                   </h2>
-                  <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted">
-                    Try widening the price range or removing a filter — or let one of our advisors
-                    search off-market for you.
+                  <p className="mx-auto mt-3 max-w-md text-sm leading-[1.95] text-muted">
+                    بازهٔ قیمت را گسترده‌تر کنید یا فیلتری را بردارید — یا بگذارید یکی از مشاوران
+                    ما به‌جای شما در فهرست‌های خارج از نمایش عمومی جست‌وجو کند.
                   </p>
                   <div className="mt-8 flex flex-wrap justify-center gap-3">
                     <Button onClick={reset} variant="primary" size="md">
-                      Clear filters
+                      پاک کردن فیلترها
                     </Button>
                     <Button to="/contact" variant="outlineDark" size="md">
-                      Speak to an advisor
+                      گفت‌وگو با مشاور
                     </Button>
                   </div>
                 </div>

@@ -2,6 +2,7 @@ import { Container } from '@/components/ui/Container'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { stats, values } from '@/data/site'
+import { toPersianDigits } from '@/lib/format'
 
 export function WhyChooseSection() {
   return (
@@ -11,9 +12,9 @@ export function WhyChooseSection() {
           <Reveal className="lg:sticky lg:top-32 lg:self-start">
             <SectionHeading
               tone="light"
-              label="Why Horizon"
-              title="Why Choose Horizon"
-              description="Twenty years of advising buyers and sellers of significant homes has shaped a way of working that is quiet, precise and entirely client-led."
+              label="چرا افق"
+              title="چرا افق را انتخاب کنید"
+              description="بیست سال مشاوره به خریداران و فروشندگان خانه‌های شاخص، روشی از کار را شکل داده است: آرام، دقیق و کاملاً در خدمت مشتری."
               className="max-w-lg"
             />
           </Reveal>
@@ -23,13 +24,11 @@ export function WhyChooseSection() {
               {values.map((value, index) => (
                 <Reveal key={value.title} delay={index * 90}>
                   <div className="border-t border-white/15 pt-6">
-                    <span className="text-[11px] font-semibold tracking-[0.22em] text-gold">
-                      {String(index + 1).padStart(2, '0')}
+                    <span className="text-[13px] font-semibold text-gold">
+                      {toPersianDigits(String(index + 1).padStart(2, '0'))}
                     </span>
-                    <h3 className="mt-4 text-[17px] font-semibold tracking-tight text-white">
-                      {value.title}
-                    </h3>
-                    <p className="mt-3 text-sm leading-relaxed text-white/65">
+                    <h3 className="mt-4 text-[17px] font-bold text-white">{value.title}</h3>
+                    <p className="mt-3 text-sm leading-[1.95] text-white/65">
                       {value.description}
                     </p>
                   </div>
@@ -41,12 +40,8 @@ export function WhyChooseSection() {
               <dl className="mt-14 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-white/15 pt-10 sm:grid-cols-4">
                 {stats.map((stat) => (
                   <div key={stat.label}>
-                    <dd className="text-[24px] font-semibold tracking-tight text-gold">
-                      {stat.value}
-                    </dd>
-                    <dt className="mt-2 text-[11px] uppercase tracking-[0.18em] text-white/55">
-                      {stat.label}
-                    </dt>
+                    <dd className="text-[23px] font-bold text-gold">{stat.value}</dd>
+                    <dt className="mt-2 text-[12px] text-white/55">{stat.label}</dt>
                   </div>
                 ))}
               </dl>

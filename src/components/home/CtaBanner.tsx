@@ -1,4 +1,4 @@
-import { ArrowRight, KeyRound } from 'lucide-react'
+import { ArrowLeft, KeyRound } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { Reveal } from '@/components/ui/Reveal'
@@ -10,8 +10,8 @@ interface CtaBannerProps {
 }
 
 export function CtaBanner({
-  title = 'Ready to Find Your Perfect Property?',
-  description = 'Let our experts guide you to the right home or investment.',
+  title = 'آماده‌اید ملک مناسب خود را پیدا کنید؟',
+  description = 'بگذارید کارشناسان ما شما را به خانه یا سرمایه‌گذاری درست راهنمایی کنند.',
   className = 'bg-white',
 }: CtaBannerProps) {
   return (
@@ -24,10 +24,10 @@ export function CtaBanner({
                 <KeyRound className="h-6 w-6" strokeWidth={1.6} aria-hidden="true" />
               </span>
               <div>
-                <h2 className="text-[clamp(1.35rem,2.6vw,1.95rem)] font-semibold leading-snug tracking-[-0.02em] text-ink">
+                <h2 className="text-[clamp(1.25rem,2.4vw,1.8rem)] font-bold leading-[1.5] text-ink">
                   {title}
                 </h2>
-                <p className="mt-2.5 max-w-md text-sm leading-relaxed text-muted">{description}</p>
+                <p className="mt-2.5 max-w-md text-sm leading-[1.95] text-muted">{description}</p>
               </div>
             </div>
 
@@ -35,9 +35,9 @@ export function CtaBanner({
               to="/contact"
               size="lg"
               className="shrink-0"
-              icon={<ArrowRight className="h-4 w-4" strokeWidth={1.8} />}
+              icon={<ArrowLeft className="h-4 w-4" strokeWidth={1.8} />}
             >
-              Get in Touch
+              تماس بگیرید
             </Button>
           </div>
         </Reveal>

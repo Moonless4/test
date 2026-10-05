@@ -16,6 +16,27 @@ Dependencies live in the `node_modules` Docker volume, not in the repo — after
 - `docker compose -f docker-compose.base44.yml exec -T web npx tsc --noEmit` → no output.
 - Browser check: no `vite-error-overlay`, `#root` has children, no failed module requests.
 
+## Localisation & RTL (Persian)
+- The app is **Persian-only and RTL**. `index.html` sets `lang="fa" dir="rtl"`; Tailwind
+  `fontFamily.sans` and the Google-Fonts link are Vazirmatn. Body copy uses generous leading
+  (`line-height` > 1.7); Persian labels must not use `uppercase` or wide `tracking`.
+- **Use logical properties** (`ps/pe/ms/me/start/end`) for anything positional. Physical
+  `left/right` is reserved for places where mirroring would be wrong (carousel edge buttons).
+- **Directional icons are mirrored on purpose** — do not "restore" them to the LTR glyphs:
+  forward CTAs use `ArrowLeft`, breadcrumb separators are `ChevronLeft`, diagonal/external links
+  are `ArrowUpLeft`, and the gallery & carousel prev/next arrows are swapped.
+- **Numbers, prices and phones** live in `src/lib/format.ts`: prices are Toman, digits are
+  Persian via `Intl('fa-IR')`, and `telHref()` converts Persian digits into a dial-safe `+98…`
+  link (plain Persian digits in an `href` produce a dead `tel:`).
+- **`PropertyCarousel` scroll maths is RTL-specific**: `scrollLeft` runs `0 → −max`, so it
+  normalises with `Math.abs` and *adds* the drag delta. Any change there must keep both arrow
+  buttons and the keyboard mapping mirrored.
+- **Content is Iranian**: cities/regions, Toman prices, `area`/`land` in square metres, Jalali
+  `year` (`سال ساخت`). The old `sqft` / `lotAcres` fields were renamed to `area` / `land`.
+- **Quick RTL verification**: `document.documentElement.dir === 'rtl'`,
+  `scrollWidth === clientWidth` (no horizontal overflow), and the first grid column renders on
+  the right.
+
 ## Non-obvious things
 - **Vite host/origin gating.** `vite.config.ts` sets `server.allowedHosts: true` plus
   `host: true`; the proxy hostname changes whenever the sandbox is recreated, so an exact-host

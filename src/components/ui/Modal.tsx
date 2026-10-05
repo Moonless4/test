@@ -51,19 +51,18 @@ export function Modal({ open, onClose, title, description, children, size = 'md'
           size === 'lg' ? 'max-w-2xl' : 'max-w-lg',
         )}
       >
+        {/* Close sits on the logical end edge, so it mirrors to the left in RTL. */}
         <button
           type="button"
           onClick={onClose}
-          aria-label="Close dialog"
-          className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full border border-navy/12 text-navy transition-colors duration-300 hover:border-navy hover:bg-navy hover:text-white"
+          aria-label="بستن پنجره"
+          className="absolute end-5 top-5 grid h-9 w-9 place-items-center rounded-full border border-navy/12 text-navy transition-colors duration-300 hover:border-navy hover:bg-navy hover:text-white"
         >
           <X className="h-4 w-4" strokeWidth={1.8} />
         </button>
 
-        <h2 className="pr-12 text-[22px] font-semibold leading-snug tracking-tight text-ink">
-          {title}
-        </h2>
-        {description ? <p className="mt-2 text-sm leading-relaxed text-muted">{description}</p> : null}
+        <h2 className="pe-12 text-[21px] font-semibold leading-snug text-ink">{title}</h2>
+        {description ? <p className="mt-2.5 text-sm leading-relaxed text-muted">{description}</p> : null}
 
         <div className="mt-7">{children}</div>
       </div>

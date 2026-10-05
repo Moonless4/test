@@ -23,18 +23,14 @@ export function SectionHeading({
     <div
       className={clsx(
         'max-w-2xl',
-        align === 'center' && 'mx-auto text-center',
+        align === 'center' ? 'mx-auto text-center' : 'text-start',
         className,
       )}
     >
-      {label ? (
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-gold">
-          {label}
-        </p>
-      ) : null}
+      {label ? <p className="mb-4 eyebrow">{label}</p> : null}
       <h2
         className={clsx(
-          'text-[clamp(1.9rem,4vw,3rem)] font-semibold leading-[1.08] tracking-[-0.02em]',
+          'text-[clamp(1.7rem,3.6vw,2.6rem)] font-bold leading-[1.45]',
           tone === 'light' ? 'text-white' : 'text-ink',
           titleClassName,
         )}
@@ -44,7 +40,7 @@ export function SectionHeading({
       {description ? (
         <p
           className={clsx(
-            'mt-5 text-[15px] leading-relaxed sm:text-base',
+            'mt-5 text-[15px] leading-[1.95]',
             tone === 'light' ? 'text-white/70' : 'text-muted',
           )}
         >

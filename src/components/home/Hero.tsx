@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown } from 'lucide-react'
+import { ArrowLeft, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { heroImageId } from '@/data/site'
@@ -11,7 +11,7 @@ export function Hero() {
         src={photo(heroImageId, 2000)}
         srcSet={photoSrcSet(heroImageId, [768, 1280, 1920, 2400], 80)}
         sizes="100vw"
-        alt="Modern villa at blue hour with floor-to-ceiling glazing and lit interiors"
+        alt="ویلایی مدرن در ساعت آبی، با شیشه‌های تمام‌قد و فضای داخلی روشن"
         decoding="async"
         className="absolute inset-0 -z-20 h-full w-full animate-hero-zoom object-cover"
       />
@@ -21,19 +21,19 @@ export function Hero() {
       />
 
       <Container className="relative z-10 pb-28 pt-32 text-center sm:pb-32">
-        <p className="animate-fade-up text-[11px] font-semibold uppercase tracking-[0.34em] text-gold">
-          Luxury real estate · Est. 2005
+        <p className="animate-fade-up text-[12px] font-semibold text-gold">
+          املاک لوکس · از سال ۱۳۸۴
         </p>
 
-        <h1 className="mx-auto mt-7 max-w-4xl text-[clamp(2.3rem,6.2vw,4.75rem)] font-semibold leading-[1.03] tracking-[-0.03em] text-white [animation-delay:120ms] animate-fade-up">
-          Discover Exceptional
+        <h1 className="mx-auto mt-7 max-w-4xl text-[clamp(2rem,5.2vw,4rem)] font-bold leading-[1.35] text-white [animation-delay:120ms] animate-fade-up">
+          خانه‌های استثنایی
           <br />
-          Homes &amp; Investments
+          برای زندگی و سرمایه‌گذاری
         </h1>
 
-        <p className="mx-auto mt-7 max-w-xl text-[15px] leading-relaxed text-white/75 [animation-delay:260ms] animate-fade-up sm:text-base">
-          Premium properties in prime locations. Find your dream home or the perfect investment
-          with confidence.
+        <p className="mx-auto mt-7 max-w-xl text-[15px] leading-[1.95] text-white/75 [animation-delay:260ms] animate-fade-up sm:text-base">
+          املاک ممتاز در بهترین موقعیت‌ها. خانهٔ رویایی یا سرمایه‌گذاری درست خود را با اطمینان پیدا
+          کنید.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3 [animation-delay:380ms] animate-fade-up">
@@ -41,19 +41,19 @@ export function Hero() {
             to="/properties"
             size="lg"
             variant="ivory"
-            icon={<ArrowRight className="h-4 w-4" strokeWidth={1.8} />}
+            icon={<ArrowLeft className="h-4 w-4" strokeWidth={1.8} />}
           >
-            Browse properties
+            مشاهدهٔ املاک
           </Button>
           <Button to="/contact" size="lg" variant="outlineLight">
-            Speak to an advisor
+            گفت‌وگو با مشاور
           </Button>
         </div>
       </Container>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-8 flex justify-center">
-        <span className="flex flex-col items-center gap-2 text-[10px] font-medium uppercase tracking-[0.3em] text-white/60">
-          Scroll
+        <span className="flex flex-col items-center gap-2 text-[11px] font-medium text-white/60">
+          اسکرول
           <ChevronDown className="h-4 w-4 animate-pulse text-gold" strokeWidth={1.6} aria-hidden="true" />
         </span>
       </div>

@@ -10,6 +10,8 @@
 
   body {
     @apply bg-white font-sans text-muted antialiased;
+    /* Persian script needs generous leading to feel calm and legible. */
+    line-height: 1.85;
     text-rendering: optimizeLegibility;
   }
 
@@ -18,7 +20,12 @@
   h3,
   h4 {
     @apply text-ink;
-    text-wrap: balance;
+    line-height: 1.4;
+  }
+
+  /* Latin identifiers (emails, numbers, URLs) keep their natural direction. */
+  [dir='ltr'] {
+    unicode-bidi: isolate;
   }
 
   ::selection {
@@ -46,6 +53,11 @@
   .drag-none {
     -webkit-user-drag: none;
     user-select: none;
+  }
+
+  /* Small section label, re-tuned for Persian (no uppercase, no letter-spacing). */
+  .eyebrow {
+    @apply text-[12px] font-semibold text-gold;
   }
 }
 

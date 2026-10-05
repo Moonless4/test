@@ -21,39 +21,39 @@ export const defaultFilters: FilterState = {
 }
 
 export const priceRanges = [
-  { value: 'all', label: 'Any price' },
-  { value: '0-2000000', label: 'Under $2M' },
-  { value: '2000000-4000000', label: '$2M – $4M' },
-  { value: '4000000-6000000', label: '$4M – $6M' },
-  { value: '6000000-99999999', label: '$6M and above' },
+  { value: 'all', label: 'هر قیمتی' },
+  { value: '0-60000000000', label: 'زیر ۶۰ میلیارد تومان' },
+  { value: '60000000000-120000000000', label: '۶۰ تا ۱۲۰ میلیارد تومان' },
+  { value: '120000000000-200000000000', label: '۱۲۰ تا ۲۰۰ میلیارد تومان' },
+  { value: '200000000000-999999999999', label: 'بیش از ۲۰۰ میلیارد تومان' },
 ]
 
 export const bedOptions = [
-  { value: 'all', label: 'Any' },
-  { value: '3', label: '3+ bedrooms' },
-  { value: '4', label: '4+ bedrooms' },
-  { value: '5', label: '5+ bedrooms' },
-  { value: '6', label: '6+ bedrooms' },
+  { value: 'all', label: 'همه' },
+  { value: '3', label: '۳ خواب و بیشتر' },
+  { value: '4', label: '۴ خواب و بیشتر' },
+  { value: '5', label: '۵ خواب و بیشتر' },
+  { value: '6', label: '۶ خواب و بیشتر' },
 ]
 
 export const bathOptions = [
-  { value: 'all', label: 'Any' },
-  { value: '3', label: '3+ bathrooms' },
-  { value: '4', label: '4+ bathrooms' },
-  { value: '5', label: '5+ bathrooms' },
-  { value: '6', label: '6+ bathrooms' },
+  { value: 'all', label: 'همه' },
+  { value: '3', label: '۳ سرویس و بیشتر' },
+  { value: '4', label: '۴ سرویس و بیشتر' },
+  { value: '5', label: '۵ سرویس و بیشتر' },
+  { value: '6', label: '۶ سرویس و بیشتر' },
 ]
 
 export const sortOptions = [
-  { value: 'featured', label: 'Featured first' },
-  { value: 'price-asc', label: 'Price: low to high' },
-  { value: 'price-desc', label: 'Price: high to low' },
-  { value: 'size-desc', label: 'Largest first' },
-  { value: 'newest', label: 'Newest built' },
+  { value: 'featured', label: 'پیشنهادهای ویژه در ابتدا' },
+  { value: 'price-asc', label: 'ارزان‌ترین به گران‌ترین' },
+  { value: 'price-desc', label: 'گران‌ترین به ارزان‌ترین' },
+  { value: 'size-desc', label: 'بزرگ‌ترین متراژ' },
+  { value: 'newest', label: 'جدیدترین سال ساخت' },
 ]
 
 export const uniqueLocations = (properties: Property[]): string[] =>
-  Array.from(new Set(properties.map((property) => `${property.city}, ${property.region}`))).sort()
+  Array.from(new Set(properties.map((property) => `${property.city}، ${property.region}`))).sort()
 
 export const uniqueTypes = (properties: Property[]): string[] =>
   Array.from(new Set(properties.map((property) => property.type))).sort()
@@ -80,7 +80,7 @@ export function applyFilters(properties: Property[], filters: FilterState): Prop
       if (!haystack.includes(term)) return false
     }
 
-    if (filters.location !== 'all' && `${property.city}, ${property.region}` !== filters.location) {
+    if (filters.location !== 'all' && `${property.city}، ${property.region}` !== filters.location) {
       return false
     }
 
@@ -106,7 +106,7 @@ export function applyFilters(properties: Property[], filters: FilterState): Prop
       sorted.sort((a, b) => b.price - a.price)
       break
     case 'size-desc':
-      sorted.sort((a, b) => b.sqft - a.sqft)
+      sorted.sort((a, b) => b.area - a.area)
       break
     case 'newest':
       sorted.sort((a, b) => b.year - a.year)

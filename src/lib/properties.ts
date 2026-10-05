@@ -26,4 +26,4 @@ export const getSimilarProperties = (property: Property, limit = 3): Property[] 
     .slice(0, limit)
 
 export const getPropertyImageAlt = (property: Property): string =>
-  `${property.name} in ${property.city}, ${property.region}`
+  `${property.name} در ${property.city}، ${property.region}`

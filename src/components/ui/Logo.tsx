@@ -10,7 +10,7 @@ export function Logo({ tone = 'light', className }: LogoProps) {
   return (
     <Link
       to="/"
-      aria-label="Horizon Properties — home"
+      aria-label="املاک افق — صفحهٔ اصلی"
       className={clsx('group flex items-center gap-3', className)}
     >
       <span
@@ -21,6 +21,7 @@ export function Logo({ tone = 'light', className }: LogoProps) {
             : 'border-navy/15 bg-navy group-hover:border-gold/60',
         )}
       >
+        {/* Brand mark — a skyline glyph, intentionally not mirrored. */}
         <svg
           viewBox="0 0 32 32"
           aria-hidden="true"
@@ -36,22 +37,22 @@ export function Logo({ tone = 'light', className }: LogoProps) {
           <path d="M3.5 27h25" />
         </svg>
       </span>
-      <span className="flex flex-col leading-none">
+      <span className="flex flex-col">
         <span
           className={clsx(
-            'text-[13px] font-semibold uppercase tracking-[0.18em] transition-colors duration-500',
+            'text-[15px] font-bold leading-tight transition-colors duration-500',
             tone === 'light' ? 'text-white' : 'text-ink',
           )}
         >
-          Horizon
+          افق
         </span>
         <span
           className={clsx(
-            'mt-1 text-[9px] font-medium uppercase tracking-[0.34em]',
+            'mt-0.5 text-[11px] font-medium leading-tight',
             tone === 'light' ? 'text-white/60' : 'text-muted',
           )}
         >
-          Properties
+          املاک ممتاز
         </span>
       </span>
     </Link>

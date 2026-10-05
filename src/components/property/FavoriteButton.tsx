@@ -22,8 +22,8 @@ export function FavoriteButton({
     <button
       type="button"
       aria-pressed={saved}
-      aria-label={saved ? `Remove ${propertyName} from saved properties` : `Save ${propertyName}`}
-      title={saved ? 'Saved' : 'Save property'}
+      aria-label={saved ? `حذف ${propertyName} از ذخیره‌شده‌ها` : `ذخیرهٔ ${propertyName}`}
+      title={saved ? 'ذخیره شده' : 'ذخیرهٔ ملک'}
       onClick={() => favoritesStore.toggle(propertyId)}
       className={clsx(
         'grid h-10 w-10 place-items-center rounded-full transition-all duration-500 ease-premium',

@@ -7,6 +7,7 @@ import { Container } from '@/components/ui/Container'
 import { Logo } from '@/components/ui/Logo'
 import { company, navLinks } from '@/data/site'
 import { useFavorites } from '@/lib/favorites'
+import { toPersianDigits } from '@/lib/format'
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
@@ -55,7 +56,7 @@ export function Header() {
           <div className="flex h-[70px] items-center justify-between gap-6 lg:h-[84px]">
             <Logo tone={onDark ? 'light' : 'dark'} />
 
-            <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex">
+            <nav aria-label="فهرست اصلی" className="hidden items-center gap-7 lg:flex">
               {navLinks.map((link) => (
                 <NavLink
                   key={link.to}
@@ -63,7 +64,7 @@ export function Header() {
                   end={link.to === '/'}
                   className={({ isActive }) =>
                     clsx(
-                      'group relative py-2 text-[13px] font-medium tracking-wide transition-colors duration-500',
+                      'group relative py-2 text-[14px] font-medium transition-colors duration-500',
                       linkTone,
                       isActive && linkActive,
                     )
@@ -74,7 +75,7 @@ export function Header() {
                       {link.label}
                       <span
                         className={clsx(
-                          'absolute -bottom-0.5 left-0 h-px bg-gold transition-[width] duration-500 ease-premium',
+                          'absolute -bottom-0.5 start-0 h-px bg-gold transition-[width] duration-500 ease-premium',
                           isActive ? 'w-full' : 'w-0 group-hover:w-full',
                         )}
                       />
@@ -87,7 +88,11 @@ export function Header() {
             <div className="flex items-center gap-2 sm:gap-3">
               <NavLink
                 to="/favorites"
-                aria-label={`Saved properties${favorites.length ? ` (${favorites.length})` : ''}`}
+                aria-label={
+                  favorites.length
+                    ? `املاک ذخیره‌شده (${toPersianDigits(favorites.length)})`
+                    : 'املاک ذخیره‌شده'
+                }
                 className={({ isActive }) =>
                   clsx(
                     'relative hidden h-10 w-10 place-items-center rounded-full border transition-colors duration-500 ease-premium sm:grid',
@@ -100,8 +105,8 @@ export function Header() {
               >
                 <Heart className="h-4 w-4" strokeWidth={1.8} />
                 {favorites.length > 0 ? (
-                  <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-gold px-1 text-[9px] font-semibold text-white">
-                    {favorites.length}
+                  <span className="absolute -end-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-gold px-1 text-[10px] font-semibold text-white">
+                    {toPersianDigits(favorites.length)}
                   </span>
                 ) : null}
               </NavLink>
@@ -113,7 +118,7 @@ export function Header() {
                 icon={<Phone className="h-3.5 w-3.5" strokeWidth={1.8} />}
                 className="hidden sm:inline-flex"
               >
-                {company.phone}
+                <span dir="ltr">{company.phone}</span>
               </Button>
 
               <button
@@ -121,7 +126,7 @@ export function Header() {
                 onClick={() => setMenuOpen((open) => !open)}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-menu"
-                aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                aria-label={menuOpen ? 'بستن منو' : 'باز کردن منو'}
                 className={clsx(
                   'grid h-10 w-10 place-items-center rounded-full border transition-colors duration-500 ease-premium lg:hidden',
                   onDark
@@ -142,7 +147,7 @@ export function Header() {
         {menuOpen ? (
           <div id="mobile-menu" className="animate-panel-in border-t border-white/10 bg-navy lg:hidden">
             <Container className="py-7">
-              <nav aria-label="Mobile" className="flex flex-col">
+              <nav aria-label="فهرست موبایل" className="flex flex-col">
                 {navLinks.map((link) => (
                   <NavLink
                     key={link.to}
@@ -169,7 +174,7 @@ export function Header() {
                   icon={<Phone className="h-4 w-4" strokeWidth={1.8} />}
                   className="w-full"
                 >
-                  {company.phone}
+                  <span dir="ltr">{company.phone}</span>
                 </Button>
                 <Button
                   to="/favorites"
@@ -178,7 +183,8 @@ export function Header() {
                   icon={<Heart className="h-4 w-4" strokeWidth={1.8} />}
                   className="w-full"
                 >
-                  Saved properties{favorites.length ? ` (${favorites.length})` : ''}
+                  املاک ذخیره‌شده
+                  {favorites.length ? ` (${toPersianDigits(favorites.length)})` : ''}
                 </Button>
               </div>
             </Container>

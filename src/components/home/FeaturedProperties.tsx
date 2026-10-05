@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { PropertyCarousel } from '@/components/property/PropertyCarousel'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
@@ -15,9 +15,9 @@ export function FeaturedProperties() {
         <Reveal>
           <SectionHeading
             align="center"
-            label="Featured"
-            title="Featured Properties"
-            description="A considered selection from our portfolio of architecturally significant homes and prime investment addresses."
+            label="ویژه"
+            title="املاک ویژه"
+            description="گزیده‌ای سنجیده از پرتفوی ما؛ خانه‌های شاخص معماری و نشانی‌های ممتاز برای سرمایه‌گذاری."
             className="max-w-3xl"
           />
         </Reveal>
@@ -31,9 +31,9 @@ export function FeaturedProperties() {
             to="/properties"
             variant="outlineDark"
             size="lg"
-            icon={<ArrowRight className="h-4 w-4" strokeWidth={1.8} />}
+            icon={<ArrowLeft className="h-4 w-4" strokeWidth={1.8} />}
           >
-            View all properties
+            مشاهدهٔ همهٔ املاک
           </Button>
         </Reveal>
       </Container>

@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import { ArrowLeft, ArrowRight, Expand, X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import type { PropertyImage } from '@/types'
+import { toPersianDigits } from '@/lib/format'
 import { photo, photoSrcSet } from '@/lib/images'
 
 interface PropertyGalleryProps {
@@ -23,8 +24,9 @@ export function PropertyGallery({ images, className }: PropertyGalleryProps) {
     if (!lightbox) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setLightbox(false)
-      if (event.key === 'ArrowRight') move(1)
-      if (event.key === 'ArrowLeft') move(-1)
+      // RTL: left arrow advances, right arrow goes back.
+      if (event.key === 'ArrowLeft') move(1)
+      if (event.key === 'ArrowRight') move(-1)
     }
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -43,7 +45,7 @@ export function PropertyGallery({ images, className }: PropertyGalleryProps) {
         <button
           type="button"
           onClick={() => setLightbox(true)}
-          aria-label="Open image in full screen"
+          aria-label="باز کردن تصویر در حالت تمام‌صفحه"
           className="group block w-full overflow-hidden rounded-card bg-mist"
         >
           <img
@@ -55,9 +57,9 @@ export function PropertyGallery({ images, className }: PropertyGalleryProps) {
             className="animate-fade-in aspect-[16/11] w-full object-cover transition-transform duration-[1400ms] ease-premium group-hover:scale-[1.02]"
             decoding="async"
           />
-          <span className="pointer-events-none absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-white/90 px-3.5 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-navy backdrop-blur-sm">
+          <span className="pointer-events-none absolute bottom-4 end-4 flex items-center gap-2 rounded-full bg-white/90 px-3.5 py-2 text-[12px] font-medium text-navy backdrop-blur-sm">
             <Expand className="h-3.5 w-3.5" strokeWidth={1.8} aria-hidden="true" />
-            View full screen
+            نمای تمام‌صفحه
           </span>
         </button>
       </div>
@@ -68,7 +70,7 @@ export function PropertyGallery({ images, className }: PropertyGalleryProps) {
             key={`${image.id}-${imageIndex}`}
             type="button"
             onClick={() => setIndex(imageIndex)}
-            aria-label={`Show image ${imageIndex + 1} of ${total}`}
+            aria-label={`نمایش تصویر ${toPersianDigits(imageIndex + 1)} از ${toPersianDigits(total)}`}
             aria-current={imageIndex === index}
             className={clsx(
               'relative h-20 w-28 shrink-0 overflow-hidden rounded-[12px] transition-all duration-500 ease-premium sm:h-24 sm:w-32',
@@ -93,18 +95,18 @@ export function PropertyGallery({ images, className }: PropertyGalleryProps) {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Property image viewer"
+          aria-label="نمایشگر تصویر ملک"
           className="fixed inset-0 z-[70] flex flex-col bg-navy/97 backdrop-blur-sm"
         >
           <div className="flex items-center justify-between px-5 py-5 sm:px-8">
-            <span className="text-xs font-medium uppercase tracking-[0.24em] text-white/70">
-              {index + 1} / {total}
+            <span dir="ltr" className="text-[12px] font-medium text-white/70">
+              {toPersianDigits(index + 1)} / {toPersianDigits(total)}
             </span>
             <button
               type="button"
               onClick={() => setLightbox(false)}
               autoFocus
-              aria-label="Close image viewer"
+              aria-label="بستن نمایشگر تصویر"
               className="grid h-10 w-10 place-items-center rounded-full border border-white/20 text-white transition-colors duration-300 hover:border-gold hover:text-gold"
             >
               <X className="h-4 w-4" strokeWidth={1.8} />
@@ -125,18 +127,18 @@ export function PropertyGallery({ images, className }: PropertyGalleryProps) {
             <button
               type="button"
               onClick={() => move(-1)}
-              aria-label="Previous image"
+              aria-label="تصویر قبلی"
               className="grid h-11 w-11 place-items-center rounded-full border border-white/20 text-white transition-colors duration-300 hover:border-gold hover:text-gold"
             >
-              <ArrowLeft className="h-4 w-4" strokeWidth={1.8} />
+              <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
             </button>
             <button
               type="button"
               onClick={() => move(1)}
-              aria-label="Next image"
+              aria-label="تصویر بعدی"
               className="grid h-11 w-11 place-items-center rounded-full border border-white/20 text-white transition-colors duration-300 hover:border-gold hover:text-gold"
             >
-              <ArrowRight className="h-4 w-4" strokeWidth={1.8} />
+              <ArrowLeft className="h-4 w-4" strokeWidth={1.8} />
             </button>
           </div>
         </div>

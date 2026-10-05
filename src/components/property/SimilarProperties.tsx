@@ -14,9 +14,9 @@ export function SimilarProperties({ property }: { property: Property }) {
       <Container>
         <Reveal>
           <SectionHeading
-            label="You may also like"
-            title="Similar properties"
-            description="Comparable homes in our current portfolio, selected by location, type and price."
+            label="شاید بپسندید"
+            title="املاک مشابه"
+            description="خانه‌های قابل مقایسه در پرتفوی کنونی ما، بر پایهٔ موقعیت، نوع و قیمت."
           />
         </Reveal>
         <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">

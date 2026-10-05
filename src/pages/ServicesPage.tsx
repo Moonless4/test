@@ -1,4 +1,4 @@
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { CtaBanner } from '@/components/home/CtaBanner'
 import { PageHero } from '@/components/layout/PageHero'
@@ -6,28 +6,29 @@ import { Container } from '@/components/ui/Container'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { services, servicesImageId } from '@/data/site'
+import { toPersianDigits } from '@/lib/format'
 import { photo, photoSrcSet } from '@/lib/images'
 
 const process = [
   {
-    title: 'Discovery',
-    description: 'A conversation about the brief, the budget and the life the property needs to support.',
+    title: 'آشنایی',
+    description: 'گفت‌وگویی دربارهٔ خواسته، بودجه و زندگی‌ای که ملک باید از آن پشتیبانی کند.',
   },
   {
-    title: 'Shortlist',
-    description: 'A curated selection, including off-market homes that never reach a public portal.',
+    title: 'فهرست کوتاه',
+    description: 'گزیده‌ای سنجیده، همراه با خانه‌های خارج از نمایش عمومی که هرگز به پورتال عمومی نمی‌رسند.',
   },
   {
-    title: 'Private viewings',
-    description: 'Accompanied access at times that suit you, with honest commentary on each home.',
+    title: 'بازدیدهای خصوصی',
+    description: 'دسترسی همراهی‌شده در زمان دلخواه شما، با ارزیابی صادقانه از هر خانه.',
   },
   {
-    title: 'Negotiation',
-    description: 'Comparable analysis and a clear negotiation strategy handled by your advisor.',
+    title: 'مذاکره',
+    description: 'تحلیل املاک قابل مقایسه و راهبرد روشن مذاکره، به دست مشاور شما.',
   },
   {
-    title: 'Completion',
-    description: 'Coordination of legal, survey and relocation so the move itself is uneventful.',
+    title: 'نهایی‌سازی',
+    description: 'هماهنگی امور حقوقی، کارشناسی و جابه‌جایی تا خودِ اسباب‌کشی بی‌دغدغه پیش برود.',
   },
 ]
 
@@ -36,18 +37,18 @@ export default function ServicesPage() {
     <>
       <PageHero
         imageId={servicesImageId}
-        label="Services"
-        title="Advisory, marketing and acquisition for prime property"
-        description="A complete service for buyers, sellers and investors — delivered by one accountable advisor from first conversation to completion."
+        label="خدمات"
+        title="مشاوره، بازاریابی و خرید برای املاک ممتاز"
+        description="خدمتی کامل برای خریداران، فروشندگان و سرمایه‌گذاران — از نخستین گفت‌وگو تا پایان کار، با یک مشاور پاسخگو."
       />
 
       <section className="bg-white py-20 sm:py-24">
         <Container>
           <Reveal>
             <SectionHeading
-              label="What we do"
-              title="Six disciplines, one team"
-              description="Each engagement draws on the full capability of the practice rather than a single agent working alone."
+              label="کار ما"
+              title="شش تخصص، یک تیم"
+              description="هر همکاری از توان کامل مجموعه بهره می‌برد، نه یک مشاور که تنها کار می‌کند."
             />
           </Reveal>
 
@@ -55,22 +56,20 @@ export default function ServicesPage() {
             {services.map((service, index) => (
               <Reveal key={service.title} delay={index * 70}>
                 <article className="flex h-full flex-col border-t border-line pt-7">
-                  <span className="text-[11px] font-semibold tracking-[0.22em] text-gold">
-                    {String(index + 1).padStart(2, '0')}
+                  <span className="text-[13px] font-semibold text-gold">
+                    {toPersianDigits(String(index + 1).padStart(2, '0'))}
                   </span>
-                  <h3 className="mt-5 text-[19px] font-semibold tracking-tight text-ink">
-                    {service.title}
-                  </h3>
-                  <p className="mt-3.5 flex-1 text-sm leading-relaxed text-muted">
+                  <h3 className="mt-5 text-[18px] font-bold text-ink">{service.title}</h3>
+                  <p className="mt-3.5 flex-1 text-sm leading-[1.95] text-muted">
                     {service.description}
                   </p>
                   <Link
                     to="/contact"
                     className="group mt-6 inline-flex items-center gap-2 text-[13px] font-medium text-navy transition-colors duration-300 hover:text-gold"
                   >
-                    Discuss this service
-                    <ArrowUpRight
-                      className="h-3.5 w-3.5 transition-transform duration-500 ease-premium group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    دربارهٔ این خدمت گفت‌وگو کنیم
+                    <ArrowUpLeft
+                      className="h-3.5 w-3.5 transition-transform duration-500 ease-premium group-hover:-translate-x-0.5 group-hover:-translate-y-0.5"
                       strokeWidth={1.9}
                       aria-hidden="true"
                     />
@@ -87,9 +86,9 @@ export default function ServicesPage() {
           <Reveal>
             <SectionHeading
               tone="light"
-              label="How we work"
-              title="A process built around discretion"
-              description="Five stages, each with a defined outcome — so you always know what happens next."
+              label="روش کار ما"
+              title="فرایندی ساخته‌شده بر رازداری"
+              description="پنج مرحله، هرکدام با نتیجه‌ای روشن — تا همیشه بدانید مرحلهٔ بعد چیست."
             />
           </Reveal>
 
@@ -97,13 +96,11 @@ export default function ServicesPage() {
             {process.map((step, index) => (
               <Reveal key={step.title} delay={index * 70}>
                 <li>
-                  <span className="text-[11px] font-semibold tracking-[0.22em] text-gold">
-                    {String(index + 1).padStart(2, '0')}
+                  <span className="text-[13px] font-semibold text-gold">
+                    {toPersianDigits(String(index + 1).padStart(2, '0'))}
                   </span>
-                  <h3 className="mt-4 text-[16px] font-semibold tracking-tight text-white">
-                    {step.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-white/65">{step.description}</p>
+                  <h3 className="mt-4 text-[16px] font-bold text-white">{step.title}</h3>
+                  <p className="mt-3 text-sm leading-[1.95] text-white/65">{step.description}</p>
                 </li>
               </Reveal>
             ))}
@@ -120,7 +117,7 @@ export default function ServicesPage() {
                   src={photo('photo-1600573472550-8090b5e0745e', 1200)}
                   srcSet={photoSrcSet('photo-1600573472550-8090b5e0745e', [640, 960, 1280])}
                   sizes="(min-width: 1024px) 45vw, 90vw"
-                  alt="Interior opening through a glass wall to a pool terrace"
+                  alt="فضای داخلی که از میان دیوار شیشه‌ای به تراس استخر باز می‌شود"
                   loading="lazy"
                   decoding="async"
                   className="aspect-[4/3] w-full object-cover"
@@ -129,18 +126,18 @@ export default function ServicesPage() {
             </Reveal>
             <Reveal delay={120}>
               <SectionHeading
-                label="Marketing"
-                title="Presentation that matches the architecture"
-                description="Editorial photography, architectural film, floor plans and a targeted campaign — released privately, or to the open market, depending on the instruction."
+                label="بازاریابی"
+                title="ارائه‌ای هم‌تراز با معماری"
+                description="عکاسی ادیتوریال، فیلم معماری، نقشه‌های طبقات و کمپین هدفمند — خصوصی یا در بازار آزاد، بسته به سفارش."
               />
               <ul className="mt-9 grid gap-x-8 gap-y-5 border-t border-line pt-9 sm:grid-cols-2">
                 {[
-                  'Architectural photography',
-                  'Film and drone coverage',
-                  'Floor plans and 3D tours',
-                  'Private buyer network',
-                  'Portal and press placement',
-                  'Performance reporting',
+                  'عکاسی معماری',
+                  'فیلم و تصویربرداری هوایی',
+                  'نقشهٔ طبقات و تور سه‌بعدی',
+                  'شبکهٔ خریداران خصوصی',
+                  'انتشار در پورتال‌ها و مطبوعات',
+                  'گزارش عملکرد',
                 ].map((item) => (
                   <li key={item} className="text-sm text-ink">
                     {item}
@@ -153,8 +150,8 @@ export default function ServicesPage() {
       </section>
 
       <CtaBanner
-        title="Not sure which service you need?"
-        description="Send us the brief and we will tell you honestly what the engagement should look like."
+        title="مطمئن نیستید کدام خدمت را لازم دارید؟"
+        description="خواسته‌تان را برای ما بفرستید تا صادقانه بگوییم این همکاری باید چگونه باشد."
       />
     </>
   )

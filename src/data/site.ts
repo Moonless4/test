@@ -1,93 +1,93 @@
 import type { ServiceItem, ValueItem } from '@/types'
 
 export const company = {
-  name: 'Horizon Properties',
-  tagline: 'Exceptional homes & investments',
-  phone: '(555) 246-7890',
-  phoneHref: 'tel:+15552467890',
-  email: 'hello@horizonproperties.com',
+  name: 'املاک افق',
+  tagline: 'خانه‌ها و سرمایه‌گذاری‌های استثنایی',
+  phone: '۰۹۱۲۳۴۵۶۷۸۹',
+  phoneHref: 'tel:+989123456789',
+  email: 'info@ofogh.ir',
   address: {
-    line1: '14 Marina Crescent, Suite 900',
-    line2: 'Austin, Texas 78701',
+    line1: 'خیابان فرشته، نبش کوچه بوعلی، پلاک ۱۴',
+    line2: 'تهران، کدپستی ۱۹۶۸۷',
   },
-  hours: 'Monday – Saturday, 9:00 – 18:00',
+  hours: 'شنبه تا پنجشنبه، ۹:۰۰ تا ۱۸:۰۰',
   socials: [
-    { label: 'Instagram', href: 'https://instagram.com' },
-    { label: 'LinkedIn', href: 'https://linkedin.com' },
-    { label: 'Facebook', href: 'https://facebook.com' },
+    { label: 'اینستاگرام', network: 'instagram', href: 'https://instagram.com' },
+    { label: 'لینکدین', network: 'linkedin', href: 'https://linkedin.com' },
+    { label: 'فیسبوک', network: 'facebook', href: 'https://facebook.com' },
   ],
 }
 
 export const navLinks = [
-  { label: 'Home', to: '/' },
-  { label: 'Properties', to: '/properties' },
-  { label: 'About Us', to: '/about' },
-  { label: 'Services', to: '/services' },
-  { label: 'Team', to: '/team' },
-  { label: 'Contact', to: '/contact' },
+  { label: 'خانه', to: '/' },
+  { label: 'املاک', to: '/properties' },
+  { label: 'درباره ما', to: '/about' },
+  { label: 'خدمات', to: '/services' },
+  { label: 'تیم ما', to: '/team' },
+  { label: 'تماس', to: '/contact' },
 ]
 
 export const services: ServiceItem[] = [
   {
-    title: 'Luxury Home Sales',
+    title: 'فروش خانه‌های لوکس',
     description:
-      'Discreet representation for architecturally significant homes, from private previews to closing.',
+      'نمایندگی محرمانه برای خانه‌های شاخص معماری؛ از بازدیدهای خصوصی تا امضای قرارداد.',
   },
   {
-    title: 'Property Investment',
+    title: 'سرمایه‌گذاری ملکی',
     description:
-      'Yield-led acquisition strategy for buyers building a portfolio of prime residential assets.',
+      'راهبرد خرید مبتنی بر بازدهی، برای خریدارانی که پرتفویی از املاک ممتاز می‌سازند.',
   },
   {
-    title: 'Property Marketing',
+    title: 'بازاریابی املاک',
     description:
-      'Editorial photography, film and targeted campaigns that position a home in front of the right buyer.',
+      'عکاسی ادیتوریال، فیلم و کمپین‌های هدفمند که هر خانه را در برابر خریدار درست قرار می‌دهد.',
   },
   {
-    title: 'Real Estate Advisory',
+    title: 'مشاورهٔ املاک',
     description:
-      'Market intelligence, valuation guidance and negotiation support for complex transactions.',
+      'تحلیل بازار، راهنمایی در ارزیابی و پشتیبانی مذاکره برای معاملات پیچیده.',
   },
   {
-    title: 'Property Valuation',
+    title: 'ارزیابی ملک',
     description:
-      'Detailed appraisals grounded in comparable sales, build quality and long-term location value.',
+      'کارشناسی دقیق بر پایهٔ معاملات مشابه، کیفیت ساخت و ارزش بلندمدت موقعیت.',
   },
   {
-    title: 'Relocation Services',
+    title: 'خدمات جابه‌جایی',
     description:
-      'End-to-end support for international and interstate clients, from shortlisting to settling in.',
+      'پشتیبانی کامل برای مشتریان داخلی و خارجی؛ از انتخاب اولیه تا استقرار نهایی.',
   },
 ]
 
 export const values: ValueItem[] = [
   {
-    title: 'Curated, never listed',
+    title: 'گزینشی، نه فهرستی',
     description:
-      'We represent a deliberately small portfolio so every home receives the attention its architecture deserves.',
+      'پرتفویی آگاهانه کوچک را نمایندگی می‌کنیم تا هر خانه توجهی را بگیرد که معماری‌اش سزاوار آن است.',
   },
   {
-    title: 'Private by default',
+    title: 'محرمانه، به‌صورت پیش‌فرض',
     description:
-      'Off-market introductions, confidential negotiations and discretion maintained at every stage.',
+      'معرفی‌های خارج از فهرست عمومی، مذاکرهٔ محرمانه و حفظ رازداری در همهٔ مراحل.',
   },
   {
-    title: 'Investment intelligence',
+    title: 'هوش سرمایه‌گذاری',
     description:
-      'Twenty years of transaction data and local insight behind every recommendation we make.',
+      'بیست سال دادهٔ معاملات و شناخت محلی، پشت هر توصیه‌ای که ارائه می‌دهیم.',
   },
   {
-    title: 'One team, end to end',
+    title: 'یک تیم، تا پایان کار',
     description:
-      'Advisory, marketing, legal coordination and relocation handled by a single accountable advisor.',
+      'مشاوره، بازاریابی، هماهنگی حقوقی و جابه‌جایی، همه بر عهدهٔ یک مشاور پاسخگو.',
   },
 ]
 
 export const stats = [
-  { value: '$1.4B', label: 'Property sold' },
-  { value: '620+', label: 'Homes placed' },
-  { value: '20', label: 'Years advising' },
-  { value: '96%', label: 'Repeat clients' },
+  { value: '۱٬۴۰۰ میلیارد', label: 'ارزش معاملات (تومان)' },
+  { value: '+۶۲۰', label: 'خانهٔ واگذارشده' },
+  { value: '۲۰', label: 'سال تجربه' },
+  { value: '٪۹۶', label: 'مشتریان تکراری' },
 ]
 
 export const heroImageId = 'photo-1600585154340-be6161a56a0c'

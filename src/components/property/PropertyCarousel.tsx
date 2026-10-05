@@ -14,7 +14,7 @@ interface PropertyCarouselProps {
 
 export function PropertyCarousel({
   properties,
-  label = 'Featured properties',
+  label = 'املاک ویژه',
   className,
   eagerFirst = false,
 }: PropertyCarouselProps) {
@@ -23,15 +23,18 @@ export function PropertyCarousel({
   const [edges, setEdges] = useState({ atStart: true, atEnd: false })
   const [progress, setProgress] = useState(0)
 
+  // In RTL the scroll origin sits at the right, so scrollLeft runs 0 → −max.
+  // Normalising with Math.abs keeps the edge detection independent of sign.
   const updateScrollState = useCallback(() => {
     const el = scrollerRef.current
     if (!el) return
     const max = el.scrollWidth - el.clientWidth
+    const position = Math.abs(el.scrollLeft)
     setEdges({
-      atStart: el.scrollLeft <= 6,
-      atEnd: el.scrollLeft >= max - 6,
+      atStart: position <= 6,
+      atEnd: position >= max - 6,
     })
-    setProgress(max > 0 ? el.scrollLeft / max : 0)
+    setProgress(max > 0 ? Math.min(position / max, 1) : 0)
   }, [])
 
   useEffect(() => {
@@ -46,20 +49,22 @@ export function PropertyCarousel({
     return card ? card.offsetWidth + 24 : 340
   }
 
+  // direction 1 = next item (visually leftwards in RTL), -1 = previous.
   const go = (direction: 1 | -1) => {
     const el = scrollerRef.current
     if (!el) return
     const max = el.scrollWidth - el.clientWidth
+    const position = Math.abs(el.scrollLeft)
 
-    if (direction === 1 && el.scrollLeft >= max - 6) {
+    if (direction === 1 && position >= max - 6) {
       el.scrollTo({ left: 0, behavior: 'smooth' })
       return
     }
-    if (direction === -1 && el.scrollLeft <= 6) {
-      el.scrollTo({ left: max, behavior: 'smooth' })
+    if (direction === -1 && position <= 6) {
+      el.scrollTo({ left: -max, behavior: 'smooth' })
       return
     }
-    el.scrollBy({ left: step() * direction, behavior: 'smooth' })
+    el.scrollBy({ left: -step() * direction, behavior: 'smooth' })
   }
 
   const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -76,7 +81,8 @@ export function PropertyCarousel({
     if (!el) return
     const delta = event.clientX - drag.current.startX
     if (Math.abs(delta) > 4) drag.current.moved = true
-    el.scrollLeft = drag.current.startScroll - delta
+    // RTL: dragging right reveals earlier cards, so scrollLeft moves toward 0.
+    el.scrollLeft = drag.current.startScroll + delta
   }
 
   const endDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -91,11 +97,11 @@ export function PropertyCarousel({
   }
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'ArrowRight') {
+    if (event.key === 'ArrowLeft') {
       event.preventDefault()
       go(1)
     }
-    if (event.key === 'ArrowLeft') {
+    if (event.key === 'ArrowRight') {
       event.preventDefault()
       go(-1)
     }
@@ -112,7 +118,7 @@ export function PropertyCarousel({
       <div
         ref={scrollerRef}
         role="group"
-        aria-label={`${label} — scrollable gallery`}
+        aria-label={`${label} — گالری قابل مرور`}
         tabIndex={0}
         onScroll={updateScrollState}
         onPointerDown={onPointerDown}
@@ -144,23 +150,32 @@ export function PropertyCarousel({
         ))}
       </div>
 
-      <button type="button" onClick={() => go(-1)} className={clsx(arrowClasses(edges.atStart), '-left-6')} aria-label="Previous properties">
-        <ArrowLeft className="h-[18px] w-[18px]" strokeWidth={1.7} />
-      </button>
-      <button type="button" onClick={() => go(1)} className={clsx(arrowClasses(edges.atEnd), '-right-6')} aria-label="Next properties">
+      {/* RTL mirrors the controls: previous sits on the right, next on the left. */}
+      <button
+        type="button"
+        onClick={() => go(-1)}
+        className={clsx(arrowClasses(edges.atStart), '-right-6')}
+        aria-label="املاک قبلی"
+      >
         <ArrowRight className="h-[18px] w-[18px]" strokeWidth={1.7} />
+      </button>
+      <button
+        type="button"
+        onClick={() => go(1)}
+        className={clsx(arrowClasses(edges.atEnd), '-left-6')}
+        aria-label="املاک بعدی"
+      >
+        <ArrowLeft className="h-[18px] w-[18px]" strokeWidth={1.7} />
       </button>
 
       <div className="mt-9 flex items-center gap-4">
-        <div className="h-px w-full max-w-[220px] bg-line">
+        <div dir="ltr" className="h-px w-full max-w-[220px] bg-line">
           <div
             className="h-px bg-navy transition-[transform] duration-300 ease-out"
-            style={{ width: '32%', transform: `translateX(${progress * 212}%)` }}
+            style={{ width: '32%', transform: `translateX(-${progress * 212}%)` }}
           />
         </div>
-        <span className="text-[11px] uppercase tracking-[0.22em] text-muted/70">
-          Drag to explore
-        </span>
+        <span className="text-[12px] text-muted/70">برای دیدن بیشتر بکشید</span>
       </div>
     </div>
   )

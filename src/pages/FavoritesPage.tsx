@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { Reveal } from '@/components/ui/Reveal'
 import { favoritesStore, useFavorites } from '@/lib/favorites'
+import { toPersianDigits } from '@/lib/format'
 import { getAllProperties } from '@/lib/properties'
 
 export default function FavoritesPage() {
@@ -14,9 +15,9 @@ export default function FavoritesPage() {
   return (
     <>
       <PageHero
-        label="Your selection"
-        title="Saved Properties"
-        description="Homes you have shortlisted. Saved properties stay on this device so you can pick up where you left off."
+        label="انتخاب شما"
+        title="املاک ذخیره‌شده"
+        description="خانه‌هایی که نشان کرده‌اید. املاک ذخیره‌شده روی همین دستگاه می‌مانند تا هر وقت برگشتید ادامه دهید."
       />
 
       <section className="bg-white py-16 sm:py-20">
@@ -25,14 +26,14 @@ export default function FavoritesPage() {
             <>
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <p className="text-sm text-muted">
-                  {saved.length} {saved.length === 1 ? 'property' : 'properties'} saved
+                  {toPersianDigits(saved.length)} ملک ذخیره شده
                 </p>
                 <button
                   type="button"
                   onClick={() => favoritesStore.clear()}
-                  className="text-xs font-medium uppercase tracking-[0.18em] text-muted transition-colors duration-300 hover:text-navy"
+                  className="text-[13px] font-medium text-muted transition-colors duration-300 hover:text-navy"
                 >
-                  Clear all
+                  پاک کردن همه
                 </button>
               </div>
 
@@ -52,15 +53,15 @@ export default function FavoritesPage() {
               <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white text-gold shadow-soft">
                 <Heart className="h-6 w-6" strokeWidth={1.7} aria-hidden="true" />
               </span>
-              <h2 className="mt-6 text-[20px] font-semibold tracking-tight text-ink">
-                No saved properties yet
+              <h2 className="mt-6 text-[20px] font-bold text-ink">
+                هنوز ملکی ذخیره نکرده‌اید
               </h2>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted">
-                Tap the heart on any property to keep it here and compare your shortlist side by
-                side.
+              <p className="mx-auto mt-3 max-w-md text-sm leading-[1.95] text-muted">
+                قلب هر ملک را بزنید تا همین‌جا بماند و بتوانید فهرست کوتاه خود را کنار هم
+                مقایسه کنید.
               </p>
               <Button to="/properties" size="lg" className="mt-8">
-                Browse properties
+                مشاهدهٔ املاک
               </Button>
             </div>
           )}

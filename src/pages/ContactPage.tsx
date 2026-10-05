@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Clock, Mail, MapPin, Phone } from 'lucide-react'
+import { ArrowLeft, Check, Clock, Mail, MapPin, Phone } from 'lucide-react'
 import { useState } from 'react'
 import { PageHero } from '@/components/layout/PageHero'
 import { Button } from '@/components/ui/Button'
@@ -6,16 +6,20 @@ import { Container } from '@/components/ui/Container'
 import { Reveal } from '@/components/ui/Reveal'
 import { fieldClasses, fieldLabelClasses } from '@/components/ui/fieldClasses'
 import { company } from '@/data/site'
+import { toLatinDigits } from '@/lib/format'
 import { photo, photoSrcSet } from '@/lib/images'
 import { submitInquiry } from '@/lib/inquiries'
 
 const interests = [
-  'Buying a home',
-  'Selling a home',
-  'Investment property',
-  'Valuation or advisory',
-  'Relocation',
+  'خرید خانه',
+  'فروش خانه',
+  'سرمایه‌گذاری ملکی',
+  'ارزیابی و مشاوره',
+  'جابه‌جایی',
 ]
+
+/** Accepts an Iranian mobile number in Persian or Latin digits. */
+const isIranianMobile = (value: string): boolean => /^09\d{9}$/.test(toLatinDigits(value.trim()))
 
 export default function ContactPage() {
   const [name, setName] = useState('')
@@ -30,11 +34,15 @@ export default function ContactPage() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!name.trim() || !email.trim() || !message.trim()) {
-      setError('Please complete your name, email and message.')
+      setError('لطفاً نام، ایمیل و متن پیام را کامل کنید.')
       return
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setError('That email address does not look right.')
+      setError('این نشانی ایمیل درست به نظر نمی‌رسد.')
+      return
+    }
+    if (phone.trim() && !isIranianMobile(phone)) {
+      setError('شمارهٔ تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.')
       return
     }
 
@@ -58,9 +66,9 @@ export default function ContactPage() {
   return (
     <>
       <PageHero
-        label="Contact"
-        title="Let's find your next address"
-        description="Tell us what you are looking for. Every enquiry is answered personally by a senior advisor within one business day."
+        label="تماس"
+        title="بیایید نشانی بعدی شما را پیدا کنیم"
+        description="بگویید دنبال چه هستید. هر پیام شخصاً توسط یک مشاور ارشد و ظرف یک روز کاری پاسخ داده می‌شود."
       />
 
       <section className="bg-white py-20 sm:py-24">
@@ -73,15 +81,19 @@ export default function ContactPage() {
                     <span className="grid h-12 w-12 place-items-center rounded-full bg-gold/15 text-gold">
                       <Check className="h-5 w-5" strokeWidth={2} />
                     </span>
-                    <h2 className="mt-6 text-[22px] font-semibold tracking-tight text-ink">
-                      Thank you — your enquiry is with us
+                    <h2 className="mt-6 text-[21px] font-bold text-ink">
+                      سپاسگزاریم — پیام شما به دست ما رسید
                     </h2>
-                    <p className="mt-3 text-sm leading-relaxed text-muted">
-                      A senior advisor will be in touch within one business day. If your enquiry is
-                      urgent, call us directly on {company.phone}.
+                    <p className="mt-3 text-sm leading-[1.95] text-muted">
+                      یک مشاور ارشد ظرف یک روز کاری با شما تماس می‌گیرد. اگر موضوع فوری است،
+                      مستقیماً با شمارهٔ{' '}
+                      <span dir="ltr" className="inline-block">
+                        {company.phone}
+                      </span>{' '}
+                      تماس بگیرید.
                     </p>
                     <Button className="mt-8" size="lg" onClick={() => setSent(false)}>
-                      Send another enquiry
+                      ارسال پیام دیگر
                     </Button>
                   </div>
                 ) : (
@@ -89,20 +101,20 @@ export default function ContactPage() {
                     <div className="grid gap-5 sm:grid-cols-2">
                       <div>
                         <label htmlFor="page-contact-name" className={fieldLabelClasses}>
-                          Full name
+                          نام و نام خانوادگی
                         </label>
                         <input
                           id="page-contact-name"
                           value={name}
                           onChange={(event) => setName(event.target.value)}
                           className={fieldClasses}
-                          placeholder="Jane Whitfield"
+                          placeholder="نگار تهرانی"
                           autoComplete="name"
                         />
                       </div>
                       <div>
                         <label htmlFor="page-contact-email" className={fieldLabelClasses}>
-                          Email
+                          ایمیل
                         </label>
                         <input
                           id="page-contact-email"
@@ -110,8 +122,9 @@ export default function ContactPage() {
                           value={email}
                           onChange={(event) => setEmail(event.target.value)}
                           className={fieldClasses}
-                          placeholder="you@example.com"
+                          placeholder="name@example.com"
                           autoComplete="email"
+                          dir="ltr"
                         />
                       </div>
                     </div>
@@ -119,20 +132,21 @@ export default function ContactPage() {
                     <div className="grid gap-5 sm:grid-cols-2">
                       <div>
                         <label htmlFor="page-contact-phone" className={fieldLabelClasses}>
-                          Phone <span className="normal-case tracking-normal text-muted/60">(optional)</span>
+                          شمارهٔ تماس <span className="text-muted/60">(اختیاری)</span>
                         </label>
                         <input
                           id="page-contact-phone"
                           value={phone}
                           onChange={(event) => setPhone(event.target.value)}
                           className={fieldClasses}
-                          placeholder="(555) 000-0000"
+                          placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                          inputMode="tel"
                           autoComplete="tel"
                         />
                       </div>
                       <div>
                         <label htmlFor="page-contact-interest" className={fieldLabelClasses}>
-                          I am interested in
+                          علاقه‌مندم به
                         </label>
                         <select
                           id="page-contact-interest"
@@ -151,14 +165,14 @@ export default function ContactPage() {
 
                     <div>
                       <label htmlFor="page-contact-message" className={fieldLabelClasses}>
-                        Message
+                        پیام
                       </label>
                       <textarea
                         id="page-contact-message"
                         value={message}
                         onChange={(event) => setMessage(event.target.value)}
                         rows={5}
-                        placeholder="Tell us about the home you are looking for, your timeline and budget."
+                        placeholder="دربارهٔ خانه‌ای که می‌خواهید، زمان‌بندی و بودجه‌تان بنویسید."
                         className={`${fieldClasses} resize-none`}
                       />
                     </div>
@@ -174,14 +188,14 @@ export default function ContactPage() {
                       size="lg"
                       className="w-full"
                       disabled={sending}
-                      icon={<ArrowRight className="h-4 w-4" strokeWidth={1.8} />}
+                      icon={<ArrowLeft className="h-4 w-4" strokeWidth={1.8} />}
                     >
-                      {sending ? 'Sending…' : 'Send enquiry'}
+                      {sending ? 'در حال ارسال…' : 'ارسال پیام'}
                     </Button>
 
-                    <p className="text-xs leading-relaxed text-muted/80">
-                      We use your details only to respond to this enquiry. No marketing lists, no
-                      third parties.
+                    <p className="text-[13px] leading-[1.9] text-muted/80">
+                      از اطلاعات شما تنها برای پاسخ به همین پیام استفاده می‌کنیم. بدون فهرست
+                      تبلیغاتی و بدون اشخاص ثالث.
                     </p>
                   </form>
                 )}
@@ -194,7 +208,7 @@ export default function ContactPage() {
                   src={photo('photo-1600566753190-17f0baa2a6c3', 1200)}
                   srcSet={photoSrcSet('photo-1600566753190-17f0baa2a6c3', [640, 960, 1280])}
                   sizes="(min-width: 1024px) 42vw, 90vw"
-                  alt="A modern residence with timber cladding and a landscaped approach"
+                  alt="اقامتگاهی مدرن با نمای چوبی و ورودی محوطه‌سازی‌شده"
                   loading="lazy"
                   decoding="async"
                   className="aspect-[16/11] w-full object-cover"
@@ -203,45 +217,50 @@ export default function ContactPage() {
 
               <dl className="mt-9 grid gap-7 border-t border-line pt-9 sm:grid-cols-2">
                 <div>
-                  <dt className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-muted">
+                  <dt className="flex items-center gap-2 text-[12px] text-muted">
                     <Phone className="h-3.5 w-3.5 text-gold" strokeWidth={1.8} aria-hidden="true" />
-                    Telephone
+                    تلفن
                   </dt>
                   <dd className="mt-2.5 text-sm">
-                    <a href={company.phoneHref} className="text-ink transition-colors hover:text-gold">
+                    <a
+                      href={company.phoneHref}
+                      className="text-ink transition-colors hover:text-gold"
+                      dir="ltr"
+                    >
                       {company.phone}
                     </a>
                   </dd>
                 </div>
                 <div>
-                  <dt className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-muted">
+                  <dt className="flex items-center gap-2 text-[12px] text-muted">
                     <Mail className="h-3.5 w-3.5 text-gold" strokeWidth={1.8} aria-hidden="true" />
-                    Email
+                    ایمیل
                   </dt>
                   <dd className="mt-2.5 text-sm">
                     <a
                       href={`mailto:${company.email}`}
                       className="break-all text-ink transition-colors hover:text-gold"
+                      dir="ltr"
                     >
                       {company.email}
                     </a>
                   </dd>
                 </div>
                 <div>
-                  <dt className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-muted">
+                  <dt className="flex items-center gap-2 text-[12px] text-muted">
                     <MapPin className="h-3.5 w-3.5 text-gold" strokeWidth={1.8} aria-hidden="true" />
-                    Office
+                    دفتر
                   </dt>
-                  <dd className="mt-2.5 text-sm leading-relaxed text-ink">
+                  <dd className="mt-2.5 text-sm leading-[1.95] text-ink">
                     {company.address.line1}
                     <br />
                     {company.address.line2}
                   </dd>
                 </div>
                 <div>
-                  <dt className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-muted">
+                  <dt className="flex items-center gap-2 text-[12px] text-muted">
                     <Clock className="h-3.5 w-3.5 text-gold" strokeWidth={1.8} aria-hidden="true" />
-                    Hours
+                    ساعات کاری
                   </dt>
                   <dd className="mt-2.5 text-sm text-ink">{company.hours}</dd>
                 </div>
