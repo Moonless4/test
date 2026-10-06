@@ -1,0 +1,21 @@
+/* =========================================================================
+   Ofogh Properties — RTL overrides
+   The base main.css already uses logical properties (margin-inline, inset-inline,
+   etc.) for automatic RTL. This file handles the few cases where the original
+   React app applied deliberate RTL-specific mirroring of directional icons and
+   physical positioning (carousel arrows, etc.).
+   ========================================================================= */
+
+/* The base CSS already handles RTL via logical properties, so most layout
+   automatically mirrors. Below are the few manual overrides that match the
+   original React app's intentional RTL mirroring. */
+
+/* RTL: No custom overrides needed — all positioning uses logical properties.
+   The carousel arrows, gallery navigation, and breadcrumb separators are all
+   direction-aware via icon choice in the PHP templates. */
+
+/* Ensure Persian numerals render correctly in WooCommerce price widgets */
+.woocommerce-Price-amount { direction: ltr; unicode-bidi: embed; }
+
+/* Ensure form inputs don't inherit RTL for email/phone fields */
+input[type="email"], input[type="tel"] { direction: ltr; text-align: right; }

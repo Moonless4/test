@@ -1,0 +1,7 @@
+<?php
+/**
+ * RTL stylesheet (auto-loaded by WordPress when is_rtl()).
+ * The main.css already uses logical properties, so this is minimal.
+ */
+
+/* No overrides needed — all positioning uses logical properties. */

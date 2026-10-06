@@ -1,0 +1,63 @@
+/* WooCommerce-specific styles for Ofogh theme */
+.woocommerce ul.products li.product,
+.woocommerce-page ul.products li.product {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    padding: 20px;
+    background: #fff;
+    transition: box-shadow 0.7s var(--ease-premium);
+}
+.woocommerce ul.products li.product:hover {
+    box-shadow: var(--shadow-soft);
+}
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+}
+.woocommerce ul.products li.product .onsale {
+    border-radius: 9999px;
+    min-height: auto;
+    min-width: auto;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.woocommerce ul.products li.product img {
+    border-radius: var(--radius-card);
+}
+.woocommerce div.product .product_title {
+    font-size: clamp(1.7rem, 4vw, 2.8rem);
+    font-weight: 700;
+}
+.woocommerce div.product p.price,
+.woocommerce div.product span.price {
+    color: var(--navy);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+.woocommerce div.product .woocommerce-product-gallery__image img {
+    border-radius: var(--radius-card);
+}
+.woocommerce-tabs ul.tabs li.active {
+    border-color: var(--gold);
+}
+.woocommerce-message,
+.woocommerce-info,
+.woocommerce-error {
+    border-radius: 12px;
+    border-top-color: var(--gold);
+}
+.woocommerce table.shop_table {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--line);
+}
+.woocommerce-cart-form .quantity .qty {
+    border-radius: 12px;
+    border-color: var(--line);
+}
+.woocommerce #review_form_wrapper .comment-form input,
+.woocommerce #review_form_wrapper .comment-form textarea {
+    border-radius: 12px;
+    border-color: var(--line);
+}

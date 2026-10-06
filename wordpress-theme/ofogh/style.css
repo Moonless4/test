@@ -1,0 +1,17 @@
+/*
+Theme Name: Ofogh Properties
+Theme URI: https://ofogh.ir
+Author: Ofogh
+Author URI: https://ofogh.ir
+Description: A premium, minimalist real estate theme for Ofogh Properties — Persian RTL, luxury editorial design, Elementor & WooCommerce ready.
+Version: 1.0.0
+Requires at least: 6.0
+Tested up to: 6.5
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: ofogh
+Tags: rtl-language-support, real-estate, custom-colors, custom-logo, custom-menu, featured-images, translation-ready, theme-options, two-columns, three-columns
+*/
+
+/* The full design system lives in assets/css/main.css (enqueued via functions.php). */
