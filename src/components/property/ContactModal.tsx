@@ -25,20 +25,25 @@ export function ContactModal({ open, onClose, kind, property, agent }: ContactMo
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [message, setMessage] = useState('')
+  const [preferredDate, setPreferredDate] = useState('')
+  const [preferredTime, setPreferredTime] = useState('')
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
 
-  const defaultMessage =
-    kind === 'viewing'
-      ? `مایل به هماهنگی بازدید از ${property?.name ?? 'این ملک'} هستم. زمان‌های پیشنهادی من…`
-      : `می‌خواهم دربارهٔ ${property?.name ?? 'پرتفوی شما'} اطلاعات بیشتری بگیرم.`
+  const isViewing = kind === 'viewing'
+
+  const defaultMessage = isViewing
+    ? ''
+    : `می‌خواهم دربارهٔ ${property?.name ?? 'پرتفوی شما'} اطلاعات بیشتری بگیرم.`
 
   useEffect(() => {
     if (!open) return
     setSent(false)
     setError('')
     setMessage(defaultMessage)
+    setPreferredDate('')
+    setPreferredTime('')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, property?.id, kind])
 
@@ -56,6 +61,10 @@ export function ContactModal({ open, onClose, kind, property, agent }: ContactMo
       setError('شمارهٔ تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.')
       return
     }
+    if (isViewing && !preferredDate.trim()) {
+      setError('لطفاً تاریخ پیشنهادی برای بازدید را وارد کنید.')
+      return
+    }
 
     setError('')
     setSending(true)
@@ -66,12 +75,17 @@ export function ContactModal({ open, onClose, kind, property, agent }: ContactMo
       phone: phone.trim(),
       message: message.trim(),
       propertySlug: property?.slug,
+      ...(isViewing
+        ? { preferredDate: preferredDate.trim(), preferredTime: preferredTime.trim() }
+        : {}),
     })
     setSending(false)
     setSent(true)
     setName('')
     setEmail('')
     setPhone('')
+    setPreferredDate('')
+    setPreferredTime('')
   }
 
   const title = kind === 'viewing' ? 'تعیین وقت بازدید' : 'تماس با مشاور'
@@ -151,18 +165,77 @@ export function ContactModal({ open, onClose, kind, property, agent }: ContactMo
             />
           </div>
 
-          <div>
-            <label htmlFor="contact-message" className="mb-2 block text-[13px] font-medium text-muted">
-              پیام
-            </label>
-            <textarea
-              id="contact-message"
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-              rows={4}
-              className={`${inputClasses} resize-none`}
-            />
-          </div>
+          {isViewing ? (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="visit-date"
+                    className="mb-2 block text-[13px] font-medium text-muted"
+                  >
+                    تاریخ پیشنهادی بازدید <span className="text-gold-dark">*</span>
+                  </label>
+                  <input
+                    id="visit-date"
+                    type="date"
+                    value={preferredDate}
+                    onChange={(event) => setPreferredDate(event.target.value)}
+                    className={inputClasses}
+                    dir="ltr"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="visit-time"
+                    className="mb-2 block text-[13px] font-medium text-muted"
+                  >
+                    بازهٔ زمانی پیشنهادی
+                  </label>
+                  <select
+                    id="visit-time"
+                    value={preferredTime}
+                    onChange={(event) => setPreferredTime(event.target.value)}
+                    className={inputClasses}
+                  >
+                    <option value="">انتخاب بازهٔ زمانی</option>
+                    <option value="morning">صبح (۹ تا ۱۲)</option>
+                    <option value="noon">ظهر (۱۲ تا ۱۵)</option>
+                    <option value="afternoon">بعدازظهر (۱۵ تا ۱۸)</option>
+                    <option value="evening">عصر (۱۸ تا ۲۰)</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="visit-message"
+                  className="mb-2 block text-[13px] font-medium text-muted"
+                >
+                  یادداشت (اختیاری)
+                </label>
+                <textarea
+                  id="visit-message"
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
+                  rows={3}
+                  className={`${inputClasses} resize-none`}
+                  placeholder="اگر نکته‌ای هست که مشاور قبل از بازدید بداند…"
+                />
+              </div>
+            </>
+          ) : (
+            <div>
+              <label htmlFor="contact-message" className="mb-2 block text-[13px] font-medium text-muted">
+                پیام
+              </label>
+              <textarea
+                id="contact-message"
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                rows={4}
+                className={`${inputClasses} resize-none`}
+              />
+            </div>
+          )}
 
           {error ? (
             <p role="alert" className="text-sm text-gold-dark">
@@ -177,7 +250,7 @@ export function ContactModal({ open, onClose, kind, property, agent }: ContactMo
             disabled={sending}
             icon={<ArrowLeft className="h-4 w-4" strokeWidth={1.8} />}
           >
-            {sending ? 'در حال ارسال…' : kind === 'viewing' ? 'ثبت درخواست بازدید' : 'ارسال پیام'}
+            {sending ? 'در حال ارسال…' : isViewing ? 'ثبت درخواست بازدید' : 'ارسال پیام'}
           </Button>
         </form>
       )}

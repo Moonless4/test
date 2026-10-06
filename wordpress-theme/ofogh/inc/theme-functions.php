@@ -57,6 +57,13 @@ function ofogh_format_number( $value ) {
 }
 
 /**
+ * Format a year without thousands separators: 1398 → «۱۳۹۸».
+ */
+function ofogh_format_year( $value ) {
+    return ofogh_to_persian_digits( (int) $value );
+}
+
+/**
  * Format a price in Iranian Toman.
  * Values >= 1 billion → «XX میلیارد تومان»
  * Values >= 1 million → «XX میلیون تومان»

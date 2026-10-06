@@ -182,15 +182,22 @@
       drag.startX = e.clientX;
       drag.startScroll = scroller.scrollLeft;
       drag.moved = false;
-      scroller.setPointerCapture(e.pointerId);
     });
     scroller.addEventListener('pointermove', function (e) {
       if (!drag.active) return;
       var delta = e.clientX - drag.startX;
-      if (Math.abs(delta) > 4) drag.moved = true;
+      if (Math.abs(delta) > 4) {
+        if (!drag.moved) {
+          drag.moved = true;
+          scroller.setPointerCapture(e.pointerId);
+        }
+      }
       scroller.scrollLeft = drag.startScroll + delta;
     });
     function endDrag(e) {
+      if (scroller.hasPointerCapture && scroller.hasPointerCapture(e.pointerId)) {
+        scroller.releasePointerCapture(e.pointerId);
+      }
       if (drag.active) {
         drag.active = false;
         updateState();
@@ -299,6 +306,29 @@
       if (modal) {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+
+        // Switch form fields based on the contact kind (viewing vs agent).
+        var kind = trigger.getAttribute('data-contact-kind') || 'contact';
+        var kindInput = modal.querySelector('[name="kind"]');
+        if (kindInput) kindInput.value = kind;
+
+        var viewingFields = modal.querySelector('[data-fields-viewing]');
+        var agentFields = modal.querySelector('[data-fields-agent]');
+        var titleEl = modal.querySelector('[data-modal-title]');
+        var submitBtn = modal.querySelector('[data-submit-btn]');
+
+        if (kind === 'viewing') {
+          if (viewingFields) viewingFields.style.display = '';
+          if (agentFields) agentFields.style.display = 'none';
+          if (titleEl) titleEl.textContent = 'تعیین وقت بازدید';
+          if (submitBtn) submitBtn.childNodes[0].nodeValue = 'ثبت درخواست بازدید ';
+        } else {
+          if (viewingFields) viewingFields.style.display = 'none';
+          if (agentFields) agentFields.style.display = '';
+          if (titleEl) titleEl.textContent = 'تماس با مشاور';
+          if (submitBtn) submitBtn.childNodes[0].nodeValue = 'ارسال پیام ';
+        }
+
         var focusEl = modal.querySelector('[autofocus]');
         if (focusEl) focusEl.focus();
       }
@@ -344,11 +374,24 @@
       var name = form.querySelector('[name="name"]').value.trim();
       var email = form.querySelector('[name="email"]').value.trim();
       var phone = form.querySelector('[name="phone"]') ? form.querySelector('[name="phone"]').value.trim() : '';
-      var message = form.querySelector('[name="message"]').value.trim();
       var kind = form.querySelector('[name="kind"]') ? form.querySelector('[name="kind"]').value : 'contact';
 
-      if (!name || !email || !phone || !message) {
-        if (errorEl) errorEl.textContent = 'لطفاً نام، ایمیل، شمارهٔ تماس و متن پیام را کامل کنید.';
+      // Read the correct message field — viewing uses [name="message"], agent uses [name="message_agent"].
+      var messageField = form.querySelector('[name="message"]') || form.querySelector('[name="message_agent"]');
+      var message = messageField ? messageField.value.trim() : '';
+      var preferredDate = form.querySelector('[name="preferred_date"]') ? form.querySelector('[name="preferred_date"]').value.trim() : '';
+      var preferredTime = form.querySelector('[name="preferred_time"]') ? form.querySelector('[name="preferred_time"]').value.trim() : '';
+
+      if (!name || !email || !phone) {
+        if (errorEl) errorEl.textContent = 'لطفاً نام، ایمیل و شمارهٔ تماس خود را وارد کنید.';
+        return;
+      }
+      if (kind === 'viewing' && !preferredDate) {
+        if (errorEl) errorEl.textContent = 'لطفاً تاریخ پیشنهادی برای بازدید را وارد کنید.';
+        return;
+      }
+      if (kind === 'agent' && !message) {
+        if (errorEl) errorEl.textContent = 'لطفاً متن پیام خود را وارد کنید.';
         return;
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -368,7 +411,9 @@
           '&email=' + encodeURIComponent(email) +
           '&phone=' + encodeURIComponent(phone) +
           '&message=' + encodeURIComponent(message) +
-          '&kind=' + encodeURIComponent(kind);
+          '&kind=' + encodeURIComponent(kind) +
+          '&preferred_date=' + encodeURIComponent(preferredDate) +
+          '&preferred_time=' + encodeURIComponent(preferredTime);
 
         fetch(ofoghData.ajaxUrl, {
           method: 'POST',
@@ -389,7 +434,10 @@
           if (errorEl) errorEl.textContent = 'خطای ارتباط. دوباره تلاش کنید.';
         })
         .finally(function () {
-          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'ارسال پیام'; }
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.childNodes[0].nodeValue = (kind === 'viewing' ? 'ثبت درخواست بازدید ' : 'ارسال پیام ');
+          }
         });
       } else {
         // Fallback: submit normally.

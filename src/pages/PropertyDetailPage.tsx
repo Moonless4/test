@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { Reveal } from '@/components/ui/Reveal'
 import { getAgent } from '@/data/team'
-import { formatNumber, formatPrice, telHref } from '@/lib/format'
+import { formatNumber, formatPrice, formatYear, telHref } from '@/lib/format'
 import { photo } from '@/lib/images'
 import { getPropertyBySlug } from '@/lib/properties'
 import NotFoundPage from '@/pages/NotFoundPage'
@@ -42,7 +42,7 @@ export default function PropertyDetailPage() {
     { label: 'اتاق خواب', value: formatNumber(property.beds), icon: BedDouble },
     { label: 'سرویس بهداشتی', value: formatNumber(property.baths), icon: Bath },
     { label: 'متراژ', value: `${formatNumber(property.area)} متر مربع`, icon: Ruler },
-    { label: 'سال ساخت', value: formatNumber(property.year), icon: Calendar },
+    { label: 'سال ساخت', value: formatYear(property.year), icon: Calendar },
     ...(property.land > 0
       ? [{ label: 'زمین', value: `${formatNumber(property.land)} متر مربع`, icon: Trees }]
       : []),

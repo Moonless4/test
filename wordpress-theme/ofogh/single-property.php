@@ -35,7 +35,7 @@ while ( have_posts() ) : the_post();
                'icon' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12V5a2 2 0 0 1 2-2h0M9 12V5M4 12h7M7 12v7a3 3 0 0 0 3 3h0a3 3 0 0 0 3-3V8a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4v8"/></svg>' ),
         array( 'label' => __( 'متراژ', 'ofogh' ), 'value' => ofogh_format_number( $area ) . ' ' . __( 'متر مربع', 'ofogh' ),
                'icon' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3H3v18h18V3z"/><path d="M9 3v18M3 9h18"/></svg>' ),
-        array( 'label' => __( 'سال ساخت', 'ofogh' ), 'value' => ofogh_format_number( $year ),
+        array( 'label' => __( 'سال ساخت', 'ofogh' ), 'value' => ofogh_format_year( $year ),
                'icon' => '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' ),
     );
     if ( $land > 0 ) {
@@ -278,7 +278,7 @@ while ( have_posts() ) : the_post();
                 <p class="contact-success-desc"><?php esc_html_e( 'یکی از اعضای تیم ما با شما تماس می‌گیرد تا ظرف یک روز کاری مرحلهٔ بعد را هماهنگ کند.', 'ofogh' ); ?></p>
             </div>
             <div class="contact-form-fields">
-                <h2 class="modal__title"><?php esc_html_e( 'تماس با مشاور', 'ofogh' ); ?></h2>
+                <h2 class="modal__title" data-modal-title><?php esc_html_e( 'تماس با مشاور', 'ofogh' ); ?></h2>
                 <p class="modal__desc"><?php echo esc_html( get_the_title() . ' · ' . $city . '، ' . $region ); ?></p>
                 <form data-ofogh-contact class="contact-form" style="margin-top:24px;">
                     <input type="hidden" name="kind" value="contact">
@@ -296,12 +296,39 @@ while ( have_posts() ) : the_post();
                         <label class="contact-label"><?php esc_html_e( 'شمارهٔ تماس', 'ofogh' ); ?> <span style="color:var(--gold-dark);">*</span></label>
                         <input type="tel" name="phone" class="field-input" placeholder="۰۹۱۲۳۴۵۶۷۸۹" required>
                     </div>
-                    <div>
-                        <label class="contact-label"><?php esc_html_e( 'پیام', 'ofogh' ); ?></label>
-                        <textarea name="message" rows="4" class="field-input field-input--area" placeholder="<?php esc_attr_e( 'می‌خواهم دربارهٔ این ملک اطلاعات بیشتری بگیرم.', 'ofogh' ); ?>"></textarea>
+
+                    <!-- Viewing-specific fields -->
+                    <div data-fields-viewing style="display:none;">
+                        <div class="contact-row">
+                            <div>
+                                <label class="contact-label"><?php esc_html_e( 'تاریخ پیشنهادی بازدید', 'ofogh' ); ?> <span style="color:var(--gold-dark);">*</span></label>
+                                <input type="date" name="preferred_date" class="field-input" dir="ltr">
+                            </div>
+                            <div>
+                                <label class="contact-label"><?php esc_html_e( 'بازهٔ زمانی پیشنهادی', 'ofogh' ); ?></label>
+                                <select name="preferred_time" class="field-input">
+                                    <option value=""><?php esc_html_e( 'انتخاب بازهٔ زمانی', 'ofogh' ); ?></option>
+                                    <option value="morning"><?php esc_html_e( 'صبح (۹ تا ۱۲)', 'ofogh' ); ?></option>
+                                    <option value="noon"><?php esc_html_e( 'ظهر (۱۲ تا ۱۵)', 'ofogh' ); ?></option>
+                                    <option value="afternoon"><?php esc_html_e( 'بعدازظهر (۱۵ تا ۱۸)', 'ofogh' ); ?></option>
+                                    <option value="evening"><?php esc_html_e( 'عصر (۱۸ تا ۲۰)', 'ofogh' ); ?></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="contact-label"><?php esc_html_e( 'یادداشت (اختیاری)', 'ofogh' ); ?></label>
+                            <textarea name="message" rows="3" class="field-input field-input--area" placeholder="<?php esc_attr_e( 'اگر نکته‌ای هست که مشاور قبل از بازدید بداند…', 'ofogh' ); ?>"></textarea>
+                        </div>
                     </div>
+
+                    <!-- Agent/consultation-specific message -->
+                    <div data-fields-agent>
+                        <label class="contact-label"><?php esc_html_e( 'پیام', 'ofogh' ); ?></label>
+                        <textarea name="message_agent" rows="4" class="field-input field-input--area" placeholder="<?php esc_attr_e( 'می‌خواهم دربارهٔ این ملک اطلاعات بیشتری بگیرم.', 'ofogh' ); ?>"></textarea>
+                    </div>
+
                     <p class="contact-error" data-contact-error></p>
-                    <button type="submit" class="of-btn of-btn--primary of-btn--lg" style="width:100%;">
+                    <button type="submit" class="of-btn of-btn--primary of-btn--lg" style="width:100%;" data-submit-btn>
                         <?php esc_html_e( 'ارسال پیام', 'ofogh' ); ?>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                     </button>

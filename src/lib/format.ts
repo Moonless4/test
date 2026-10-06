@@ -21,6 +21,9 @@ export const telHref = (phone: string): string => {
 /** 1250 → «۱٬۲۵۰» using Persian digits and thousands separators. */
 export const formatNumber = (value: number): string => faNumber.format(value)
 
+/** Years are displayed without thousands separators: 1398 → «۱۳۹۸». */
+export const formatYear = (value: number): string => toPersianDigits(value)
+
 const compactBillions = (value: number): string => {
   const billions = value / 1_000_000_000
   return Number.isInteger(billions) ? billions.toFixed(0) : billions.toFixed(1)

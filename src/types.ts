@@ -69,5 +69,9 @@ export interface Inquiry {
   phone?: string
   message: string
   propertySlug?: string
+  /** Preferred visit date — only for 'viewing' kind. */
+  preferredDate?: string
+  /** Preferred visit time slot — only for 'viewing' kind. */
+  preferredTime?: string
   createdAt: string
 }

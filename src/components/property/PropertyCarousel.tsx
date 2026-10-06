@@ -71,8 +71,10 @@ export function PropertyCarousel({
     if (event.pointerType !== 'mouse' || event.button !== 0) return
     const el = scrollerRef.current
     if (!el) return
+    // Don't capture the pointer yet — setPointerCapture on pointerdown prevents
+    // the click event from reaching child <Link> elements. We only capture once
+    // the user has actually started dragging (threshold exceeded in onPointerMove).
     drag.current = { active: true, startX: event.clientX, startScroll: el.scrollLeft, moved: false }
-    el.setPointerCapture(event.pointerId)
   }
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -80,14 +82,21 @@ export function PropertyCarousel({
     const el = scrollerRef.current
     if (!el) return
     const delta = event.clientX - drag.current.startX
-    if (Math.abs(delta) > 4) drag.current.moved = true
+    if (Math.abs(delta) > 4) {
+      if (!drag.current.moved) {
+        drag.current.moved = true
+        // Now that it's a real drag, capture the pointer so movement tracking
+        // continues even if the cursor leaves the scroller.
+        el.setPointerCapture(event.pointerId)
+      }
+    }
     // RTL: dragging right reveals earlier cards, so scrollLeft moves toward 0.
     el.scrollLeft = drag.current.startScroll + delta
   }
 
   const endDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
     const el = scrollerRef.current
-    if (drag.current.active && el?.hasPointerCapture(event.pointerId)) {
+    if (el?.hasPointerCapture(event.pointerId)) {
       el.releasePointerCapture(event.pointerId)
     }
     if (drag.current.active) {
