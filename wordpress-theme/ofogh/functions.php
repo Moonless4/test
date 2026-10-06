@@ -195,11 +195,17 @@ function ofogh_handle_contact_form() {
     $message = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
     $kind    = isset( $_POST['kind'] ) ? sanitize_text_field( wp_unslash( $_POST['kind'] ) ) : 'contact';
 
-    if ( empty( $name ) || empty( $email ) || empty( $message ) ) {
-        wp_send_json_error( array( 'message' => __( 'لطفاً نام، ایمیل و متن پیام را کامل کنید.', 'ofogh' ) ) );
+    if ( empty( $name ) || empty( $email ) || empty( $phone ) || empty( $message ) ) {
+        wp_send_json_error( array( 'message' => __( 'لطفاً نام، ایمیل، شمارهٔ تماس و متن پیام را کامل کنید.', 'ofogh' ) ) );
     }
     if ( ! is_email( $email ) ) {
         wp_send_json_error( array( 'message' => __( 'این نشانی ایمیل درست به نظر نمی‌رسد.', 'ofogh' ) ) );
+    }
+    // Validate Iranian mobile number (Persian or Latin digits).
+    $phone_latin = ofogh_to_latin_digits( $phone );
+    $phone_latin = preg_replace( '/[^\d+]/', '', $phone_latin );
+    if ( ! preg_match( '/^09\d{9}$/', $phone_latin ) ) {
+        wp_send_json_error( array( 'message' => __( 'شمارهٔ تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.', 'ofogh' ) ) );
     }
 
     // Save as a private inquiry post (or email admin).
@@ -296,6 +302,66 @@ function ofogh_register_inquiry_cpt() {
     ) );
 }
 add_action( 'init', 'ofogh_register_inquiry_cpt' );
+
+/**
+ * Meta box for inquiry details (email, phone, kind) in admin.
+ */
+function ofogh_add_inquiry_meta_box() {
+    add_meta_box(
+        'ofogh-inquiry-details',
+        __( 'جزئیات درخواست', 'ofogh' ),
+        'ofogh_inquiry_meta_box_html',
+        'ofogh_inquiry',
+        'normal',
+        'high'
+    );
+}
+add_action( 'add_meta_boxes', 'ofogh_add_inquiry_meta_box' );
+
+/**
+ * Inquiry meta box HTML — shows name, email, phone, kind.
+ */
+function ofogh_inquiry_meta_box_html( $post ) {
+    $name  = get_post_meta( $post->ID, '_inquiry_name', true );
+    $email = get_post_meta( $post->ID, '_inquiry_email', true );
+    $phone = get_post_meta( $post->ID, '_inquiry_phone', true );
+    $kind  = get_post_meta( $post->ID, '_inquiry_kind', true );
+    $kinds = array(
+        'contact' => __( 'تماس عمومی', 'ofogh' ),
+        'viewing' => __( 'تعیین وقت بازدید', 'ofogh' ),
+        'agent'   => __( 'تماس با مشاور', 'ofogh' ),
+    );
+    $kind_label = isset( $kinds[ $kind ] ) ? $kinds[ $kind ] : $kind;
+    ?>
+    <style>
+        .ofogh-inquiry-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .ofogh-inquiry-meta .full { grid-column: 1 / -1; }
+        .ofogh-inquiry-meta .field { border: 1px solid #e4e2dc; border-radius: 12px; padding: 16px; background: #f9f8f6; }
+        .ofogh-inquiry-meta .field label { display: block; font-size: 12px; font-weight: 600; color: #5B6672; margin-bottom: 6px; }
+        .ofogh-inquiry-meta .field .value { font-size: 15px; font-weight: 500; color: #0B1B31; }
+        .ofogh-inquiry-meta .field a { color: #A9814A; text-decoration: none; }
+        .ofogh-inquiry-meta .field a:hover { text-decoration: underline; }
+    </style>
+    <div class="ofogh-inquiry-meta">
+        <div class="field">
+            <label><?php esc_html_e( 'نام و نام خانوادگی', 'ofogh' ); ?></label>
+            <div class="value"><?php echo esc_html( $name ); ?></div>
+        </div>
+        <div class="field">
+            <label><?php esc_html_e( 'نوع درخواست', 'ofogh' ); ?></label>
+            <div class="value"><?php echo esc_html( $kind_label ); ?></div>
+        </div>
+        <div class="field">
+            <label><?php esc_html_e( 'ایمیل', 'ofogh' ); ?></label>
+            <div class="value"><a href="mailto:<?php echo esc_attr( $email ); ?>" dir="ltr"><?php echo esc_html( $email ); ?></a></div>
+        </div>
+        <div class="field">
+            <label><?php esc_html_e( 'شمارهٔ تماس', 'ofogh' ); ?></label>
+            <div class="value"><a href="<?php echo esc_attr( ofogh_tel_href( $phone ) ); ?>" dir="ltr"><?php echo esc_html( $phone ); ?></a></div>
+        </div>
+    </div>
+    <?php
+}
 
 /**
  * Add ARIA current class to nav menu items.

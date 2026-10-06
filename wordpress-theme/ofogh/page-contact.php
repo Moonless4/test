@@ -48,8 +48,8 @@ get_template_part( 'template-parts/page', 'hero', array(
                             </div>
                             <div class="contact-row">
                                 <div>
-                                    <label class="contact-label"><?php esc_html_e( 'شمارهٔ تماس', 'ofogh' ); ?> <span style="color:rgba(91,102,114,0.6);">(<?php esc_html_e( 'اختیاری', 'ofogh' ); ?>)</span></label>
-                                    <input type="tel" name="phone" class="field-input" placeholder="۰۹۱۲۳۴۵۶۷۸۹" inputmode="tel" autocomplete="tel">
+                                    <label class="contact-label"><?php esc_html_e( 'شمارهٔ تماس', 'ofogh' ); ?> <span style="color:var(--gold-dark);">*</span></label>
+                                    <input type="tel" name="phone" class="field-input" placeholder="۰۹۱۲۳۴۵۶۷۸۹" inputmode="tel" autocomplete="tel" required>
                                 </div>
                                 <div>
                                     <label class="contact-label"><?php esc_html_e( 'علاقه‌مندم به', 'ofogh' ); ?></label>

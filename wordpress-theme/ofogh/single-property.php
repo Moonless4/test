@@ -192,6 +192,21 @@ while ( have_posts() ) : the_post();
                         </dl>
 
                         <div class="property-sidebar__actions">
+                            <?php
+                            // WooCommerce add-to-cart button (only if WooCommerce is active and a linked product exists).
+                            if ( function_exists( 'ofogh_property_add_to_cart_url' ) ) {
+                                $cart_url = ofogh_property_add_to_cart_url( $post_id );
+                                $product_id = ofogh_property_product_id( $post_id );
+                                if ( $cart_url && $product_id ) :
+                            ?>
+                                <a href="<?php echo esc_url( $cart_url ); ?>" class="of-btn of-btn--gold of-btn--lg" data-property-id="<?php echo esc_attr( $post_id ); ?>">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                                    <?php esc_html_e( 'پرداخت رزرو / بیعانه', 'ofogh' ); ?>
+                                </a>
+                            <?php
+                                endif;
+                            }
+                            ?>
                             <button type="button" class="of-btn of-btn--primary of-btn--lg" data-modal-trigger="contact-modal" data-contact-kind="viewing">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>
                                 <?php esc_html_e( 'تعیین وقت بازدید', 'ofogh' ); ?>
@@ -278,8 +293,8 @@ while ( have_posts() ) : the_post();
                         </div>
                     </div>
                     <div>
-                        <label class="contact-label"><?php esc_html_e( 'شمارهٔ تماس', 'ofogh' ); ?> <span style="color:rgba(91,102,114,0.6);">(<?php esc_html_e( 'اختیاری', 'ofogh' ); ?>)</span></label>
-                        <input type="tel" name="phone" class="field-input" placeholder="۰۹۱۲۳۴۵۶۷۸۹">
+                        <label class="contact-label"><?php esc_html_e( 'شمارهٔ تماس', 'ofogh' ); ?> <span style="color:var(--gold-dark);">*</span></label>
+                        <input type="tel" name="phone" class="field-input" placeholder="۰۹۱۲۳۴۵۶۷۸۹" required>
                     </div>
                     <div>
                         <label class="contact-label"><?php esc_html_e( 'پیام', 'ofogh' ); ?></label>

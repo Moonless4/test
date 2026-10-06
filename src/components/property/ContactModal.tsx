@@ -44,15 +44,15 @@ export function ContactModal({ open, onClose, kind, property, agent }: ContactMo
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!name.trim() || !email.trim()) {
-      setError('برای پاسخ‌دادن، نام و ایمیل خود را وارد کنید.')
+    if (!name.trim() || !email.trim() || !phone.trim()) {
+      setError('برای پاسخ‌دادن، نام، ایمیل و شمارهٔ تماس خود را وارد کنید.')
       return
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       setError('این نشانی ایمیل درست به نظر نمی‌رسد.')
       return
     }
-    if (phone.trim() && !isIranianMobile(phone)) {
+    if (!isIranianMobile(phone)) {
       setError('شمارهٔ تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.')
       return
     }
@@ -63,7 +63,7 @@ export function ContactModal({ open, onClose, kind, property, agent }: ContactMo
       kind,
       name: name.trim(),
       email: email.trim(),
-      phone: phone.trim() || undefined,
+      phone: phone.trim(),
       message: message.trim(),
       propertySlug: property?.slug,
     })
@@ -137,7 +137,7 @@ export function ContactModal({ open, onClose, kind, property, agent }: ContactMo
 
           <div>
             <label htmlFor="contact-phone" className="mb-2 block text-[13px] font-medium text-muted">
-              شمارهٔ تماس <span className="text-muted/60">(اختیاری)</span>
+              شمارهٔ تماس <span className="text-gold-dark">*</span>
             </label>
             <input
               id="contact-phone"
@@ -147,6 +147,7 @@ export function ContactModal({ open, onClose, kind, property, agent }: ContactMo
               placeholder="۰۹۱۲۳۴۵۶۷۸۹"
               inputMode="tel"
               autoComplete="tel"
+              required
             />
           </div>
 

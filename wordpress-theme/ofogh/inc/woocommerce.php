@@ -71,3 +71,105 @@ function ofogh_woo_per_page( $cols ) {
     return $cols;
 }
 add_filter( 'loop_shop_per_page', 'ofogh_woo_per_page' );
+
+/**
+ * Sync a property to a WooCommerce product when the property is saved.
+ * Each property gets a linked "simple" product with the property's price.
+ * This lets site owners manage payments, deposits, or inquiries through WooCommerce.
+ */
+function ofogh_sync_property_to_product( $post_id ) {
+    if ( get_post_type( $post_id ) !== 'property' ) return;
+    if ( ! class_exists( 'WooCommerce' ) ) return;
+
+    $price  = ofogh_get_property_meta( $post_id, '_property_price', '0' );
+    $title  = get_the_title( $post_id );
+    $linked_product_id = get_post_meta( $post_id, '_linked_product_id', true );
+
+    // Build product data from property meta.
+    $product_data = array(
+        'post_title'   => $title,
+        'post_content' => get_post_field( 'post_content', $post_id ),
+        'post_status'  => 'publish',
+        'post_type'    => 'product',
+    );
+
+    if ( $linked_product_id && get_post( $linked_product_id ) ) {
+        // Update existing linked product.
+        $product_data['ID'] = $linked_product_id;
+        wp_update_post( $product_data );
+    } else {
+        // Create new product.
+        $linked_product_id = wp_insert_post( $product_data );
+        if ( $linked_product_id ) {
+            update_post_meta( $post_id, '_linked_product_id', $linked_product_id );
+            update_post_meta( $linked_product_id, '_linked_property_id', $post_id );
+        }
+    }
+
+    if ( ! $linked_product_id ) return;
+
+    // Set product type to "simple" and assign price.
+    wp_set_object_terms( $linked_product_id, 'simple', 'product_type' );
+    update_post_meta( $linked_product_id, '_price', $price );
+    update_post_meta( $linked_product_id, '_regular_price', $price );
+    update_post_meta( $linked_product_id, '_visibility', 'visible' );
+    update_post_meta( $linked_product_id, '_virtual', 'no' );
+    update_post_meta( $linked_product_id, '_downloadable', 'no' );
+    update_post_meta( $linked_product_id, '_manage_stock', 'no' );
+    update_post_meta( $linked_product_id, '_stock_status', 'instock' );
+
+    // Sync featured image.
+    if ( has_post_thumbnail( $post_id ) ) {
+        $thumb_id = get_post_thumbnail_id( $post_id );
+        set_post_thumbnail( $linked_product_id, $thumb_id );
+    }
+}
+add_action( 'save_post_property', 'ofogh_sync_property_to_product', 20 );
+
+/**
+ * Get the add-to-cart URL for a property's linked WooCommerce product.
+ *
+ * @param int $property_id Property post ID.
+ * @return string|false Add-to-cart URL or false if no product.
+ */
+function ofogh_property_add_to_cart_url( $property_id ) {
+    if ( ! class_exists( 'WooCommerce' ) ) return false;
+
+    $linked_product_id = get_post_meta( $property_id, '_linked_product_id', true );
+    if ( ! $linked_product_id || ! get_post( $linked_product_id ) ) return false;
+
+    $product = wc_get_product( $linked_product_id );
+    if ( ! $product ) return false;
+
+    return $product->add_to_cart_url();
+}
+
+/**
+ * Get the WooCommerce product ID linked to a property.
+ */
+function ofogh_property_product_id( $property_id ) {
+    if ( ! class_exists( 'WooCommerce' ) ) return false;
+
+    $linked_product_id = get_post_meta( $property_id, '_linked_product_id', true );
+    if ( ! $linked_product_id || ! get_post( $linked_product_id ) ) return false;
+
+    return $linked_product_id;
+}
+
+/**
+ * Redirect WooCommerce product single pages to their linked property page.
+ * Properties are managed through the property CPT; WooCommerce is used only for
+ * the checkout/cart/payment flow.
+ */
+function ofogh_redirect_product_to_property() {
+    if ( ! class_exists( 'WooCommerce' ) ) return;
+    if ( ! is_product() ) return;
+
+    $product_id = get_the_ID();
+    $property_id = get_post_meta( $product_id, '_linked_property_id', true );
+    if ( $property_id && get_post( $property_id ) ) {
+        wp_safe_redirect( get_permalink( $property_id ), 301 );
+        exit;
+    }
+}
+add_action( 'template_redirect', 'ofogh_redirect_product_to_property' );

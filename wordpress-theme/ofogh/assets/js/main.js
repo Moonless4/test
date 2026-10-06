@@ -195,11 +195,14 @@
         drag.active = false;
         updateState();
       }
+      // Reset moved after the current event loop so the click that follows
+      // a drag is still blocked, but subsequent genuine clicks work.
+      setTimeout(function () { drag.moved = false; }, 0);
     }
     scroller.addEventListener('pointerup', endDrag);
     scroller.addEventListener('pointercancel', endDrag);
     scroller.addEventListener('click', function (e) {
-      if (drag.moved) { e.preventDefault(); e.stopPropagation(); drag.moved = false; }
+      if (drag.moved) { e.preventDefault(); e.stopPropagation(); }
     }, true);
 
     // Keyboard.
@@ -344,15 +347,15 @@
       var message = form.querySelector('[name="message"]').value.trim();
       var kind = form.querySelector('[name="kind"]') ? form.querySelector('[name="kind"]').value : 'contact';
 
-      if (!name || !email || !message) {
-        if (errorEl) errorEl.textContent = 'لطفاً نام، ایمیل و متن پیام را کامل کنید.';
+      if (!name || !email || !phone || !message) {
+        if (errorEl) errorEl.textContent = 'لطفاً نام، ایمیل، شمارهٔ تماس و متن پیام را کامل کنید.';
         return;
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         if (errorEl) errorEl.textContent = 'این نشانی ایمیل درست به نظر نمی‌رسد.';
         return;
       }
-      if (phone && !/^09\d{9}$/.test(toLatinDigits(phone.trim()))) {
+      if (!/^09\d{9}$/.test(toLatinDigits(phone.trim()))) {
         if (errorEl) errorEl.textContent = 'شمارهٔ تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.';
         return;
       }

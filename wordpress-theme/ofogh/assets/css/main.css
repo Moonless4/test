@@ -947,9 +947,9 @@ h1, h2, h3, h4 { color: var(--ink); line-height: 1.4; font-weight: 700; }
 .pagination a:hover { border-color: var(--navy); color: var(--navy); }
 .pagination .current { background: var(--navy); color: #fff; border-color: var(--navy); }
 
-/* ---- Elementor canvas fix ---- */
-.elementor-page .site-header { display: none; }
-.elementor-page .site-footer { display: none; }
+/* ---- Elementor canvas fix (only hide header/footer on true canvas mode) ---- */
+.elementor-template-canvas .site-header { display: none; }
+.elementor-template-canvas .site-footer { display: none; }
 
 /* ---- WooCommerce ---- */
 .woocommerce .page-content { padding-top: 128px; }

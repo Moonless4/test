@@ -94,6 +94,8 @@ export function PropertyCarousel({
       drag.current.active = false
       updateScrollState()
     }
+    // Reset moved after the click event so genuine clicks after a drag aren't blocked.
+    setTimeout(() => { drag.current.moved = false }, 0)
   }
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -130,7 +132,6 @@ export function PropertyCarousel({
           if (drag.current.moved) {
             event.preventDefault()
             event.stopPropagation()
-            drag.current.moved = false
           }
         }}
         className="no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto overscroll-x-contain scroll-smooth pb-1"
