@@ -38,6 +38,10 @@ curl -I http://localhost:3000/
   image area.
 - **Layout must not scroll horizontally.** `body` uses `overflow-x: clip` (not `hidden`, which
   breaks the sticky header).
+- **Tablet chrome cutoff**: the bottom tab bar, the product action bar, the category drawer and
+  the header's wishlist/account icons all switch at Tailwind's `2xl` (1536px), and the shell
+  reserves the bar's height with `pb-[84px] 2xl:pb-0`. Keep those in step — every tablet (a
+  1366px landscape iPad Pro included) must keep the floating bar, and a desktop must not.
 - `tsconfig` has `noUnusedLocals`; `npm run typecheck` is the quick sanity check.
 
 ## Where things live

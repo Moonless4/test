@@ -67,7 +67,7 @@ export default function CategoryDrawer({ open, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-[70] xl:hidden">
+    <div className="fixed inset-0 z-[70] 2xl:hidden">
       <button
         type="button"
         aria-label="بستن دسته‌بندی"
