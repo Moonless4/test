@@ -1,9 +1,16 @@
-/* Persian UI font (see public/fonts/iransans/SOURCE.txt).
-   Regular weight only: bold is synthesised, and Latin glyphs fall back to Vazirmatn. */
+/* Persian UI font — IRANYekanX (see public/fonts/iranyekanx/SOURCE.txt). */
 @font-face {
-  font-family: 'IRANSans';
-  src: url('/fonts/iransans/IranianSans-Regular.ttf') format('truetype');
+  font-family: 'IRANYekanX';
+  src: url('/fonts/iranyekanx/IRANYekanX-Regular.ttf') format('truetype');
   font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IRANYekanX';
+  src: url('/fonts/iranyekanx/IRANYekanX-Bold.ttf') format('truetype');
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
