@@ -9,7 +9,7 @@ const COLUMNS = [
       { label: 'پیگیری سفارش', to: '/cart' },
       { label: 'پشتیبانی', to: '/blog' },
       { label: 'بازگشت کالا', to: '/blog' },
-      { label: 'سوالات متداول', to: '/blog' },
+      { label: 'سوالات متداول', to: '/faq' },
     ],
   },
   {

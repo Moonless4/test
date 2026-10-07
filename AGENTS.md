@@ -114,8 +114,14 @@ curl -I http://localhost:3000/
 - `src/components/home/*` — the homepage sections in `src/pages/HomePage.tsx` order:
   Hero, CategoryCards, DiscountSection, PromoBanners, NewArrivals, Benefits, PromoCollection,
   Testimonials, Newsletter.
+- `src/lib/faq.ts` + `src/pages/FaqPage.tsx` + `src/components/faq/FaqAccordion.tsx` — «سوالات متداول».
+  Questions are grouped by topic; the page filters by group (a wrapping row of chips on a phone, a
+  rail from `lg`) and renders one `FaqAccordion` per group (one answer open at a time, the first one
+  open on mount). The footer's «سوالات متداول» link points here. Answers are plain strings, so they
+  carry no `<Price>`: keep money out of the prose and name the shop's real rules instead — the coin
+  rates, coupon codes and return window in that file must stay true to what the app does.
 - Other routes: `/shop`, `/shop/:category`, `/product/:id`, `/search?q=`, `/cart`, `/checkout`,
-  `/wishlist`, `/blog`, `/blog/:id`, `/login`, `/register`, `/account`.
+  `/wishlist`, `/blog`, `/blog/:id`, `/login`, `/register`, `/account`, `/faq`.
 
 ## Porting to WordPress
 
