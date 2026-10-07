@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext';
 import { toFa } from '../lib/format';
+import CoinPanel from '../components/account/CoinPanel';
 import EmptyState from '../components/ui/EmptyState';
 import Price from '../components/ui/Price';
 
@@ -147,6 +148,8 @@ export default function AccountPage() {
                   </div>
                 ))}
               </div>
+
+              <CoinPanel />
 
               <div className="rounded-panel border border-line bg-white p-5 sm:p-6">
                 <h2 className="text-base font-bold text-ink">دسترسی سریع</h2>

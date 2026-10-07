@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   BadgeCheck,
   ChevronLeft,
+  Coins,
   Heart,
   PackageCheck,
   RotateCcw,
@@ -11,7 +12,7 @@ import {
   Truck,
   Zap,
 } from 'lucide-react';
-import { getProduct, relatedProducts } from '../lib/data';
+import { COIN_TITLE, COIN_VALUE, coinsFor, getProduct, relatedProducts } from '../lib/data';
 import { toFa } from '../lib/format';
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE, useStore } from '../context/StoreContext';
 import ProductActionBar from '../components/product/ProductActionBar';
@@ -60,6 +61,7 @@ export default function ProductPage() {
   const selectedSize = size ?? product.sizes[0];
   const selectedColor = color ?? product.colors[0]?.name ?? '';
   const wishlisted = isWishlisted(product.id);
+  const earnedCoins = coinsFor(product.price * qty);
 
   const handleAdd = () => addToCart(product, selectedSize, selectedColor, qty);
   const handleBuyNow = () => {
@@ -217,6 +219,20 @@ export default function ProductPage() {
               خرید سریع
             </button>
           </div>
+
+          <p className="mt-4 flex items-center gap-2.5 rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-[12.5px] font-medium text-black">
+            <Coins className="h-4 w-4 shrink-0" />
+            <span>
+              با خرید این محصول {toFa(earnedCoins)} {COIN_TITLE} می‌گیرید
+              {earnedCoins > 0 ? (
+                <>
+                  {' '}
+                  (معادل <Price value={earnedCoins * COIN_VALUE} /> تخفیف در خرید بعدی)
+                </>
+              ) : null}
+              .
+            </span>
+          </p>
 
           <ul className="mt-7 grid gap-3 rounded-panel border border-line bg-cream p-4 text-[12px] text-ink sm:text-[13px]">
             <li className="flex items-center gap-2.5">
