@@ -6,7 +6,7 @@ import PriceDisplay from '../ui/PriceDisplay';
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-lg bg-white transition-all duration-300 hover:-translate-y-1">
+    <article className="relative flex flex-col overflow-hidden rounded-lg bg-white">
       <div className="relative overflow-hidden">
         <Link to={`/product/${product.id}`} aria-label={product.name}>
           <div className="aspect-[4/5] w-full overflow-hidden">
@@ -17,7 +17,7 @@ export default function ProductCard({ product }: { product: Product }) {
               height={1000}
               loading="lazy"
               decoding="async"
-              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+              className="h-full w-full object-cover"
             />
           </div>
         </Link>
@@ -33,7 +33,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <div className="flex flex-1 flex-col gap-1.5 p-2.5">
         <Link
           to={`/product/${product.id}`}
-          className="line-clamp-2 min-h-[2.5em] text-start text-[12px] font-medium leading-5 text-ink transition-colors hover:text-black sm:text-[13px]"
+          className="line-clamp-2 min-h-[2.5em] text-start text-[12px] font-medium leading-5 text-ink sm:text-[13px]"
         >
           {product.name}
         </Link>
