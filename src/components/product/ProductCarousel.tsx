@@ -48,7 +48,7 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
         {products.map((product) => (
           <div
             key={product.id}
-            className="w-[46%] shrink-0 snap-start sm:w-[42%] md:w-[31%] lg:w-[23.4%]"
+            className="w-[46%] shrink-0 snap-start sm:w-[30%] md:w-[23%] lg:w-[18.3%] xl:w-[15%]"
           >
             <ProductCard product={product} />
           </div>

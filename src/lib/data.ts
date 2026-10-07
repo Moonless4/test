@@ -472,7 +472,7 @@ const SEEDS: Seed[] = [
   {
     id: 'acc-women-handbag',
     name: 'کیف دستی زنانه چرم',
-    category: 'accessories',
+    category: 'bags',
     brand: 'LUXE',
     price: 1840000,
     originalPrice: 2300000,
@@ -543,7 +543,7 @@ const SEEDS: Seed[] = [
   {
     id: 'acc-shoulder-bag',
     name: 'کیف دوشی چرم',
-    category: 'accessories',
+    category: 'bags',
     brand: 'PARSA',
     price: 1425000,
     originalPrice: 1900000,
@@ -580,7 +580,7 @@ const SEEDS: Seed[] = [
   {
     id: 'acc-crossbody',
     name: 'کیف دوشی کوچک زنانه',
-    category: 'accessories',
+    category: 'bags',
     brand: 'ATRI',
     price: 1250000,
     rating: 4.4,
@@ -594,6 +594,81 @@ const SEEDS: Seed[] = [
     fit: 'تک‌سایز',
     description:
       'کیف دوشی کوچک با بند بلند قابل تنظیم؛ برای همراه‌داشتن ضروری‌ها در بیرون‌رفت‌های کوتاه.',
+  },
+
+  /* ---------------------------- زیبایی ---------------------------- */
+  {
+    id: 'beauty-perfume',
+    name: 'ادوپرفیوم زنانه گل‌دار',
+    category: 'beauty',
+    brand: 'GLOW',
+    price: 2450000,
+    originalPrice: 2900000,
+    rating: 4.8,
+    reviewCount: 96,
+    image: '1541643600914-78b084683601',
+    sizes: ONE_SIZE,
+    colors: [COLOR.pink, COLOR.cream],
+    stock: 21,
+    isNew: true,
+    material: 'ادوپرفیوم ۱۰۰ میلی‌لیتر',
+    fit: 'تک‌سایز',
+    description:
+      'ادوپرفیوم با رایحه‌ی گل‌های سفید و ماندگاری بالا؛ انتخابی مناسب برای مهمانی‌های شب و استفاده‌ی روزمره.',
+  },
+  {
+    id: 'beauty-face-serum',
+    name: 'سرم روشن‌کننده ویتامین C',
+    category: 'beauty',
+    brand: 'GLOW',
+    price: 1290000,
+    originalPrice: 1650000,
+    rating: 4.7,
+    reviewCount: 143,
+    image: '1620916566398-39f1143ab7be',
+    sizes: ONE_SIZE,
+    colors: [COLOR.white, COLOR.cream],
+    stock: 34,
+    material: 'سرم ۳۰ میلی‌لیتر',
+    fit: 'تک‌سایز',
+    description:
+      'سرم ویتامین C با بافت سبک و جذب سریع؛ به یکنواختی رنگ پوست کمک می‌کند و برای استفاده‌ی روزانه مناسب است.',
+  },
+  {
+    id: 'beauty-skin-spray',
+    name: 'اسپری آبرسان پوست',
+    category: 'beauty',
+    brand: 'GLOW',
+    price: 690000,
+    originalPrice: 850000,
+    rating: 4.5,
+    reviewCount: 78,
+    image: '1556228578-8c89e6adf883',
+    sizes: ONE_SIZE,
+    colors: [COLOR.white],
+    stock: 47,
+    material: 'اسپری ۱۵۰ میلی‌لیتر',
+    fit: 'تک‌سایز',
+    description:
+      'اسپری آبرسان با آب‌رسانی فوری؛ برای تازه‌سازی پوست در طول روز و پیش از آرایش استفاده می‌شود.',
+  },
+  {
+    id: 'beauty-lipstick',
+    name: 'رژ لب مات مخملی',
+    category: 'beauty',
+    brand: 'VENUS',
+    price: 420000,
+    originalPrice: 520000,
+    rating: 4.6,
+    reviewCount: 118,
+    image: '1586495777744-4413f21062fa',
+    sizes: ONE_SIZE,
+    colors: [COLOR.wine, COLOR.pink],
+    stock: 62,
+    material: 'رژ لب جامد',
+    fit: 'تک‌سایز',
+    description:
+      'رژ لب مات با پوشش کامل و ماندگاری بالا؛ بافت مخملی آن خشکی روی لب ایجاد نمی‌کند.',
   },
 ];
 
@@ -647,6 +722,20 @@ const POOLS: Record<CategoryId, string[]> = {
     '1543163521-1bf539c55dd2',
     '1523170335258-f5ed11844a49',
     '1572635196237-14b3f281503f',
+  ],
+  bags: [
+    '1584917865442-de89df76afd3',
+    '1553062407-98eeb64c6a62',
+    '1543163521-1bf539c55dd2',
+    '1590874103328-eac38a683ce7',
+    '1548036328-c9fa89d128fa',
+  ],
+  beauty: [
+    '1541643600914-78b084683601',
+    '1620916566398-39f1143ab7be',
+    '1596462502278-27bfdc403348',
+    '1556228578-8c89e6adf883',
+    '1586495777744-4413f21062fa',
   ],
 };
 
@@ -723,54 +812,71 @@ export const relatedProducts = (product: Product, count = 4): Product[] =>
  * Static content
  * ------------------------------------------------------------------ */
 
+const countIn = (id: CategoryId): number =>
+  products.filter((p) => p.category === id).length;
+
 export const categories: Category[] = [
   {
     id: 'men',
     title: 'مردانه',
     subtitle: 'پوشاک کلاسیک و روزمره',
     image: img('1512436991641-6745cdb1723f', 800, 1000),
-    itemCount: 8,
+    itemCount: countIn('men'),
   },
   {
     id: 'women',
     title: 'زنانه',
     subtitle: 'مانتو، پیراهن و شومییز',
     image: img('1515886657613-9f3515b0c78f', 800, 1000),
-    itemCount: 7,
+    itemCount: countIn('women'),
   },
   {
     id: 'shoes',
     title: 'کفش',
     subtitle: 'کتانی، چرم و بوت',
     image: img('1549298916-b41d501d3772', 800, 1000),
-    itemCount: 6,
+    itemCount: countIn('shoes'),
   },
   {
     id: 'accessories',
     title: 'اکسسوری',
-    subtitle: 'کیف، ساعت و عینک',
+    subtitle: 'ساعت، عینک و شال',
     image: img('1523170335258-f5ed11844a49', 800, 1000),
-    itemCount: 7,
+    itemCount: countIn('accessories'),
+  },
+  {
+    id: 'bags',
+    title: 'کیف و کوله',
+    subtitle: 'دستی، دوشی و کوله',
+    image: img('1548036328-c9fa89d128fa', 800, 1000),
+    itemCount: countIn('bags'),
+  },
+  {
+    id: 'beauty',
+    title: 'زیبایی',
+    subtitle: 'عطر و مراقبت پوست',
+    image: img('1596462502278-27bfdc403348', 800, 1000),
+    itemCount: countIn('beauty'),
   },
 ];
 
 export const heroSlides = [
   {
-    image: heroImg('1521572163474-6864f9cf17ab'),
+    image: wideImg('1521572163474-6864f9cf17ab', 1800, 780),
     eyebrow: 'کالکشن پاییز و زمستان',
     title: ['استایل خاص', 'برای هر لحظه'],
     text: 'جدیدترین ترندهای لباس مردانه، زنانه و اکسسوری‌های خاص را اینجا پیدا کنید.',
     cta: { label: 'مشاهده مجموعه', to: '/shop' },
   },
   {
-    image: heroImg('1539109136881-3be0616acf4b'),
+    image: wideImg('1539109136881-3be0616acf4b', 1800, 780),
     eyebrow: 'کالکشن زنانه',
     title: ['ظاهری مدرن', 'با حس روزمره'],
     text: 'ترکیبی از راحتی و ظرافت برای استایل‌های روزانه و مهمانی‌های خاص.',
     cta: { label: 'مشاهده مجموعه', to: '/shop/women' },
   },
   {
-    image: heroImg('1552374196-c4e7ffc6e126'),
+    image: wideImg('1552374196-c4e7ffc6e126', 1800, 780),
     eyebrow: 'جدیدترین‌ها',
     title: ['ساده، دقیق', 'و همیشه شیک'],
     text: 'پوشاکی که با کیفیت دوخت و پارچه‌ی درست، سال‌ها همراه شما می‌ماند.',

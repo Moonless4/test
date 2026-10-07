@@ -12,7 +12,7 @@ import FilterSidebar, {
 import ProductGrid from '../components/product/ProductGrid';
 import EmptyState from '../components/ui/EmptyState';
 
-const VALID: CategoryId[] = ['men', 'women', 'shoes', 'accessories'];
+const VALID: CategoryId[] = categories.map((c) => c.id);
 
 export default function ShopPage() {
   const { category } = useParams<{ category?: string }>();

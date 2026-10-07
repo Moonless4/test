@@ -29,6 +29,8 @@ const COLUMNS = [
       { label: 'زنانه', to: '/shop/women' },
       { label: 'کفش', to: '/shop/shoes' },
       { label: 'اکسسوری', to: '/shop/accessories' },
+      { label: 'کیف و کوله', to: '/shop/bags' },
+      { label: 'زیبایی', to: '/shop/beauty' },
     ],
   },
 ];

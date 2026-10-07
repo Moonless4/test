@@ -6,6 +6,8 @@ type Props = {
   count?: number;
   size?: 'sm' | 'md';
   showValue?: boolean;
+  /** Single-line variant for narrow product cards. */
+  compact?: boolean;
   className?: string;
 };
 
@@ -14,9 +16,24 @@ export default function Rating({
   count,
   size = 'sm',
   showValue = false,
+  compact = false,
   className = '',
 }: Props) {
   const starSize = size === 'sm' ? 'h-3.5 w-3.5' : 'h-4 w-4';
+
+  if (compact) {
+    return (
+      <div
+        className={`flex min-w-0 items-center gap-1 text-[11px] ${className}`}
+        role="img"
+        aria-label={`امتیاز ${toFa(value)} از ۵`}
+      >
+        <Star className={`${starSize} shrink-0 fill-gold text-gold`} strokeWidth={1.6} aria-hidden="true" />
+        <span className="font-medium text-ink">{toFa(value)}</span>
+        {count != null ? <span className="truncate text-muted">({toFa(count)})</span> : null}
+      </div>
+    );
+  }
 
   return (
     <div className={`flex items-center gap-1.5 ${className}`}>

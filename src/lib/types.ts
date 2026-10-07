@@ -1,4 +1,10 @@
-export type CategoryId = 'men' | 'women' | 'shoes' | 'accessories';
+export type CategoryId =
+  | 'men'
+  | 'women'
+  | 'shoes'
+  | 'accessories'
+  | 'bags'
+  | 'beauty';
 
 export type ProductColor = {
   name: string;
