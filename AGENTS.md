@@ -89,6 +89,9 @@ curl -I http://localhost:3000/
   `styleon.addresses`, `styleon.orders`, `styleon.wallet`) because the app ships without a server.
   Replace these helpers with real API calls when a backend exists. `updateOrderStatus` relabels an
   order already in the book, which is how a payment moves it from awaiting to processing.
+  The checkout offers a signed-in shopper's saved addresses above «اطلاعات ارسال» and fills the
+  shipping form from the one they tap (the receiver splits into first/last name; an address carries
+  no province, so that field is left as it is).
 - `src/lib/payment.ts` + `src/pages/PaymentPage.tsx` + `server/index.mjs` — the payment path.
   Checkout turns the basket into a `PaymentOrder`, keeps it in the store-wide ledger
   (`styleon.payments`), registers it in the account panel as «در انتظار پرداخت» and hands off to

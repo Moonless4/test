@@ -11,7 +11,7 @@ import {
   Truck,
 } from 'lucide-react';
 import { FREE_SHIPPING_THRESHOLD, useStore } from '../context/StoreContext';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, type Address } from '../context/AuthContext';
 import { COIN_TITLE } from '../lib/data';
 import { onlyDigits, toFa } from '../lib/format';
 import {
@@ -98,7 +98,7 @@ export default function CheckoutPage() {
     settleOrder,
     clearCart,
   } = useStore();
-  const { addOrder, updateOrderStatus } = useAuth();
+  const { addOrder, updateOrderStatus, addresses } = useAuth();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<Form>(EMPTY_FORM);
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
@@ -109,6 +109,7 @@ export default function CheckoutPage() {
   const [earned, setEarned] = useState(0);
   const [payError, setPayError] = useState<string | null>(null);
   const [redirecting, setRedirecting] = useState(false);
+  const [pickedAddress, setPickedAddress] = useState<string | null>(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const paymentOutcome = searchParams.get('payment');
@@ -150,6 +151,23 @@ export default function CheckoutPage() {
     if (!method) return 0;
     return total >= FREE_SHIPPING_THRESHOLD ? 0 : method.price;
   }, [shipMethod, total]);
+
+  // Fills the shipping form from an address saved in the account panel, so a returning
+  // shopper only has to tap once. Addresses carry no province, so that field is left alone.
+  const applyAddress = (address: Address) => {
+    const [first, ...rest] = address.receiver.trim().split(/\s+/);
+    setForm((prev) => ({
+      ...prev,
+      firstName: first ?? '',
+      lastName: rest.join(' '),
+      mobile: address.mobile,
+      city: address.city,
+      address: address.line,
+      postalCode: address.postalCode,
+    }));
+    setErrors({});
+    setPickedAddress(address.id);
+  };
 
   const validate = () => {
     const next: Partial<Record<keyof Form, string>> = {};
@@ -395,6 +413,53 @@ export default function CheckoutPage() {
           {step === 1 ? (
             <div className="space-y-5">
               <h2 className="text-base font-bold text-ink">اطلاعات ارسال</h2>
+
+              {addresses.length > 0 ? (
+                <div>
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="text-[13px] font-bold text-ink">نشانی‌های ذخیره‌شده‌ی شما</h3>
+                    <span className="text-[11.5px] text-muted">
+                      روی نشانی بزنید تا فرم خودکار پر شود
+                    </span>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {addresses.map((address) => {
+                      const active = pickedAddress === address.id;
+                      return (
+                        <button
+                          key={address.id}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() => applyAddress(address)}
+                          className={`flex items-start gap-3 rounded-panel border p-4 text-start transition-colors ${
+                            active
+                              ? 'border-teal-800 bg-cream'
+                              : 'border-line bg-white hover:border-teal-800/40 hover:bg-cream/60'
+                          }`}
+                        >
+                          {active ? (
+                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-teal-800" />
+                          ) : (
+                            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted" />
+                          )}
+                          <span className="min-w-0">
+                            <span className="block text-[13px] font-bold text-ink">
+                              {address.title}
+                            </span>
+                            <span className="mt-1 block text-[12px] text-muted">
+                              {address.receiver} — <span dir="ltr">{toFa(address.mobile)}</span>
+                            </span>
+                            <span className="mt-1 block text-[12px] leading-6 text-muted">
+                              {address.city}، {address.line} — کد پستی {toFa(address.postalCode)}
+                            </span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+
               <div className="grid gap-5 sm:grid-cols-2">
                 {input('firstName', 'نام', { placeholder: 'مثلاً سارا' })}
                 {input('lastName', 'نام خانوادگی', { placeholder: 'مثلاً محمدی' })}
