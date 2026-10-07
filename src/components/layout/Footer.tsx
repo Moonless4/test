@@ -123,6 +123,18 @@ export default function Footer() {
                 تهران، خیابان ولیعصر، پلاک ۱۲۴، طبقه سوم
               </li>
             </ul>
+
+            {/* eNamad trust badge — the artwork carries its own white background, so it keeps a
+                white chip; on the dark footer a bare picture would look like a hole. */}
+            <a
+              href="https://trustseal.enamad.ir/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="نماد اعتماد الکترونیکی"
+              className="mt-5 inline-flex rounded-xl bg-white p-2"
+            >
+              <img src="/enamad.png" alt="نماد اعتماد الکترونیکی" className="h-24 w-auto" />
+            </a>
           </div>
         </div>
 

@@ -61,6 +61,9 @@ curl -I http://localhost:3000/
   tab-bar and favicon size a lockup is illegible, so those two keep a letter tile ("M"). The
   `localStorage` keys still carry the historic `styleon.*` prefix on purpose — renaming them would
   drop every saved cart, session and order.
+- **Trust badge**: the eNamad seal is `public/enamad.png` (artwork that carries its own white
+  background), shown under «تماس با ما» in the footer on a white chip and linking to
+  `trustseal.enamad.ir`.
 - `tsconfig` has `noUnusedLocals`; `npm run typecheck` is the quick sanity check.
 
 ## Where things live
