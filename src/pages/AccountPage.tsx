@@ -22,6 +22,7 @@ import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext';
 import { onlyDigits, toFa } from '../lib/format';
 import CoinPanel from '../components/account/CoinPanel';
+import NotificationsPanel from '../components/account/NotificationsPanel';
 import WishlistPanel from '../components/account/WishlistPanel';
 import EmptyState from '../components/ui/EmptyState';
 import Price from '../components/ui/Price';
@@ -694,13 +695,7 @@ export default function AccountPage() {
 
           {tab === 'club' ? <CoinPanel /> : null}
 
-          {tab === 'notifications' ? (
-            <EmptyState
-              icon={<Bell className="h-7 w-7" />}
-              title="درخواست اطلاع‌رسانی فعالی ندارید"
-              text="با فعال کردن اطلاع‌رسانی، از تخفیف‌ها و کالکشن‌های جدید زودتر باخبر می‌شوید."
-            />
-          ) : null}
+          {tab === 'notifications' ? <NotificationsPanel /> : null}
         </div>
       </div>
     </div>
