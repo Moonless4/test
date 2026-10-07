@@ -1,10 +1,15 @@
+import { useRef } from 'react';
 import { Quote } from 'lucide-react';
 import { promoArt, testimonials } from '../../lib/data';
+import { useDragScroll } from '../../hooks/useDragScroll';
 import Img from '../ui/Img';
 import Rating from '../ui/Rating';
 import Reveal from '../ui/Reveal';
 
 export default function Testimonials() {
+  const railRef = useRef<HTMLDivElement>(null);
+  const railDrag = useDragScroll(railRef);
+
   return (
     <section className="mt-12 bg-cream py-12 sm:mt-16 sm:py-16" aria-label="نظرات مشتریان">
       <div className="container">
@@ -35,7 +40,11 @@ export default function Testimonials() {
           </Reveal>
 
           <div className="lg:col-span-8">
-            <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0">
+            <div
+              ref={railRef}
+              {...railDrag}
+              className="no-scrollbar -mx-4 flex cursor-grab snap-x snap-mandatory select-none gap-4 overflow-x-auto px-4 pb-2 active:cursor-grabbing sm:mx-0 sm:cursor-auto sm:grid sm:select-text sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0"
+            >
               {testimonials.map((item, i) => (
                 <Reveal
                   key={item.name}
