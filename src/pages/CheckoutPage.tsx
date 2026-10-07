@@ -12,7 +12,7 @@ import {
 import { FREE_SHIPPING_THRESHOLD, useStore } from '../context/StoreContext';
 import { useAuth } from '../context/AuthContext';
 import { COIN_TITLE } from '../lib/data';
-import { toFa } from '../lib/format';
+import { onlyDigits, toFa } from '../lib/format';
 import RewardPanel from '../components/cart/RewardPanel';
 import Price from '../components/ui/Price';
 import EmptyState from '../components/ui/EmptyState';
@@ -47,6 +47,7 @@ const SHIPPING_METHODS = [
 
 const PAYMENT_METHODS = [
   { id: 'online', title: 'پرداخت آنلاین', text: 'درگاه امن بانکی، همه کارت‌های عضو شتاب' },
+  { id: 'wallet', title: 'کیف پول', text: 'پرداخت از موجودی کیف پول شما' },
   { id: 'installment', title: 'پرداخت اعتباری', text: 'خرید اعتباری تا ۴ قسط بدون بهره' },
   { id: 'cod', title: 'پرداخت در محل', text: 'پرداخت هنگام تحویل کالا' },
 ];
@@ -280,7 +281,13 @@ export default function CheckoutPage() {
               <div className="grid gap-5 sm:grid-cols-2">
                 {input('firstName', 'نام', { placeholder: 'مثلاً سارا' })}
                 {input('lastName', 'نام خانوادگی', { placeholder: 'مثلاً محمدی' })}
-                {input('mobile', 'شماره موبایل', { dir: 'ltr', placeholder: '09123456789' })}
+                {input('mobile', 'شماره موبایل', {
+                  dir: 'ltr',
+                  placeholder: '09xxxxxxxxx',
+                  inputMode: 'numeric',
+                  maxLength: 11,
+                  onChange: (e) => setForm((f) => ({ ...f, mobile: onlyDigits(e.target.value) })),
+                })}
                 <div>
                   <label htmlFor="province" className="mb-2 block text-[13px] font-medium text-ink">
                     استان

@@ -11,7 +11,6 @@ import Price from '../ui/Price';
 export default function CoinPanel() {
   const { coins } = useStore();
   const toGo = Math.max(0, COIN_MIN_REDEEM - coins);
-  const progress = Math.min(100, Math.round((coins / COIN_MIN_REDEEM) * 100));
 
   const rules = [
     <>
@@ -47,19 +46,11 @@ export default function CoinPanel() {
         معادل <Price value={coins * COIN_VALUE} /> تخفیف در خرید بعدی شما.
       </p>
 
-      <div className="mt-4">
-        <div className="h-2 overflow-hidden rounded-full bg-cream">
-          <span
-            className="block h-full rounded-full bg-teal-800"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <p className="mt-2 text-[12px] text-muted">
-          {toGo > 0
-            ? `${toFa(toGo)} کوین دیگر تا فعال شدن امکان خرج کردن کوین‌ها.`
-            : 'کوین‌های شما آماده استفاده در سبد خرید است.'}
-        </p>
-      </div>
+      <p className="mt-4 text-[12px] text-muted">
+        {toGo > 0
+          ? `${toFa(toGo)} کوین دیگر تا فعال شدن امکان خرج کردن کوین‌ها.`
+          : 'کوین‌های شما آماده استفاده در سبد خرید است.'}
+      </p>
 
       <ul className="mt-4 space-y-2.5 border-t border-line pt-4 text-[12.5px] leading-6 text-ink/85">
         {rules.map((rule, index) => (

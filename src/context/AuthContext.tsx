@@ -57,6 +57,7 @@ type AuthValue = {
   login: (email: string, password: string) => AuthResult;
   logout: () => void;
   updateProfile: (patch: Partial<Pick<User, 'name' | 'email' | 'mobile'>>) => void;
+  changePassword: (current: string, next: string) => AuthResult;
   addAddress: (address: Omit<Address, 'id'>) => void;
   removeAddress: (id: string) => void;
   addOrder: (order: Omit<Order, 'id' | 'date'> & { id: string }) => void;
@@ -161,6 +162,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [userId],
   );
 
+  const changePassword: AuthValue['changePassword'] = useCallback(
+    (current, next) => {
+      const found = users.find((item) => item.id === userId);
+      if (!found) return { ok: false, error: 'ابتدا وارد حساب کاربری شوید.' };
+      if (found.password !== current) return { ok: false, error: 'رمز عبور فعلی درست نیست.' };
+      setUsers((prev) =>
+        prev.map((item) => (item.id === userId ? { ...item, password: next } : item)),
+      );
+      return { ok: true };
+    },
+    [userId, users],
+  );
+
   const addAddress: AuthValue['addAddress'] = useCallback(
     (address) => {
       if (!userId) return;
@@ -204,6 +218,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       logout,
       updateProfile,
+      changePassword,
       addAddress,
       removeAddress,
       addOrder,
@@ -217,6 +232,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       logout,
       updateProfile,
+      changePassword,
       addAddress,
       removeAddress,
       addOrder,

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { onlyDigits } from '../lib/format';
 
 const field =
   'h-12 w-full rounded-xl border border-line bg-white px-4 text-[13px] text-ink outline-none transition-colors focus:border-teal-400';
@@ -70,8 +71,10 @@ export default function RegisterPage() {
               id="mobile"
               dir="ltr"
               value={form.mobile}
-              onChange={(e) => set('mobile', e.target.value)}
+              onChange={(e) => set('mobile', onlyDigits(e.target.value))}
               placeholder="09xxxxxxxxx"
+              inputMode="numeric"
+              maxLength={11}
               className={field}
             />
           </div>

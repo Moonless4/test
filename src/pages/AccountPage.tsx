@@ -6,7 +6,6 @@ import {
   CreditCard,
   Heart,
   LayoutDashboard,
-  LifeBuoy,
   LogOut,
   MapPin,
   MessageSquare,
@@ -20,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext';
-import { toFa } from '../lib/format';
+import { onlyDigits, toFa } from '../lib/format';
 import CoinPanel from '../components/account/CoinPanel';
 import WishlistPanel from '../components/account/WishlistPanel';
 import EmptyState from '../components/ui/EmptyState';
@@ -34,7 +33,6 @@ type TabId =
   | 'profile'
   | 'addresses'
   | 'reviews'
-  | 'tickets'
   | 'bank'
   | 'wallet'
   | 'club'
@@ -48,7 +46,6 @@ const TABS: { id: TabId; label: string; icon: typeof User }[] = [
   { id: 'profile', label: 'اطلاعات حساب کاربری', icon: User },
   { id: 'addresses', label: 'نشانی‌ها', icon: MapPin },
   { id: 'reviews', label: 'نظرات ثبت‌شده', icon: MessageSquare },
-  { id: 'tickets', label: 'تیکت‌های من', icon: LifeBuoy },
   { id: 'bank', label: 'اطلاعات حساب بانکی', icon: CreditCard },
   { id: 'wallet', label: 'کیف پول', icon: Wallet },
   { id: 'club', label: 'باشگاه مشتریان', icon: Coins },
@@ -69,7 +66,8 @@ const EMPTY_ADDRESS = {
 
 /** Signed-in area: overview, orders, returns, wishlist, addresses, profile and the loyalty club. */
 export default function AccountPage() {
-  const { user, orders, addresses, logout, updateProfile, addAddress, removeAddress } = useAuth();
+  const { user, orders, addresses, logout, updateProfile, changePassword, addAddress, removeAddress } =
+    useAuth();
   const { wishlist } = useStore();
   const navigate = useNavigate();
   const [tab, setTab] = useState<TabId>('dashboard');
@@ -81,6 +79,9 @@ export default function AccountPage() {
     mobile: user?.mobile ?? '',
   });
   const [saved, setSaved] = useState(false);
+  const [password, setPassword] = useState({ current: '', next: '', confirm: '' });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSaved, setPasswordSaved] = useState(false);
 
   if (!user) return <Navigate to="/login" replace />;
 
@@ -88,6 +89,7 @@ export default function AccountPage() {
     { label: 'سفارش', value: toFa(orders.length), icon: Package },
     { label: 'آدرس', value: toFa(addresses.length), icon: MapPin },
     { label: 'علاقه‌مندی', value: toFa(wishlist.length), icon: Heart },
+    { label: 'کیف پول', value: toFa(0), icon: Wallet },
   ];
 
   const submitAddress = (e: React.FormEvent) => {
@@ -110,6 +112,19 @@ export default function AccountPage() {
     updateProfile(profile);
     setSaved(true);
     window.setTimeout(() => setSaved(false), 2500);
+  };
+
+  const submitPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password.next.length < 6) return setPasswordError('رمز عبور جدید باید حداقل ۶ کاراکتر باشد.');
+    if (password.next !== password.confirm)
+      return setPasswordError('تکرار رمز عبور جدید مطابقت ندارد.');
+    const result = changePassword(password.current, password.next);
+    if (!result.ok) return setPasswordError(result.error ?? 'تغییر رمز عبور انجام نشد.');
+    setPassword({ current: '', next: '', confirm: '' });
+    setPasswordError('');
+    setPasswordSaved(true);
+    window.setTimeout(() => setPasswordSaved(false), 2500);
   };
 
   return (
@@ -174,7 +189,7 @@ export default function AccountPage() {
         <div className="min-w-0">
           {tab === 'dashboard' ? (
             <div className="space-y-6">
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {stats.map(({ label, value, icon: Icon }) => (
                   <div key={label} className="rounded-panel border border-line bg-white p-5">
                     <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-cream text-black">
@@ -320,8 +335,10 @@ export default function AccountPage() {
                   />
                   <input
                     dir="ltr"
+                    inputMode="numeric"
+                    maxLength={11}
                     value={draft.mobile}
-                    onChange={(e) => setDraft({ ...draft, mobile: e.target.value })}
+                    onChange={(e) => setDraft({ ...draft, mobile: onlyDigits(e.target.value) })}
                     placeholder="09xxxxxxxxx"
                     aria-label="شماره موبایل"
                     className={field}
@@ -368,61 +385,155 @@ export default function AccountPage() {
           ) : null}
 
           {tab === 'profile' ? (
-            <form
-              onSubmit={saveProfile}
-              className="rounded-panel border border-line bg-white p-5 sm:p-6"
-              noValidate
-            >
-              <h2 className="text-base font-bold text-ink">اطلاعات حساب کاربری</h2>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <label htmlFor="acc-name" className="mb-1.5 block text-[13px] font-medium text-ink">
-                    نام و نام خانوادگی
-                  </label>
-                  <input
-                    id="acc-name"
-                    value={profile.name}
-                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                    className={field}
-                  />
+            <div className="space-y-6">
+              <form
+                onSubmit={saveProfile}
+                className="rounded-panel border border-line bg-white p-5 sm:p-6"
+                noValidate
+              >
+                <h2 className="text-base font-bold text-ink">اطلاعات حساب کاربری</h2>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="acc-name"
+                      className="mb-1.5 block text-[13px] font-medium text-ink"
+                    >
+                      نام و نام خانوادگی
+                    </label>
+                    <input
+                      id="acc-name"
+                      value={profile.name}
+                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                      className={field}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="acc-email"
+                      className="mb-1.5 block text-[13px] font-medium text-ink"
+                    >
+                      ایمیل
+                    </label>
+                    <input
+                      id="acc-email"
+                      type="email"
+                      dir="ltr"
+                      value={profile.email}
+                      onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                      className={field}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="acc-mobile"
+                      className="mb-1.5 block text-[13px] font-medium text-ink"
+                    >
+                      شماره موبایل
+                    </label>
+                    <input
+                      id="acc-mobile"
+                      dir="ltr"
+                      inputMode="numeric"
+                      maxLength={11}
+                      value={profile.mobile}
+                      onChange={(e) => setProfile({ ...profile, mobile: onlyDigits(e.target.value) })}
+                      className={field}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label htmlFor="acc-email" className="mb-1.5 block text-[13px] font-medium text-ink">
-                    ایمیل
-                  </label>
-                  <input
-                    id="acc-email"
-                    type="email"
-                    dir="ltr"
-                    value={profile.email}
-                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                    className={field}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="acc-mobile" className="mb-1.5 block text-[13px] font-medium text-ink">
-                    شماره موبایل
-                  </label>
-                  <input
-                    id="acc-mobile"
-                    dir="ltr"
-                    value={profile.mobile}
-                    onChange={(e) => setProfile({ ...profile, mobile: e.target.value })}
-                    className={field}
-                  />
-                </div>
-              </div>
 
-              <div className="mt-5 flex items-center gap-3">
-                <button
-                  type="submit"
-                  className="h-11 rounded-xl bg-teal-800 px-6 text-sm font-bold text-white transition-colors hover:bg-teal-700"
-                >
-                  ذخیره تغییرات
-                </button>
-                {saved ? <span className="text-[12.5px] text-teal-800">تغییرات ذخیره شد.</span> : null}
-              </div>
-            </form>
+                <div className="mt-5 flex items-center gap-3">
+                  <button
+                    type="submit"
+                    className="h-11 rounded-xl bg-teal-800 px-6 text-sm font-bold text-white transition-colors hover:bg-teal-700"
+                  >
+                    ذخیره تغییرات
+                  </button>
+                  {saved ? (
+                    <span className="text-[12.5px] text-teal-800">تغییرات ذخیره شد.</span>
+                  ) : null}
+                </div>
+              </form>
+
+              <form
+                onSubmit={submitPassword}
+                className="rounded-panel border border-line bg-white p-5 sm:p-6"
+                noValidate
+              >
+                <h2 className="text-base font-bold text-ink">تغییر رمز عبور</h2>
+                <p className="mt-2 text-[12.5px] leading-6 text-muted">
+                  برای تغییر رمز، ابتدا رمز عبور فعلی و سپس رمز جدید را وارد کنید.
+                </p>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label
+                      htmlFor="acc-current"
+                      className="mb-1.5 block text-[13px] font-medium text-ink"
+                    >
+                      رمز عبور فعلی
+                    </label>
+                    <input
+                      id="acc-current"
+                      type="password"
+                      dir="ltr"
+                      value={password.current}
+                      onChange={(e) => setPassword({ ...password, current: e.target.value })}
+                      className={field}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="acc-new" className="mb-1.5 block text-[13px] font-medium text-ink">
+                      رمز عبور جدید
+                    </label>
+                    <input
+                      id="acc-new"
+                      type="password"
+                      dir="ltr"
+                      value={password.next}
+                      onChange={(e) => setPassword({ ...password, next: e.target.value })}
+                      className={field}
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="acc-confirm"
+                      className="mb-1.5 block text-[13px] font-medium text-ink"
+                    >
+                      تکرار رمز عبور جدید
+                    </label>
+                    <input
+                      id="acc-confirm"
+                      type="password"
+                      dir="ltr"
+                      value={password.confirm}
+                      onChange={(e) => setPassword({ ...password, confirm: e.target.value })}
+                      className={field}
+                    />
+                  </div>
+                </div>
+
+                {passwordError ? (
+                  <p
+                    role="alert"
+                    className="mt-4 rounded-xl bg-sale/10 px-4 py-3 text-[12.5px] text-sale"
+                  >
+                    {passwordError}
+                  </p>
+                ) : null}
+
+                <div className="mt-5 flex items-center gap-3">
+                  <button
+                    type="submit"
+                    className="h-11 rounded-xl bg-teal-800 px-6 text-sm font-bold text-white transition-colors hover:bg-teal-700"
+                  >
+                    تغییر رمز عبور
+                  </button>
+                  {passwordSaved ? (
+                    <span className="text-[12.5px] text-teal-800">رمز عبور تغییر کرد.</span>
+                  ) : null}
+                </div>
+              </form>
+            </div>
           ) : null}
 
           {tab === 'returns' ? (
@@ -440,14 +551,6 @@ export default function AccountPage() {
               icon={<MessageSquare className="h-7 w-7" />}
               title="هنوز نظری ثبت نکرده‌اید"
               text="پس از خرید، می‌توانید نظر و امتیاز خود را برای کالاهای خریداری‌شده ثبت کنید."
-            />
-          ) : null}
-
-          {tab === 'tickets' ? (
-            <EmptyState
-              icon={<LifeBuoy className="h-7 w-7" />}
-              title="تیکتی ثبت نشده است"
-              text="برای پیگیری سفارش یا پرداخت، از پشتیبانی تیکت بزنید؛ پاسخ‌ها همین‌جا نمایش داده می‌شود."
             />
           ) : null}
 
