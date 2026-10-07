@@ -16,6 +16,9 @@ export default defineConfig({
       '/api': {
         target: process.env.PAYMENT_API_ORIGIN ?? 'http://api:8000',
         changeOrigin: true,
+        // Forward the real client address (and the scheme) so the payment service can rate
+        // limit per shopper instead of lumping every caller under the proxy's own IP.
+        xfwd: true,
       },
     },
     watch: {

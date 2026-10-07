@@ -179,3 +179,62 @@ request/verify/redirect logic can still be checked end to end.
 1. `curl -s http://localhost:3000/ | head` — dev server serves the live HTML shell.
 2. `docker compose -f docker-compose.base44.yml ps` — web service must be `healthy`.
 3. Drive the real UI in the preview: add to cart, wishlist, search, filters, checkout steps.
+4. Security regressions: `curl -i http://localhost:3000/api/payment/health` (headers present, no
+   configuration in the body), then `curl -s -o /dev/null -w '%{http_code}' -X POST
+   http://localhost:3000/api/payment/request -H 'content-type: application/json' -d
+   '{"orderId":"../../x","amount":1000}'` (400) and the same with `-H 'Origin: https://evil.example'`
+   (403). See "Security" below for the full list.
+
+## Security
+
+The storefront is a static SPA: no server-side session, no database, no user data beyond what the
+browser stores itself. The only server-side attack surface is the payment service
+(`server/index.mjs`) — and it **is** reachable from the public preview host through the dev server's
+`/api` proxy, so that is where the hardening lives rather than in the SPA.
+
+**What the payment service enforces:**
+
+- A **16 KB body cap**, so a huge POST cannot be buffered into memory.
+- A **JSON object** body only: a scalar, an array or malformed JSON is rejected.
+- `orderId` limited to 64 characters of `[A-Za-z0-9._-]`; `amount` must be a **JSON number**,
+  integral, positive and at most 1e9 Toman (a numeric string is rejected rather than coerced);
+  `description` is truncated to 300 characters.
+- An **Origin check** on `POST /api/payment/request`: a state-changing request carrying a foreign
+  `Origin` is answered 403 — the CSRF defence for the one route that moves money.
+- A **fixed-window rate limit** (30 requests/minute per client IP, with `Retry-After` on 429) on the
+  request and callback routes. The dev server's proxy forwards `x-forwarded-for` (`xfwd: true` in
+  `vite.config.ts`) so the limit keys on the shopper, not on the proxy.
+- **Bounded memory**: `pending` entries expire after 30 minutes and the map is capped at 500, so it
+  cannot be grown without bound by repeated requests.
+- **Security headers** on every response: `nosniff`, `DENY` framing, `no-referrer`, a
+  `default-src 'none'` CSP, `no-store`, and HSTS when the request arrived over TLS
+  (`x-forwarded-proto: https`).
+- `GET /api/payment/health` reports only `{ ok, gateway, sandbox }` — it no longer discloses
+  whether the merchant id is configured, the site URL, or the in-flight count.
+- Errors never carry a stack trace or a configuration value; details go to the server log only.
+
+**Client-side**: there is no `dangerouslySetInnerHTML`, `eval` or `innerHTML` anywhere in the
+source, so everything a shopper can type (search query, review text, checkout fields) reaches the
+DOM as escaped React text. Keep it that way — a review or a query must never be rendered as HTML.
+
+### Accepted limitations (only a backend can fix these)
+
+These are architectural, not bugs, and no client-side change removes them:
+
+- **Accounts live in `localStorage`** (`AuthContext.tsx`), passwords included. Anything in the
+  browser is readable by any script on the origin, and a client-only app must keep a verifier it
+  can compare against — so hashing it there would rename the problem, not solve it. Do not put real
+  customer credentials into this demo.
+- **Authorization is client-side.** `addressBook[userId]` / `orderBook[userId]` are trusted because
+  there is no server to re-check them. The `AccountPage` route guard is a UX affordance, not access
+  control.
+- **The ledger is client-side**, so `/checkout?payment=paid&order=…` can mark a pending record paid
+  in the shopper's *own* browser. It grants nothing beyond that browser, but the payment status
+  must be re-verified server-side once a backend exists.
+- **The amount is whatever the client posts.** The service validates its *shape*, never its
+  *correctness*: only a server-side price source (WooCommerce's order total) can prove the amount
+  matches the basket. Fix this first when the store gets a backend.
+- `ZARINPAL_MERCHANT_ID` is the only real credential and stays server-side. Never move it to a
+  `VITE_*` variable — Vite inlines every `VITE_` value into the client bundle.
+- The dev server's `allowedHosts: true` is a preview-only concession. A host must serve the built
+  app behind HTTPS with HSTS and a real CSP; Vite's dev server sets neither.
