@@ -18,7 +18,7 @@ export default function PromoBanners() {
             <Link
               to={banner.to}
               aria-label={banner.title}
-              className="group relative block h-[150px] overflow-hidden rounded-card bg-[#3F4635] sm:h-[170px] lg:h-[190px]"
+              className="group relative block h-[150px] overflow-hidden bg-[#3F4635] sm:h-[170px] lg:h-[190px]"
             >
               <Img
                 src={banner.image}
