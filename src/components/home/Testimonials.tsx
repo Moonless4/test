@@ -8,7 +8,9 @@ export default function Testimonials() {
   return (
     <section className="mt-12 bg-cream py-12 sm:mt-16 sm:py-16" aria-label="نظرات مشتریان">
       <div className="container">
-        <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
+        {/* grid-cols-1 keeps the auto track from stretching to the review carousel's
+            max-content width on phones, which widened the whole document. */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
           <Reveal className="lg:col-span-4">
             <span className="text-xs font-medium tracking-wide text-black sm:text-[13px]">
               رضایت شما
