@@ -9,9 +9,10 @@ type Props = {
 };
 
 /**
- * Phone and tablet bottom bar: a light pill carrying the four main destinations, with the
- * brand button floating in the middle. It stays below `2xl` so every tablet keeps it, including
- * the 1366px-wide landscape iPad Pro. Rendered by the app shell, so every page has it.
+ * Phone and tablet bottom bar: a full-width bar anchored to the bottom edge that carries the
+ * four main destinations plus the brand button in the middle. It stays below `xl` (1280px), so
+ * tablets keep it while a desktop keeps its own header chrome. Rendered by the app shell, so
+ * every page has it.
  *
  * `sticky`, not `fixed`: a `fixed` bar fell to the end of the document in the preview on a real
  * tablet (it only showed up over the footer, where a scaled/transformed preview shell breaks
@@ -23,19 +24,23 @@ export default function MobileTabBar({ onOpenCategories }: Props) {
   const { pathname } = useLocation();
 
   const tab =
-    'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl py-1.5 text-[10.5px] font-medium transition-colors';
+    'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-1.5 text-[10.5px] font-medium transition-colors';
   const tone = (on: boolean) => (on ? 'text-teal-800' : 'text-ink/70 hover:text-ink');
 
   const badge =
     'absolute top-0 end-3 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold text-white';
 
+  const brand = `mx-1 flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full bg-white text-[17px] font-black tracking-tight ring-1 ring-line transition-colors ${
+    pathname === '/' ? 'text-teal-800' : 'text-ink'
+  }`;
+
   return (
-    <div className="sticky bottom-0 z-[60] px-3 pb-[max(10px,env(safe-area-inset-bottom))] 2xl:hidden">
+    <div className="sticky bottom-0 z-[60] xl:hidden">
       <nav
         aria-label="ناوبری موبایل"
-        className="relative mx-auto w-full max-w-[430px] rounded-[30px] bg-cream shadow-lift ring-1 ring-line"
+        className="border-t border-line bg-cream pb-[max(6px,env(safe-area-inset-bottom))]"
       >
-        <div className="flex h-[62px] items-center px-1.5">
+        <div className="mx-auto flex h-[62px] max-w-[640px] items-center px-2">
           {/* First child renders on the right in RTL: cart, categories, brand, wishlist, profile. */}
           <button
             type="button"
@@ -60,7 +65,9 @@ export default function MobileTabBar({ onOpenCategories }: Props) {
             دسته‌بندی
           </button>
 
-          <span aria-hidden className="w-[58px] shrink-0" />
+          <Link to="/" aria-label="استایل‌آن" className={brand}>
+            S
+          </Link>
 
           <Link to="/wishlist" className={`${tab} ${tone(pathname === '/wishlist')}`}>
             <Heart className="h-5 w-5" />
@@ -75,17 +82,6 @@ export default function MobileTabBar({ onOpenCategories }: Props) {
             پروفایل
           </Link>
         </div>
-
-        {/* Brand button floating over the middle of the pill. */}
-        <Link
-          to="/"
-          aria-label="استایل‌آن"
-          className={`absolute inset-x-0 -top-[21px] mx-auto flex h-[56px] w-[56px] items-center justify-center rounded-full bg-white text-[19px] font-black tracking-tight shadow-lift ring-1 ring-line transition-transform ${
-            pathname === '/' ? 'text-teal-800' : 'text-ink'
-          }`}
-        >
-          S
-        </Link>
       </nav>
     </div>
   );

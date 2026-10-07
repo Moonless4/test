@@ -39,8 +39,10 @@ curl -I http://localhost:3000/
 - **Layout must not scroll horizontally.** `body` uses `overflow-x: clip` (not `hidden`, which
   breaks the sticky header).
 - **Bottom-bar cutoff**: the bottom tab bar, the product action bar, the category drawer and the
-  header's wishlist/account icons all switch at Tailwind's `2xl` (1536px). Keep those in step —
-  every tablet (a 1366px landscape iPad Pro included) keeps the floating bar, a desktop does not.
+  header's wishlist/account icons all switch at Tailwind's `xl` (1280px). Keep those in step — every
+  phone/tablet keeps the bottom bar, a desktop (1280px and up) keeps the header's own icons instead.
+  Below `xl` the bottom bar is the only place for the wishlist and the account, so the header hides
+  those two icons there.
 - **The bottom tab bar is `sticky`, not `fixed`** (last child of the shell, `bottom-0`); its own
   slot reserves the clearance, so the shell needs no bottom padding. Under `position: fixed` the
   bar was invisible on a real tablet — it scrolled away with the page and only appeared over the
