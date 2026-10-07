@@ -4,8 +4,8 @@ import type { Category, Product } from './types';
 /** Shortest query that starts showing suggestions. */
 export const MIN_QUERY = 2;
 
-/** Chips shown under "popular searches" in the search overlay and on the results page. */
-export const POPULAR_SEARCHES = [
+/** Candidate chips for "popular searches"; only the ones with real results are offered. */
+const POPULAR_SEARCH_CANDIDATES = [
   'کت جین',
   'مانتو کتان',
   'کتانی کلاسیک',
@@ -55,6 +55,15 @@ export function searchCatalog(query: string): SearchMatches {
   };
 }
 
+/** True when searching the phrase actually returns products or categories. */
+export function hasMatches(phrase: string): boolean {
+  const { products: hits, categories: matched } = searchCatalog(phrase);
+  return hits.length + matched.length > 0;
+}
+
+/** Chips shown under "popular searches" in the search overlay and on the results page. */
+export const POPULAR_SEARCHES = POPULAR_SEARCH_CANDIDATES.filter(hasMatches);
+
 /**
  * Search phrases containing what has been typed so far: the curated mega menu labels
  * first, then categories and product names. Each one is a query of its own.
@@ -75,7 +84,8 @@ export function searchTerms(query: string, limit = 6): string[] {
   const hits: string[] = [];
   for (const phrase of pool) {
     const plain = normalise(phrase);
-    if (seen.has(plain) || !plain.includes(term)) continue;
+    // Never suggest a phrase that leads to an empty result page.
+    if (seen.has(plain) || !plain.includes(term) || !hasMatches(phrase)) continue;
     seen.add(plain);
     hits.push(phrase);
     if (hits.length >= limit) break;

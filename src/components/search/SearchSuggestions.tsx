@@ -1,6 +1,8 @@
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, PlusCircle, Search, SearchX, Sparkles } from 'lucide-react';
 import { MIN_QUERY, POPULAR_SEARCHES, searchCatalog, searchTerms } from '../../lib/search';
+import { useDragScroll } from '../../hooks/useDragScroll';
 import Img from '../ui/Img';
 
 const MAX_PRODUCTS = 8;
@@ -15,6 +17,9 @@ const heading = 'flex items-center gap-1.5 px-4 pb-1.5 pt-3 text-[12.5px] font-b
 
 /** Live search overlay: matching phrases, related products and popular searches. */
 export default function SearchSuggestions({ query, onSelect }: Props) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const railDrag = useDragScroll(railRef);
+
   const term = query.trim();
   if (term.length < MIN_QUERY) return null;
 
@@ -62,7 +67,9 @@ export default function SearchSuggestions({ query, onSelect }: Props) {
             محصولات مرتبط
           </h3>
           <div
-            className="no-scrollbar flex overflow-x-auto px-4 pb-2 [&>*:not(:first-child)]:border-s [&>*:not(:first-child)]:border-line [&>*:not(:first-child)]:ps-4"
+            ref={railRef}
+            {...railDrag}
+            className="no-scrollbar flex cursor-grab select-none overflow-x-auto px-4 pb-2 active:cursor-grabbing [&_a]:cursor-grab [&>*:not(:first-child)]:border-s [&>*:not(:first-child)]:border-line [&>*:not(:first-child)]:ps-4"
           >
             {items.map((product) => (
               <Link
