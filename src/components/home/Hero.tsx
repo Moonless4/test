@@ -23,11 +23,11 @@ export default function Hero() {
     setIndex((i) => (i + step + heroSlides.length) % heroSlides.length);
 
   const arrow =
-    'absolute top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-cocoa shadow-lift transition-colors hover:bg-cream sm:flex';
+    'absolute top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-cocoa shadow-lift transition-colors hover:bg-cream lg:flex';
 
   return (
-    <section className="container pt-5 sm:pt-7" aria-label="بنر اصلی">
-      <div className="relative overflow-hidden rounded-panel bg-beige">
+    <section aria-label="بنر اصلی">
+      <div className="relative overflow-hidden bg-beige">
         <div className="relative flex min-h-[420px] items-center sm:min-h-[470px] lg:min-h-[520px]">
           {heroSlides.map((slide, i) => (
             <div
@@ -49,7 +49,7 @@ export default function Hero() {
             </div>
           ))}
 
-          <div className="relative z-10 flex w-full flex-col justify-center gap-7 px-6 pb-16 pt-10 sm:px-10 sm:pb-16 sm:pt-12 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:px-20 lg:py-14">
+          <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col justify-center gap-7 px-6 pb-16 pt-10 sm:px-10 sm:pb-16 sm:pt-12 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:px-20 lg:py-14">
             <div className="max-w-[520px]">
               {heroSlides.map((slide, i) =>
                 i === index ? (
