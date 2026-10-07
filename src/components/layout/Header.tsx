@@ -44,26 +44,29 @@ export default function Header() {
     >
       <div className="container relative">
         <div className="flex h-[64px] items-center gap-3 lg:h-[74px] lg:gap-6">
-          <Link to="/" className="flex shrink-0 items-center gap-2.5" onMouseEnter={closeMenu}>
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-800 text-[17px] font-black tracking-tight text-white">
-              S
-            </span>
-            <span className="flex flex-col leading-none">
-              <span className="text-[19px] font-black tracking-[0.14em] text-ink lg:text-[21px]">
-                STYLEON
+          {/* Logo and the desktop search sit together, 5px apart. */}
+          <div className="flex min-w-0 flex-1 items-center gap-[5px]">
+            <Link to="/" className="flex shrink-0 items-center gap-2.5" onMouseEnter={closeMenu}>
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-800 text-[17px] font-black tracking-tight text-white">
+                S
               </span>
-              <span className="mt-1 text-[8.5px] tracking-[0.3em] text-muted lg:text-[9px]">
-                WEAR YOUR STYLE
+              <span className="flex flex-col leading-none">
+                <span className="text-[19px] font-black tracking-[0.14em] text-ink lg:text-[21px]">
+                  STYLEON
+                </span>
+                <span className="mt-1 text-[8.5px] tracking-[0.3em] text-muted lg:text-[9px]">
+                  WEAR YOUR STYLE
+                </span>
               </span>
-            </span>
-          </Link>
+            </Link>
 
-          {/* Desktop search: light pill, per the reference header */}
-          <div
-            onMouseEnter={closeMenu}
-            className="mx-auto hidden min-w-0 max-w-[620px] flex-1 lg:block"
-          >
-            <SearchBox />
+            {/* Desktop search: light pill, per the reference header */}
+            <div
+              onMouseEnter={closeMenu}
+              className="hidden min-w-0 max-w-[620px] flex-1 lg:block"
+            >
+              <SearchBox />
+            </div>
           </div>
 
           {/* Phones use the bottom tab bar for the cart; this row keeps the search shortcut. */}
