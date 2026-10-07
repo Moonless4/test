@@ -14,10 +14,12 @@ type Props = {
  * tablets keep it while a desktop keeps its own header chrome. Rendered by the app shell, so
  * every page has it.
  *
- * `sticky`, not `fixed`: a `fixed` bar fell to the end of the document in the preview on a real
- * tablet (it only showed up over the footer, where a scaled/transformed preview shell breaks
- * `position: fixed`). Sticky pins it to the viewport bottom everywhere, and its own slot at the
- * end of the shell reserves the clearance the old shell padding used to provide.
+ * `sticky` with a negative top margin, not `fixed`: a `fixed` bar fell to the end of the document
+ * in the preview on a real tablet (it only showed up over the footer, where a scaled/transformed
+ * preview shell breaks `position: fixed`). The `-mt-[69px]` pulls the bar up over the footer's own
+ * bottom padding — the footer reserves that dark 69px strip with `pb-[69px] xl:pb-0` — so the bar
+ * always lies over the page and never reads as a strip of page flow sitting under the footer.
+ * Keep those two numbers equal.
  */
 export default function MobileTabBar({ onOpenCategories }: Props) {
   const { cartCount, wishlist, openCart } = useStore();
@@ -35,7 +37,7 @@ export default function MobileTabBar({ onOpenCategories }: Props) {
   }`;
 
   return (
-    <div className="sticky bottom-0 z-[60] xl:hidden">
+    <div className="sticky bottom-0 z-[60] -mt-[69px] xl:hidden">
       <nav
         aria-label="ناوبری موبایل"
         className="border-t border-line bg-cream pb-[max(6px,env(safe-area-inset-bottom))]"

@@ -40,7 +40,7 @@ export default function Footer() {
     'inline-block py-1 text-[13px] text-white/70 transition-all duration-300 hover:translate-x-[-4px] hover:text-white hover:underline hover:decoration-teal-300 hover:underline-offset-4';
 
   return (
-    <footer className="mt-16 bg-teal-900 text-white sm:mt-20">
+    <footer className="mt-16 bg-teal-900 pb-[69px] text-white sm:mt-20 xl:pb-0">
       <div className="container">
         <div className="grid gap-10 py-12 lg:grid-cols-12 lg:gap-8 lg:py-16">
           <div className="lg:col-span-4">

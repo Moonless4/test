@@ -43,12 +43,13 @@ curl -I http://localhost:3000/
   phone/tablet keeps the bottom bar, a desktop (1280px and up) keeps the header's own icons instead.
   Below `xl` the bottom bar is the only place for the wishlist and the account, so the header hides
   those two icons there.
-- **The bottom tab bar is `sticky`, not `fixed`** (last child of the shell, `bottom-0`); its own
-  slot reserves the clearance, so the shell needs no bottom padding. Under `position: fixed` the
-  bar was invisible on a real tablet — it scrolled away with the page and only appeared over the
-  footer, which is what a scaled/transformed preview shell does to `fixed`. Sticky pins it to the
-  viewport bottom in the sandbox preview and on real devices alike. The product page's
-  `ProductActionBar` is still `fixed`, since it lives inside the page rather than the shell.
+- **The bottom tab bar is `sticky`, not `fixed`** (last child of the shell, `bottom-0`), pulled up
+  over the footer's reserved strip with `-mt-[69px]`, matching `pb-[69px] xl:pb-0` on the footer.
+  Keep those two numbers equal: if they drift, the bar either sits in a strip of its own under the
+  footer or covers the footer's copyright row. Under `position: fixed` the bar was invisible on a
+  real tablet — it scrolled away with the page and only showed up over the footer, which is what a
+  scaled/transformed preview shell does to `fixed`. The product page's `ProductActionBar` is still
+  `fixed`, since it lives inside the page rather than the shell.
 - `tsconfig` has `noUnusedLocals`; `npm run typecheck` is the quick sanity check.
 
 ## Where things live
