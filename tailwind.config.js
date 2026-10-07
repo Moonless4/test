@@ -41,7 +41,7 @@ export default {
         line: '#EAE6E0',
       },
       fontFamily: {
-        sans: ['Vazirmatn', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        sans: ['IRANSans', 'Vazirmatn', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
         script: ['"Dancing Script"', 'cursive'],
       },
       borderRadius: {

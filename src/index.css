@@ -1,3 +1,13 @@
+/* Persian UI font (see public/fonts/iransans/SOURCE.txt).
+   Regular weight only: bold is synthesised, and Latin glyphs fall back to Vazirmatn. */
+@font-face {
+  font-family: 'IRANSans';
+  src: url('/fonts/iransans/IranianSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
