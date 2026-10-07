@@ -45,9 +45,13 @@ export type MegaMenuLink = {
   q: string;
 };
 
-/** A titled column of the mega menu, so every section has its own structure. */
-export type MegaMenuGroup = {
+/** One sub-section of the mega menu: its rail entry plus the links its panel shows. */
+export type MegaMenuSection = {
+  id: string;
   title: string;
+  image: string;
+  /** Catalog query run by the rail entry and the "view all" link. */
+  q: string;
   links: MegaMenuLink[];
 };
 

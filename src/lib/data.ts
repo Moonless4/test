@@ -3,7 +3,7 @@ import type {
   BlogPost,
   Category,
   CategoryId,
-  MegaMenuGroup,
+  MegaMenuSection,
   Product,
   ProductColor,
   ProductReview,
@@ -861,131 +861,187 @@ export const categories: Category[] = [
   },
 ];
 
-/** Sub-links of the header mega menu — each one runs the matching catalog search. */
-export const megaMenu: Record<CategoryId, MegaMenuGroup[]> = {
+/**
+ * Sub-sections of the header mega menu. Hovering a top-level nav item opens that
+ * category's menu: the rail lists its sub-sections and the panel shows the links of
+ * the selected one — every link runs the matching catalog search.
+ */
+export const megaMenu: Record<CategoryId, MegaMenuSection[]> = {
   men: [
     {
-      title: 'پوشاک بالا تنه',
+      id: 'men-clothing',
+      title: 'لباس مردانه',
+      image: img('1521572163474-6864f9cf17ab', 160, 160),
+      q: 'مردانه',
       links: [
         { label: 'پیراهن مردانه', q: 'پیراهن مردانه' },
         { label: 'تی‌شرت مردانه', q: 'تی‌شرت' },
-        { label: 'پولوشرت', q: 'پولوشرت' },
-        { label: 'هودی و سویشرت', q: 'هودی' },
+        { label: 'پولوشرت مردانه', q: 'پولوشرت' },
+        { label: 'هودی و سویشرت مردانه', q: 'هودی' },
+        { label: 'کت و کاپشن مردانه', q: 'کت مردانه' },
+        { label: 'کاپشن و پالتو مردانه', q: 'کاپشن' },
+        { label: 'شلوار جین مردانه', q: 'شلوار جین' },
+        { label: 'شلوار مردانه', q: 'شلوار مردانه' },
       ],
     },
     {
-      title: 'کت و کاپشن',
-      links: [
-        { label: 'کت جین', q: 'کت جین' },
-        { label: 'کت کتان', q: 'کت کتان' },
-        { label: 'کاپشن و پالتو', q: 'کاپشن' },
-      ],
-    },
-    {
-      title: 'شلوار',
-      links: [
-        { label: 'شلوار جین', q: 'شلوار جین' },
-        { label: 'همه شلوارها', q: 'شلوار' },
-      ],
-    },
-    {
+      id: 'men-shoes',
       title: 'کفش مردانه',
+      image: img('1542291026-7eec264c27ff', 160, 160),
+      q: 'کفش مردانه',
       links: [
-        { label: 'کفش چرم', q: 'کفش چرم' },
-        { label: 'نیم‌بوت چرم', q: 'نیم‌بوت' },
-        { label: 'کفش ورزشی', q: 'ورزشی' },
-        { label: 'کتانی', q: 'کتانی' },
+        { label: 'کفش چرم مردانه', q: 'کفش چرم' },
+        { label: 'نیم‌بوت چرم مردانه', q: 'نیم‌بوت' },
+        { label: 'کفش ورزشی مردانه', q: 'ورزشی' },
+        { label: 'کتانی کلاسیک', q: 'کتانی' },
       ],
     },
     {
+      id: 'men-accessories',
       title: 'اکسسوری مردانه',
+      image: img('1523170335258-f5ed11844a49', 160, 160),
+      q: 'اکسسوری',
       links: [
-        { label: 'کمربند چرم', q: 'کمربند' },
-        { label: 'ساعت مچی', q: 'ساعت' },
+        { label: 'کمربند چرم مردانه', q: 'کمربند' },
+        { label: 'ساعت مچی مردانه', q: 'ساعت' },
         { label: 'عینک آفتابی', q: 'عینک' },
+        { label: 'شال و روسری', q: 'شال' },
+      ],
+    },
+    {
+      id: 'men-bags',
+      title: 'کیف مردانه',
+      image: img('1553062407-98eeb64c6a62', 160, 160),
+      q: 'کیف',
+      links: [
+        { label: 'کیف چرم', q: 'کیف چرم' },
+        { label: 'کیف دوشی', q: 'کیف دوشی' },
+        { label: 'همه کیف‌ها', q: 'کیف' },
       ],
     },
   ],
   women: [
     {
-      title: 'مانتو و تونیک',
+      id: 'women-clothing',
+      title: 'لباس زنانه',
+      image: img('1594938298603-c8148c4dae35', 160, 160),
+      q: 'زنانه',
       links: [
-        { label: 'مانتو کتان', q: 'مانتو' },
-        { label: 'تونیک زنانه', q: 'تونیک' },
-      ],
-    },
-    {
-      title: 'پیراهن و بلوز',
-      links: [
+        { label: 'مانتو زنانه', q: 'مانتو' },
         { label: 'پیراهن زنانه', q: 'پیراهن زنانه' },
-        { label: 'بلوز و شومیز', q: 'بلوز' },
-        { label: 'پیراهن مجلسی', q: 'پیراهن مجلسی' },
-      ],
-    },
-    {
-      title: 'کت و شلوار',
-      links: [
+        { label: 'بلوز و شومیز زنانه', q: 'بلوز' },
         { label: 'کت زنانه', q: 'کت زنانه' },
-        { label: 'شلوار پارچه‌ای', q: 'شلوار پارچه‌ای' },
+        { label: 'شلوار زنانه', q: 'شلوار زنانه' },
+        { label: 'تونیک زنانه', q: 'تونیک' },
+        { label: 'پیراهن مجلسی زنانه', q: 'پیراهن مجلسی' },
       ],
     },
     {
+      id: 'women-shoes',
       title: 'کفش زنانه',
+      image: img('1490114538077-0a7f8cb49891', 160, 160),
+      q: 'کفش زنانه',
       links: [
         { label: 'بوت زنانه', q: 'بوت زنانه' },
-        { label: 'صندل تابستانی', q: 'صندل' },
+        { label: 'صندل زنانه', q: 'صندل' },
+        { label: 'کتانی و اسپرت', q: 'کتانی' },
+        { label: 'کفش ورزشی', q: 'ورزشی' },
       ],
     },
     {
-      title: 'کیف و اکسسوری',
+      id: 'women-bags',
+      title: 'کیف زنانه',
+      image: img('1584917865442-de89df76afd3', 160, 160),
+      q: 'کیف',
       links: [
-        { label: 'کیف دستی', q: 'کیف دستی' },
+        { label: 'کیف دستی زنانه', q: 'کیف دستی' },
+        { label: 'کیف دوشی چرم', q: 'کیف دوشی چرم' },
+        { label: 'کیف دوشی کوچک', q: 'کیف دوشی کوچک' },
+      ],
+    },
+    {
+      id: 'women-accessories',
+      title: 'اکسسوری زنانه',
+      image: img('1483985988355-763728e1935b', 160, 160),
+      q: 'اکسسوری',
+      links: [
         { label: 'شال و روسری', q: 'شال' },
-        { label: 'روسری ابریشمی', q: 'روسری' },
+        { label: 'عینک آفتابی', q: 'عینک' },
+        { label: 'ساعت مچی', q: 'ساعت' },
       ],
     },
   ],
   shoes: [
     {
+      id: 'shoes-men',
       title: 'کفش مردانه',
+      image: img('1542291026-7eec264c27ff', 160, 160),
+      q: 'کفش مردانه',
       links: [
-        { label: 'کفش چرم', q: 'کفش چرم' },
-        { label: 'نیم‌بوت', q: 'نیم‌بوت' },
-        { label: 'کفش ورزشی', q: 'ورزشی' },
+        { label: 'کفش چرم مردانه', q: 'کفش چرم' },
+        { label: 'نیم‌بوت چرم', q: 'نیم‌بوت' },
+        { label: 'کفش ورزشی رانینگ', q: 'رانینگ' },
       ],
     },
     {
+      id: 'shoes-women',
       title: 'کفش زنانه',
+      image: img('1543163521-1bf539c55dd2', 160, 160),
+      q: 'کفش زنانه',
       links: [
-        { label: 'بوت چرم', q: 'بوت زنانه' },
-        { label: 'صندل', q: 'صندل' },
+        { label: 'بوت زنانه چرم', q: 'بوت زنانه' },
+        { label: 'صندل تابستانی', q: 'صندل' },
       ],
     },
     {
-      title: 'بر اساس جنس',
+      id: 'shoes-sneakers',
+      title: 'کتانی و اسپرت',
+      image: img('1560769629-975ec94e6a86', 160, 160),
+      q: 'کتانی',
       links: [
-        { label: 'چرم طبیعی', q: 'چرم' },
-        { label: 'کتانی و اسپرت', q: 'کتانی' },
+        { label: 'کتانی کلاسیک', q: 'کتانی' },
+        { label: 'کفش ورزشی رانینگ', q: 'ورزشی' },
+        { label: 'کفش روزمره', q: 'کفش' },
+      ],
+    },
+    {
+      id: 'shoes-leather',
+      title: 'چرم طبیعی',
+      image: img('1600185365483-26d7a4cc7519', 160, 160),
+      q: 'چرم',
+      links: [
+        { label: 'کفش چرم مردانه', q: 'کفش چرم' },
+        { label: 'نیم‌بوت چرم', q: 'نیم‌بوت' },
+        { label: 'بوت زنانه چرم', q: 'بوت زنانه' },
       ],
     },
   ],
   accessories: [
     {
+      id: 'acc-glasses-watch',
       title: 'عینک و ساعت',
+      image: img('1523170335258-f5ed11844a49', 160, 160),
+      q: 'اکسسوری',
       links: [
         { label: 'عینک آفتابی', q: 'عینک' },
-        { label: 'ساعت مچی', q: 'ساعت' },
+        { label: 'ساعت مچی مردانه', q: 'ساعت' },
       ],
     },
     {
-      title: 'چرم',
+      id: 'acc-leather',
+      title: 'کمربند و چرم',
+      image: img('1553062407-98eeb64c6a62', 160, 160),
+      q: 'چرم',
       links: [
-        { label: 'کمربند چرم', q: 'کمربند' },
-        { label: 'کیف چرم', q: 'کیف چرم' },
+        { label: 'کمربند چرم مردانه', q: 'کمربند' },
+        { label: 'کیف دوشی چرم', q: 'کیف چرم' },
       ],
     },
     {
+      id: 'acc-scarf',
       title: 'شال و روسری',
+      image: img('1584370848010-d7fe6bc767ec', 160, 160),
+      q: 'شال',
       links: [
         { label: 'شال ابریشمی', q: 'شال' },
         { label: 'روسری', q: 'روسری' },
@@ -994,44 +1050,62 @@ export const megaMenu: Record<CategoryId, MegaMenuGroup[]> = {
   ],
   bags: [
     {
+      id: 'bags-hand',
       title: 'کیف دستی',
+      image: img('1584917865442-de89df76afd3', 160, 160),
+      q: 'کیف دستی',
       links: [
         { label: 'کیف دستی زنانه', q: 'کیف دستی' },
         { label: 'کیف چرم', q: 'کیف چرم' },
       ],
     },
     {
+      id: 'bags-shoulder',
       title: 'کیف دوشی',
+      image: img('1553062407-98eeb64c6a62', 160, 160),
+      q: 'کیف دوشی',
       links: [
         { label: 'کیف دوشی چرم', q: 'کیف دوشی چرم' },
         { label: 'کیف دوشی کوچک', q: 'کیف دوشی کوچک' },
       ],
     },
     {
-      title: 'جنس و طرح',
+      id: 'bags-all',
+      title: 'همه کیف‌ها',
+      image: img('1548036328-c9fa89d128fa', 160, 160),
+      q: 'کیف',
       links: [
-        { label: 'کیف چرم طبیعی', q: 'چرم' },
-        { label: 'همه کیف‌ها', q: 'کیف' },
+        { label: 'کیف دستی زنانه', q: 'کیف دستی' },
+        { label: 'کیف دوشی چرم', q: 'کیف دوشی' },
       ],
     },
   ],
   beauty: [
     {
+      id: 'beauty-perfume',
       title: 'عطر و ادوپرفیوم',
+      image: img('1541643600914-78b084683601', 160, 160),
+      q: 'ادوپرفیوم',
       links: [
         { label: 'ادوپرفیوم زنانه', q: 'ادوپرفیوم' },
         { label: 'عطر گل‌دار', q: 'گل‌دار' },
       ],
     },
     {
+      id: 'beauty-skin',
       title: 'مراقبت پوست',
+      image: img('1620916566398-39f1143ab7be', 160, 160),
+      q: 'پوست',
       links: [
         { label: 'سرم روشن‌کننده', q: 'سرم' },
         { label: 'اسپری آبرسان', q: 'اسپری' },
       ],
     },
     {
+      id: 'beauty-makeup',
       title: 'آرایش',
+      image: img('1586495777744-4413f21062fa', 160, 160),
+      q: 'رژ',
       links: [
         { label: 'رژ لب مات', q: 'رژ' },
       ],

@@ -75,7 +75,7 @@ export function searchTerms(query: string, limit = 6): string[] {
   const pool = [
     ...Object.values(megaMenu)
       .flat()
-      .flatMap((group) => group.links.map((link) => link.label)),
+      .flatMap((section) => section.links.map((link) => link.label)),
     ...categories.map((category) => category.title),
     ...products.map((product) => product.name),
   ];

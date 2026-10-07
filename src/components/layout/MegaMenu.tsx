@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import { categories, megaMenu } from '../../lib/data';
+import { megaMenu } from '../../lib/data';
 import type { CategoryId } from '../../lib/types';
 import Img from '../ui/Img';
 
@@ -11,79 +11,76 @@ type Props = {
 };
 
 /**
- * Header mega menu: category rail on the start side, the sub-links of the
- * hovered category on the end side.
+ * Header mega menu: the sub-sections of the category on the start side, the links
+ * of the selected sub-section in the panel on the end side.
  */
 export default function MegaMenu({ category, onNavigate }: Props) {
-  const [active, setActive] = useState<CategoryId>(category);
+  const sections = megaMenu[category];
+  const [activeId, setActiveId] = useState(sections[0].id);
 
-  useEffect(() => setActive(category), [category]);
+  useEffect(() => setActiveId(megaMenu[category][0].id), [category]);
 
-  const groups = megaMenu[active];
-  const current = categories.find((item) => item.id === active);
+  const active = sections.find((section) => section.id === activeId) ?? sections[0];
 
   return (
     <div className="absolute inset-x-4 top-full z-40 pt-2 sm:inset-x-5 lg:inset-x-6">
       <div className="flex overflow-hidden rounded-panel border border-line bg-white shadow-lift motion-safe:animate-fade-in">
-        <div className="flex w-[228px] shrink-0 flex-col gap-0.5 bg-[#F8F9FB] p-2.5">
-          {categories.map((item) => {
-            const isActive = item.id === active;
+        <div className="flex w-[236px] shrink-0 flex-col gap-0.5 bg-[#F7F8FA] p-2.5">
+          {sections.map((section) => {
+            const isActive = section.id === active.id;
             return (
               <Link
-                key={item.id}
-                to={`/shop/${item.id}`}
-                onMouseEnter={() => setActive(item.id)}
+                key={section.id}
+                to={`/search?q=${encodeURIComponent(section.q)}`}
+                onMouseEnter={() => setActiveId(section.id)}
                 onClick={onNavigate}
-                className={`flex items-center gap-2.5 rounded-xl p-2 transition-colors ${
-                  isActive ? 'bg-white text-wine shadow-soft' : 'text-ink hover:bg-white/70'
+                className={`flex items-center gap-3 rounded-xl border px-2.5 py-2 transition-colors ${
+                  isActive
+                    ? 'border-line bg-white text-teal-800 shadow-soft'
+                    : 'border-transparent text-ink hover:bg-white/70'
                 }`}
               >
                 <Img
-                  src={item.image}
+                  src={section.image}
                   alt=""
                   loading="lazy"
-                  className="h-9 w-9 shrink-0 rounded-lg object-cover"
+                  className="h-10 w-10 shrink-0 rounded-full object-cover"
                 />
-                <span className="flex-1 text-[13px] font-medium">{item.title}</span>
-                <ChevronLeft className="h-4 w-4 shrink-0 opacity-60" />
+                <span className="flex-1 text-[13px] font-medium">{section.title}</span>
+                <ChevronLeft
+                  className={`h-4 w-4 shrink-0 ${isActive ? 'text-teal-800' : 'opacity-45'}`}
+                />
               </Link>
             );
           })}
         </div>
 
-        <div className="min-w-0 flex-1 p-6">
-          <div className="flex items-center justify-between gap-4">
-            <h3 className="text-base font-bold text-ink">{current?.title}</h3>
+        <div className="min-w-0 flex-1 px-6 py-5">
+          <div className="flex items-center justify-between gap-4 border-b border-line pb-3.5">
+            <h3 className="text-base font-bold text-ink">{active.title}</h3>
             <Link
-              to={`/shop/${active}`}
+              to={`/search?q=${encodeURIComponent(active.q)}`}
               onClick={onNavigate}
-              className="flex items-center gap-1 text-[13px] font-medium text-wine transition-colors hover:text-wine-dark"
+              className="flex items-center gap-1 text-[13px] font-medium text-teal-800 transition-colors hover:text-teal-700"
             >
               مشاهده همه
               <ChevronLeft className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="mt-5 grid grid-cols-2 gap-x-8 gap-y-6 xl:grid-cols-4">
-            {groups.map((group) => (
-              <div key={group.title}>
-                <h4 className="mb-2.5 text-[12.5px] font-bold text-black">{group.title}</h4>
-                <ul className="space-y-1.5">
-                  {group.links.map((link) => (
-                    <li key={link.label}>
-                      <Link
-                        to={`/search?q=${encodeURIComponent(link.q)}`}
-                        onClick={onNavigate}
-                        className="text-[13px] text-muted transition-colors hover:text-wine"
-                      >
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+          <ul className="mt-4 columns-2 gap-x-8 xl:columns-4">
+            {active.links.map((link) => (
+              <li key={link.label} className="mb-2.5 break-inside-avoid">
+                <Link
+                  to={`/search?q=${encodeURIComponent(link.q)}`}
+                  onClick={onNavigate}
+                  className="text-[13px] text-muted transition-colors hover:text-teal-800"
+                >
+                  {link.label}
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </div>
     </div>
