@@ -1,8 +1,9 @@
 # MEDORA («مدورا») — Base44 dev environment notes
 
-Persian (RTL) fashion storefront. Single-page **React 18 + TypeScript + Vite + Tailwind** app.
-There is no backend, database, queue or external credential — everything renders from local
-mock data, so the stack is a single container.
+Persian (RTL) fashion storefront. Single-page **React 18 + TypeScript + Vite + Tailwind** app, plus
+a dependency-free Node payment service (`server/`). No database and no external credential except
+the payment merchant id: the catalog, the cart and the accounts render from local mock data and
+localStorage.
 
 ## Running it
 
@@ -11,7 +12,10 @@ docker compose -f docker-compose.base44.yml up -d --build
 curl -I http://localhost:3000/
 ```
 
-- Dev server listens on **host port 3000** (`vite`, `host: 0.0.0.0`, `strictPort`).
+- Dev server listens on **host port 3000** (`vite`, `host: 0.0.0.0`, `strictPort`) and proxies
+  `/api` to the `api` service (`PAYMENT_API_ORIGIN`, default `http://api:8000`), so the app, the
+  Zarinpal callback and the session share one origin. Do not publish the payment service on its
+  own port.
 - `npm ci` runs at container start, then `npm run dev`. `node_modules/` lives in the bind
   mounted repo (gitignored) — do not delete it while the container is running.
 - Source is bind mounted, so edits hot-reload. If HMR ever stops firing, the dev server polls
@@ -85,15 +89,24 @@ curl -I http://localhost:3000/
   `styleon.addresses`, `styleon.orders`, `styleon.wallet`) because the app ships without a server.
   Replace these helpers with real API calls when a backend exists. `updateOrderStatus` relabels an
   order already in the book, which is how a payment moves it from awaiting to processing.
-- `src/lib/payment.ts` + `src/pages/PaymentPage.tsx` — the payment seam. Checkout turns the basket
-  into a `PaymentOrder`, keeps it in the store-wide ledger (`styleon.payments`), registers it in the
-  account panel as «در انتظار پرداخت» and hands off to `activeGateway.handoff()`. `/payment/:id` is
-  the stand-in bank page the bundled `sandboxGateway` points at: it moves no money, and its buttons
-  only exercise the paid/failed/canceled branches. Coins, the discount code and the basket are
-  settled on the way *back*, never on submit, so an abandoned payment leaves the basket intact.
-  Going live means adding the two server routes documented at the top of `src/lib/payment.ts`
-  (`/payment/request`, `/payment/verify`), implementing `PaymentGateway` against them and pointing
-  `activeGateway` at it — the merchant key belongs on the server, never in the browser.
+- `src/lib/payment.ts` + `src/pages/PaymentPage.tsx` + `server/index.mjs` — the payment path.
+  Checkout turns the basket into a `PaymentOrder`, keeps it in the store-wide ledger
+  (`styleon.payments`), registers it in the account panel as «در انتظار پرداخت» and hands off to
+  `activeGateway.handoff()` (async: a real gateway has to be asked first). `VITE_PAYMENT_GATEWAY`
+  picks the gateway: `sandbox` (default) keeps the in-app stand-in bank page at `/payment/:id`,
+  which moves no money, while `zarinpal` calls the payment service — `POST /api/payment/request`
+  → Zarinpal REST v4 (amounts travel in Toman and are sent in Rial) → the shopper pays at
+  `payment.zarinpal.com`, and `GET /api/payment/callback` verifies server-side before sending them
+  back to `/checkout?payment=…&order=…&ref=…`.
+  Coins, the discount code and the basket are settled on the way *back*, in `CheckoutPage`'s return
+  effect, never on submit, so an abandoned payment leaves the basket intact. That effect only
+  settles a ledger record that is still `pending` — the stand-in gateway has written its own record
+  by the time it returns, so nothing is settled twice.
+  `ZARINPAL_MERCHANT_ID` arrives through the platform env file (`/run/base44/app.env`); without it
+  `/api/payment/request` answers 503 with a Persian message. `ZARINPAL_SANDBOX=1` (the compose
+  default) points at `sandbox.zarinpal.com`; a host sets it to `0` and sets
+  `VITE_PAYMENT_GATEWAY=zarinpal` for live money. Requests in flight live in the service's memory —
+  a restart forgets a payment still at the bank, and the shopper lands back on the checkout.
   The ledger is the only place a guest's order is recorded; the account panel still needs a session.
 - `src/lib/filters.ts` + `src/components/shop/FilterLayout.tsx` — one filter model and layout shared
   by `/shop` and `/search`. Filter groups are collapsible and start closed; their state resets when
@@ -103,6 +116,20 @@ curl -I http://localhost:3000/
   Testimonials, Newsletter.
 - Other routes: `/shop`, `/shop/:category`, `/product/:id`, `/search?q=`, `/cart`, `/checkout`,
   `/wishlist`, `/blog`, `/blog/:id`, `/login`, `/register`, `/account`.
+
+## Porting to WordPress
+
+The owner's plan is to move the storefront to WordPress and host it. Nothing here is a WordPress
+theme, so the port means rebuilding the pages as a theme (or running this SPA headless) and moving
+the catalog, the accounts and the orders into WooCommerce — `src/lib/data.ts` and the localStorage
+stores in the contexts are what get replaced. The payment path is the piece that does *not* carry
+over: on WordPress, WooCommerce plus the زرین‌پال gateway plugin owns it, and `server/index.mjs`
+exists for the SPA while it stands alone. `src/lib/payment.ts` stays the contract either way — a
+headless build would point it at WooCommerce's REST API instead.
+
+Caveat when verifying payments here: the sandbox cannot reach `zarinpal.com` (the request times
+out), so the live gateway can only be exercised on a host that can. With a stub behind `fetch`, the
+request/verify/redirect logic can still be checked end to end.
 
 ## Verifying a change
 

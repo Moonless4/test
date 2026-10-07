@@ -13,6 +13,10 @@ services:
       - CI=true
       # Set by the platform; Vite appends it to server.allowedHosts.
       - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+      # The dev server proxies /api to the payment service, so the app keeps one origin.
+      - PAYMENT_API_ORIGIN=http://api:8000
+      # `sandbox` keeps the stand-in bank page (nothing is charged); a host sets `zarinpal`.
+      - VITE_PAYMENT_GATEWAY=${VITE_PAYMENT_GATEWAY:-sandbox}
     restart: on-failure
     healthcheck:
       test:
@@ -24,3 +28,34 @@ services:
       timeout: 5s
       retries: 6
       start_period: 120s
+
+  # Zarinpal needs a server: the merchant id is a credential and the transaction has to be
+  # verified server-side. Dependency-free node:http, so there is no install step and the
+  # bind mount keeps the running service on the current source.
+  api:
+    image: node:22-alpine
+    working_dir: /app
+    command: ["node", "--watch", "server/index.mjs"]
+    volumes:
+      - ./:/app
+    environment:
+      - PAYMENT_API_PORT=8000
+      # Zarinpal returns the shopper here: this environment's public host, on the web port,
+      # because the dev server proxies /api to this service.
+      - SITE_URL=https://3000-${BASE44_PUBLIC_HOST_SUFFIX}
+      # Sandbox by default, so nothing real is charged while working in the preview.
+      - ZARINPAL_SANDBOX=${ZARINPAL_SANDBOX:-1}
+    env_file:
+      # Platform-managed secrets last, so a value from the dashboard always wins.
+      - /run/base44/app.env
+    restart: on-failure
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:8000/api/payment/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\"",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 20s

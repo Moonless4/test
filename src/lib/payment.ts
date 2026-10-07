@@ -1,20 +1,22 @@
 /**
  * Payment layer for the checkout.
  *
- * This is the seam between the store and a payment service provider (PSP). It keeps
- * three things: the payment record a checkout produces, the lifecycle of that record,
- * and the gateway the shopper is handed off to.
+ * This is the seam between the store and a payment service provider (PSP). It keeps the
+ * payment record a checkout produces, the lifecycle of that record, and the gateway the
+ * shopper is handed off to.
  *
- * The app ships with `sandboxGateway`, an in-app stand-in for the bank page that moves
- * no money. That is deliberate: every Iranian PSP (زرین‌پال، آی‌دی‌پی، زیبال، …) needs a
- * server to request the transaction and to verify it with the merchant credentials, and
- * this repo has no server yet. Nothing here changes when one is added:
+ * Two gateways ship here:
+ *   sandboxGateway  — an in-app stand-in for the bank page. It moves no money and is the
+ *                     default, so the preview and a fresh clone stay testable.
+ *   zarinpalGateway — the real thing: it asks `server/index.mjs` for a payment, and that
+ *                     server verifies the transaction with Zarinpal (REST v4) before the
+ *                     shopper comes back.
+ * `VITE_PAYMENT_GATEWAY` picks between them (`sandbox` when unset), so a host runs
+ * `zarinpal` while the sandbox preview keeps the stand-in.
  *
- *   handoff  → POST /payment/request   { orderId, amount, callbackUrl } → { authority, redirectUrl }
- *   verify   → POST /payment/verify    { authority }                   → { ok, refId }
- *
- * Implement `PaymentGateway` against those two routes and point `activeGateway` at it.
- * The merchant key stays on the server — never ship it to the browser.
+ * Zarinpal verifies on the server and returns the shopper to
+ * `/checkout?payment=…&order=…&ref=…`; only inline gateways verify in the browser, which
+ * is why `verify` is optional. The merchant id is a credential and stays on the server.
  */
 
 export type PaymentMethod = 'online' | 'wallet' | 'installment' | 'cod';
@@ -36,7 +38,7 @@ export type PaymentCustomer = {
 export type PaymentOrder = {
   /** Order number the shopper sees, e.g. ST-482913. */
   id: string;
-  /** What the gateway charges: basket due plus shipping. */
+  /** What the gateway charges, in Toman: basket due plus shipping. */
   amount: number;
   method: PaymentMethod;
   methodTitle: string;
@@ -65,9 +67,9 @@ export type PaymentGateway = {
   id: string;
   title: string;
   /** Where the shopper is sent to authorise the payment. */
-  handoff: (order: PaymentOrder) => string;
-  /** Confirms that handoff. A real gateway calls its server here. */
-  verify: (order: PaymentOrder, input: VerifyInput) => VerifyResult;
+  handoff: (order: PaymentOrder) => Promise<string>;
+  /** Only inline gateways confirm in the browser; a real PSP does it on its server. */
+  verify?: (order: PaymentOrder, input: VerifyInput) => Promise<VerifyResult>;
 };
 
 /** Order status as it shows up in the account panel. */
@@ -84,8 +86,8 @@ export const sandboxGateway: PaymentGateway = {
   id: 'sandbox',
   title: 'درگاه آزمایشی',
   // No external host: the stand-in bank page is a route of this app.
-  handoff: (order) => `/payment/${order.id}`,
-  verify: (_order, input) => {
+  handoff: async (order) => `/payment/${order.id}`,
+  verify: async (_order, input) => {
     if (input.outcome === 'canceled') {
       return { ok: false, status: 'canceled', error: 'پرداخت لغو شد.' };
     }
@@ -96,8 +98,37 @@ export const sandboxGateway: PaymentGateway = {
   },
 };
 
-/** The gateway checkout uses. Swap the value once a real PSP is wired. */
-export const activeGateway: PaymentGateway = sandboxGateway;
+const PAYMENT_API = '/api/payment';
+
+export const zarinpalGateway: PaymentGateway = {
+  id: 'zarinpal',
+  title: 'زرین‌پال',
+  handoff: async (order) => {
+    const response = await fetch(`${PAYMENT_API}/request`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        orderId: order.id,
+        amount: order.amount,
+        description: `سفارش ${order.id} — فروشگاه مدورا`,
+      }),
+    });
+    const data = (await response.json().catch(() => ({}))) as {
+      redirectUrl?: string;
+      error?: string;
+    };
+    if (!response.ok || !data.redirectUrl) {
+      throw new Error(data.error ?? 'اتصال به درگاه پرداخت ممکن نشد.');
+    }
+    return data.redirectUrl;
+  },
+};
+
+const configuredGateway = (import.meta.env.VITE_PAYMENT_GATEWAY ?? 'sandbox').toLowerCase();
+
+/** The gateway checkout uses. Set `VITE_PAYMENT_GATEWAY=zarinpal` to take real money. */
+export const activeGateway: PaymentGateway =
+  configuredGateway === 'zarinpal' ? zarinpalGateway : sandboxGateway;
 
 const PAYMENTS_KEY = 'styleon.payments';
 

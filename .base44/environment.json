@@ -2,5 +2,11 @@
   "previewPort": 3000,
   "healthPath": "/",
   "startCommand": "docker compose -f docker-compose.base44.yml up -d",
-  "secrets": []
+  "secrets": [
+    {
+      "name": "ZARINPAL_MERCHANT_ID",
+      "description": "شناسه پذیرنده زرین‌پال (۳۶ کاراکتری) از پنل zarinpal.com → درگاه پرداخت → تنظیمات درگاه. برای پرداخت واقعی لازم است؛ بدون آن سرویس پرداخت با پیام خطا پاسخ می‌دهد.",
+      "requiredAtBoot": false
+    }
+  ]
 }

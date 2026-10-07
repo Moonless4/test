@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   AlertCircle,
@@ -98,14 +98,17 @@ export default function CheckoutPage() {
     settleOrder,
     clearCart,
   } = useStore();
-  const { addOrder } = useAuth();
+  const { addOrder, updateOrderStatus } = useAuth();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<Form>(EMPTY_FORM);
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
   const [shipMethod, setShipMethod] = useState('post');
   const [payMethod, setPayMethod] = useState('online');
   const [placed, setPlaced] = useState<string | null>(null);
+  const [placedRef, setPlacedRef] = useState<string | undefined>(undefined);
   const [earned, setEarned] = useState(0);
+  const [payError, setPayError] = useState<string | null>(null);
+  const [redirecting, setRedirecting] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const paymentOutcome = searchParams.get('payment');
@@ -115,6 +118,32 @@ export default function CheckoutPage() {
     () => (returnedOrderId ? readPayment(returnedOrderId) : null),
     [returnedOrderId],
   );
+
+  // A gateway that verifies on its server (Zarinpal) sends the shopper back with the
+  // outcome in the query string, and this is where the ledger, the coins and the basket
+  // are settled. The stand-in gateway has already written its record by then, so the guard
+  // on `pending` keeps this to exactly one settlement.
+  useEffect(() => {
+    if (!returned || returned.status !== 'pending') return;
+    if (paymentOutcome !== 'paid' && paymentOutcome !== 'failed' && paymentOutcome !== 'canceled') {
+      return;
+    }
+    const coinsEarned = paymentOutcome === 'paid' ? settleOrder(returned.amount) : 0;
+    savePayment({
+      ...returned,
+      status: paymentOutcome,
+      refId: searchParams.get('ref') ?? returned.refId,
+      paidAt: paymentOutcome === 'paid' ? new Date().toISOString() : undefined,
+      coinsEarned,
+    });
+    updateOrderStatus(returned.id, STATUS_LABEL[paymentOutcome]);
+    if (paymentOutcome === 'paid') {
+      clearCart();
+      setPlacedRef(searchParams.get('ref') ?? undefined);
+      setEarned(coinsEarned);
+      setPlaced(returned.id);
+    }
+  }, [returned, paymentOutcome, searchParams, settleOrder, clearCart, updateOrderStatus]);
 
   const shippingCost = useMemo(() => {
     const method = SHIPPING_METHODS.find((m) => m.id === shipMethod);
@@ -139,7 +168,7 @@ export default function CheckoutPage() {
     setStep((s) => Math.min(s + 1, 4));
   };
 
-  const placeOrder = () => {
+  const placeOrder = async () => {
     const orderNumber = newOrderId();
     const amount = due + shippingCost;
     const method = PAYMENT_METHODS.find((m) => m.id === payMethod);
@@ -176,7 +205,16 @@ export default function CheckoutPage() {
       };
       savePayment(record);
       addOrder({ id: orderNumber, total: amount, status: STATUS_LABEL.pending, lines: orderLines });
-      navigate(activeGateway.handoff(record));
+      setPayError(null);
+      setRedirecting(true);
+      try {
+        // Zarinpal answers with a URL of its own; the stand-in gateway stays in the app.
+        navigate(await activeGateway.handoff(record));
+      } catch (error) {
+        // The order stays registered as awaiting payment, so a retry loses nothing.
+        setRedirecting(false);
+        setPayError(error instanceof Error ? error.message : 'اتصال به درگاه پرداخت ممکن نشد.');
+      }
       return;
     }
 
@@ -191,7 +229,7 @@ export default function CheckoutPage() {
   };
 
   const done = placed
-    ? { id: placed, refId: undefined as string | undefined, earned }
+    ? { id: placed, refId: placedRef, earned }
     : returned?.status === 'paid'
       ? { id: returned.id, refId: returned.refId, earned: returned.coinsEarned ?? 0 }
       : null;
@@ -304,6 +342,13 @@ export default function CheckoutPage() {
             {paymentOutcome === 'canceled' ? 'پرداخت لغو شد' : 'پرداخت ناموفق بود'} و مبلغی از
             حساب شما کسر نشد. سبد خریدتان دست‌نخورده باقی مانده است؛ می‌توانید دوباره تلاش کنید.
           </p>
+        </div>
+      ) : null}
+
+      {payError ? (
+        <div className="mb-6 flex items-start gap-3 rounded-panel border border-line bg-cream p-4">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-sale" />
+          <p className="text-[13px] leading-6 text-ink">{payError}</p>
         </div>
       ) : null}
 
@@ -560,9 +605,10 @@ export default function CheckoutPage() {
               <button
                 type="button"
                 onClick={placeOrder}
-                className="h-12 rounded-xl bg-teal-800 px-7 text-sm font-bold text-white transition-colors hover:bg-teal-700"
+                disabled={redirecting}
+                className="h-12 rounded-xl bg-teal-800 px-7 text-sm font-bold text-white transition-colors hover:bg-teal-700 disabled:opacity-60"
               >
-                ثبت سفارش و پرداخت
+                {redirecting ? 'در حال انتقال به درگاه…' : 'ثبت سفارش و پرداخت'}
               </button>
             )}
           </div>

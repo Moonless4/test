@@ -47,11 +47,12 @@ export default function PaymentPage() {
     );
   }
 
-  const finish = (outcome: VerifyInput['outcome']) => {
-    if (busy || order.status !== 'pending') return;
+  const finish = async (outcome: VerifyInput['outcome']) => {
+    const confirm = activeGateway.verify;
+    if (busy || !confirm || order.status !== 'pending') return;
     setBusy(true);
 
-    const result = activeGateway.verify(order, { outcome });
+    const result = await confirm(order, { outcome });
     // Coins and the discount code are settled only once the money is really in, and the
     // basket is left untouched whenever the shopper walks away from the gateway.
     const coinsEarned = result.ok ? settleOrder(order.amount) : 0;
