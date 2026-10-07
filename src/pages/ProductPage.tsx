@@ -16,6 +16,7 @@ import { toFa } from '../lib/format';
 import { useStore } from '../context/StoreContext';
 import ProductGallery from '../components/product/ProductGallery';
 import ProductCarousel from '../components/product/ProductCarousel';
+import ProductReviews from '../components/product/ProductReviews';
 import DiscountBadge from '../components/ui/DiscountBadge';
 import PriceDisplay from '../components/ui/PriceDisplay';
 import QuantitySelector from '../components/ui/QuantitySelector';
@@ -307,42 +308,36 @@ export default function ProductPage() {
           ) : null}
 
           {tab === 'reviews' ? (
-            <div className="grid max-w-4xl gap-4 sm:grid-cols-2">
-              <div className="rounded-panel border border-line bg-cream p-5">
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl font-black text-teal-800">{toFa(product.rating)}</span>
-                  <div>
-                    <Rating value={product.rating} size="md" />
-                    <p className="mt-1 text-[12px] text-muted">
-                      از {toFa(product.reviewCount)} نظر ثبت‌شده
-                    </p>
-                  </div>
+            <div className="max-w-4xl rounded-panel border border-line bg-cream p-5 sm:p-6">
+              <div className="flex items-center gap-4">
+                <span className="text-3xl font-black text-teal-800">{toFa(product.rating)}</span>
+                <div>
+                  <Rating value={product.rating} size="md" />
+                  <p className="mt-1 text-[12px] text-muted">
+                    از {toFa(product.reviewCount)} نظر ثبت‌شده
+                  </p>
                 </div>
               </div>
-              {product.reviews.map((review) => (
-                <figure key={review.name} className="rounded-panel border border-line p-5">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={review.avatar}
-                      alt=""
-                      loading="lazy"
-                      className="h-10 w-10 rounded-full object-cover"
-                    />
-                    <div>
-                      <figcaption className="text-[13px] font-bold text-ink">{review.name}</figcaption>
-                      <span className="text-[11px] text-muted">{review.date}</span>
-                    </div>
-                  </div>
-                  <Rating value={review.rating} className="mt-3" />
-                  <blockquote className="mt-3 text-[13px] leading-7 text-ink/85">
-                    {review.text}
-                  </blockquote>
-                </figure>
-              ))}
+              <p className="mt-4 text-[13px] leading-7 text-muted">
+                نظرات خریداران و فرم ثبت نظر در بخش «نظرات مشتریان» پایین همین صفحه است.
+              </p>
+              <button
+                type="button"
+                onClick={() =>
+                  document
+                    .getElementById('product-reviews')
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+                className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-teal-800 px-5 text-sm font-bold text-white transition-colors hover:bg-teal-700"
+              >
+                خواندن و ثبت نظرات
+              </button>
             </div>
           ) : null}
         </div>
       </section>
+
+      <ProductReviews product={product} />
 
       <section className="mt-12 sm:mt-16">
         <h2 className="mb-6 text-xl font-bold text-ink sm:text-2xl">محصولات مرتبط</h2>
