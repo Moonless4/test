@@ -79,7 +79,7 @@ export default function CountdownPanel() {
         <div>
           <h3 className="text-lg font-black sm:text-xl">تخفیف شگفت‌انگیز</h3>
           <p className="mt-1 text-[11px] text-white/75 sm:text-xs">
-            تخفیف‌های ویژه در استایل آن
+            تخفیف‌های ویژه در مدورا
           </p>
         </div>
 

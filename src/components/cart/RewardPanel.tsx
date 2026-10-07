@@ -74,7 +74,7 @@ export default function RewardPanel() {
                 setDraft(e.target.value);
                 setError('');
               }}
-              placeholder="مثلاً STYLEON10"
+              placeholder="مثلاً MEDORA10"
               className="h-10 min-w-0 flex-1 rounded-lg border border-line bg-cream px-3 text-[13px] tracking-wide text-ink outline-none transition-colors focus:border-teal-400"
             />
             <button

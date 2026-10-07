@@ -88,8 +88,8 @@ export default function MobileTabBar({ onOpenCategories }: Props) {
             دسته‌بندی
           </button>
 
-          <Link to="/" aria-label="استایل‌آن" className={brand}>
-            S
+          <Link to="/" aria-label="مدورا" className={brand}>
+            M
           </Link>
 
           <Link to="/wishlist" className={`${tab} ${tone(pathname === '/wishlist')}`}>

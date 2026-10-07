@@ -32,7 +32,7 @@ export default function Newsletter() {
 
           <div className="p-7 sm:p-10 lg:p-12">
             <span className="text-[11px] font-medium tracking-wide text-teal-200 sm:text-xs">
-              خبرنامه استایل آن
+              خبرنامه مدورا
             </span>
             <h2 className="mt-3 text-[22px] font-black text-white sm:text-[28px]">
               عضویت در خبرنامه

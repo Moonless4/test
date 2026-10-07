@@ -25,7 +25,7 @@ export default function Testimonials() {
             </h2>
             <span className="mt-3 block h-1 w-12 rounded-full bg-teal-800" />
             <p className="mt-5 max-w-[380px] text-[13px] leading-7 text-muted sm:text-sm sm:leading-8">
-              بیش از ۱۲٬۰۰۰ مشتری تا امروز از استایل آن خرید کرده‌اند. اینها بخشی از نظرات ثبت‌شده
+              بیش از ۱۲٬۰۰۰ مشتری تا امروز از مدورا خرید کرده‌اند. اینها بخشی از نظرات ثبت‌شده
               در مورد کیفیت کالا و تجربه خرید است.
             </p>
 

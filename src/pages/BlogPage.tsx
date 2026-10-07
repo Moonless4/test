@@ -16,7 +16,7 @@ export default function BlogPage() {
       </nav>
 
       <SectionHeader
-        eyebrow="مجله استایل آن"
+        eyebrow="مجله مدورا"
         title="وبلاگ"
         linkLabel="بازگشت به فروشگاه"
         linkTo="/shop"

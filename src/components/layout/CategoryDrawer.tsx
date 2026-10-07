@@ -91,7 +91,7 @@ export default function CategoryDrawer({ open, onClose }: Props) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               aria-label="جستجوی محصولات"
-              placeholder="جستجو در استایل‌آن"
+              placeholder="جستجو در مدورا"
               className="h-full w-full bg-transparent text-[13px] text-ink outline-none placeholder:text-muted"
             />
             <Search className="h-4 w-4 shrink-0 text-ink/60" />

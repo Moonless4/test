@@ -90,7 +90,7 @@ const SEEDS: Seed[] = [
     id: 'men-denim-jacket',
     name: 'کت جین مردانه',
     category: 'men',
-    brand: 'STYLEON',
+    brand: 'MEDORA',
     price: 1995000,
     originalPrice: 2850000,
     rating: 4.8,
@@ -126,7 +126,7 @@ const SEEDS: Seed[] = [
     id: 'men-cotton-tee',
     name: 'تی‌شرت مردانه پنبه',
     category: 'men',
-    brand: 'STYLEON',
+    brand: 'MEDORA',
     price: 890000,
     rating: 4.7,
     reviewCount: 203,
@@ -143,7 +143,7 @@ const SEEDS: Seed[] = [
     id: 'men-linen-coat',
     name: 'کت کتان مردانه',
     category: 'men',
-    brand: 'STYLEON',
+    brand: 'MEDORA',
     price: 1800000,
     originalPrice: 2400000,
     rating: 4.9,
@@ -365,7 +365,7 @@ const SEEDS: Seed[] = [
     id: 'shoes-classic-sneaker',
     name: 'کتانی کلاسیک',
     category: 'shoes',
-    brand: 'STYLEON',
+    brand: 'MEDORA',
     price: 1870000,
     originalPrice: 2200000,
     rating: 4.7,
@@ -493,7 +493,7 @@ const SEEDS: Seed[] = [
     id: 'acc-sunglasses',
     name: 'عینک آفتابی کلاسیک',
     category: 'accessories',
-    brand: 'STYLEON',
+    brand: 'MEDORA',
     price: 1190000,
     originalPrice: 1400000,
     rating: 4.4,
@@ -1200,7 +1200,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'چطور با سه تکه‌ی ساده، چند استایل متفاوت برای روزهای خنک بسازیم.',
     image: img('1441986300917-64674bd600d8', 900, 700),
     date: '۱۲ مهر ۱۴۰۴',
-    author: 'تیم استایل استایل‌آن',
+    author: 'تیم مدورا',
     readTime: '۶ دقیقه مطالعه',
     body: [
       'لایه‌کردن لباس ساده‌ترین راه برای ساختن چند استایل با تعداد کمی تکه است. با سه قطعه — یک زیرپوش سبک، یک لایه‌ی میانی و یک رویه‌ی مقاوم — می‌توانید استایل روزمره، کاری و عصرانه داشته باشید.',
@@ -1215,7 +1215,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'تفاوت پنبه، کتان و ویسکوز را بشناسید تا انتخاب دقیق‌تری داشته باشید.',
     image: img('1620799140408-edc6dcb6d633', 900, 700),
     date: '۲ مهر ۱۴۰۴',
-    author: 'تیم استایل استایل‌آن',
+    author: 'تیم مدورا',
     readTime: '۷ دقیقه مطالعه',
     body: [
       'پیش از خرید آنلاین، شناختن پارچه مهم‌تر از دیدن عکس است. پنبه‌ی خالص نفس‌کش است، رطوبت را جذب می‌کند و برای تی‌شرت و شلوار راحت انتخاب اول است.',
@@ -1230,7 +1230,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'چند قدم ساده که عمر کفش چرم شما را چند برابر می‌کند.',
     image: img('1600185365483-26d7a4cc7519', 900, 700),
     date: '۲۴ شهریور ۱۴۰۴',
-    author: 'تیم استایل استایل‌آن',
+    author: 'تیم مدورا',
     readTime: '۵ دقیقه مطالعه',
     body: [
       'چرم طبیعی با مراقبت درست سال‌ها همراهتان می‌ماند. اولین قدم، تمیز کردن گرد و غبار با یک برس نرم یا پارچه‌ی نخی خشک بعد از هر استفاده است.',
@@ -1245,7 +1245,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'با چند رنگ خنثی می‌توانید بیشتر تکه‌های لباستان را با هم ست کنید.',
     image: img('1515886657613-9f3515b0c78f', 900, 700),
     date: '۱۸ شهریور ۱۴۰۴',
-    author: 'تیم استایل استایل‌آن',
+    author: 'تیم مدورا',
     readTime: '۵ دقیقه مطالعه',
     body: [
       'یک کمد لباس کارا روی چند رنگ خنثی بنا می‌شود: مشکی، سفید، کرم، طوسی و سرمه‌ای. این پنج رنگ تقریباً با هر چیزی ست می‌شوند و خرید بعدی شما را ساده‌تر می‌کنند.',
@@ -1260,7 +1260,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'بوت یا نیم‌بوت؟ چه ویژگی‌هایی برای روزهای سرد شهری مهم است.',
     image: img('1549298916-b41d501d3772', 900, 700),
     date: '۱۰ شهریور ۱۴۰۴',
-    author: 'تیم استایل استایل‌آن',
+    author: 'تیم مدورا',
     readTime: '۴ دقیقه مطالعه',
     body: [
       'برای شهر، مهم‌ترین ویژگی کفش زمستانی ضدنفوذ بودن و زیره‌ی نچسب است. زیره‌ی لاستیکی با آج‌های عمیق روی سطح خیس بهتر عمل می‌کند.',
@@ -1275,7 +1275,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'اندازه، جنس و تعداد جیب‌های کیف را بر اساس برنامه‌ی روزانه انتخاب کنید.',
     image: img('1548036328-c9fa89d128fa', 900, 700),
     date: '۳ شهریور ۱۴۰۴',
-    author: 'تیم استایل استایل‌آن',
+    author: 'تیم مدورا',
     readTime: '۵ دقیقه مطالعه',
     body: [
       'اول برنامه‌ی روزتان را مشخص کنید: اگر لپ‌تاپ و دفتر همراه دارید، کیف دوشی با فضای مستند مناسب‌تر است؛ برای قرارهای کوتاه، کیف دستی کوچک کافی است.',
@@ -1338,7 +1338,7 @@ export const allBrands = Array.from(new Set(products.map((p) => p.brand))).sort(
  * here: add the codes you hand out and they start working right away.
  */
 export const coupons: Coupon[] = [
-  { code: 'STYLEON10', percent: 10, label: '۱۰٪ تخفیف روی کل سبد' },
+  { code: 'MEDORA10', percent: 10, label: '۱۰٪ تخفیف روی کل سبد' },
   {
     code: 'WELCOME15',
     percent: 15,

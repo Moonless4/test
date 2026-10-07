@@ -44,20 +44,13 @@ export default function Footer() {
       <div className="container">
         <div className="grid gap-10 py-12 lg:grid-cols-12 lg:gap-8 lg:py-16">
           <div className="lg:col-span-4">
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/12 text-lg font-black ring-1 ring-white/20">
-                S
-              </span>
-              <span className="flex flex-col leading-none">
-                <span className="text-xl font-black tracking-[0.14em]">STYLEON</span>
-                <span className="mt-1 text-[9px] tracking-[0.3em] text-teal-200">
-                  WEAR YOUR STYLE
-                </span>
-              </span>
-            </div>
+            {/* The lockup is black on white, so it sits on its own white chip over the dark footer. */}
+            <span className="inline-flex items-center rounded-xl bg-white px-3 py-2">
+              <img src="/medora-logo.png" alt="مدورا" className="h-8 w-auto" />
+            </span>
 
             <p className="mt-5 max-w-sm text-[13px] leading-7 text-white/65">
-              استایل آن، فروشگاه اینترنتی پوشاک و اکسسوری با تمرکز بر کیفیت دوخت، پارچه‌ی درست و
+              مدورا، فروشگاه اینترنتی پوشاک و اکسسوری با تمرکز بر کیفیت دوخت، پارچه‌ی درست و
               طراحی امروزی. از میان جدیدترین کالکشن‌ها انتخاب کنید و درب منزل تحویل بگیرید.
             </p>
 
@@ -125,7 +118,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0 text-teal-300" />
-                <span dir="ltr">info@styleon.ir</span>
+                <span dir="ltr">info@medora.ir</span>
               </li>
               <li className="flex items-start gap-2 leading-6">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-teal-300" />
@@ -136,7 +129,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 sm:flex-row">
-          <p className="text-[12px] text-white/55">© ۲۰۲۵ Styleon. تمامی حقوق محفوظ است.</p>
+          <p className="text-[12px] text-white/55">© ۲۰۲۵ مدورا. تمامی حقوق محفوظ است.</p>
           <div className="flex items-center gap-5 text-[12px] text-white/55">
             <Link to="/blog" className="transition-colors hover:text-white">
               حریم خصوصی
