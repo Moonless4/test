@@ -806,8 +806,8 @@ export const newArrivals = [
 
 /**
  * A product's kind inside its category, so a rail never mixes a shirt with a pair of
- * trousers. Persian names are matched on the noun they carry; anything unmatched
- * (shoes, bags, accessories, beauty) is already one kind per category.
+ * trousers. Persian names are matched on the noun they carry; anything unmatched keeps its
+ * category as the kind, so bags, accessories and beauty use their whole category.
  */
 const TYPE_RULES: [keyword: string, type: string][] = [
   ['کت ', 'outerwear'], // کت جین، کت کتان، کت مجلسی — the space keeps «کتانی» out
@@ -827,14 +827,12 @@ const TYPE_RULES: [keyword: string, type: string][] = [
 const typeOf = (product: Product): string =>
   TYPE_RULES.find(([keyword]) => product.name.includes(keyword))?.[1] ?? product.category;
 
-/** Same category only — closest kind first (a coat leads with coats) — capped at `count`. */
+/** Same category **and** same kind only — a coat never leads to a t-shirt. May be empty. */
 export const relatedProducts = (product: Product, count = 6): Product[] => {
-  const others = products.filter((p) => p.id !== product.id && p.category === product.category);
   const type = typeOf(product);
-  return [
-    ...others.filter((p) => typeOf(p) === type),
-    ...others.filter((p) => typeOf(p) !== type),
-  ].slice(0, count);
+  return products
+    .filter((p) => p.id !== product.id && p.category === product.category && typeOf(p) === type)
+    .slice(0, count);
 };
 
 /* ------------------------------------------------------------------ *

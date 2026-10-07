@@ -358,16 +358,12 @@ export default function ProductPage() {
 
       <ProductReviews product={product} />
 
-      <section className="mt-12 sm:mt-16">
-        <h2 className="mb-6 text-xl font-bold text-ink sm:text-2xl">محصولات مرتبط</h2>
-        {sameCategory.length > 0 ? (
+      {sameCategory.length > 0 ? (
+        <section className="mt-12 sm:mt-16">
+          <h2 className="mb-6 text-xl font-bold text-ink sm:text-2xl">محصولات مرتبط</h2>
           <ProductCarousel products={sameCategory} />
-        ) : (
-          <p className="rounded-panel border border-line bg-cream p-5 text-[13px] text-muted">
-            هنوز کالای دیگری در این دسته ثبت نشده است.
-          </p>
-        )}
-      </section>
+        </section>
+      ) : null}
 
       {/* Phone chrome: this page's bottom bar replaces the app's tab bar. */}
       <ProductActionBar price={product.price} onAdd={handleAdd} />
