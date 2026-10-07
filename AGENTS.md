@@ -43,9 +43,9 @@ curl -I http://localhost:3000/
 ## Where things live
 
 - `src/lib/data.ts` — the whole catalog (28 products), categories, hero slides, testimonials,
-  blog posts. Prices are plain Toman integers. `relatedProducts()` is same-category only, so a
-  rail never mixes shoes with coats; `complementaryProducts()` builds the separate
-  «همراه این کالا» cross-sell rail from the `COMPLEMENTS` category map.
+  blog posts. Prices are plain Toman integers. `relatedProducts()` stays inside the product's
+  own category and ranks same-kind items first (`TYPE_RULES` maps a Persian product name to a
+  kind such as outerwear/top/bottom), so a shirt rail never leads with a pair of trousers.
 - `src/context/StoreContext.tsx` — cart + wishlist state, persisted to `localStorage`
   (`styleon.cart`, `styleon.wishlist`). Adding to the cart opens the drawer. Wishlist is added from
   the product page only; product cards carry no heart button. It also owns the basket perks: the

@@ -12,14 +12,7 @@ import {
   Truck,
   Zap,
 } from 'lucide-react';
-import {
-  COIN_TITLE,
-  COIN_VALUE,
-  coinsFor,
-  complementaryProducts,
-  getProduct,
-  relatedProducts,
-} from '../lib/data';
+import { COIN_TITLE, COIN_VALUE, coinsFor, getProduct, relatedProducts } from '../lib/data';
 import { toFa } from '../lib/format';
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE, useStore } from '../context/StoreContext';
 import ProductActionBar from '../components/product/ProductActionBar';
@@ -70,7 +63,6 @@ export default function ProductPage() {
   const wishlisted = isWishlisted(product.id);
   const earnedCoins = coinsFor(product.price * qty);
   const sameCategory = relatedProducts(product, 6);
-  const alsoBuy = complementaryProducts(product, 6);
 
   const handleAdd = () => addToCart(product, selectedSize, selectedColor, qty);
   const handleBuyNow = () => {
@@ -376,13 +368,6 @@ export default function ProductPage() {
           </p>
         )}
       </section>
-
-      {alsoBuy.length > 0 ? (
-        <section className="mt-12 sm:mt-16">
-          <h2 className="mb-6 text-xl font-bold text-ink sm:text-2xl">این‌ها را هم با هم بخرید</h2>
-          <ProductCarousel products={alsoBuy} />
-        </section>
-      ) : null}
 
       {/* Phone chrome: this page's bottom bar replaces the app's tab bar. */}
       <ProductActionBar price={product.price} onAdd={handleAdd} />

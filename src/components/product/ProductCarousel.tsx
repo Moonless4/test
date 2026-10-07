@@ -23,12 +23,13 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
     'flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-black shadow-soft transition-all hover:bg-teal-800 hover:text-white';
 
   return (
-    <div className="relative">
-      <div className="pointer-events-none absolute -top-14 start-0 hidden items-center gap-2 sm:flex">
+    <div>
+      {/* Kept in the flow so the arrows can never land on top of the section heading. */}
+      <div className="mb-3 hidden items-center justify-end gap-2 sm:flex">
         <button
           type="button"
           aria-label="محصولات قبلی"
-          className={`pointer-events-auto ${arrow}`}
+          className={arrow}
           onClick={() => scrollByCards(false)}
         >
           <ChevronRight className="h-5 w-5" />
@@ -36,7 +37,7 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
         <button
           type="button"
           aria-label="محصولات بعدی"
-          className={`pointer-events-auto ${arrow}`}
+          className={arrow}
           onClick={() => scrollByCards(true)}
         >
           <ChevronLeft className="h-5 w-5" />

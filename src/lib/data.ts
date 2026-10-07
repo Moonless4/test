@@ -804,32 +804,37 @@ export const newArrivals = [
   .map((id) => getProduct(id))
   .filter((p): p is Product => Boolean(p));
 
-/** Same-category neighbours only: a shoe never shows up under a coat. */
-export const relatedProducts = (product: Product, count = 4): Product[] =>
-  products.filter((p) => p.id !== product.id && p.category === product.category).slice(0, count);
+/**
+ * A product's kind inside its category, so a rail never mixes a shirt with a pair of
+ * trousers. Persian names are matched on the noun they carry; anything unmatched
+ * (shoes, bags, accessories, beauty) is already one kind per category.
+ */
+const TYPE_RULES: [keyword: string, type: string][] = [
+  ['کت ', 'outerwear'], // کت جین، کت کتان، کت مجلسی — the space keeps «کتانی» out
+  ['کاپشن', 'outerwear'],
+  ['مانتو', 'outerwear'],
+  ['شلوار', 'bottom'],
+  ['پیراهن زنانه', 'dress'],
+  ['پیراهن مجلسی', 'dress'],
+  ['پیراهن', 'top'],
+  ['تی‌شرت', 'top'],
+  ['هودی', 'top'],
+  ['پولوشرت', 'top'],
+  ['بلوز', 'top'],
+  ['تونیک', 'top'],
+];
 
-/** What completes a look: a pair of jeans pairs with shoes and a belt, not with perfume. */
-const COMPLEMENTS: Record<CategoryId, CategoryId[]> = {
-  men: ['shoes', 'accessories'],
-  women: ['shoes', 'bags', 'beauty'],
-  shoes: ['bags', 'accessories'],
-  accessories: ['bags', 'shoes'],
-  bags: ['accessories', 'shoes'],
-  beauty: ['accessories', 'bags'],
-};
+const typeOf = (product: Product): string =>
+  TYPE_RULES.find(([keyword]) => product.name.includes(keyword))?.[1] ?? product.category;
 
-/** Cross-sell rail: one pick per complementary category, round-robin so the rail stays mixed. */
-export const complementaryProducts = (product: Product, count = 6): Product[] => {
-  const pools = (COMPLEMENTS[product.category] ?? []).map((category) =>
-    products.filter((p) => p.category === category),
-  );
-  const mixed: Product[] = [];
-  for (let i = 0; mixed.length < count && pools.some((pool) => pool.length > i); i += 1) {
-    pools.forEach((pool) => {
-      if (pool[i]) mixed.push(pool[i]);
-    });
-  }
-  return mixed.slice(0, count);
+/** Same category only — closest kind first (a coat leads with coats) — capped at `count`. */
+export const relatedProducts = (product: Product, count = 6): Product[] => {
+  const others = products.filter((p) => p.id !== product.id && p.category === product.category);
+  const type = typeOf(product);
+  return [
+    ...others.filter((p) => typeOf(p) === type),
+    ...others.filter((p) => typeOf(p) !== type),
+  ].slice(0, count);
 };
 
 /* ------------------------------------------------------------------ *
