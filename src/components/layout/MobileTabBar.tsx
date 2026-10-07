@@ -53,8 +53,10 @@ export default function MobileTabBar({ onOpenCategories }: Props) {
   const badge =
     'absolute top-0 end-3 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold text-white';
 
-  const brand = `mx-1 flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full bg-white text-[17px] font-black tracking-tight ring-1 ring-line transition-colors ${
-    pathname === '/' ? 'text-teal-800' : 'text-ink'
+  // The brand button carries the standalone mark, not the lockup: at 46px the wordmark is
+  // illegible. The mark is black ink on transparency, so it sits straight on the white chip.
+  const brand = `mx-1 flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full bg-white ring-1 transition-colors ${
+    pathname === '/' ? 'ring-teal-800' : 'ring-line'
   }`;
 
   return (
@@ -89,7 +91,7 @@ export default function MobileTabBar({ onOpenCategories }: Props) {
           </button>
 
           <Link to="/" aria-label="مدورا" className={brand}>
-            M
+            <img src="/medora-mark.png" alt="" className="h-6 w-auto" />
           </Link>
 
           <Link to="/wishlist" className={`${tab} ${tone(pathname === '/wishlist')}`}>

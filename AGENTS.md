@@ -61,8 +61,11 @@ curl -I http://localhost:3000/
   the two viewports agree, so it is a no-op in the sandbox preview and on desktop.
 - **Brand**: the store is MEDORA / «مدورا». Two lockups, both in `public/`: `medora-logo.png` (black
   on white) for the header, and `medora-logo-white.png` (white ink, transparent background) for the
-  footer, which drops it straight onto the dark teal — never put a chip or background behind it. At
-  tab-bar and favicon size a lockup is illegible, so those two keep a letter tile ("M"). The
+  footer, which drops it straight onto the dark teal — never put a chip or background behind it.
+  `public/medora-mark.png` is the standalone mark (black ink on transparency) and is what the phone
+  and tablet tab bar's round brand button carries: a lockup is illegible at 46px, and the mark keeps
+  the tile's white chip so the black ink reads. The active tab is signalled by that chip's ring
+  colour, since the artwork itself cannot change colour. The
   `localStorage` keys still carry the historic `styleon.*` prefix on purpose — renaming them would
   drop every saved cart, session and order.
 - **Trust badge**: the eNamad seal is `public/enamad.png` (artwork that carries its own white
