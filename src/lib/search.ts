@@ -30,7 +30,11 @@ export type SearchMatches = {
   categories: Category[];
 };
 
-/** Every word of the query must appear in the product's text or the category title. */
+/**
+ * Every word of the query must appear in the haystack. Products are matched on name,
+ * brand and category title only: descriptions name other items ("با شلوار جین ست میشود"),
+ * which made unrelated products show up for a query like "شلوار جین".
+ */
 function matches(haystack: string, words: string[]) {
   const plain = normalise(haystack);
   return words.every((word) => plain.includes(word));
@@ -46,10 +50,7 @@ export function searchCatalog(query: string): SearchMatches {
     products: products.filter((product) => {
       const categoryTitle =
         categories.find((c) => c.id === product.category)?.title ?? '';
-      return matches(
-        [product.name, product.brand, product.description, categoryTitle].join(' '),
-        words,
-      );
+      return matches([product.name, product.brand, categoryTitle].join(' '), words);
     }),
     categories: categories.filter((category) => matches(category.title, words)),
   };
