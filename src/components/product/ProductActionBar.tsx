@@ -1,9 +1,8 @@
 import { ShoppingBag } from 'lucide-react';
-import PriceDisplay from '../ui/PriceDisplay';
+import Price from '../ui/Price';
 
 type Props = {
   price: number;
-  originalPrice: number;
   /** The page's own add-to-cart handler, so the chosen size, colour and quantity carry over. */
   onAdd: () => void;
 };
@@ -12,7 +11,7 @@ type Props = {
  * Phone-only sticky bar for a product page: the price and the add-to-cart action, in
  * place of the usual bottom tab bar.
  */
-export default function ProductActionBar({ price, originalPrice, onAdd }: Props) {
+export default function ProductActionBar({ price, onAdd }: Props) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-[60] px-3 pb-[max(10px,env(safe-area-inset-bottom))] lg:hidden">
       <div className="mx-auto flex h-[62px] w-full max-w-[430px] items-center justify-between gap-3 rounded-[26px] bg-white px-2.5 shadow-lift ring-1 ring-line">
@@ -26,13 +25,7 @@ export default function ProductActionBar({ price, originalPrice, onAdd }: Props)
           افزودن به سبد خرید
         </button>
 
-        <PriceDisplay
-          price={price}
-          originalPrice={originalPrice}
-          size="sm"
-          align="end"
-          className="shrink-0"
-        />
+        <Price value={price} className="shrink-0 text-sm font-bold text-ink" />
       </div>
     </div>
   );

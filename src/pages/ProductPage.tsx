@@ -347,11 +347,7 @@ export default function ProductPage() {
       </section>
 
       {/* Phone chrome: this page's bottom bar replaces the app's tab bar. */}
-      <ProductActionBar
-        price={product.price}
-        originalPrice={product.originalPrice}
-        onAdd={handleAdd}
-      />
+      <ProductActionBar price={product.price} onAdd={handleAdd} />
     </div>
   );
 }
