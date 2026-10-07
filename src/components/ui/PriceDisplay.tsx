@@ -47,7 +47,7 @@ export default function PriceDisplay({
           </span>
         </span>
       ) : null}
-      <span className={`${currentSize} font-bold ${discounted ? 'text-teal-800' : 'text-ink'}`}>
+      <span className={`${currentSize} font-bold ${discounted ? 'text-black' : 'text-ink'}`}>
         {formatPrice(price)}
       </span>
     </div>

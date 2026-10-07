@@ -135,7 +135,7 @@ export default function ReviewForm({ productName, onSubmit }: Props) {
 
       {error ? <p className="mt-3 text-[12px] font-medium text-sale">{error}</p> : null}
       {done ? (
-        <p className="mt-3 text-[12px] font-medium text-teal-700">
+        <p className="mt-3 text-[12px] font-medium text-black">
           نظر شما ثبت شد. ممنون که تجربه‌تان را نوشتید!
         </p>
       ) : null}

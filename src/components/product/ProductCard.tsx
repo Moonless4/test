@@ -41,7 +41,7 @@ export default function ProductCard({ product }: { product: Product }) {
           className={`absolute top-2 start-2 flex h-8 w-8 items-center justify-center rounded-full border backdrop-blur transition-all duration-300 ${
             wishlisted
               ? 'border-sale/20 bg-sale text-white shadow-soft'
-              : 'border-line bg-white/90 text-teal-800 hover:bg-white hover:shadow-soft'
+              : 'border-line bg-white/90 text-black hover:bg-white hover:shadow-soft'
           }`}
         >
           <Heart className={`h-3.5 w-3.5 ${wishlisted ? 'fill-current' : ''}`} strokeWidth={1.8} />
@@ -51,7 +51,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <div className="flex flex-1 flex-col gap-1.5 p-2.5">
         <Link
           to={`/product/${product.id}`}
-          className="line-clamp-2 min-h-[2.5em] text-start text-[12px] font-medium leading-5 text-ink transition-colors hover:text-teal-700 sm:text-[13px]"
+          className="line-clamp-2 min-h-[2.5em] text-start text-[12px] font-medium leading-5 text-ink transition-colors hover:text-black sm:text-[13px]"
         >
           {product.name}
         </Link>

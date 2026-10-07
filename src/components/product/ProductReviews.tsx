@@ -25,7 +25,7 @@ export default function ProductReviews({ product }: { product: Product }) {
 
       <div className="flex flex-wrap items-center gap-x-8 gap-y-4 rounded-panel border border-line bg-cream p-5 sm:p-6">
         <div className="flex items-center gap-3">
-          <span className="text-3xl font-black text-teal-800">{toFa(average.toFixed(1))}</span>
+          <span className="text-3xl font-black text-black">{toFa(average.toFixed(1))}</span>
           <div>
             <Rating value={average} size="md" />
             <p className="mt-1 text-[12px] text-muted">از {toFa(total)} نظر ثبت‌شده</p>
@@ -63,7 +63,7 @@ export default function ProductReviews({ product }: { product: Product }) {
                 ) : (
                   <span
                     aria-hidden="true"
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-50 text-[15px] font-bold text-teal-800"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-50 text-[15px] font-bold text-black"
                   >
                     {review.name.trim().charAt(0)}
                   </span>
@@ -75,7 +75,7 @@ export default function ProductReviews({ product }: { product: Product }) {
                   <span className="text-[11px] text-muted">{review.date}</span>
                 </div>
                 {index < reviews.length ? (
-                  <span className="ms-auto shrink-0 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-bold text-teal-800">
+                  <span className="ms-auto shrink-0 rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-bold text-black">
                     نظر شما
                   </span>
                 ) : null}

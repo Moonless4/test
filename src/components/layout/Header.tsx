@@ -136,7 +136,7 @@ export default function Header() {
                 aria-expanded={link.category ? openMenu === link.category : undefined}
                 className={`relative flex items-center gap-1 whitespace-nowrap rounded-lg px-2.5 py-2 text-[13.5px] font-medium transition-colors xl:px-3 xl:text-sm ${
                   isActive(link.to)
-                    ? 'text-teal-800'
+                    ? 'text-black'
                     : 'text-ink/75 hover:bg-cream hover:text-ink'
                 }`}
               >

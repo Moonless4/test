@@ -35,7 +35,7 @@ export default {
         wine: '#9A2B42',
         'wine-dark': '#7C2136',
         ink: '#000000',
-        muted: '#71818A',
+        muted: '#5F5F5F',
         sale: '#E84B3C',
         gold: '#F4A623',
         line: '#EAE6E0',

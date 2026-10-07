@@ -16,10 +16,10 @@ type Props = {
 const VARIANTS: Record<Variant, string> = {
   primary:
     'bg-teal-800 text-white hover:bg-teal-700 shadow-soft hover:shadow-card',
-  light: 'bg-white text-teal-800 hover:bg-cream shadow-soft hover:shadow-card',
+  light: 'bg-white text-black hover:bg-cream shadow-soft hover:shadow-card',
   outline:
-    'border border-teal-800/25 text-teal-800 hover:bg-teal-800 hover:text-white hover:border-teal-800',
-  ghost: 'text-teal-800 hover:bg-teal-50',
+    'border border-teal-800/25 text-black hover:bg-teal-800 hover:text-white hover:border-teal-800',
+  ghost: 'text-black hover:bg-teal-50',
   dark: 'bg-teal-900 text-white hover:bg-teal-800',
 };
 

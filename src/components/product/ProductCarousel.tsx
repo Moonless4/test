@@ -20,7 +20,7 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
   }, []);
 
   const arrow =
-    'flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-teal-800 shadow-soft transition-all hover:bg-teal-800 hover:text-white';
+    'flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-black shadow-soft transition-all hover:bg-teal-800 hover:text-white';
 
   return (
     <div className="relative">

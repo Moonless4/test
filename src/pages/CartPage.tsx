@@ -37,7 +37,7 @@ export default function CartPage() {
   return (
     <div className="container py-8 sm:py-10">
       <nav aria-label="مسیر صفحه" className="mb-5 flex items-center gap-1.5 text-[12px] text-muted">
-        <Link to="/" className="transition-colors hover:text-teal-800">
+        <Link to="/" className="transition-colors hover:text-black">
           خانه
         </Link>
         <span>/</span>
@@ -82,7 +82,7 @@ export default function CartPage() {
               <div className="flex min-w-0 flex-1 flex-col gap-2">
                 <Link
                   to={`/product/${line.productId}`}
-                  className="text-[14px] font-bold text-ink transition-colors hover:text-teal-700"
+                  className="text-[14px] font-bold text-ink transition-colors hover:text-black"
                 >
                   {line.product.name}
                 </Link>
@@ -91,7 +91,7 @@ export default function CartPage() {
                   {line.color ? (
                     <span className="rounded-md bg-cream px-2 py-0.5">{line.color}</span>
                   ) : null}
-                  <span dir="ltr" className="text-[11px] uppercase tracking-wide text-teal-600">
+                  <span dir="ltr" className="text-[11px] uppercase tracking-wide text-black">
                     {line.product.brand}
                   </span>
                 </div>
@@ -105,7 +105,7 @@ export default function CartPage() {
                   onChange={(q) => updateQty(line.productId, line.size, line.color, q)}
                 />
                 <div className="text-end">
-                  <p className="text-[15px] font-bold text-teal-800">{formatPrice(line.lineTotal)}</p>
+                  <p className="text-[15px] font-bold text-black">{formatPrice(line.lineTotal)}</p>
                   {line.product.discount > 0 ? (
                     <p className="text-[11px] text-muted">
                       {toFa(line.product.discount)}٪ تخفیف اعمال شده
@@ -127,7 +127,7 @@ export default function CartPage() {
 
           <Link
             to="/shop"
-            className="inline-flex items-center gap-2 pt-2 text-[13px] font-medium text-teal-800 transition-colors hover:text-teal-600"
+            className="inline-flex items-center gap-2 pt-2 text-[13px] font-medium text-black transition-colors hover:text-black"
           >
             <ArrowLeft className="h-4 w-4" />
             ادامه خرید
@@ -160,11 +160,11 @@ export default function CartPage() {
             </dl>
 
             {remaining > 0 ? (
-              <p className="mt-5 rounded-xl bg-white px-3.5 py-2.5 text-[12px] leading-6 text-teal-800 ring-1 ring-line">
+              <p className="mt-5 rounded-xl bg-white px-3.5 py-2.5 text-[12px] leading-6 text-black ring-1 ring-line">
                 تنها {formatPrice(remaining)} تا ارسال رایگان باقی مانده است.
               </p>
             ) : (
-              <p className="mt-5 rounded-xl bg-teal-50 px-3.5 py-2.5 text-[12px] font-medium text-teal-800">
+              <p className="mt-5 rounded-xl bg-teal-50 px-3.5 py-2.5 text-[12px] font-medium text-black">
                 ارسال این سفارش رایگان است ✓
               </p>
             )}

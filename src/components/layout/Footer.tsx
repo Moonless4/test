@@ -77,7 +77,7 @@ export default function Footer() {
               />
               <button
                 type="submit"
-                className="h-10 shrink-0 rounded-lg bg-white px-4 text-[13px] font-medium text-teal-900 transition-colors hover:bg-cream"
+                className="h-10 shrink-0 rounded-lg bg-white px-4 text-[13px] font-medium text-black transition-colors hover:bg-cream"
               >
                 عضویت
               </button>
@@ -93,7 +93,7 @@ export default function Footer() {
                   key={label}
                   href="#"
                   aria-label={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white/80 transition-all duration-300 hover:bg-white hover:text-teal-900"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white/80 transition-all duration-300 hover:bg-white hover:text-black"
                 >
                   <Icon className="h-[18px] w-[18px]" strokeWidth={1.8} />
                 </a>

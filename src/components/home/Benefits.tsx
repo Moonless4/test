@@ -18,7 +18,7 @@ export default function Benefits() {
             const Icon = ICONS[item.icon];
             return (
               <div key={item.title} className="flex flex-col items-center gap-3 text-center">
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-teal-800 shadow-soft">
+                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-black shadow-soft">
                   <Icon className="h-6 w-6" strokeWidth={1.7} />
                 </span>
                 <div>

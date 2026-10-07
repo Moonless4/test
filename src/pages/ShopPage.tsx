@@ -74,11 +74,11 @@ export default function ShopPage() {
   return (
     <div className="container py-6 sm:py-8">
       <nav aria-label="مسیر صفحه" className="mb-5 flex items-center gap-1.5 text-[12px] text-muted">
-        <Link to="/" className="transition-colors hover:text-teal-800">
+        <Link to="/" className="transition-colors hover:text-black">
           خانه
         </Link>
         <ChevronLeft className="h-3.5 w-3.5" />
-        <Link to="/shop" className="transition-colors hover:text-teal-800">
+        <Link to="/shop" className="transition-colors hover:text-black">
           فروشگاه
         </Link>
         {activeCategory ? (

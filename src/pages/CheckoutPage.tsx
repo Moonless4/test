@@ -107,13 +107,13 @@ export default function CheckoutPage() {
     return (
       <div className="container py-12 sm:py-20">
         <Reveal className="mx-auto max-w-xl rounded-panel border border-line bg-cream p-8 text-center sm:p-12">
-          <span className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white text-teal-800 shadow-soft">
+          <span className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white text-black shadow-soft">
             <CheckCircle2 className="h-8 w-8" />
           </span>
           <h1 className="text-xl font-black text-ink sm:text-2xl">سفارش شما ثبت شد</h1>
           <p className="mt-4 text-[13px] leading-7 text-muted sm:text-sm">
             شماره پیگیری سفارش شما{' '}
-            <span dir="ltr" className="font-bold text-teal-800">
+            <span dir="ltr" className="font-bold text-black">
               {placed}
             </span>{' '}
             است. همکاران ما تا ساعتی دیگر برای هماهنگی ارسال با شما تماس می‌گیرند.
@@ -127,7 +127,7 @@ export default function CheckoutPage() {
             </Link>
             <Link
               to="/"
-              className="inline-flex h-12 items-center rounded-xl border border-teal-800/20 px-6 text-sm font-medium text-teal-800 transition-colors hover:bg-white"
+              className="inline-flex h-12 items-center rounded-xl border border-teal-800/20 px-6 text-sm font-medium text-black transition-colors hover:bg-white"
             >
               بازگشت به صفحه اصلی
             </Link>
@@ -177,11 +177,11 @@ export default function CheckoutPage() {
   return (
     <div className="container py-8 sm:py-10">
       <nav aria-label="مسیر صفحه" className="mb-5 flex items-center gap-1.5 text-[12px] text-muted">
-        <Link to="/" className="transition-colors hover:text-teal-800">
+        <Link to="/" className="transition-colors hover:text-black">
           خانه
         </Link>
         <span>/</span>
-        <Link to="/cart" className="transition-colors hover:text-teal-800">
+        <Link to="/cart" className="transition-colors hover:text-black">
           سبد خرید
         </Link>
         <span>/</span>
@@ -221,7 +221,7 @@ export default function CheckoutPage() {
                 >
                   {item.title}
                 </span>
-                <Icon className="mt-1 h-3.5 w-3.5 text-teal-600" />
+                <Icon className="mt-1 h-3.5 w-3.5 text-black" />
               </span>
             </li>
           );
@@ -314,7 +314,7 @@ export default function CheckoutPage() {
                       <span className="mt-1 block text-[12px] text-muted">{method.text}</span>
                     </span>
                   </span>
-                  <span className="shrink-0 text-[13px] font-medium text-teal-800">
+                  <span className="shrink-0 text-[13px] font-medium text-black">
                     {total >= FREE_SHIPPING_THRESHOLD || method.price === 0
                       ? 'رایگان'
                       : formatPrice(method.price)}
@@ -357,7 +357,7 @@ export default function CheckoutPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-panel border border-line p-4">
                   <h3 className="mb-3 flex items-center gap-2 text-[13px] font-bold text-ink">
-                    <MapPin className="h-4 w-4 text-teal-700" />
+                    <MapPin className="h-4 w-4 text-black" />
                     گیرنده
                   </h3>
                   <p className="text-[13px] leading-7 text-muted">
@@ -374,7 +374,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="rounded-panel border border-line p-4">
                   <h3 className="mb-3 flex items-center gap-2 text-[13px] font-bold text-ink">
-                    <PackageCheck className="h-4 w-4 text-teal-700" />
+                    <PackageCheck className="h-4 w-4 text-black" />
                     ارسال و پرداخت
                   </h3>
                   <p className="text-[13px] leading-7 text-muted">
@@ -405,7 +405,7 @@ export default function CheckoutPage() {
                         سایز {toFa(line.size)} · {line.color} · {toFa(line.qty)} عدد
                       </span>
                     </span>
-                    <span className="shrink-0 text-[13px] font-bold text-teal-800">
+                    <span className="shrink-0 text-[13px] font-bold text-black">
                       {formatPrice(line.lineTotal)}
                     </span>
                   </li>
@@ -466,7 +466,7 @@ export default function CheckoutPage() {
                       {toFa(line.qty)} × سایز {toFa(line.size)}
                     </span>
                   </span>
-                  <span className="shrink-0 text-[12px] font-bold text-teal-800">
+                  <span className="shrink-0 text-[12px] font-bold text-black">
                     {formatPrice(line.lineTotal)}
                   </span>
                 </li>

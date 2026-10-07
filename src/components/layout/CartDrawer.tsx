@@ -45,10 +45,10 @@ export default function CartDrawer() {
       <aside className="absolute inset-y-0 left-0 flex w-full max-w-[400px] flex-col bg-white shadow-2xl motion-safe:animate-drawer-left">
         <header className="flex items-center justify-between border-b border-line px-5 py-4">
           <h2 className="flex items-center gap-2 text-base font-bold text-ink">
-            <ShoppingBag className="h-5 w-5 text-teal-700" />
+            <ShoppingBag className="h-5 w-5 text-black" />
             سبد خرید
             {cartCount > 0 ? (
-              <span className="rounded-full bg-cream px-2 py-0.5 text-xs font-medium text-teal-800">
+              <span className="rounded-full bg-cream px-2 py-0.5 text-xs font-medium text-black">
                 {toFa(cartCount)} کالا
               </span>
             ) : null}
@@ -107,7 +107,7 @@ export default function CartDrawer() {
                       <Link
                         to={`/product/${line.productId}`}
                         onClick={closeCart}
-                        className="line-clamp-2 text-[13px] font-medium leading-6 text-ink hover:text-teal-700"
+                        className="line-clamp-2 text-[13px] font-medium leading-6 text-ink hover:text-black"
                       >
                         {line.product.name}
                       </Link>
@@ -135,7 +135,7 @@ export default function CartDrawer() {
                         max={line.product.stock}
                         onChange={(q) => updateQty(line.productId, line.size, line.color, q)}
                       />
-                      <span className="text-sm font-bold text-teal-800">
+                      <span className="text-sm font-bold text-black">
                         {formatPrice(line.lineTotal)}
                       </span>
                     </div>
@@ -146,11 +146,11 @@ export default function CartDrawer() {
 
             <footer className="border-t border-line bg-cream/60 p-4">
               {remaining > 0 ? (
-                <p className="mb-3 rounded-xl bg-white px-3 py-2 text-[12px] leading-6 text-teal-800 ring-1 ring-line">
+                <p className="mb-3 rounded-xl bg-white px-3 py-2 text-[12px] leading-6 text-black ring-1 ring-line">
                   تنها {formatPrice(remaining)} تا ارسال رایگان باقی مانده است.
                 </p>
               ) : (
-                <p className="mb-3 rounded-xl bg-teal-50 px-3 py-2 text-[12px] font-medium text-teal-800">
+                <p className="mb-3 rounded-xl bg-teal-50 px-3 py-2 text-[12px] font-medium text-black">
                   ارسال این سفارش رایگان است ✓
                 </p>
               )}
@@ -180,7 +180,7 @@ export default function CartDrawer() {
                 <Link
                   to="/cart"
                   onClick={closeCart}
-                  className="flex h-12 items-center justify-center rounded-xl border border-teal-800/20 text-sm font-medium text-teal-800 transition-colors hover:bg-white"
+                  className="flex h-12 items-center justify-center rounded-xl border border-teal-800/20 text-sm font-medium text-black transition-colors hover:bg-white"
                 >
                   مشاهده سبد
                 </Link>

@@ -68,11 +68,11 @@ export default function ProductPage() {
   return (
     <div className="container py-6 sm:py-8">
       <nav aria-label="مسیر صفحه" className="mb-6 flex items-center gap-1.5 text-[12px] text-muted">
-        <Link to="/" className="transition-colors hover:text-teal-800">
+        <Link to="/" className="transition-colors hover:text-black">
           خانه
         </Link>
         <ChevronLeft className="h-3.5 w-3.5" />
-        <Link to={`/shop/${product.category}`} className="transition-colors hover:text-teal-800">
+        <Link to={`/shop/${product.category}`} className="transition-colors hover:text-black">
           {product.category === 'men'
             ? 'مردانه'
             : product.category === 'women'
@@ -90,7 +90,7 @@ export default function ProductPage() {
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-[12px] font-medium uppercase tracking-wide text-teal-600" dir="ltr">
+            <span className="text-[12px] font-medium uppercase tracking-wide text-black" dir="ltr">
               {product.brand}
             </span>
             {product.discount > 0 ? <DiscountBadge value={product.discount} /> : null}
@@ -106,7 +106,7 @@ export default function ProductPage() {
             <span className="h-1 w-1 rounded-full bg-line" />
             <span
               className={`text-[12px] font-medium ${
-                product.stock > 5 ? 'text-teal-700' : 'text-sale'
+                product.stock > 5 ? 'text-black' : 'text-sale'
               }`}
             >
               {product.stock > 5
@@ -164,7 +164,7 @@ export default function ProductPage() {
                   aria-label={option.name}
                   className={`flex h-11 items-center gap-2 rounded-xl border px-3 text-[12px] font-medium transition-all ${
                     selectedColor === option.name
-                      ? 'border-teal-800 bg-teal-50 text-teal-900'
+                      ? 'border-teal-800 bg-teal-50 text-black'
                       : 'border-line bg-white text-ink hover:border-teal-300'
                   }`}
                 >
@@ -201,7 +201,7 @@ export default function ProductPage() {
                 className={`flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl border transition-all ${
                   wishlisted
                     ? 'border-sale/20 bg-sale/10 text-sale'
-                    : 'border-line bg-white text-teal-800 hover:border-teal-300'
+                    : 'border-line bg-white text-black hover:border-teal-300'
                 }`}
               >
                 <Heart className={`h-5 w-5 ${wishlisted ? 'fill-current' : ''}`} strokeWidth={1.8} />
@@ -210,7 +210,7 @@ export default function ProductPage() {
             <button
               type="button"
               onClick={handleBuyNow}
-              className="h-[52px] rounded-xl border border-teal-800/25 text-sm font-bold text-teal-800 transition-colors hover:bg-teal-800 hover:text-white"
+              className="h-[52px] rounded-xl border border-teal-800/25 text-sm font-bold text-black transition-colors hover:bg-teal-800 hover:text-white"
             >
               خرید سریع
             </button>
@@ -218,19 +218,19 @@ export default function ProductPage() {
 
           <ul className="mt-7 grid gap-3 rounded-panel border border-line bg-cream p-4 text-[12px] text-ink sm:text-[13px]">
             <li className="flex items-center gap-2.5">
-              <Truck className="h-4 w-4 shrink-0 text-teal-700" />
+              <Truck className="h-4 w-4 shrink-0 text-black" />
               ارسال سریع به سراسر کشور
             </li>
             <li className="flex items-center gap-2.5">
-              <ShieldCheck className="h-4 w-4 shrink-0 text-teal-700" />
+              <ShieldCheck className="h-4 w-4 shrink-0 text-black" />
               پرداخت امن با تمامی کارت‌های بانکی
             </li>
             <li className="flex items-center gap-2.5">
-              <RotateCcw className="h-4 w-4 shrink-0 text-teal-700" />
+              <RotateCcw className="h-4 w-4 shrink-0 text-black" />
               بازگشت کالا تا ۷ روز
             </li>
             <li className="flex items-center gap-2.5">
-              <BadgeCheck className="h-4 w-4 shrink-0 text-teal-700" />
+              <BadgeCheck className="h-4 w-4 shrink-0 text-black" />
               ضمانت اصالت کالا
             </li>
           </ul>
@@ -248,7 +248,7 @@ export default function ProductPage() {
               aria-current={tab === item.id}
               className={`-mb-px whitespace-nowrap border-b-2 px-4 py-3 text-[13px] font-medium transition-colors sm:text-sm ${
                 tab === item.id
-                  ? 'border-teal-800 text-teal-800'
+                  ? 'border-teal-800 text-black'
                   : 'border-transparent text-muted hover:text-ink'
               }`}
             >
@@ -286,7 +286,7 @@ export default function ProductPage() {
             <div className="grid max-w-3xl gap-5 sm:grid-cols-2">
               <div className="rounded-panel border border-line p-5">
                 <h3 className="mb-2 flex items-center gap-2 text-[13px] font-bold text-ink">
-                  <PackageCheck className="h-4 w-4 text-teal-700" />
+                  <PackageCheck className="h-4 w-4 text-black" />
                   شرایط ارسال
                 </h3>
                 <p className="text-[13px] leading-7 text-muted">
@@ -296,7 +296,7 @@ export default function ProductPage() {
               </div>
               <div className="rounded-panel border border-line p-5">
                 <h3 className="mb-2 flex items-center gap-2 text-[13px] font-bold text-ink">
-                  <Zap className="h-4 w-4 text-teal-700" />
+                  <Zap className="h-4 w-4 text-black" />
                   بازگشت کالا
                 </h3>
                 <p className="text-[13px] leading-7 text-muted">
@@ -310,7 +310,7 @@ export default function ProductPage() {
           {tab === 'reviews' ? (
             <div className="max-w-4xl rounded-panel border border-line bg-cream p-5 sm:p-6">
               <div className="flex items-center gap-4">
-                <span className="text-3xl font-black text-teal-800">{toFa(product.rating)}</span>
+                <span className="text-3xl font-black text-black">{toFa(product.rating)}</span>
                 <div>
                   <Rating value={product.rating} size="md" />
                   <p className="mt-1 text-[12px] text-muted">

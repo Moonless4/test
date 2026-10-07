@@ -65,7 +65,7 @@ export default function Newsletter() {
                 </div>
                 <button
                   type="submit"
-                  className="h-12 shrink-0 rounded-xl bg-white px-7 text-[13px] font-bold text-teal-900 transition-colors hover:bg-cream"
+                  className="h-12 shrink-0 rounded-xl bg-white px-7 text-[13px] font-bold text-black transition-colors hover:bg-cream"
                 >
                   عضویت
                 </button>

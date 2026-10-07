@@ -21,7 +21,7 @@ export default function SectionHeader({
     <Reveal className={`mb-6 flex items-end justify-between gap-4 sm:mb-8 ${className}`}>
       <div className="min-w-0">
         {eyebrow ? (
-          <span className="mb-2 block text-xs font-medium tracking-wide text-teal-500 sm:text-[13px]">
+          <span className="mb-2 block text-xs font-medium tracking-wide text-black sm:text-[13px]">
             {eyebrow}
           </span>
         ) : null}
@@ -32,7 +32,7 @@ export default function SectionHeader({
       {linkTo ? (
         <Link
           to={linkTo}
-          className="group flex shrink-0 items-center gap-1 pb-1 text-[13px] font-medium text-teal-700 transition-colors hover:text-teal-900 sm:text-sm"
+          className="group flex shrink-0 items-center gap-1 pb-1 text-[13px] font-medium text-black transition-colors hover:text-black sm:text-sm"
         >
           {linkLabel}
           <ChevronLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />

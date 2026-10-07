@@ -10,7 +10,7 @@ export default function Testimonials() {
       <div className="container">
         <div className="grid gap-8 lg:grid-cols-12 lg:gap-10">
           <Reveal className="lg:col-span-4">
-            <span className="text-xs font-medium tracking-wide text-teal-500 sm:text-[13px]">
+            <span className="text-xs font-medium tracking-wide text-black sm:text-[13px]">
               رضایت شما
             </span>
             <h2 className="mt-2 text-xl font-bold text-ink sm:text-2xl lg:text-[28px]">

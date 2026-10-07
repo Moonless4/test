@@ -51,7 +51,7 @@ export default function CategoryCards() {
                     decoding="async"
                     className="aspect-square w-full rounded-lg bg-cream object-cover shadow-soft"
                   />
-                  <h3 className="mt-2.5 text-[13px] font-bold text-ink transition-colors duration-300 group-hover:text-teal-800 sm:text-sm lg:text-[15px]">
+                  <h3 className="mt-2.5 text-[13px] font-bold text-ink transition-colors duration-300 group-hover:text-black sm:text-sm lg:text-[15px]">
                     {category.title}
                   </h3>
                 </Link>

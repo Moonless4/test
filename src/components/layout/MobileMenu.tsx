@@ -72,7 +72,7 @@ export default function MobileMenu({ open, onClose }: Props) {
 
         <form onSubmit={submit} role="search" className="border-b border-line p-4">
           <div className="flex items-center gap-2 rounded-xl bg-cream px-3.5 ring-1 ring-line focus-within:ring-teal-300">
-            <Search className="h-4 w-4 shrink-0 text-teal-600" />
+            <Search className="h-4 w-4 shrink-0 text-black" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -102,7 +102,7 @@ export default function MobileMenu({ open, onClose }: Props) {
             <Link
               to="/wishlist"
               onClick={onClose}
-              className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl bg-cream text-[11px] font-medium text-teal-800"
+              className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl bg-cream text-[11px] font-medium text-black"
             >
               <Heart className="h-4 w-4" />
               علاقه‌مندی
@@ -110,7 +110,7 @@ export default function MobileMenu({ open, onClose }: Props) {
             <Link
               to="/cart"
               onClick={onClose}
-              className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl bg-cream text-[11px] font-medium text-teal-800"
+              className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl bg-cream text-[11px] font-medium text-black"
             >
               <ShoppingBag className="h-4 w-4" />
               سبد خرید
@@ -118,14 +118,14 @@ export default function MobileMenu({ open, onClose }: Props) {
             <Link
               to="/checkout"
               onClick={onClose}
-              className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl bg-cream text-[11px] font-medium text-teal-800"
+              className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl bg-cream text-[11px] font-medium text-black"
             >
               <User className="h-4 w-4" />
               حساب من
             </Link>
           </div>
 
-          <div className="mt-4 flex items-center justify-center gap-3 text-teal-700">
+          <div className="mt-4 flex items-center justify-center gap-3 text-black">
             <a href="#" aria-label="اینستاگرام" className="rounded-lg p-2 hover:bg-cream">
               <Instagram className="h-5 w-5" />
             </a>

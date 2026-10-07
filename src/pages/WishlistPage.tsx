@@ -39,7 +39,7 @@ export default function WishlistPage() {
   return (
     <div className="container py-8 sm:py-10">
       <nav aria-label="مسیر صفحه" className="mb-5 flex items-center gap-1.5 text-[12px] text-muted">
-        <Link to="/" className="transition-colors hover:text-teal-800">
+        <Link to="/" className="transition-colors hover:text-black">
           خانه
         </Link>
         <span>/</span>
@@ -73,7 +73,7 @@ export default function WishlistPage() {
               <div className="flex items-start justify-between gap-3">
                 <Link
                   to={`/product/${product.id}`}
-                  className="text-[14px] font-bold leading-6 text-ink transition-colors hover:text-teal-700"
+                  className="text-[14px] font-bold leading-6 text-ink transition-colors hover:text-black"
                 >
                   {product.name}
                 </Link>
@@ -112,7 +112,7 @@ export default function WishlistPage() {
 
       <p className="mt-6 text-[12px] text-muted">
         جمع مبلغ کالاهای ذخیره‌شده:{' '}
-        <span className="font-bold text-teal-800">
+        <span className="font-bold text-black">
           {formatPrice(items.reduce((sum, p) => sum + p.price, 0))}
         </span>{' '}
         ({toFa(items.length)} کالا)

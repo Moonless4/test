@@ -79,7 +79,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
         />
         <div className="mt-3 flex items-center justify-between text-[11px] text-muted">
           <span>{formatPrice(200000)}</span>
-          <span className="font-medium text-teal-800">تا {formatPrice(filters.maxPrice)}</span>
+          <span className="font-medium text-black">تا {formatPrice(filters.maxPrice)}</span>
         </div>
       </section>
 
@@ -120,7 +120,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
                 aria-pressed={active}
                 className={`flex h-10 items-center gap-2 rounded-xl border px-2.5 text-[12px] font-medium transition-all ${
                   active
-                    ? 'border-teal-800 bg-teal-50 text-teal-900'
+                    ? 'border-teal-800 bg-teal-50 text-black'
                     : 'border-line bg-white text-ink hover:border-teal-300'
                 }`}
               >
@@ -176,7 +176,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
           <button
             type="button"
             onClick={() => patch({ minRating: 0 })}
-            className="px-1 pt-1 text-[12px] text-muted transition-colors hover:text-teal-800"
+            className="px-1 pt-1 text-[12px] text-muted transition-colors hover:text-black"
           >
             بدون محدودیت امتیاز
           </button>

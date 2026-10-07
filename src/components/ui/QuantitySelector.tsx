@@ -17,7 +17,7 @@ export default function QuantitySelector({
   size = 'md',
 }: Props) {
   const btn =
-    'flex items-center justify-center text-teal-800 transition-colors hover:bg-teal-50 disabled:opacity-40 disabled:hover:bg-transparent';
+    'flex items-center justify-center text-black transition-colors hover:bg-teal-50 disabled:opacity-40 disabled:hover:bg-transparent';
   const box = size === 'sm' ? 'h-9 w-9' : 'h-11 w-11';
 
   return (

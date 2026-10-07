@@ -39,7 +39,7 @@ export default function SearchPage() {
   return (
     <div className="container py-8 sm:py-10">
       <nav aria-label="مسیر صفحه" className="mb-5 flex items-center gap-1.5 text-[12px] text-muted">
-        <Link to="/" className="transition-colors hover:text-teal-800">
+        <Link to="/" className="transition-colors hover:text-black">
           خانه
         </Link>
         <span>/</span>
@@ -50,7 +50,7 @@ export default function SearchPage() {
         <h1 className="text-xl font-bold text-ink sm:text-2xl">
           {query ? (
             <>
-              نتایج جستجو برای «<span className="text-teal-800">{query}</span>»
+              نتایج جستجو برای «<span className="text-black">{query}</span>»
             </>
           ) : (
             'جستجو در فروشگاه'
@@ -67,14 +67,14 @@ export default function SearchPage() {
 
       <div className="mb-8 flex flex-wrap items-center gap-2">
         <span className="flex items-center gap-1.5 text-[12px] font-medium text-muted">
-          <Sparkles className="h-3.5 w-3.5 text-teal-600" />
+          <Sparkles className="h-3.5 w-3.5 text-black" />
           جستجوهای پیشنهادی:
         </span>
         {SUGGESTIONS.map((item) => (
           <Link
             key={item}
             to={`/search?q=${encodeURIComponent(item)}`}
-            className="rounded-xl border border-line bg-white px-3 py-1.5 text-[12px] text-ink transition-colors hover:border-teal-300 hover:text-teal-800"
+            className="rounded-xl border border-line bg-white px-3 py-1.5 text-[12px] text-ink transition-colors hover:border-teal-300 hover:text-black"
           >
             {item}
           </Link>
