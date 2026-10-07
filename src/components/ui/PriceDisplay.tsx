@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { formatPrice } from '../../lib/format';
 
 type Props = {
@@ -5,6 +6,8 @@ type Props = {
   originalPrice: number;
   size?: 'sm' | 'md' | 'lg';
   align?: 'start' | 'center' | 'end';
+  /** Small tag shown next to the struck-through original price. */
+  tag?: ReactNode;
   className?: string;
 };
 
@@ -17,6 +20,7 @@ export default function PriceDisplay({
   originalPrice,
   size = 'md',
   align = 'start',
+  tag,
   className = '',
 }: Props) {
   const discounted = originalPrice > price;
@@ -36,15 +40,14 @@ export default function PriceDisplay({
       } ${className}`}
     >
       {discounted ? (
-        <span className={`${originalSize} text-muted line-through decoration-sale/50 decoration-[1.5px]`}>
-          {formatPrice(originalPrice)}
+        <span className="flex items-center gap-1.5">
+          <span className={`${originalSize} text-muted line-through decoration-sale/50 decoration-[1.5px]`}>
+            {formatPrice(originalPrice)}
+          </span>
+          {tag}
         </span>
       ) : null}
-      <span
-        className={`${currentSize} font-bold ${
-          discounted ? 'text-teal-800' : 'text-ink'
-        }`}
-      >
+      <span className={`${currentSize} font-bold ${discounted ? 'text-teal-800' : 'text-ink'}`}>
         {formatPrice(price)}
       </span>
     </div>

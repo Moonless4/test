@@ -7,15 +7,17 @@ export default function DiscountBadge({
   className = '',
 }: {
   value: number;
-  size?: 'sm' | 'md';
+  size?: 'xs' | 'sm' | 'md';
   className?: string;
 }) {
   if (!value) return null;
 
   const box =
-    size === 'sm'
-      ? 'h-6 rounded-md px-2 text-[11px]'
-      : 'h-7 rounded-lg px-2.5 text-[12px] sm:text-[13px]';
+    size === 'xs'
+      ? 'h-5 rounded px-1.5 text-[10px]'
+      : size === 'sm'
+        ? 'h-6 rounded-md px-2 text-[11px]'
+        : 'h-7 rounded-lg px-2.5 text-[12px] sm:text-[13px]';
 
   return (
     <span

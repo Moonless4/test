@@ -56,13 +56,13 @@ export default function ProductCard({ product }: { product: Product }) {
           {product.name}
         </Link>
 
-        <div className="mt-auto flex flex-wrap items-center justify-end gap-1.5 pt-1">
-          {product.discount > 0 ? <DiscountBadge value={product.discount} size="sm" /> : null}
+        <div className="mt-auto flex justify-end pt-1">
           <PriceDisplay
             price={product.price}
             originalPrice={product.originalPrice}
             size="sm"
             align="end"
+            tag={<DiscountBadge value={product.discount} size="xs" />}
           />
         </div>
       </div>
