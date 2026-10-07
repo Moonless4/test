@@ -75,7 +75,8 @@ export default function CategoryDrawer({ open, onClose }: Props) {
         className="absolute inset-0 h-full w-full bg-teal-950/50 backdrop-blur-sm motion-safe:animate-fade-in"
       />
 
-      <div className="absolute inset-y-0 start-0 flex w-full max-w-[430px] flex-col bg-white shadow-2xl motion-safe:animate-drawer-right">
+      {/* Full width on phones and tablets, like the phone sheet. */}
+      <div className="absolute inset-y-0 start-0 flex w-full flex-col bg-white shadow-2xl motion-safe:animate-drawer-right">
         <form onSubmit={submit} role="search" className="flex items-center gap-2 p-3">
           <button
             type="button"
