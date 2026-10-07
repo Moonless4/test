@@ -43,13 +43,16 @@ curl -I http://localhost:3000/
   phone/tablet keeps the bottom bar, a desktop (1280px and up) keeps the header's own icons instead.
   Below `xl` the bottom bar is the only place for the wishlist and the account, so the header hides
   those two icons there.
-- **The bottom tab bar is `sticky`, not `fixed`** (last child of the shell, `bottom-0`), pulled up
-  over the footer's reserved strip with `-mt-[69px]`, matching `pb-[69px] xl:pb-0` on the footer.
-  Keep those two numbers equal: if they drift, the bar either sits in a strip of its own under the
-  footer or covers the footer's copyright row. Under `position: fixed` the bar was invisible on a
-  real tablet — it scrolled away with the page and only showed up over the footer, which is what a
-  scaled/transformed preview shell does to `fixed`. The product page's `ProductActionBar` is still
-  `fixed`, since it lives inside the page rather than the shell.
+- **The bottom tab bar is `fixed`** — it is anchored to the viewport, not to a document slot — and
+  the footer reserves the strip it needs with `pb-[69px] xl:pb-0`. Keep that number equal to the
+  bar's height (62px row + 6px padding + border): if they drift, the bar either sits in a strip of
+  its own under the footer or covers the footer's copyright row. `sticky bottom-0` looked right in
+  the sandbox preview but on a real tablet the bar stayed at the end of the document until the user
+  scrolled, so do not go back to it.
+- **Bottom bars need the `visualViewport` nudge**: `MobileTabBar` lifts itself with a `translateY`
+  equal to the strip a dynamic-toolbar browser hides below the layout viewport, otherwise the bar
+  starts off-screen and only appears after the first scroll on iPad Safari. The offset is 0 wherever
+  the two viewports agree, so it is a no-op in the sandbox preview and on desktop.
 - `tsconfig` has `noUnusedLocals`; `npm run typecheck` is the quick sanity check.
 
 ## Where things live

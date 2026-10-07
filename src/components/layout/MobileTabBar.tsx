@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Heart, LayoutGrid, ShoppingBag, User } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
@@ -14,16 +15,36 @@ type Props = {
  * tablets keep it while a desktop keeps its own header chrome. Rendered by the app shell, so
  * every page has it.
  *
- * `sticky` with a negative top margin, not `fixed`: a `fixed` bar fell to the end of the document
- * in the preview on a real tablet (it only showed up over the footer, where a scaled/transformed
- * preview shell breaks `position: fixed`). The `-mt-[69px]` pulls the bar up over the footer's own
- * bottom padding — the footer reserves that dark 69px strip with `pb-[69px] xl:pb-0` — so the bar
- * always lies over the page and never reads as a strip of page flow sitting under the footer.
- * Keep those two numbers equal.
+ * `fixed`, so the bar is anchored to the viewport instead of a document slot. The footer reserves
+ * the space it needs with a matching `pb-[69px] xl:pb-0`, which keeps the bar lying over the
+ * footer rather than in a strip of its own underneath it.
  */
 export default function MobileTabBar({ onOpenCategories }: Props) {
   const { cartCount, wishlist, openCart } = useStore();
   const { pathname } = useLocation();
+  const ref = useRef<HTMLDivElement>(null);
+
+  /**
+   * Browsers with a dynamic toolbar resolve `bottom: 0` against the taller layout viewport, so a
+   * bottom bar can start below the visible area and only jump into place after the first scroll.
+   * Lifting it by the strip the user cannot see keeps it on screen from the first paint; where the
+   * two viewports agree the offset is 0 and this does nothing.
+   */
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const sync = () => {
+      const hidden = document.documentElement.clientHeight - vv.height - vv.offsetTop;
+      ref.current?.style.setProperty('transform', `translateY(${-Math.max(0, hidden)}px)`);
+    };
+    sync();
+    vv.addEventListener('resize', sync);
+    vv.addEventListener('scroll', sync);
+    return () => {
+      vv.removeEventListener('resize', sync);
+      vv.removeEventListener('scroll', sync);
+    };
+  }, []);
 
   const tab =
     'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 py-1.5 text-[10.5px] font-medium transition-colors';
@@ -37,7 +58,7 @@ export default function MobileTabBar({ onOpenCategories }: Props) {
   }`;
 
   return (
-    <div className="sticky bottom-0 z-[60] -mt-[69px] xl:hidden">
+    <div ref={ref} className="fixed inset-x-0 bottom-0 z-[60] xl:hidden">
       <nav
         aria-label="ناوبری موبایل"
         className="border-t border-line bg-cream pb-[max(6px,env(safe-area-inset-bottom))]"
