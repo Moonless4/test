@@ -32,11 +32,11 @@ export default function CountdownPanel() {
   ];
 
   return (
-    <div className="flex w-full shrink-0 flex-col sm:w-[210px] xl:w-[230px]">
-      {/* Phones: the full-width banner. */}
+    <div className="flex w-full shrink-0 flex-col lg:w-[210px] xl:w-[230px]">
+      {/* Phones and tablets: the full-width banner. */}
       <Link
         to="/shop?discount=true"
-        className="flex items-center justify-between gap-1.5 rounded-panel bg-gradient-to-l from-teal-950 to-teal-800 px-2.5 py-3 text-white sm:hidden"
+        className="flex items-center justify-between gap-1.5 rounded-panel bg-gradient-to-l from-teal-950 to-teal-800 px-2.5 py-3 text-white lg:hidden"
       >
         <span className="flex min-w-0 items-center gap-1.5">
           <Percent className="h-4 w-4 shrink-0" />
@@ -67,8 +67,8 @@ export default function CountdownPanel() {
         </span>
       </Link>
 
-      {/* Tablet and up: the side card. */}
-      <div className="hidden flex-1 flex-col items-center justify-center gap-4 rounded-panel bg-gradient-to-b from-teal-800 to-teal-950 px-4 py-6 text-center text-white sm:flex">
+      {/* Desktop: the side card. */}
+      <div className="hidden flex-1 flex-col items-center justify-center gap-4 rounded-panel bg-gradient-to-b from-teal-800 to-teal-950 px-4 py-6 text-center text-white lg:flex">
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
           <Percent className="h-6 w-6 text-gold" />
         </span>

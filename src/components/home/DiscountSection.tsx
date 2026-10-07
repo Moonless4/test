@@ -31,7 +31,9 @@ export default function DiscountSection() {
     >
       <div className="container">
         <Reveal>
-          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:gap-4">
+          {/* Phones and tablets stack the promo banner above the rail; only the desktop
+              row splits it into a side panel. */}
+          <div className="flex flex-col items-stretch gap-3 lg:flex-row lg:gap-4">
             <CountdownPanel />
 
             <div
@@ -53,7 +55,7 @@ export default function DiscountSection() {
               type="button"
               onClick={step}
               aria-label="محصولات تخفیف‌دار بعدی"
-              className="hidden h-11 w-11 shrink-0 items-center justify-center self-center rounded-full border border-line bg-white text-cocoa shadow-lift transition-colors hover:bg-cream sm:flex"
+              className="hidden h-11 w-11 shrink-0 items-center justify-center self-center rounded-full border border-line bg-white text-cocoa shadow-lift transition-colors hover:bg-cream lg:flex"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
