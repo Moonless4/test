@@ -55,10 +55,12 @@ curl -I http://localhost:3000/
   equal to the strip a dynamic-toolbar browser hides below the layout viewport, otherwise the bar
   starts off-screen and only appears after the first scroll on iPad Safari. The offset is 0 wherever
   the two viewports agree, so it is a no-op in the sandbox preview and on desktop.
-- **Brand**: the store is MEDORA / «مدورا». `public/medora-logo.png` (black lockup on white) is the
-  mark in the header and, on a white chip, in the footer. At tab-bar and favicon size the lockup is
-  illegible, so those two keep a letter tile ("M"). The `localStorage` keys still carry the historic
-  `styleon.*` prefix on purpose — renaming them would drop every saved cart, session and order.
+- **Brand**: the store is MEDORA / «مدورا». Two lockups, both in `public/`: `medora-logo.png` (black
+  on white) for the header, and `medora-logo-white.png` (white ink, transparent background) for the
+  footer, which drops it straight onto the dark teal — never put a chip or background behind it. At
+  tab-bar and favicon size a lockup is illegible, so those two keep a letter tile ("M"). The
+  `localStorage` keys still carry the historic `styleon.*` prefix on purpose — renaming them would
+  drop every saved cart, session and order.
 - `tsconfig` has `noUnusedLocals`; `npm run typecheck` is the quick sanity check.
 
 ## Where things live

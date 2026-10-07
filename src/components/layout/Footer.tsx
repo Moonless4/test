@@ -44,10 +44,8 @@ export default function Footer() {
       <div className="container">
         <div className="grid gap-10 py-12 lg:grid-cols-12 lg:gap-8 lg:py-16">
           <div className="lg:col-span-4">
-            {/* The lockup is black on white, so it sits on its own white chip over the dark footer. */}
-            <span className="inline-flex items-center rounded-xl bg-white px-3 py-2">
-              <img src="/medora-logo.png" alt="مدورا" className="h-8 w-auto" />
-            </span>
+            {/* White lockup on a transparent file, so it sits straight on the dark footer. */}
+            <img src="/medora-logo-white.png" alt="مدورا" className="h-9 w-auto" />
 
             <p className="mt-5 max-w-sm text-[13px] leading-7 text-white/65">
               مدورا، فروشگاه اینترنتی پوشاک و اکسسوری با تمرکز بر کیفیت دوخت، پارچه‌ی درست و
