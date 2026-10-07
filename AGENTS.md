@@ -38,11 +38,13 @@ curl -I http://localhost:3000/
   image area.
 - **Layout must not scroll horizontally.** `body` uses `overflow-x: clip` (not `hidden`, which
   breaks the sticky header).
-- **Bottom-bar cutoff**: the bottom tab bar, the product action bar, the category drawer and the
-  header's wishlist/account icons all switch at Tailwind's `xl` (1280px). Keep those in step — every
-  phone/tablet keeps the bottom bar, a desktop (1280px and up) keeps the header's own icons instead.
-  Below `xl` the bottom bar is the only place for the wishlist and the account, so the header hides
-  those two icons there.
+- **Bottom-bar cutoff is 769px** (`min-[769px]:`, deliberately 1px above Tailwind's `md`, so a 768px
+  tablet keeps the phone chrome). The bottom tab bar, the product action bar, the category drawer,
+  the footer's reserved strip and the header's main menu + wishlist/account icons all switch there.
+  Keep them in step: up to 768px the bottom bar is the only place for the wishlist, the account and
+  the category drawer, so the header hides its menu row and those two icons; from 769px the header
+  takes over and the bar goes away. The header's search pill stays at `lg` (1024px) — it needs the
+  room next to the logo — so 769–1023px keeps the search icon instead.
 - **The bottom tab bar is `fixed`** — it is anchored to the viewport, not to a document slot — and
   the footer reserves the strip it needs with `pb-[69px] xl:pb-0`. Keep that number equal to the
   bar's height (62px row + 6px padding + border): if they drift, the bar either sits in a strip of

@@ -74,9 +74,9 @@ export default function Header() {
             <Link to="/search" aria-label="جستجو" className={`${iconBtn} lg:hidden`}>
               <Search className="h-5 w-5" />
             </Link>
-            {/* Phones and tablets rely on the bottom bar for these two, so the header only
-                carries search and the basket below `xl`. */}
-            <Link to="/wishlist" aria-label="علاقه‌مندی‌ها" className={`${iconBtn} hidden xl:flex`}>
+            {/* Phones and tablets rely on the bottom bar for these two, so up to 768px the
+                header only carries search and the basket. */}
+            <Link to="/wishlist" aria-label="علاقه‌مندی‌ها" className={`${iconBtn} hidden min-[769px]:flex`}>
               <Heart className="h-5 w-5" />
               {wishlist.length > 0 ? (
                 <span className="absolute -top-0.5 end-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-teal-800 px-1 text-[10px] font-bold text-white">
@@ -84,7 +84,7 @@ export default function Header() {
                 </span>
               ) : null}
             </Link>
-            <Link to="/account" aria-label="حساب کاربری" className={`${iconBtn} hidden xl:flex`}>
+            <Link to="/account" aria-label="حساب کاربری" className={`${iconBtn} hidden min-[769px]:flex`}>
               <User className="h-5 w-5" />
             </Link>
             <button type="button" onClick={openCart} aria-label="سبد خرید" className={iconBtn}>
@@ -99,7 +99,7 @@ export default function Header() {
         </div>
 
         {/* Second row: the main menu sits under the search bar */}
-        <nav className="hidden items-center gap-1 pb-2 lg:flex" aria-label="ناوبری اصلی">
+        <nav className="hidden items-center gap-1 pb-2 min-[769px]:flex" aria-label="ناوبری اصلی">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.to}

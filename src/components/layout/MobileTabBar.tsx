@@ -11,12 +11,12 @@ type Props = {
 
 /**
  * Phone and tablet bottom bar: a full-width bar anchored to the bottom edge that carries the
- * four main destinations plus the brand button in the middle. It stays below `xl` (1280px), so
- * tablets keep it while a desktop keeps its own header chrome. Rendered by the app shell, so
- * every page has it.
+ * four main destinations plus the brand button in the middle. It is hidden from 769px up, where
+ * the header takes over with its own menu, wishlist and account entries. Rendered by the app
+ * shell, so every page has it.
  *
  * `fixed`, so the bar is anchored to the viewport instead of a document slot. The footer reserves
- * the space it needs with a matching `pb-[69px] xl:pb-0`, which keeps the bar lying over the
+ * the space it needs with a matching `pb-[69px] min-[769px]:pb-0`, which keeps the bar over the
  * footer rather than in a strip of its own underneath it.
  */
 export default function MobileTabBar({ onOpenCategories }: Props) {
@@ -58,7 +58,7 @@ export default function MobileTabBar({ onOpenCategories }: Props) {
   }`;
 
   return (
-    <div ref={ref} className="fixed inset-x-0 bottom-0 z-[60] xl:hidden">
+    <div ref={ref} className="fixed inset-x-0 bottom-0 z-[60] min-[769px]:hidden">
       <nav
         aria-label="ناوبری موبایل"
         className="border-t border-line bg-cream pb-[max(6px,env(safe-area-inset-bottom))]"
