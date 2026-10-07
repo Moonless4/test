@@ -83,7 +83,18 @@ curl -I http://localhost:3000/
 - `src/context/AuthContext.tsx` — demo accounts. Users, session, addresses, orders and the wallet
   (balance + transactions) are kept in `localStorage` (`styleon.users`, `styleon.session`,
   `styleon.addresses`, `styleon.orders`, `styleon.wallet`) because the app ships without a server.
-  Replace these helpers with real API calls when a backend exists.
+  Replace these helpers with real API calls when a backend exists. `updateOrderStatus` relabels an
+  order already in the book, which is how a payment moves it from awaiting to processing.
+- `src/lib/payment.ts` + `src/pages/PaymentPage.tsx` — the payment seam. Checkout turns the basket
+  into a `PaymentOrder`, keeps it in the store-wide ledger (`styleon.payments`), registers it in the
+  account panel as «در انتظار پرداخت» and hands off to `activeGateway.handoff()`. `/payment/:id` is
+  the stand-in bank page the bundled `sandboxGateway` points at: it moves no money, and its buttons
+  only exercise the paid/failed/canceled branches. Coins, the discount code and the basket are
+  settled on the way *back*, never on submit, so an abandoned payment leaves the basket intact.
+  Going live means adding the two server routes documented at the top of `src/lib/payment.ts`
+  (`/payment/request`, `/payment/verify`), implementing `PaymentGateway` against them and pointing
+  `activeGateway` at it — the merchant key belongs on the server, never in the browser.
+  The ledger is the only place a guest's order is recorded; the account panel still needs a session.
 - `src/lib/filters.ts` + `src/components/shop/FilterLayout.tsx` — one filter model and layout shared
   by `/shop` and `/search`. Filter groups are collapsible and start closed; their state resets when
   the category, discount flag or search query changes.

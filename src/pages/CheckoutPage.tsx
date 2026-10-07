@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
+  AlertCircle,
   CheckCircle2,
   Coins,
   CreditCard,
@@ -13,6 +14,14 @@ import { FREE_SHIPPING_THRESHOLD, useStore } from '../context/StoreContext';
 import { useAuth } from '../context/AuthContext';
 import { COIN_TITLE } from '../lib/data';
 import { onlyDigits, toFa } from '../lib/format';
+import {
+  STATUS_LABEL,
+  activeGateway,
+  newOrderId,
+  readPayment,
+  savePayment,
+  type PaymentOrder,
+} from '../lib/payment';
 import RewardPanel from '../components/cart/RewardPanel';
 import Price from '../components/ui/Price';
 import EmptyState from '../components/ui/EmptyState';
@@ -97,6 +106,15 @@ export default function CheckoutPage() {
   const [payMethod, setPayMethod] = useState('online');
   const [placed, setPlaced] = useState<string | null>(null);
   const [earned, setEarned] = useState(0);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const paymentOutcome = searchParams.get('payment');
+  const returnedOrderId = searchParams.get('order');
+  // A gateway returns the shopper through the query string, so read what it recorded.
+  const returned = useMemo(
+    () => (returnedOrderId ? readPayment(returnedOrderId) : null),
+    [returnedOrderId],
+  );
 
   const shippingCost = useMemo(() => {
     const method = SHIPPING_METHODS.find((m) => m.id === shipMethod);
@@ -122,27 +140,63 @@ export default function CheckoutPage() {
   };
 
   const placeOrder = () => {
-    const orderNumber = `ST-${Math.floor(100000 + Math.random() * 899999)}`;
+    const orderNumber = newOrderId();
+    const amount = due + shippingCost;
+    const method = PAYMENT_METHODS.find((m) => m.id === payMethod);
+    const shippingMethod = SHIPPING_METHODS.find((m) => m.id === shipMethod);
+    if (!method || !shippingMethod) return;
+
+    const orderLines = lines.map((line) => ({
+      name: line.product.name,
+      qty: line.qty,
+      price: line.product.price,
+    }));
+
+    if (payMethod === 'online') {
+      // Online payment leaves the site for the gateway: the order is registered here as
+      // awaiting payment, and the basket only empties once the money is confirmed.
+      const record: PaymentOrder = {
+        id: orderNumber,
+        amount,
+        method: 'online',
+        methodTitle: method.title,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        customer: {
+          name: `${form.firstName} ${form.lastName}`.trim(),
+          mobile: form.mobile,
+          province: form.province,
+          city: form.city,
+          address: form.address,
+          postalCode: form.postalCode,
+          note: form.note || undefined,
+        },
+        shipping: { id: shippingMethod.id, title: shippingMethod.title, cost: shippingCost },
+        lines: orderLines,
+      };
+      savePayment(record);
+      addOrder({ id: orderNumber, total: amount, status: STATUS_LABEL.pending, lines: orderLines });
+      navigate(activeGateway.handoff(record));
+      return;
+    }
+
     // Coins are settled while the basket still holds this order's numbers.
-    const coinsEarned = settleOrder(due + shippingCost);
+    const coinsEarned = settleOrder(amount);
     // Signed-in shoppers keep the order in their account panel.
-    addOrder({
-      id: orderNumber,
-      total: due,
-      status: 'در حال پردازش',
-      lines: lines.map((line) => ({
-        name: line.product.name,
-        qty: line.qty,
-        price: line.product.price,
-      })),
-    });
+    addOrder({ id: orderNumber, total: amount, status: STATUS_LABEL.paid, lines: orderLines });
     setEarned(coinsEarned);
     setPlaced(orderNumber);
     clearCart();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (placed) {
+  const done = placed
+    ? { id: placed, refId: undefined as string | undefined, earned }
+    : returned?.status === 'paid'
+      ? { id: returned.id, refId: returned.refId, earned: returned.coinsEarned ?? 0 }
+      : null;
+
+  if (done) {
     return (
       <div className="container py-12 sm:py-20">
         <Reveal className="mx-auto max-w-xl rounded-panel border border-line bg-cream p-8 text-center sm:p-12">
@@ -153,14 +207,22 @@ export default function CheckoutPage() {
           <p className="mt-4 text-[13px] leading-7 text-muted sm:text-sm">
             شماره پیگیری سفارش شما{' '}
             <span dir="ltr" className="font-bold text-black">
-              {placed}
+              {done.id}
             </span>{' '}
             است. همکاران ما تا ساعتی دیگر برای هماهنگی ارسال با شما تماس می‌گیرند.
           </p>
-          {earned > 0 ? (
+          {done.refId ? (
+            <p className="mt-3 text-[12px] text-muted">
+              کد پیگیری پرداخت:{' '}
+              <span dir="ltr" className="font-bold text-black">
+                {toFa(done.refId)}
+              </span>
+            </p>
+          ) : null}
+          {done.earned > 0 ? (
             <p className="mx-auto mt-5 flex max-w-sm items-center justify-center gap-2 rounded-xl bg-teal-50 px-4 py-3 text-[12px] font-medium leading-6 text-black">
               <Coins className="h-4 w-4 shrink-0" />
-              {toFa(earned)} {COIN_TITLE} بابت این خرید به موجودی شما اضافه شد.
+              {toFa(done.earned)} {COIN_TITLE} بابت این خرید به موجودی شما اضافه شد.
             </p>
           ) : null}
           <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -234,6 +296,16 @@ export default function CheckoutPage() {
       </nav>
 
       <h1 className="mb-7 text-xl font-bold text-ink sm:text-2xl">تکمیل خرید</h1>
+
+      {paymentOutcome === 'failed' || paymentOutcome === 'canceled' ? (
+        <div className="mb-6 flex items-start gap-3 rounded-panel border border-line bg-cream p-4">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-sale" />
+          <p className="text-[13px] leading-6 text-ink">
+            {paymentOutcome === 'canceled' ? 'پرداخت لغو شد' : 'پرداخت ناموفق بود'} و مبلغی از
+            حساب شما کسر نشد. سبد خریدتان دست‌نخورده باقی مانده است؛ می‌توانید دوباره تلاش کنید.
+          </p>
+        </div>
+      ) : null}
 
       {/* Stepper */}
       <ol className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">

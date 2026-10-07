@@ -76,6 +76,8 @@ type AuthValue = {
   addAddress: (address: Omit<Address, 'id'>) => void;
   removeAddress: (id: string) => void;
   addOrder: (order: Omit<Order, 'id' | 'date'> & { id: string }) => void;
+  /** Moves a registered order to a new state, e.g. once its payment lands. */
+  updateOrderStatus: (id: string, status: string) => void;
 };
 
 const USERS_KEY = 'styleon.users';
@@ -231,6 +233,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [userId],
   );
 
+  const updateOrderStatus: AuthValue['updateOrderStatus'] = useCallback(
+    (id, status) => {
+      if (!userId) return;
+      setOrderBook((prev) => ({
+        ...prev,
+        [userId]: (prev[userId] ?? []).map((order) =>
+          order.id === id ? { ...order, status } : order,
+        ),
+      }));
+    },
+    [userId],
+  );
+
   const depositWallet: AuthValue['depositWallet'] = useCallback(
     (amount) => {
       if (!userId || amount <= 0) return;
@@ -294,6 +309,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       addAddress,
       removeAddress,
       addOrder,
+      updateOrderStatus,
     }),
     [
       user,
@@ -311,6 +327,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       addAddress,
       removeAddress,
       addOrder,
+      updateOrderStatus,
     ],
   );
 
