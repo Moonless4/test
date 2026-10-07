@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import {
+  ArrowDownLeft,
+  ArrowUpRight,
   Bell,
   Coins,
   Heart,
@@ -63,8 +65,19 @@ const EMPTY_ADDRESS = {
 
 /** Signed-in area: overview, orders, returns, wishlist, addresses, profile and the loyalty club. */
 export default function AccountPage() {
-  const { user, orders, addresses, logout, updateProfile, changePassword, addAddress, removeAddress } =
-    useAuth();
+  const {
+    user,
+    orders,
+    addresses,
+    wallet,
+    logout,
+    updateProfile,
+    changePassword,
+    depositWallet,
+    withdrawWallet,
+    addAddress,
+    removeAddress,
+  } = useAuth();
   const { wishlist } = useStore();
   const navigate = useNavigate();
   const [tab, setTab] = useState<TabId>('dashboard');
@@ -79,6 +92,8 @@ export default function AccountPage() {
   const [password, setPassword] = useState({ current: '', next: '', confirm: '' });
   const [passwordError, setPasswordError] = useState('');
   const [passwordSaved, setPasswordSaved] = useState(false);
+  const [walletAmount, setWalletAmount] = useState('');
+  const [walletError, setWalletError] = useState('');
 
   if (!user) return <Navigate to="/login" replace />;
 
@@ -86,7 +101,7 @@ export default function AccountPage() {
     { label: 'سفارش', value: toFa(orders.length), icon: Package },
     { label: 'آدرس', value: toFa(addresses.length), icon: MapPin },
     { label: 'علاقه‌مندی', value: toFa(wishlist.length), icon: Heart },
-    { label: 'کیف پول', value: toFa(0), icon: Wallet },
+    { label: 'کیف پول', value: toFa(wallet.balance), icon: Wallet },
   ];
 
   const submitAddress = (e: React.FormEvent) => {
@@ -122,6 +137,18 @@ export default function AccountPage() {
     setPasswordError('');
     setPasswordSaved(true);
     window.setTimeout(() => setPasswordSaved(false), 2500);
+  };
+
+  const submitWallet = (kind: 'deposit' | 'withdraw') => {
+    const amount = Number(walletAmount);
+    if (!walletAmount || !Number.isFinite(amount) || amount <= 0)
+      return setWalletError('مبلغ را وارد کنید.');
+    if (kind === 'withdraw' && amount > wallet.balance)
+      return setWalletError('موجودی کیف پول برای این برداشت کافی نیست.');
+    if (kind === 'deposit') depositWallet(amount);
+    else withdrawWallet(amount);
+    setWalletAmount('');
+    setWalletError('');
   };
 
   return (
@@ -552,17 +579,116 @@ export default function AccountPage() {
           ) : null}
 
           {tab === 'wallet' ? (
-            <div className="rounded-panel border border-line bg-white p-5 sm:p-6">
-              <h2 className="flex items-center gap-2 text-base font-bold text-ink">
-                <Wallet className="h-4.5 w-4.5" />
-                کیف پول
-              </h2>
-              <p className="mt-4 text-2xl font-black text-ink">
-                <Price value={0} />
-              </p>
-              <p className="mt-1.5 text-[12.5px] leading-6 text-muted">
-                مبلغ مرجوعی سفارش‌ها به کیف پول اضافه می‌شود و می‌توانید آن را در خرید بعدی خرج کنید.
-              </p>
+            <div className="space-y-6">
+              <div className="rounded-panel border border-line bg-white p-5 sm:p-6">
+                <h2 className="flex items-center gap-2 text-base font-bold text-ink">
+                  <Wallet className="h-4.5 w-4.5" />
+                  کیف پول
+                </h2>
+                <p className="mt-4 text-2xl font-black text-ink">
+                  <Price value={wallet.balance} />
+                </p>
+                <p className="mt-1.5 text-[12.5px] leading-6 text-muted">
+                  مبلغ مرجوعی سفارش‌ها به کیف پول اضافه می‌شود و می‌توانید آن را در خرید بعدی خرج
+                  کنید.
+                </p>
+
+                <div className="mt-5 border-t border-line pt-5">
+                  <label
+                    htmlFor="wallet-amount"
+                    className="mb-1.5 block text-[13px] font-medium text-ink"
+                  >
+                    مبلغ (تومان)
+                  </label>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <input
+                      id="wallet-amount"
+                      dir="ltr"
+                      inputMode="numeric"
+                      value={walletAmount}
+                      onChange={(e) => setWalletAmount(onlyDigits(e.target.value))}
+                      placeholder="100000"
+                      className={`${field} sm:max-w-[220px]`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => submitWallet('deposit')}
+                      className="flex h-12 items-center gap-2 rounded-xl bg-teal-800 px-5 text-sm font-bold text-white transition-colors hover:bg-teal-700"
+                    >
+                      <ArrowDownLeft className="h-4 w-4" />
+                      واریز
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => submitWallet('withdraw')}
+                      className="flex h-12 items-center gap-2 rounded-xl border border-line px-5 text-sm font-bold text-ink transition-colors hover:border-teal-300"
+                    >
+                      <ArrowUpRight className="h-4 w-4" />
+                      برداشت
+                    </button>
+                  </div>
+
+                  {walletError ? (
+                    <p
+                      role="alert"
+                      className="mt-4 rounded-xl bg-sale/10 px-4 py-3 text-[12.5px] text-sale"
+                    >
+                      {walletError}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="rounded-panel border border-line bg-white p-5 sm:p-6">
+                <h2 className="text-base font-bold text-ink">تراکنش‌ها</h2>
+                {wallet.transactions.length === 0 ? (
+                  <p className="mt-4 rounded-xl bg-cream p-5 text-[13px] text-muted">
+                    هنوز تراکنشی ثبت نشده است.
+                  </p>
+                ) : (
+                  <ul className="mt-2 divide-y divide-line">
+                    {wallet.transactions.map((transaction) => {
+                      const isDeposit = transaction.type === 'deposit';
+                      return (
+                        <li
+                          key={transaction.id}
+                          className="flex items-center justify-between gap-3 py-3.5"
+                        >
+                          <span className="flex items-center gap-3">
+                            <span
+                              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                                isDeposit ? 'bg-teal-50 text-teal-800' : 'bg-sale/10 text-sale'
+                              }`}
+                            >
+                              {isDeposit ? (
+                                <ArrowDownLeft className="h-4 w-4" />
+                              ) : (
+                                <ArrowUpRight className="h-4 w-4" />
+                              )}
+                            </span>
+                            <span>
+                              <span className="block text-[13px] font-medium text-ink">
+                                {isDeposit ? 'واریز' : 'برداشت'}
+                              </span>
+                              <span className="mt-0.5 block text-[12px] text-muted">
+                                {transaction.date}
+                              </span>
+                            </span>
+                          </span>
+                          <span
+                            className={`shrink-0 text-[13px] font-bold ${
+                              isDeposit ? 'text-teal-800' : 'text-sale'
+                            }`}
+                          >
+                            {isDeposit ? '+' : '−'}
+                            <Price value={transaction.amount} />
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
             </div>
           ) : null}
 

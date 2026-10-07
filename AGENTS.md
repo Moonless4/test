@@ -51,9 +51,10 @@ curl -I http://localhost:3000/
   coupon/coin maths behind `due`, and `settleOrder()`, which credits the coins a placed order earns
   and debits the ones it spends. Codes and coin rules are plain data in `src/lib/data.ts`, rendered
   by one shared box: `src/components/cart/RewardPanel.tsx`.
-- `src/context/AuthContext.tsx` — demo accounts. Users, session, addresses and orders are kept in
-  `localStorage` (`styleon.users`, `styleon.session`, `styleon.addresses`, `styleon.orders`) because
-  the app ships without a server. Replace these helpers with real API calls when a backend exists.
+- `src/context/AuthContext.tsx` — demo accounts. Users, session, addresses, orders and the wallet
+  (balance + transactions) are kept in `localStorage` (`styleon.users`, `styleon.session`,
+  `styleon.addresses`, `styleon.orders`, `styleon.wallet`) because the app ships without a server.
+  Replace these helpers with real API calls when a backend exists.
 - `src/lib/filters.ts` + `src/components/shop/FilterLayout.tsx` — one filter model and layout shared
   by `/shop` and `/search`. Filter groups are collapsible and start closed; their state resets when
   the category, discount flag or search query changes.

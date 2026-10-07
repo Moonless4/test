@@ -47,17 +47,32 @@ export type Order = {
   lines: OrderLine[];
 };
 
+export type WalletTransaction = {
+  id: string;
+  type: 'deposit' | 'withdraw';
+  amount: number;
+  date: string;
+};
+
+export type Wallet = {
+  balance: number;
+  transactions: WalletTransaction[];
+};
+
 export type AuthResult = { ok: boolean; error?: string };
 
 type AuthValue = {
   user: User | null;
   addresses: Address[];
   orders: Order[];
+  wallet: Wallet;
   register: (input: { name: string; email: string; mobile: string; password: string }) => AuthResult;
   login: (email: string, password: string) => AuthResult;
   logout: () => void;
   updateProfile: (patch: Partial<Pick<User, 'name' | 'email' | 'mobile'>>) => void;
   changePassword: (current: string, next: string) => AuthResult;
+  depositWallet: (amount: number) => void;
+  withdrawWallet: (amount: number) => void;
   addAddress: (address: Omit<Address, 'id'>) => void;
   removeAddress: (id: string) => void;
   addOrder: (order: Omit<Order, 'id' | 'date'> & { id: string }) => void;
@@ -67,6 +82,9 @@ const USERS_KEY = 'styleon.users';
 const SESSION_KEY = 'styleon.session';
 const ADDRESSES_KEY = 'styleon.addresses';
 const ORDERS_KEY = 'styleon.orders';
+const WALLET_KEY = 'styleon.wallet';
+
+const EMPTY_WALLET: Wallet = { balance: 0, transactions: [] };
 
 const AuthContext = createContext<AuthValue | null>(null);
 
@@ -98,11 +116,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [orderBook, setOrderBook] = useState<Record<string, Order[]>>(() =>
     read<Record<string, Order[]>>(ORDERS_KEY, {}),
   );
+  const [walletBook, setWalletBook] = useState<Record<string, Wallet>>(() =>
+    read<Record<string, Wallet>>(WALLET_KEY, {}),
+  );
 
   useEffect(() => write(USERS_KEY, users), [users]);
   useEffect(() => write(SESSION_KEY, userId), [userId]);
   useEffect(() => write(ADDRESSES_KEY, addressBook), [addressBook]);
   useEffect(() => write(ORDERS_KEY, orderBook), [orderBook]);
+  useEffect(() => write(WALLET_KEY, walletBook), [walletBook]);
 
   const user = useMemo(
     () => users.find((item) => item.id === userId) ?? null,
@@ -209,16 +231,66 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [userId],
   );
 
+  const depositWallet: AuthValue['depositWallet'] = useCallback(
+    (amount) => {
+      if (!userId || amount <= 0) return;
+      setWalletBook((prev) => {
+        const current = prev[userId] ?? EMPTY_WALLET;
+        const transaction: WalletTransaction = {
+          id: `t-${Date.now()}`,
+          type: 'deposit',
+          amount,
+          date: new Date().toLocaleDateString('fa-IR'),
+        };
+        return {
+          ...prev,
+          [userId]: {
+            balance: current.balance + amount,
+            transactions: [transaction, ...current.transactions],
+          },
+        };
+      });
+    },
+    [userId],
+  );
+
+  const withdrawWallet: AuthValue['withdrawWallet'] = useCallback(
+    (amount) => {
+      if (!userId || amount <= 0) return;
+      setWalletBook((prev) => {
+        const current = prev[userId] ?? EMPTY_WALLET;
+        if (amount > current.balance) return prev;
+        const transaction: WalletTransaction = {
+          id: `t-${Date.now()}`,
+          type: 'withdraw',
+          amount,
+          date: new Date().toLocaleDateString('fa-IR'),
+        };
+        return {
+          ...prev,
+          [userId]: {
+            balance: current.balance - amount,
+            transactions: [transaction, ...current.transactions],
+          },
+        };
+      });
+    },
+    [userId],
+  );
+
   const value = useMemo<AuthValue>(
     () => ({
       user: user ? { id: user.id, name: user.name, email: user.email, mobile: user.mobile } : null,
       addresses: userId ? addressBook[userId] ?? [] : [],
       orders: userId ? orderBook[userId] ?? [] : [],
+      wallet: userId ? walletBook[userId] ?? EMPTY_WALLET : EMPTY_WALLET,
       register,
       login,
       logout,
       updateProfile,
       changePassword,
+      depositWallet,
+      withdrawWallet,
       addAddress,
       removeAddress,
       addOrder,
@@ -228,11 +300,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       userId,
       addressBook,
       orderBook,
+      walletBook,
       register,
       login,
       logout,
       updateProfile,
       changePassword,
+      depositWallet,
+      withdrawWallet,
       addAddress,
       removeAddress,
       addOrder,
