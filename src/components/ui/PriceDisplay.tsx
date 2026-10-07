@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { formatNumber } from '../../lib/format';
 import Price from './Price';
 
 type Props = {
@@ -42,8 +43,11 @@ export default function PriceDisplay({
       {discounted ? (
         <span className="flex items-center gap-1.5">
           {tag}
-          <span className={`${originalSize} text-muted line-through decoration-sale/50 decoration-[1.5px]`}>
-            <Price value={originalPrice} />
+          {/* The struck original price carries no currency glyph — plain digits under a pale red line. */}
+          <span
+            className={`${originalSize} text-muted line-through decoration-sale/50 decoration-[1.5px]`}
+          >
+            {formatNumber(originalPrice)}
           </span>
         </span>
       ) : null}
