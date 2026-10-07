@@ -6,7 +6,7 @@ type Props = {
  * The Toman currency glyph, drawn inline so it takes the colour of the price it
  * sits next to. Sized in `em` so it always matches the surrounding text size.
  */
-export default function TomanIcon({ className = 'h-[1.2em] w-auto' }: Props) {
+export default function TomanIcon({ className = 'h-[1.35em] w-auto' }: Props) {
   return (
     <svg
       viewBox="0 0 14 14"
