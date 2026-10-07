@@ -27,12 +27,6 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         </Link>
 
-        {product.discount > 0 ? (
-          <div className="pointer-events-none absolute top-2 end-2">
-            <DiscountBadge value={product.discount} size="sm" />
-          </div>
-        ) : null}
-
         {product.isNew && !product.discount ? (
           <span className="pointer-events-none absolute top-2 end-2 rounded-md bg-teal-800 px-2 py-0.5 text-[10px] font-medium text-white">
             جدید
@@ -62,7 +56,8 @@ export default function ProductCard({ product }: { product: Product }) {
           {product.name}
         </Link>
 
-        <div className="mt-auto flex justify-end pt-1">
+        <div className="mt-auto flex flex-wrap items-center justify-end gap-1.5 pt-1">
+          {product.discount > 0 ? <DiscountBadge value={product.discount} size="sm" /> : null}
           <PriceDisplay
             price={product.price}
             originalPrice={product.originalPrice}

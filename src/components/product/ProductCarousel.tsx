@@ -1,11 +1,13 @@
 import { useCallback, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Product } from '../../lib/types';
+import { useDragScroll } from '../../hooks/useDragScroll';
 import ProductCard from './ProductCard';
 
 /** Horizontally scrollable product rail with RTL-aware arrow controls. */
 export default function ProductCarousel({ products }: { products: Product[] }) {
   const railRef = useRef<HTMLDivElement>(null);
+  const railDrag = useDragScroll(railRef);
 
   const scrollByCards = useCallback((forward: boolean) => {
     const el = railRef.current;
@@ -43,7 +45,8 @@ export default function ProductCarousel({ products }: { products: Product[] }) {
 
       <div
         ref={railRef}
-        className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3.5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-5 sm:px-0"
+        {...railDrag}
+        className="no-scrollbar -mx-4 flex cursor-grab snap-x snap-mandatory select-none gap-3.5 overflow-x-auto px-4 pb-2 active:cursor-grabbing [&_a]:cursor-grab sm:mx-0 sm:gap-5 sm:px-0"
       >
         {products.map((product) => (
           <div

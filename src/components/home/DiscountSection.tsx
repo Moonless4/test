@@ -4,11 +4,13 @@ import { discountedProducts } from '../../lib/data';
 import CountdownPanel from './CountdownPanel';
 import ProductCard from '../product/ProductCard';
 import Reveal from '../ui/Reveal';
+import { useDragScroll } from '../../hooks/useDragScroll';
 
 /** "Off-time" strip: scrolling deal cards next to the countdown panel. */
 export default function DiscountSection() {
   const items = discountedProducts;
   const railRef = useRef<HTMLDivElement>(null);
+  const railDrag = useDragScroll(railRef);
 
   const step = useCallback(() => {
     const el = railRef.current;
@@ -41,7 +43,8 @@ export default function DiscountSection() {
 
             <div
               ref={railRef}
-              className="no-scrollbar flex min-w-0 flex-1 gap-3 overflow-x-auto pb-1 xl:gap-4"
+              {...railDrag}
+              className="no-scrollbar flex min-w-0 flex-1 cursor-grab select-none gap-3 overflow-x-auto pb-1 active:cursor-grabbing [&_a]:cursor-grab xl:gap-4"
             >
               {items.map((product) => (
                 <div
