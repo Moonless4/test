@@ -27,7 +27,8 @@ export default function Hero() {
   return (
     <section className="pt-3 sm:pt-4" aria-label="بنر اصلی">
       <div className="relative overflow-hidden bg-beige">
-        <div className="relative min-h-[420px] sm:min-h-[470px] lg:min-h-[520px]">
+        {/* Phones and tablets share one height; only desktop grows. */}
+        <div className="relative min-h-[420px] lg:min-h-[520px]">
           {heroSlides.map((slide, i) => (
             <div
               key={slide.eyebrow}
