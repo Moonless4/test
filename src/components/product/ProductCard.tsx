@@ -6,7 +6,9 @@ import PriceDisplay from '../ui/PriceDisplay';
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
-    <article className="relative flex flex-col overflow-hidden rounded-lg bg-white">
+    // h-full keeps every card as tall as its row, so discounted and non-discounted
+    // prices share one baseline.
+    <article className="relative flex h-full flex-col overflow-hidden rounded-lg bg-white">
       <div className="relative overflow-hidden">
         <Link to={`/product/${product.id}`} aria-label={product.name}>
           <div className="aspect-[4/5] w-full overflow-hidden">
