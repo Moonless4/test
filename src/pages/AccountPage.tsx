@@ -3,7 +3,6 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import {
   Bell,
   Coins,
-  CreditCard,
   Heart,
   LayoutDashboard,
   LogOut,
@@ -33,7 +32,6 @@ type TabId =
   | 'profile'
   | 'addresses'
   | 'reviews'
-  | 'bank'
   | 'wallet'
   | 'club'
   | 'notifications';
@@ -46,7 +44,6 @@ const TABS: { id: TabId; label: string; icon: typeof User }[] = [
   { id: 'profile', label: 'اطلاعات حساب کاربری', icon: User },
   { id: 'addresses', label: 'نشانی‌ها', icon: MapPin },
   { id: 'reviews', label: 'نظرات ثبت‌شده', icon: MessageSquare },
-  { id: 'bank', label: 'اطلاعات حساب بانکی', icon: CreditCard },
   { id: 'wallet', label: 'کیف پول', icon: Wallet },
   { id: 'club', label: 'باشگاه مشتریان', icon: Coins },
   { id: 'notifications', label: 'درخواست‌های اطلاع‌رسانی', icon: Bell },
@@ -551,14 +548,6 @@ export default function AccountPage() {
               icon={<MessageSquare className="h-7 w-7" />}
               title="هنوز نظری ثبت نکرده‌اید"
               text="پس از خرید، می‌توانید نظر و امتیاز خود را برای کالاهای خریداری‌شده ثبت کنید."
-            />
-          ) : null}
-
-          {tab === 'bank' ? (
-            <EmptyState
-              icon={<CreditCard className="h-7 w-7" />}
-              title="کارت بانکی ثبت نشده است"
-              text="برای دریافت مبلغ مرجوعی، شماره کارت به نام خودتان را ثبت کنید."
             />
           ) : null}
 
