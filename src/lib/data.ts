@@ -1145,6 +1145,7 @@ export const megaMenu: Record<CategoryId, MegaMenuSection[]> = {
 export const heroSlides = [
   {
     image: wideImg('1521572163474-6864f9cf17ab', 1800, 780),
+    imagePhone: wideImg('1521572163474-6864f9cf17ab', 1100, 1000),
     eyebrow: 'کالکشن پاییز و زمستان',
     title: ['استایل خاص', 'برای هر لحظه'],
     text: 'جدیدترین ترندهای لباس مردانه، زنانه و اکسسوری‌های خاص را اینجا پیدا کنید.',
@@ -1152,6 +1153,7 @@ export const heroSlides = [
   },
   {
     image: wideImg('1539109136881-3be0616acf4b', 1800, 780),
+    imagePhone: wideImg('1539109136881-3be0616acf4b', 1100, 1000),
     eyebrow: 'کالکشن زنانه',
     title: ['ظاهری مدرن', 'با حس روزمره'],
     text: 'ترکیبی از راحتی و ظرافت برای استایل‌های روزانه و مهمانی‌های خاص.',
@@ -1159,6 +1161,7 @@ export const heroSlides = [
   },
   {
     image: wideImg('1552374196-c4e7ffc6e126', 1800, 780),
+    imagePhone: wideImg('1552374196-c4e7ffc6e126', 1100, 1000),
     eyebrow: 'جدیدترین‌ها',
     title: ['ساده، دقیق', 'و همیشه شیک'],
     text: 'پوشاکی که با کیفیت دوخت و پارچه‌ی درست، سال‌ها همراه شما می‌ماند.',

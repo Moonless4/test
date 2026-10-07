@@ -9,6 +9,9 @@ const SLIDE_MS = 7000;
 /** Full-bleed editorial image slider — photos only, arrows on the sides. */
 export default function Hero() {
   const [index, setIndex] = useState(0);
+  // The wide desktop crop inside a phone-height box zooms in ~2.6×, so phones take their own
+  // crop, shaped like the box they fill.
+  const [phone] = useState(() => window.matchMedia('(max-width: 639px)').matches);
 
   useEffect(() => {
     const timer = window.setInterval(
@@ -27,8 +30,9 @@ export default function Hero() {
   return (
     <section className="pt-3 sm:pt-4" aria-label="بنر اصلی">
       <div className="relative overflow-hidden bg-beige">
-        {/* Phones and tablets share one height; only desktop grows. */}
-        <div className="relative min-h-[420px] lg:min-h-[520px]">
+        {/* On a phone the box keeps the crop's own ~11:10 shape, so the photo is shown as shot
+            instead of zoomed; tablets and desktop keep the fixed heights. */}
+        <div className="relative aspect-[11/10] sm:aspect-auto sm:min-h-[420px] lg:min-h-[520px]">
           {heroSlides.map((slide, i) => (
             <div
               key={slide.eyebrow}
@@ -38,7 +42,7 @@ export default function Hero() {
               aria-hidden={i !== index}
             >
               <Img
-                src={slide.image}
+                src={phone ? slide.imagePhone : slide.image}
                 alt=""
                 loading={i === 0 ? 'eager' : 'lazy'}
                 decoding="async"

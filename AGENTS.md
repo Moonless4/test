@@ -39,7 +39,11 @@ curl -I http://localhost:3000/
 - **Images** are hotlinked from `images.unsplash.com` and need network access in the browser.
   Always build URLs through `src/lib/images.ts` (`img`, `heroImg`, `wideImg`, `avatarImg`) so the
   crop size and `auto=format` (AVIF/WebP) parameters stay consistent. Product cards assume a 4:5
-  image area.
+  image area. The hero slider carries two crops per slide: `image` (1800×780, tablets and desktop)
+  and `imagePhone` (1100×1000). The wide crop inside a phone-height box is zoomed in ~2.6× (only a
+  third of the photo survives `object-cover`), so `Hero` picks `imagePhone` under
+  `matchMedia('(max-width: 639px)')` and its box keeps that ~11:10 shape (`aspect-[11/10]`,
+  `sm:aspect-auto sm:min-h-[420px]`), which is what sizes the slider on a phone.
 - **Layout must not scroll horizontally.** `body` uses `overflow-x: clip` (not `hidden`, which
   breaks the sticky header).
 - **Bottom-bar cutoff is 769px** (`min-[769px]:`, deliberately 1px above Tailwind's `md`, so a 768px

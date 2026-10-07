@@ -8,3 +8,5 @@ dist-ssr
 .DS_Store
 npm-debug.log*
 .vite
+
+*.tsbuildinfo
