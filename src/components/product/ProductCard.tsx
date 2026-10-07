@@ -1,14 +1,13 @@
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingBag } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import type { Product } from '../../lib/types';
 import { useStore } from '../../context/StoreContext';
 import DiscountBadge from '../ui/DiscountBadge';
 import Img from '../ui/Img';
 import PriceDisplay from '../ui/PriceDisplay';
-import Rating from '../ui/Rating';
 
 export default function ProductCard({ product }: { product: Product }) {
-  const { addToCart, toggleWishlist, isWishlisted } = useStore();
+  const { toggleWishlist, isWishlisted } = useStore();
   const wishlisted = isWishlisted(product.id);
 
   return (
@@ -58,23 +57,18 @@ export default function ProductCard({ product }: { product: Product }) {
       <div className="flex flex-1 flex-col gap-1.5 p-2.5">
         <Link
           to={`/product/${product.id}`}
-          className="line-clamp-2 min-h-[2.5em] text-[12px] font-medium leading-5 text-ink transition-colors hover:text-teal-700 sm:text-[13px]"
+          className="line-clamp-2 min-h-[2.5em] text-start text-[12px] font-medium leading-5 text-ink transition-colors hover:text-teal-700 sm:text-[13px]"
         >
           {product.name}
         </Link>
 
-        <Rating value={product.rating} count={product.reviewCount} compact />
-
-        <div className="mt-auto flex items-end justify-between gap-1.5 pt-1">
-          <PriceDisplay price={product.price} originalPrice={product.originalPrice} size="sm" />
-          <button
-            type="button"
-            onClick={() => addToCart(product)}
-            aria-label={`افزودن ${product.name} به سبد خرید`}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-800 transition-all duration-300 hover:bg-teal-800 hover:text-white hover:shadow-card group-hover:bg-teal-800 group-hover:text-white"
-          >
-            <ShoppingBag className="h-4 w-4" strokeWidth={1.9} />
-          </button>
+        <div className="mt-auto flex justify-end pt-1">
+          <PriceDisplay
+            price={product.price}
+            originalPrice={product.originalPrice}
+            size="sm"
+            align="end"
+          />
         </div>
       </div>
     </article>

@@ -4,7 +4,7 @@ type Props = {
   price: number;
   originalPrice: number;
   size?: 'sm' | 'md' | 'lg';
-  align?: 'start' | 'center';
+  align?: 'start' | 'center' | 'end';
   className?: string;
 };
 
@@ -28,11 +28,15 @@ export default function PriceDisplay({
   return (
     <div
       className={`flex flex-col gap-1 ${
-        align === 'center' ? 'items-center text-center' : 'items-start'
+        align === 'center'
+          ? 'items-center text-center'
+          : align === 'end'
+            ? 'items-end text-end'
+            : 'items-start'
       } ${className}`}
     >
       {discounted ? (
-        <span className={`${originalSize} text-muted line-through decoration-sale/80 decoration-[1.5px]`}>
+        <span className={`${originalSize} text-muted line-through decoration-sale/50 decoration-[1.5px]`}>
           {formatPrice(originalPrice)}
         </span>
       ) : null}
