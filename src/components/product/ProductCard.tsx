@@ -12,7 +12,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const wishlisted = isWishlisted(product.id);
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-card transition-all duration-300 hover:-translate-y-1">
+    <article className="group relative flex flex-col overflow-hidden rounded-lg bg-white transition-all duration-300 hover:-translate-y-1">
       <div className="relative overflow-hidden">
         <Link to={`/product/${product.id}`} aria-label={product.name}>
           <div className="aspect-[4/5] w-full overflow-hidden">
