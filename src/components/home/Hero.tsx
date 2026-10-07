@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { heroSlides } from '../../lib/data';
 import { toFa } from '../../lib/format';
 import Img from '../ui/Img';
 
 const SLIDE_MS = 7000;
 
-/** Editorial banner slider: beige canvas, photo centre, dark-brown CTA and round arrows. */
+/** Full-bleed editorial image slider — photos only, arrows on the sides. */
 export default function Hero() {
   const [index, setIndex] = useState(0);
 
@@ -28,7 +27,7 @@ export default function Hero() {
   return (
     <section className="pt-3 sm:pt-4" aria-label="بنر اصلی">
       <div className="relative overflow-hidden bg-beige">
-        <div className="relative flex min-h-[420px] items-center sm:min-h-[470px] lg:min-h-[520px]">
+        <div className="relative min-h-[420px] sm:min-h-[470px] lg:min-h-[520px]">
           {heroSlides.map((slide, i) => (
             <div
               key={slide.eyebrow}
@@ -44,58 +43,8 @@ export default function Hero() {
                 decoding="async"
                 className="h-full w-full object-cover object-center"
               />
-              {/* Beige scrim that keeps the copy legible over the photo. */}
-              <div className="absolute inset-0 bg-[linear-gradient(to_left,rgba(233,222,208,0.97)_0%,rgba(233,222,208,0.93)_34%,rgba(233,222,208,0.55)_62%,rgba(233,222,208,0)_100%)]" />
             </div>
           ))}
-
-          <div className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-col justify-center gap-7 px-6 pb-16 pt-10 sm:px-10 sm:pb-16 sm:pt-12 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:px-20 lg:py-14">
-            <div className="max-w-[520px]">
-              {heroSlides.map((slide, i) =>
-                i === index ? (
-                  <div key={slide.eyebrow} className="motion-safe:animate-fade-up">
-                    <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1.5 text-[11px] font-medium text-cocoa ring-1 ring-cocoa/10 backdrop-blur sm:text-xs">
-                      <Sparkles className="h-3.5 w-3.5 text-wine" />
-                      {slide.eyebrow}
-                    </span>
-
-                    <h1 className="mt-4 text-[30px] font-black leading-[1.3] text-cocoa sm:text-[42px] sm:leading-[1.22] lg:text-[52px] lg:leading-[1.16]">
-                      {slide.title[0]}
-                      <span className="mt-1 block">{slide.title[1]}</span>
-                    </h1>
-
-                    <p className="mt-4 max-w-[430px] text-[13px] leading-7 text-cocoa/75 sm:text-[15px] sm:leading-8">
-                      {slide.text}
-                    </p>
-                  </div>
-                ) : null,
-              )}
-            </div>
-
-            <div className="shrink-0">
-              {heroSlides.map((slide, i) =>
-                i === index ? (
-                  <div
-                    key={slide.eyebrow}
-                    className="motion-safe:animate-fade-up flex flex-col items-start gap-3"
-                  >
-                    <Link
-                      to={slide.cta.to}
-                      className="inline-flex h-12 items-center rounded-full bg-cocoa px-7 text-[13px] font-bold text-white shadow-lift transition-all duration-300 hover:bg-cocoa/90 sm:h-[52px] sm:text-sm"
-                    >
-                      {slide.cta.label}
-                    </Link>
-                    <Link
-                      to="/shop?discount=true"
-                      className="text-[12px] font-medium text-cocoa/70 underline-offset-4 transition-colors hover:text-cocoa hover:underline sm:text-[13px]"
-                    >
-                      تخفیف‌های ویژه
-                    </Link>
-                  </div>
-                ) : null,
-              )}
-            </div>
-          </div>
 
           <button
             type="button"
