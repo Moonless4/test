@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown, Heart, Menu, Search, ShoppingBag, User } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { NAV_LINKS } from '../../lib/nav';
@@ -7,14 +7,13 @@ import type { CategoryId } from '../../lib/types';
 import { toFa } from '../../lib/format';
 import MegaMenu from './MegaMenu';
 import MobileMenu from './MobileMenu';
+import SearchBox from '../search/SearchBox';
 
 export default function Header() {
   const { cartCount, wishlist, openCart } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<CategoryId | null>(null);
-  const [query, setQuery] = useState('');
   const [scrolled, setScrolled] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
@@ -26,15 +25,6 @@ export default function Header() {
 
   // Navigating away must never leave the mega menu hanging.
   useEffect(() => setOpenMenu(null), [location.pathname, location.search]);
-
-  const submitSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const q = query.trim();
-    if (!q) return;
-    navigate(`/search?q=${encodeURIComponent(q)}`);
-    setQuery('');
-    setMenuOpen(false);
-  };
 
   const isActive = (to: string) => {
     const path = to.split('?')[0];
@@ -83,21 +73,12 @@ export default function Header() {
             </Link>
 
             {/* Desktop search: light pill, per the reference header */}
-            <form
-              onSubmit={submitSearch}
-              role="search"
+            <div
               onMouseEnter={closeMenu}
-              className="mx-auto hidden min-w-0 max-w-[620px] flex-1 items-center gap-2 rounded-full bg-[#F5F5F7] px-4 lg:flex"
+              className="mx-auto hidden min-w-0 max-w-[620px] flex-1 lg:block"
             >
-              <Search className="h-4 w-4 shrink-0 text-muted" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                aria-label="جستجوی محصولات"
-                placeholder="جستجوی محصول، برند یا دسته‌بندی..."
-                className="h-11 w-full bg-transparent text-sm text-ink outline-none placeholder:text-muted"
-              />
-            </form>
+              <SearchBox />
+            </div>
 
             <div className="ms-auto flex items-center gap-1 lg:ms-0" onMouseEnter={closeMenu}>
               <Link to="/search" aria-label="جستجو" className={`${iconBtn} lg:hidden`}>

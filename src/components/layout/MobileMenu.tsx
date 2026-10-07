@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, Instagram, Search, Send, ShoppingBag, User, X } from 'lucide-react';
 import { NAV_LINKS } from '../../lib/nav';
+import { MIN_QUERY } from '../../lib/search';
+import SearchSuggestions from '../search/SearchSuggestions';
 
 type Props = {
   open: boolean;
@@ -34,6 +36,12 @@ export default function MobileMenu({ open, onClose }: Props) {
     const q = query.trim();
     if (!q) return;
     navigate(`/search?q=${encodeURIComponent(q)}`);
+    setQuery('');
+    onClose();
+  };
+
+  /** Opening one of the live suggestions closes the drawer. */
+  const closeSearch = () => {
     setQuery('');
     onClose();
   };
@@ -82,6 +90,12 @@ export default function MobileMenu({ open, onClose }: Props) {
             />
           </div>
         </form>
+
+        {query.trim().length >= MIN_QUERY ? (
+          <div className="max-h-[46vh] overflow-y-auto border-b border-line">
+            <SearchSuggestions query={query} onSelect={closeSearch} />
+          </div>
+        ) : null}
 
         <nav className="flex-1 overflow-y-auto p-2" aria-label="ناوبری موبایل">
           {NAV_LINKS.map((link) => (

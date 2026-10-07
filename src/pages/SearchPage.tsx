@@ -1,40 +1,18 @@
 import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { SearchX, Sparkles } from 'lucide-react';
-import { categories, products } from '../lib/data';
+import { searchCatalog } from '../lib/search';
 import { toFa } from '../lib/format';
 import ProductGrid from '../components/product/ProductGrid';
 import EmptyState from '../components/ui/EmptyState';
-
-/** Normalises Persian/Arabic glyph variants so search matches either spelling. */
-const normalise = (value: string): string =>
-  value
-    .replace(/[\u200c\u200f\u200e]/g, '')
-    .replace(/ي/g, 'ی')
-    .replace(/ك/g, 'ک')
-    .replace(/[أإآ]/g, 'ا')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase();
 
 const SUGGESTIONS = ['کت جین', 'مانتو کتان', 'کتانی کلاسیک', 'کیف دستی', 'عینک آفتابی', 'هودی'];
 
 export default function SearchPage() {
   const [params] = useSearchParams();
   const query = params.get('q') ?? '';
-  const term = normalise(query);
 
-  const results = useMemo(() => {
-    if (!term) return [];
-    return products.filter((product) => {
-      const categoryTitle =
-        categories.find((c) => c.id === product.category)?.title ?? '';
-      const haystack = normalise(
-        [product.name, product.brand, product.description, categoryTitle].join(' '),
-      );
-      return term.split(' ').every((word) => haystack.includes(word));
-    });
-  }, [term]);
+  const results = useMemo(() => searchCatalog(query).products, [query]);
 
   return (
     <div className="container py-8 sm:py-10">
