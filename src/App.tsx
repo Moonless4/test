@@ -1,8 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import CartDrawer from './components/layout/CartDrawer';
+import CategoryDrawer from './components/layout/CategoryDrawer';
+import MobileTabBar from './components/layout/MobileTabBar';
 import HomePage from './pages/HomePage';
 import ShopPage from './pages/ShopPage';
 import ProductPage from './pages/ProductPage';
@@ -26,8 +28,10 @@ function ScrollToTop() {
 }
 
 export default function App() {
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-white pb-[84px] lg:pb-0">
       <ScrollToTop />
       <Header />
 
@@ -52,6 +56,10 @@ export default function App() {
 
       <Footer />
       <CartDrawer />
+
+      {/* Phone chrome: the bottom bar owns the category sheet, so the pages stay untouched. */}
+      <MobileTabBar onOpenCategories={() => setCategoriesOpen(true)} />
+      <CategoryDrawer open={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
     </div>
   );
 }
