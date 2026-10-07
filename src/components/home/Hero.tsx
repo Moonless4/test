@@ -23,10 +23,10 @@ export default function Hero() {
     setIndex((i) => (i + step + heroSlides.length) % heroSlides.length);
 
   const arrow =
-    'absolute top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-cocoa shadow-lift transition-colors hover:bg-cream lg:flex';
+    'absolute top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white text-cocoa transition-colors hover:bg-cream lg:flex';
 
   return (
-    <section aria-label="بنر اصلی">
+    <section className="pt-3 sm:pt-4" aria-label="بنر اصلی">
       <div className="relative overflow-hidden bg-beige">
         <div className="relative flex min-h-[420px] items-center sm:min-h-[470px] lg:min-h-[520px]">
           {heroSlides.map((slide, i) => (

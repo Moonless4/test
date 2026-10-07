@@ -39,6 +39,12 @@ export type Product = {
   reviews: ProductReview[];
 };
 
+/** One sub-link of the header mega menu: what it reads and what it searches for. */
+export type MegaMenuLink = {
+  label: string;
+  q: string;
+};
+
 export type Category = {
   id: CategoryId;
   title: string;

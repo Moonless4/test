@@ -3,6 +3,7 @@ import type {
   BlogPost,
   Category,
   CategoryId,
+  MegaMenuLink,
   Product,
   ProductColor,
   ProductReview,
@@ -859,6 +860,53 @@ export const categories: Category[] = [
     itemCount: countIn('beauty'),
   },
 ];
+
+/** Sub-links of the header mega menu — each one runs the matching catalog search. */
+export const megaMenu: Record<CategoryId, MegaMenuLink[]> = {
+  men: [
+    { label: 'پیراهن مردانه', q: 'پیراهن مردانه' },
+    { label: 'تی‌شرت مردانه', q: 'تی‌شرت مردانه' },
+    { label: 'پولوشرت مردانه', q: 'پولوشرت مردانه' },
+    { label: 'هودی و سویشرت', q: 'هودی مردانه' },
+    { label: 'کت و جلیقه', q: 'کت مردانه' },
+    { label: 'کاپشن و پالتو', q: 'کاپشن مردانه' },
+    { label: 'شلوار جین', q: 'شلوار جین' },
+  ],
+  women: [
+    { label: 'مانتو زنانه', q: 'مانتو زنانه' },
+    { label: 'پیراهن زنانه', q: 'پیراهن زنانه' },
+    { label: 'بلوز و شومیز', q: 'بلوز زنانه' },
+    { label: 'کت و جلیقه', q: 'کت زنانه' },
+    { label: 'شلوار پارچه‌ای', q: 'شلوار پارچه‌ای' },
+    { label: 'تونیک زنانه', q: 'تونیک زنانه' },
+    { label: 'لباس مجلسی', q: 'مجلسی زنانه' },
+  ],
+  shoes: [
+    { label: 'کتانی', q: 'کتانی' },
+    { label: 'کفش چرم', q: 'کفش چرم' },
+    { label: 'کفش ورزشی', q: 'کفش ورزشی' },
+    { label: 'بوت و نیم‌بوت', q: 'بوت' },
+    { label: 'صندل', q: 'صندل' },
+  ],
+  accessories: [
+    { label: 'عینک آفتابی', q: 'عینک' },
+    { label: 'ساعت مچی', q: 'ساعت' },
+    { label: 'کمربند', q: 'کمربند' },
+    { label: 'شال و روسری', q: 'شال' },
+  ],
+  bags: [
+    { label: 'کیف دستی', q: 'کیف دستی' },
+    { label: 'کیف دوشی', q: 'کیف دوشی' },
+    { label: 'کیف چرم', q: 'کیف چرم' },
+    { label: 'همه کیف‌ها', q: 'کیف' },
+  ],
+  beauty: [
+    { label: 'عطر و ادوپرفیوم', q: 'ادوپرفیوم' },
+    { label: 'سرم و کرم', q: 'سرم' },
+    { label: 'اسپری و مرطوب‌کننده', q: 'اسپری' },
+    { label: 'آرایش لب', q: 'رژ لب' },
+  ],
+};
 
 export const heroSlides = [
   {

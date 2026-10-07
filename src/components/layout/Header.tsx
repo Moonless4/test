@@ -3,12 +3,15 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Heart, Menu, Search, ShoppingBag, User } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { NAV_LINKS } from '../../lib/nav';
+import type { CategoryId } from '../../lib/types';
 import { toFa } from '../../lib/format';
+import MegaMenu from './MegaMenu';
 import MobileMenu from './MobileMenu';
 
 export default function Header() {
   const { cartCount, wishlist, openCart } = useStore();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<CategoryId | null>(null);
   const [query, setQuery] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
@@ -20,6 +23,9 @@ export default function Header() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // Navigating away must never leave the mega menu hanging.
+  useEffect(() => setOpenMenu(null), [location.pathname, location.search]);
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,14 +45,17 @@ export default function Header() {
   const iconBtn =
     'relative flex h-10 w-10 items-center justify-center rounded-xl text-white/85 transition-colors hover:bg-white/10 hover:text-white';
 
+  const closeMenu = () => setOpenMenu(null);
+
   return (
     <>
       <header
         className={`sticky top-0 z-50 bg-teal-800 text-white transition-shadow duration-300 ${
           scrolled ? 'shadow-[0_8px_28px_-12px_rgba(13,53,68,.6)]' : ''
         }`}
+        onMouseLeave={closeMenu}
       >
-        <div className="container">
+        <div className="container relative">
           <div className="flex h-[68px] items-center gap-3 lg:h-[76px] lg:gap-5">
             {/* Mobile: hamburger + logo */}
             <button
@@ -59,7 +68,7 @@ export default function Header() {
               <Menu className="h-5 w-5" />
             </button>
 
-            <Link to="/" className="flex shrink-0 items-center gap-2.5">
+            <Link to="/" className="flex shrink-0 items-center gap-2.5" onMouseEnter={closeMenu}>
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/12 text-[17px] font-black tracking-tight ring-1 ring-white/20">
                 S
               </span>
@@ -77,6 +86,7 @@ export default function Header() {
             <form
               onSubmit={submitSearch}
               role="search"
+              onMouseEnter={closeMenu}
               className="mx-auto hidden min-w-0 max-w-[420px] flex-1 items-center gap-2 rounded-xl bg-white/10 px-4 ring-1 ring-white/15 transition-colors focus-within:bg-white/15 lg:flex"
             >
               <Search className="h-4 w-4 shrink-0 text-teal-200" />
@@ -94,6 +104,9 @@ export default function Header() {
                 <Link
                   key={link.to}
                   to={link.to}
+                  onMouseEnter={() => setOpenMenu(link.category ?? null)}
+                  aria-haspopup={link.category ? 'true' : undefined}
+                  aria-expanded={link.category ? openMenu === link.category : undefined}
                   className={`relative whitespace-nowrap rounded-lg px-2.5 py-2 text-[13.5px] font-medium transition-colors xl:px-3 xl:text-sm ${
                     isActive(link.to)
                       ? 'text-white'
@@ -108,7 +121,7 @@ export default function Header() {
               ))}
             </nav>
 
-            <div className="ms-auto flex items-center gap-1 lg:ms-0">
+            <div className="ms-auto flex items-center gap-1 lg:ms-0" onMouseEnter={closeMenu}>
               <Link to="/search" aria-label="جستجو" className={`${iconBtn} lg:hidden`}>
                 <Search className="h-5 w-5" />
               </Link>
@@ -133,6 +146,8 @@ export default function Header() {
               </button>
             </div>
           </div>
+
+          {openMenu ? <MegaMenu category={openMenu} onNavigate={closeMenu} /> : null}
         </div>
       </header>
 
