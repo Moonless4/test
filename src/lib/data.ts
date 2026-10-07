@@ -804,11 +804,33 @@ export const newArrivals = [
   .map((id) => getProduct(id))
   .filter((p): p is Product => Boolean(p));
 
+/** Same-category neighbours only: a shoe never shows up under a coat. */
 export const relatedProducts = (product: Product, count = 4): Product[] =>
-  products
-    .filter((p) => p.id !== product.id && p.category === product.category)
-    .concat(products.filter((p) => p.id !== product.id && p.category !== product.category))
-    .slice(0, count);
+  products.filter((p) => p.id !== product.id && p.category === product.category).slice(0, count);
+
+/** What completes a look: a pair of jeans pairs with shoes and a belt, not with perfume. */
+const COMPLEMENTS: Record<CategoryId, CategoryId[]> = {
+  men: ['shoes', 'accessories'],
+  women: ['shoes', 'bags', 'beauty'],
+  shoes: ['bags', 'accessories'],
+  accessories: ['bags', 'shoes'],
+  bags: ['accessories', 'shoes'],
+  beauty: ['accessories', 'bags'],
+};
+
+/** Cross-sell rail: one pick per complementary category, round-robin so the rail stays mixed. */
+export const complementaryProducts = (product: Product, count = 6): Product[] => {
+  const pools = (COMPLEMENTS[product.category] ?? []).map((category) =>
+    products.filter((p) => p.category === category),
+  );
+  const mixed: Product[] = [];
+  for (let i = 0; mixed.length < count && pools.some((pool) => pool.length > i); i += 1) {
+    pools.forEach((pool) => {
+      if (pool[i]) mixed.push(pool[i]);
+    });
+  }
+  return mixed.slice(0, count);
+};
 
 /* ------------------------------------------------------------------ *
  * Static content
