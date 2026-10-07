@@ -49,10 +49,13 @@ const primaryButton =
   'flex h-11 shrink-0 items-center gap-2 rounded-xl bg-teal-800 px-5 text-[13px] font-bold text-white transition-colors hover:bg-teal-700';
 
 export default function NotificationsPanel() {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const [prefs, setPrefs] = useState<Notice>(() => load(user?.id ?? 'guest'));
   const [mobile, setMobile] = useState(prefs.sms || user?.mobile || '');
   const [mobileError, setMobileError] = useState('');
+  const [email, setEmail] = useState(user?.email ?? '');
+  const [emailError, setEmailError] = useState('');
+  const [emailSaved, setEmailSaved] = useState(false);
   const [pushNote, setPushNote] = useState('');
   const [permission, setPermission] = useState<NotificationPermission>(() =>
     typeof Notification === 'undefined' ? 'denied' : Notification.permission,
@@ -72,6 +75,18 @@ export default function NotificationsPanel() {
       return setMobileError('شماره موبایل را به شکل ۰۹xxxxxxxxx وارد کنید.');
     setMobileError('');
     save({ sms: mobile });
+  };
+
+  const submitEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    const clean = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(clean))
+      return setEmailError('ایمیل را به شکل درست وارد کنید.');
+    setEmailError('');
+    updateProfile({ email: clean });
+    setEmail(clean);
+    setEmailSaved(true);
+    window.setTimeout(() => setEmailSaved(false), 2500);
   };
 
   const askPush = async () => {
@@ -155,9 +170,37 @@ export default function NotificationsPanel() {
         <p className="mt-3 text-[12.5px] leading-6 text-muted">
           خبرنامه و پیشنهادهای اختصاصی به ایمیل حساب کاربری شما ارسال می‌شود.
         </p>
-        <p dir="ltr" className="mt-3 text-[13px] font-medium text-ink">
-          {user?.email}
+        <p className="mt-3 text-[12.5px] leading-6 text-muted">
+          برای تغییر ایمیل اطلاع‌رسانی، نشانی جدید را وارد و ذخیره کنید.
         </p>
+
+        <form onSubmit={submitEmail} className="mt-4 flex flex-wrap items-center gap-3" noValidate>
+          <input
+            dir="ltr"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            aria-label="ایمیل اطلاع‌رسانی"
+            className={`${field} sm:max-w-[280px]`}
+          />
+          <button type="submit" className={primaryButton}>
+            ذخیره ایمیل
+          </button>
+        </form>
+
+        {emailError ? (
+          <p role="alert" className="mt-4 rounded-xl bg-sale/10 px-4 py-3 text-[12.5px] text-sale">
+            {emailError}
+          </p>
+        ) : null}
+
+        {emailSaved ? (
+          <p className="mt-4 flex items-center gap-2 rounded-xl bg-teal-50 px-4 py-3 text-[12.5px] text-teal-800">
+            <Check className="h-4 w-4 shrink-0" />
+            ایمیل اطلاع‌رسانی با موفقیت تغییر کرد.
+          </p>
+        ) : null}
 
         {prefs.email ? (
           <p className="mt-4 flex items-center gap-2 rounded-xl bg-teal-50 px-4 py-3 text-[12.5px] text-teal-800">
