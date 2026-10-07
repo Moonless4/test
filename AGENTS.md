@@ -46,7 +46,11 @@ curl -I http://localhost:3000/
   blog posts. Prices are plain Toman integers.
 - `src/context/StoreContext.tsx` — cart + wishlist state, persisted to `localStorage`
   (`styleon.cart`, `styleon.wishlist`). Adding to the cart opens the drawer. Wishlist is added from
-  the product page only; product cards carry no heart button.
+  the product page only; product cards carry no heart button. It also owns the basket perks: the
+  applied discount code (`styleon.coupon`), the «مدورا کوین» balance (`styleon.coins`), the
+  coupon/coin maths behind `due`, and `settleOrder()`, which credits the coins a placed order earns
+  and debits the ones it spends. Codes and coin rules are plain data in `src/lib/data.ts`, rendered
+  by one shared box: `src/components/cart/RewardPanel.tsx`.
 - `src/context/AuthContext.tsx` — demo accounts. Users, session, addresses and orders are kept in
   `localStorage` (`styleon.users`, `styleon.session`, `styleon.addresses`, `styleon.orders`) because
   the app ships without a server. Replace these helpers with real API calls when a backend exists.

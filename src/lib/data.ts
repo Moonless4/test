@@ -3,6 +3,7 @@ import type {
   BlogPost,
   Category,
   CategoryId,
+  Coupon,
   MegaMenuSection,
   Product,
   ProductColor,
@@ -1303,3 +1304,29 @@ export const allColors = products
   .flatMap((p) => p.colors)
   .filter((c, i, arr) => arr.findIndex((x) => x.name === c.name) === i);
 export const allBrands = Array.from(new Set(products.map((p) => p.brand))).sort();
+
+/**
+ * Discount codes shoppers can type in the cart. There is no server, so the list lives
+ * here: add the codes you hand out and they start working right away.
+ */
+export const coupons: Coupon[] = [
+  { code: 'STYLEON10', percent: 10, label: '۱۰٪ تخفیف روی کل سبد' },
+  {
+    code: 'WELCOME15',
+    percent: 15,
+    minSpend: 2000000,
+    label: '۱۵٪ تخفیف برای خریدهای بالای ۲ میلیون',
+  },
+  { code: 'MODURA50', amount: 50000, minSpend: 1000000, label: 'تخفیف نقدی ۵۰ هزار روی سبد' },
+];
+
+/** «مدورا کوین»: loyalty coins earned on every order and spendable on a later one. */
+export const COIN_TITLE = 'مدورا کوین';
+/** One coin is earned per this many paid. */
+export const COIN_PER_AMOUNT = 100000;
+/** What a single coin takes off an order. */
+export const COIN_VALUE = 10000;
+/** Balance a shopper needs before coins can be spent at all. */
+export const COIN_MIN_REDEEM = 10;
+/** Coins an order earns: the pricier the basket, the more coins it pays back. */
+export const coinsFor = (amount: number) => Math.max(1, Math.floor(amount / COIN_PER_AMOUNT));

@@ -70,6 +70,16 @@ export type CartLine = {
   qty: number;
 };
 
+/** A discount code the shopper can type in the cart. Percent OR amount, never both. */
+export type Coupon = {
+  code: string;
+  percent?: number;
+  amount?: number;
+  /** The code only works once the cart total reaches this amount. */
+  minSpend?: number;
+  label: string;
+};
+
 export type Testimonial = {
   name: string;
   avatar: string;

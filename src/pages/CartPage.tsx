@@ -1,15 +1,28 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ShoppingBag, Trash2 } from 'lucide-react';
 import { FREE_SHIPPING_THRESHOLD, useStore } from '../context/StoreContext';
+import { COIN_TITLE } from '../lib/data';
 import { toFa } from '../lib/format';
+import RewardPanel from '../components/cart/RewardPanel';
 import Price from '../components/ui/Price';
 import EmptyState from '../components/ui/EmptyState';
 import Img from '../components/ui/Img';
 import QuantitySelector from '../components/ui/QuantitySelector';
 
 export default function CartPage() {
-  const { lines, removeFromCart, updateQty, subtotal, discountTotal, shipping, total, clearCart } =
-    useStore();
+  const {
+    lines,
+    removeFromCart,
+    updateQty,
+    subtotal,
+    discountTotal,
+    shipping,
+    total,
+    due,
+    couponDiscount,
+    coinDiscount,
+    clearCart,
+  } = useStore();
 
   if (lines.length === 0) {
     return (
@@ -139,6 +152,10 @@ export default function CartPage() {
           <div className="rounded-panel border border-line bg-cream p-5 sm:p-6">
             <h2 className="mb-5 text-base font-bold text-ink">خلاصه سفارش</h2>
 
+            <div className="mb-5">
+              <RewardPanel />
+            </div>
+
             <dl className="space-y-3 text-[13px]">
               <div className="flex items-center justify-between text-muted">
                 <dt>جمع کالاها</dt>
@@ -150,13 +167,25 @@ export default function CartPage() {
                   <dd><Price value={discountTotal} />−</dd>
                 </div>
               ) : null}
+              {couponDiscount > 0 ? (
+                <div className="flex items-center justify-between text-sale">
+                  <dt>کد تخفیف</dt>
+                  <dd><Price value={couponDiscount} />−</dd>
+                </div>
+              ) : null}
+              {coinDiscount > 0 ? (
+                <div className="flex items-center justify-between text-sale">
+                  <dt>{COIN_TITLE}</dt>
+                  <dd><Price value={coinDiscount} />−</dd>
+                </div>
+              ) : null}
               <div className="flex items-center justify-between text-muted">
                 <dt>هزینه ارسال</dt>
                 <dd className="text-ink">{shipping === 0 ? 'رایگان' : <Price value={shipping} />}</dd>
               </div>
               <div className="flex items-center justify-between border-t border-line pt-3.5 text-[15px] font-bold text-ink">
                 <dt>مبلغ قابل پرداخت</dt>
-                <dd><Price value={total + shipping} /></dd>
+                <dd><Price value={due + shipping} /></dd>
               </div>
             </dl>
 

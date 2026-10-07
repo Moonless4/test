@@ -6,6 +6,8 @@ import { toFa } from '../../lib/format';
 import Price from '../ui/Price';
 import EmptyState from '../ui/EmptyState';
 import Img from '../ui/Img';
+import { COIN_TITLE } from '../../lib/data';
+import RewardPanel from '../cart/RewardPanel';
 import QuantitySelector from '../ui/QuantitySelector';
 
 export default function CartDrawer() {
@@ -19,6 +21,9 @@ export default function CartDrawer() {
     discountTotal,
     shipping,
     total,
+    due,
+    couponDiscount,
+    coinDiscount,
     cartCount,
   } = useStore();
 
@@ -146,6 +151,10 @@ export default function CartDrawer() {
             </div>
 
             <footer className="border-t border-line bg-cream/60 p-4">
+              <div className="mb-3">
+                <RewardPanel />
+              </div>
+
               {remaining > 0 ? (
                 <p className="mb-3 rounded-xl bg-white px-3 py-2 text-[12px] leading-6 text-black ring-1 ring-line">
                   تنها <Price value={remaining} /> تا ارسال رایگان باقی مانده است.
@@ -167,13 +176,25 @@ export default function CartDrawer() {
                     <dd><Price value={discountTotal} />−</dd>
                   </div>
                 ) : null}
+                {couponDiscount > 0 ? (
+                  <div className="flex items-center justify-between text-sale">
+                    <dt>کد تخفیف</dt>
+                    <dd><Price value={couponDiscount} />−</dd>
+                  </div>
+                ) : null}
+                {coinDiscount > 0 ? (
+                  <div className="flex items-center justify-between text-sale">
+                    <dt>{COIN_TITLE}</dt>
+                    <dd><Price value={coinDiscount} />−</dd>
+                  </div>
+                ) : null}
                 <div className="flex items-center justify-between text-muted">
                   <dt>هزینه ارسال</dt>
                   <dd>{shipping === 0 ? 'رایگان' : <Price value={shipping} />}</dd>
                 </div>
                 <div className="flex items-center justify-between border-t border-line pt-2.5 text-[15px] font-bold text-ink">
                   <dt>مبلغ قابل پرداخت</dt>
-                  <dd><Price value={total + shipping} /></dd>
+                  <dd><Price value={due + shipping} /></dd>
                 </div>
               </dl>
 

@@ -1,9 +1,19 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, CreditCard, MapPin, PackageCheck, ShoppingBag, Truck } from 'lucide-react';
+import {
+  CheckCircle2,
+  Coins,
+  CreditCard,
+  MapPin,
+  PackageCheck,
+  ShoppingBag,
+  Truck,
+} from 'lucide-react';
 import { FREE_SHIPPING_THRESHOLD, useStore } from '../context/StoreContext';
 import { useAuth } from '../context/AuthContext';
+import { COIN_TITLE } from '../lib/data';
 import { toFa } from '../lib/format';
+import RewardPanel from '../components/cart/RewardPanel';
 import Price from '../components/ui/Price';
 import EmptyState from '../components/ui/EmptyState';
 import Img from '../components/ui/Img';
@@ -67,7 +77,17 @@ const fieldClass =
   'h-12 w-full rounded-xl border border-line bg-white px-4 text-[13px] text-ink outline-none transition-colors focus:border-teal-400';
 
 export default function CheckoutPage() {
-  const { lines, subtotal, discountTotal, total, clearCart } = useStore();
+  const {
+    lines,
+    subtotal,
+    discountTotal,
+    total,
+    due,
+    couponDiscount,
+    coinDiscount,
+    settleOrder,
+    clearCart,
+  } = useStore();
   const { addOrder } = useAuth();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<Form>(EMPTY_FORM);
@@ -75,6 +95,7 @@ export default function CheckoutPage() {
   const [shipMethod, setShipMethod] = useState('post');
   const [payMethod, setPayMethod] = useState('online');
   const [placed, setPlaced] = useState<string | null>(null);
+  const [earned, setEarned] = useState(0);
 
   const shippingCost = useMemo(() => {
     const method = SHIPPING_METHODS.find((m) => m.id === shipMethod);
@@ -101,10 +122,12 @@ export default function CheckoutPage() {
 
   const placeOrder = () => {
     const orderNumber = `ST-${Math.floor(100000 + Math.random() * 899999)}`;
+    // Coins are settled while the basket still holds this order's numbers.
+    const coinsEarned = settleOrder(due + shippingCost);
     // Signed-in shoppers keep the order in their account panel.
     addOrder({
       id: orderNumber,
-      total,
+      total: due,
       status: 'در حال پردازش',
       lines: lines.map((line) => ({
         name: line.product.name,
@@ -112,6 +135,7 @@ export default function CheckoutPage() {
         price: line.product.price,
       })),
     });
+    setEarned(coinsEarned);
     setPlaced(orderNumber);
     clearCart();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -132,6 +156,12 @@ export default function CheckoutPage() {
             </span>{' '}
             است. همکاران ما تا ساعتی دیگر برای هماهنگی ارسال با شما تماس می‌گیرند.
           </p>
+          {earned > 0 ? (
+            <p className="mx-auto mt-5 flex max-w-sm items-center justify-center gap-2 rounded-xl bg-teal-50 px-4 py-3 text-[12px] font-medium leading-6 text-black">
+              <Coins className="h-4 w-4 shrink-0" />
+              {toFa(earned)} {COIN_TITLE} بابت این خرید به موجودی شما اضافه شد.
+            </p>
+          ) : null}
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               to="/shop"
@@ -463,6 +493,10 @@ export default function CheckoutPage() {
           <div className="rounded-panel border border-line bg-cream p-5 sm:p-6">
             <h2 className="mb-5 text-base font-bold text-ink">خلاصه سفارش</h2>
 
+            <div className="mb-5">
+              <RewardPanel />
+            </div>
+
             <ul className="mb-5 max-h-[280px] space-y-3 overflow-y-auto pe-1">
               {lines.map((line) => (
                 <li key={`${line.productId}-${line.size}-${line.color}`} className="flex items-center gap-3">
@@ -498,6 +532,18 @@ export default function CheckoutPage() {
                   <dd><Price value={discountTotal} />−</dd>
                 </div>
               ) : null}
+              {couponDiscount > 0 ? (
+                <div className="flex items-center justify-between text-sale">
+                  <dt>کد تخفیف</dt>
+                  <dd><Price value={couponDiscount} />−</dd>
+                </div>
+              ) : null}
+              {coinDiscount > 0 ? (
+                <div className="flex items-center justify-between text-sale">
+                  <dt>{COIN_TITLE}</dt>
+                  <dd><Price value={coinDiscount} />−</dd>
+                </div>
+              ) : null}
               <div className="flex items-center justify-between text-muted">
                 <dt>هزینه ارسال</dt>
                 <dd className="text-ink">
@@ -506,7 +552,7 @@ export default function CheckoutPage() {
               </div>
               <div className="flex items-center justify-between border-t border-line pt-3.5 text-[15px] font-bold text-ink">
                 <dt>مبلغ قابل پرداخت</dt>
-                <dd><Price value={total + shippingCost} /></dd>
+                <dd><Price value={due + shippingCost} /></dd>
               </div>
             </dl>
           </div>

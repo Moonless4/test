@@ -7,11 +7,13 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { products } from '../lib/data';
-import type { CartLine, Product } from '../lib/types';
+import { COIN_MIN_REDEEM, COIN_VALUE, coinsFor, coupons, products } from '../lib/data';
+import type { CartLine, Coupon, Product } from '../lib/types';
 
 const CART_KEY = 'styleon.cart';
 const WISH_KEY = 'styleon.wishlist';
+const COUPON_KEY = 'styleon.coupon';
+const COINS_KEY = 'styleon.coins';
 export const FREE_SHIPPING_THRESHOLD = 5000000;
 export const SHIPPING_FEE = 45000;
 
@@ -26,6 +28,22 @@ type StoreValue = {
   shipping: number;
   total: number;
   isCartOpen: boolean;
+  /** Discount code applied to the basket and what it saves. */
+  coupon: Coupon | null;
+  couponDiscount: number;
+  applyCoupon: (code: string) => { ok: boolean; error?: string };
+  removeCoupon: () => void;
+  /** «مدورا کوین» balance and how much of it this order spends. */
+  coins: number;
+  canUseCoins: boolean;
+  useCoins: boolean;
+  setUseCoins: (on: boolean) => void;
+  coinCount: number;
+  coinDiscount: number;
+  /** Order amount after the code and the coins; shipping is added by the caller. */
+  due: number;
+  /** Credits earned coins and debits the spent ones; returns the coins earned. */
+  settleOrder: (paidAmount: number) => number;
   openCart: () => void;
   closeCart: () => void;
   addToCart: (product: Product, size?: string, color?: string, qty?: number) => void;
@@ -53,6 +71,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     readStorage<string[]>(WISH_KEY, []),
   );
   const [isCartOpen, setCartOpen] = useState(false);
+  const [couponCode, setCouponCode] = useState<string | null>(() =>
+    readStorage<string | null>(COUPON_KEY, null),
+  );
+  const [coins, setCoins] = useState<number>(() => readStorage<number>(COINS_KEY, 0));
+  const [useCoins, setUseCoins] = useState(false);
 
   useEffect(() => {
     window.localStorage.setItem(CART_KEY, JSON.stringify(cart));
@@ -61,6 +84,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     window.localStorage.setItem(WISH_KEY, JSON.stringify(wishlist));
   }, [wishlist]);
+
+  useEffect(() => {
+    window.localStorage.setItem(COUPON_KEY, JSON.stringify(couponCode));
+  }, [couponCode]);
+
+  useEffect(() => {
+    window.localStorage.setItem(COINS_KEY, JSON.stringify(coins));
+  }, [coins]);
 
   // Freeze background scrolling while the drawer is open.
   useEffect(() => {
@@ -115,6 +146,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => setCart([]), []);
 
+  const removeCoupon = useCallback(() => setCouponCode(null), []);
+
   const toggleWishlist = useCallback((productId: string) => {
     setWishlist((prev) =>
       prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId],
@@ -139,6 +172,46 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const shipping =
       lines.length === 0 || total >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
 
+    const coupon = coupons.find((item) => item.code === couponCode) ?? null;
+    const couponDiscount =
+      coupon && (!coupon.minSpend || total >= coupon.minSpend)
+        ? Math.min(
+            coupon.percent ? Math.round((total * coupon.percent) / 100) : coupon.amount ?? 0,
+            total,
+          )
+        : 0;
+
+    const remaining = Math.max(0, total - couponDiscount);
+    const canUseCoins = coins >= COIN_MIN_REDEEM;
+    // Coins are whole: a fraction of one is never cashed in.
+    const coinCount =
+      useCoins && canUseCoins ? Math.min(coins, Math.floor(remaining / COIN_VALUE)) : 0;
+    const coinDiscount = coinCount * COIN_VALUE;
+    const due = remaining - coinDiscount;
+
+    const applyCoupon = (raw: string) => {
+      const code = raw.trim().toUpperCase();
+      if (!code) return { ok: false, error: 'کد تخفیف را وارد کنید.' };
+      const found = coupons.find((item) => item.code === code);
+      if (!found) return { ok: false, error: 'این کد تخفیف معتبر نیست.' };
+      if (found.minSpend && total < found.minSpend) {
+        return {
+          ok: false,
+          error: 'این کد برای سبد فعلی فعال نیست؛ مبلغ سبد کمتر از حد لازم است.',
+        };
+      }
+      setCouponCode(code);
+      return { ok: true };
+    };
+
+    const settleOrder = (paidAmount: number) => {
+      const earned = coinsFor(paidAmount);
+      setCoins((prev) => Math.max(0, prev - coinCount) + earned);
+      setCouponCode(null);
+      setUseCoins(false);
+      return earned;
+    };
+
     return {
       lines,
       wishlist,
@@ -148,6 +221,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       shipping,
       total,
       isCartOpen,
+      coupon,
+      couponDiscount,
+      applyCoupon,
+      removeCoupon,
+      coins,
+      canUseCoins,
+      useCoins,
+      setUseCoins,
+      coinCount,
+      coinDiscount,
+      due,
+      settleOrder,
       openCart: () => setCartOpen(true),
       closeCart: () => setCartOpen(false),
       addToCart,
@@ -157,7 +242,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toggleWishlist,
       isWishlisted: (id: string) => wishlist.includes(id),
     };
-  }, [cart, wishlist, isCartOpen, addToCart, removeFromCart, updateQty, clearCart, toggleWishlist]);
+  }, [
+    cart,
+    wishlist,
+    isCartOpen,
+    couponCode,
+    coins,
+    useCoins,
+    addToCart,
+    removeFromCart,
+    updateQty,
+    clearCart,
+    toggleWishlist,
+    removeCoupon,
+  ]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }
