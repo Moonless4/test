@@ -16,16 +16,9 @@ export default function DiscountSection() {
     const el = railRef.current;
     if (!el) return;
 
+    // RTL rails scroll towards negative offsets; the button stops at the end of the
+    // rail instead of looping back to the start.
     const isRtl = getComputedStyle(el).direction === 'rtl';
-    // RTL rails start at offset 0 and grow towards negative values.
-    const progress = isRtl ? -el.scrollLeft : el.scrollLeft;
-    const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
-
-    if (progress >= maxScroll - 8) {
-      el.scrollTo({ left: 0, behavior: 'smooth' });
-      return;
-    }
-
     const delta = Math.max(el.clientWidth * 0.8, 260);
     el.scrollBy({ left: isRtl ? -delta : delta, behavior: 'smooth' });
   }, []);
