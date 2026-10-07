@@ -1,30 +1,58 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import {
+  Bell,
+  Coins,
+  CreditCard,
   Heart,
   LayoutDashboard,
+  LifeBuoy,
   LogOut,
   MapPin,
+  MessageSquare,
   Package,
   Plus,
+  RotateCcw,
   ShoppingBag,
   Trash2,
   User,
+  Wallet,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext';
 import { toFa } from '../lib/format';
 import CoinPanel from '../components/account/CoinPanel';
+import WishlistPanel from '../components/account/WishlistPanel';
 import EmptyState from '../components/ui/EmptyState';
 import Price from '../components/ui/Price';
 
-type TabId = 'dashboard' | 'orders' | 'addresses' | 'profile';
+type TabId =
+  | 'dashboard'
+  | 'orders'
+  | 'returns'
+  | 'wishlist'
+  | 'profile'
+  | 'addresses'
+  | 'reviews'
+  | 'tickets'
+  | 'bank'
+  | 'wallet'
+  | 'club'
+  | 'notifications';
 
 const TABS: { id: TabId; label: string; icon: typeof User }[] = [
-  { id: 'dashboard', label: 'پیشخوان', icon: LayoutDashboard },
+  { id: 'dashboard', label: 'حساب کاربری من', icon: LayoutDashboard },
   { id: 'orders', label: 'سفارش‌های من', icon: Package },
-  { id: 'addresses', label: 'آدرس‌ها', icon: MapPin },
-  { id: 'profile', label: 'اطلاعات حساب', icon: User },
+  { id: 'returns', label: 'مرجوعی‌های من', icon: RotateCcw },
+  { id: 'wishlist', label: 'علاقه‌مندی‌ها', icon: Heart },
+  { id: 'profile', label: 'اطلاعات حساب کاربری', icon: User },
+  { id: 'addresses', label: 'نشانی‌ها', icon: MapPin },
+  { id: 'reviews', label: 'نظرات ثبت‌شده', icon: MessageSquare },
+  { id: 'tickets', label: 'تیکت‌های من', icon: LifeBuoy },
+  { id: 'bank', label: 'اطلاعات حساب بانکی', icon: CreditCard },
+  { id: 'wallet', label: 'کیف پول', icon: Wallet },
+  { id: 'club', label: 'باشگاه مشتریان', icon: Coins },
+  { id: 'notifications', label: 'درخواست‌های اطلاع‌رسانی', icon: Bell },
 ];
 
 const field =
@@ -39,7 +67,7 @@ const EMPTY_ADDRESS = {
   postalCode: '',
 };
 
-/** Signed-in area: overview, orders, addresses and profile. */
+/** Signed-in area: overview, orders, returns, wishlist, addresses, profile and the loyalty club. */
 export default function AccountPage() {
   const { user, orders, addresses, logout, updateProfile, addAddress, removeAddress } = useAuth();
   const { wishlist } = useStore();
@@ -94,45 +122,54 @@ export default function AccountPage() {
         <span className="font-medium text-ink">حساب کاربری</span>
       </nav>
 
-      <header className="mb-7 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-ink sm:text-2xl">سلام، {user.name}</h1>
-          <p className="mt-2 text-[13px] text-muted">
-            سفارش‌ها، آدرس‌ها و اطلاعات حساب خود را از این‌جا مدیریت کنید.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            logout();
-            navigate('/', { replace: true });
-          }}
-          className="flex h-11 items-center gap-2 rounded-xl border border-line bg-white px-4 text-[13px] font-medium text-ink transition-colors hover:border-sale hover:text-sale"
-        >
-          <LogOut className="h-4 w-4" />
-          خروج از حساب
-        </button>
+      <header className="mb-7">
+        <h1 className="text-xl font-bold text-ink sm:text-2xl">سلام، {user.name}</h1>
+        <p className="mt-2 text-[13px] text-muted">
+          سفارش‌ها، آدرس‌ها و اطلاعات حساب خود را از این‌جا مدیریت کنید.
+        </p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[240px_1fr] lg:gap-8">
-        <nav aria-label="بخش‌های حساب" className="flex gap-2 overflow-x-auto lg:flex-col lg:gap-1">
-          {TABS.map(({ id, label, icon: Icon }) => (
+      <div className="grid gap-6 lg:grid-cols-[260px_1fr] lg:gap-8">
+        <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
+          <div className="mb-3 hidden rounded-panel border border-line bg-white p-4 lg:block">
+            <p className="text-[11.5px] text-muted">کاربر گرامی</p>
+            <p className="mt-1 text-[13px] font-bold text-ink">{user.name}</p>
+          </div>
+
+          <nav
+            aria-label="بخش‌های حساب"
+            className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 lg:mx-0 lg:flex-col lg:gap-1 lg:overflow-visible lg:px-0"
+          >
+            {TABS.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setTab(id)}
+                aria-current={tab === id ? 'page' : undefined}
+                className={`flex min-h-11 shrink-0 items-center gap-2.5 rounded-xl px-4 text-[13px] font-medium transition-colors lg:w-full ${
+                  tab === id
+                    ? 'bg-teal-800 text-white'
+                    : 'bg-white text-ink ring-1 ring-line hover:bg-cream lg:ring-0 lg:hover:bg-cream'
+                }`}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                {label}
+              </button>
+            ))}
+
             <button
-              key={id}
               type="button"
-              onClick={() => setTab(id)}
-              aria-current={tab === id ? 'page' : undefined}
-              className={`flex min-h-11 shrink-0 items-center gap-2.5 rounded-xl px-4 text-[13px] font-medium transition-colors ${
-                tab === id
-                  ? 'bg-teal-800 text-white'
-                  : 'bg-white text-ink ring-1 ring-line hover:bg-cream lg:ring-0'
-              }`}
+              onClick={() => {
+                logout();
+                navigate('/', { replace: true });
+              }}
+              className="flex min-h-11 shrink-0 items-center gap-2.5 rounded-xl px-4 text-[13px] font-medium text-ink transition-colors hover:bg-sale/10 hover:text-sale lg:mt-1 lg:w-full lg:border-t lg:border-line lg:rounded-none lg:pt-4"
             >
-              <Icon className="h-4 w-4" />
-              {label}
+              <LogOut className="h-4 w-4 shrink-0" />
+              خروج از حساب کاربری
             </button>
-          ))}
-        </nav>
+          </nav>
+        </div>
 
         <div className="min-w-0">
           {tab === 'dashboard' ? (
@@ -336,7 +373,7 @@ export default function AccountPage() {
               className="rounded-panel border border-line bg-white p-5 sm:p-6"
               noValidate
             >
-              <h2 className="text-base font-bold text-ink">اطلاعات حساب</h2>
+              <h2 className="text-base font-bold text-ink">اطلاعات حساب کاربری</h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <label htmlFor="acc-name" className="mb-1.5 block text-[13px] font-medium text-ink">
@@ -386,6 +423,65 @@ export default function AccountPage() {
                 {saved ? <span className="text-[12.5px] text-teal-800">تغییرات ذخیره شد.</span> : null}
               </div>
             </form>
+          ) : null}
+
+          {tab === 'returns' ? (
+            <EmptyState
+              icon={<RotateCcw className="h-7 w-7" />}
+              title="مرجوعی فعالی ندارید"
+              text="اگر کالایی را مرجوع کنید، وضعیت درخواست و مبلغ بازگشتی آن از همین بخش قابل پیگیری است."
+            />
+          ) : null}
+
+          {tab === 'wishlist' ? <WishlistPanel /> : null}
+
+          {tab === 'reviews' ? (
+            <EmptyState
+              icon={<MessageSquare className="h-7 w-7" />}
+              title="هنوز نظری ثبت نکرده‌اید"
+              text="پس از خرید، می‌توانید نظر و امتیاز خود را برای کالاهای خریداری‌شده ثبت کنید."
+            />
+          ) : null}
+
+          {tab === 'tickets' ? (
+            <EmptyState
+              icon={<LifeBuoy className="h-7 w-7" />}
+              title="تیکتی ثبت نشده است"
+              text="برای پیگیری سفارش یا پرداخت، از پشتیبانی تیکت بزنید؛ پاسخ‌ها همین‌جا نمایش داده می‌شود."
+            />
+          ) : null}
+
+          {tab === 'bank' ? (
+            <EmptyState
+              icon={<CreditCard className="h-7 w-7" />}
+              title="کارت بانکی ثبت نشده است"
+              text="برای دریافت مبلغ مرجوعی، شماره کارت به نام خودتان را ثبت کنید."
+            />
+          ) : null}
+
+          {tab === 'wallet' ? (
+            <div className="rounded-panel border border-line bg-white p-5 sm:p-6">
+              <h2 className="flex items-center gap-2 text-base font-bold text-ink">
+                <Wallet className="h-4.5 w-4.5" />
+                کیف پول
+              </h2>
+              <p className="mt-4 text-2xl font-black text-ink">
+                <Price value={0} />
+              </p>
+              <p className="mt-1.5 text-[12.5px] leading-6 text-muted">
+                مبلغ مرجوعی سفارش‌ها به کیف پول اضافه می‌شود و می‌توانید آن را در خرید بعدی خرج کنید.
+              </p>
+            </div>
+          ) : null}
+
+          {tab === 'club' ? <CoinPanel /> : null}
+
+          {tab === 'notifications' ? (
+            <EmptyState
+              icon={<Bell className="h-7 w-7" />}
+              title="درخواست اطلاع‌رسانی فعالی ندارید"
+              text="با فعال کردن اطلاع‌رسانی، از تخفیف‌ها و کالکشن‌های جدید زودتر باخبر می‌شوید."
+            />
           ) : null}
         </div>
       </div>
