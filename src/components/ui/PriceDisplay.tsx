@@ -41,10 +41,10 @@ export default function PriceDisplay({
     >
       {discounted ? (
         <span className="flex items-center gap-1.5">
+          {tag}
           <span className={`${originalSize} text-muted line-through decoration-sale/50 decoration-[1.5px]`}>
             {formatPrice(originalPrice)}
           </span>
-          {tag}
         </span>
       ) : null}
       <span className={`${currentSize} font-bold ${discounted ? 'text-teal-800' : 'text-ink'}`}>
