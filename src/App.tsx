@@ -31,9 +31,9 @@ export default function App() {
   const { pathname } = useLocation();
   const [categoriesOpen, setCategoriesOpen] = useState(false);
 
-  // Room for the floating bottom bar until the `2xl` cutoff, where it disappears.
+  // The bottom bar is sticky and the shell's last child, so it reserves its own height.
   return (
-    <div className="flex min-h-screen flex-col bg-white pb-[84px] 2xl:pb-0">
+    <div className="flex min-h-screen flex-col bg-white">
       <ScrollToTop />
       <Header />
 

@@ -38,10 +38,15 @@ curl -I http://localhost:3000/
   image area.
 - **Layout must not scroll horizontally.** `body` uses `overflow-x: clip` (not `hidden`, which
   breaks the sticky header).
-- **Tablet chrome cutoff**: the bottom tab bar, the product action bar, the category drawer and
-  the header's wishlist/account icons all switch at Tailwind's `2xl` (1536px), and the shell
-  reserves the bar's height with `pb-[84px] 2xl:pb-0`. Keep those in step — every tablet (a
-  1366px landscape iPad Pro included) must keep the floating bar, and a desktop must not.
+- **Bottom-bar cutoff**: the bottom tab bar, the product action bar, the category drawer and the
+  header's wishlist/account icons all switch at Tailwind's `2xl` (1536px). Keep those in step —
+  every tablet (a 1366px landscape iPad Pro included) keeps the floating bar, a desktop does not.
+- **The bottom tab bar is `sticky`, not `fixed`** (last child of the shell, `bottom-0`); its own
+  slot reserves the clearance, so the shell needs no bottom padding. Under `position: fixed` the
+  bar was invisible on a real tablet — it scrolled away with the page and only appeared over the
+  footer, which is what a scaled/transformed preview shell does to `fixed`. Sticky pins it to the
+  viewport bottom in the sandbox preview and on real devices alike. The product page's
+  `ProductActionBar` is still `fixed`, since it lives inside the page rather than the shell.
 - `tsconfig` has `noUnusedLocals`; `npm run typecheck` is the quick sanity check.
 
 ## Where things live

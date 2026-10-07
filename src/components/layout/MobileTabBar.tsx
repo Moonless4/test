@@ -12,6 +12,11 @@ type Props = {
  * Phone and tablet bottom bar: a light pill carrying the four main destinations, with the
  * brand button floating in the middle. It stays below `2xl` so every tablet keeps it, including
  * the 1366px-wide landscape iPad Pro. Rendered by the app shell, so every page has it.
+ *
+ * `sticky`, not `fixed`: a `fixed` bar fell to the end of the document in the preview on a real
+ * tablet (it only showed up over the footer, where a scaled/transformed preview shell breaks
+ * `position: fixed`). Sticky pins it to the viewport bottom everywhere, and its own slot at the
+ * end of the shell reserves the clearance the old shell padding used to provide.
  */
 export default function MobileTabBar({ onOpenCategories }: Props) {
   const { cartCount, wishlist, openCart } = useStore();
@@ -25,7 +30,7 @@ export default function MobileTabBar({ onOpenCategories }: Props) {
     'absolute top-0 end-3 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold text-white';
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[60] px-3 pb-[max(10px,env(safe-area-inset-bottom))] 2xl:hidden">
+    <div className="sticky bottom-0 z-[60] px-3 pb-[max(10px,env(safe-area-inset-bottom))] 2xl:hidden">
       <nav
         aria-label="ناوبری موبایل"
         className="relative mx-auto w-full max-w-[430px] rounded-[30px] bg-cream shadow-lift ring-1 ring-line"
