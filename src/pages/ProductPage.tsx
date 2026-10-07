@@ -14,6 +14,7 @@ import {
 import { getProduct, relatedProducts } from '../lib/data';
 import { toFa } from '../lib/format';
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE, useStore } from '../context/StoreContext';
+import ProductActionBar from '../components/product/ProductActionBar';
 import ProductGallery from '../components/product/ProductGallery';
 import ProductCarousel from '../components/product/ProductCarousel';
 import ProductReviews from '../components/product/ProductReviews';
@@ -344,6 +345,13 @@ export default function ProductPage() {
         <h2 className="mb-6 text-xl font-bold text-ink sm:text-2xl">محصولات مرتبط</h2>
         <ProductCarousel products={relatedProducts(product, 6)} />
       </section>
+
+      {/* Phone chrome: this page's bottom bar replaces the app's tab bar. */}
+      <ProductActionBar
+        price={product.price}
+        originalPrice={product.originalPrice}
+        onAdd={handleAdd}
+      />
     </div>
   );
 }

@@ -28,6 +28,7 @@ function ScrollToTop() {
 }
 
 export default function App() {
+  const { pathname } = useLocation();
   const [categoriesOpen, setCategoriesOpen] = useState(false);
 
   return (
@@ -57,8 +58,11 @@ export default function App() {
       <Footer />
       <CartDrawer />
 
-      {/* Phone chrome: the bottom bar owns the category sheet, so the pages stay untouched. */}
-      <MobileTabBar onOpenCategories={() => setCategoriesOpen(true)} />
+      {/* Phone chrome: the bottom bar owns the category sheet, so the pages stay untouched.
+          On a product page it steps aside for that page's own price/action bar. */}
+      {pathname.startsWith('/product/') ? null : (
+        <MobileTabBar onOpenCategories={() => setCategoriesOpen(true)} />
+      )}
       <CategoryDrawer open={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
     </div>
   );
