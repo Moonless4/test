@@ -44,8 +44,8 @@ export default function Header() {
     >
       <div className="container relative">
         <div className="flex h-[64px] items-center gap-3 lg:h-[74px] lg:gap-6">
-          {/* Logo and the desktop search sit together, 5px apart. */}
-          <div className="flex min-w-0 flex-1 items-center gap-[5px]">
+          {/* Logo and the desktop search sit together, 12px apart. */}
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <Link to="/" className="flex shrink-0 items-center gap-2.5" onMouseEnter={closeMenu}>
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-800 text-[17px] font-black tracking-tight text-white">
                 S
