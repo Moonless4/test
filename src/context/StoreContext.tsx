@@ -14,7 +14,7 @@ const CART_KEY = 'styleon.cart';
 const WISH_KEY = 'styleon.wishlist';
 const COUPON_KEY = 'styleon.coupon';
 const COINS_KEY = 'styleon.coins';
-export const FREE_SHIPPING_THRESHOLD = 5000000;
+export const FREE_SHIPPING_THRESHOLD = 3000000;
 export const SHIPPING_FEE = 45000;
 
 export type DetailedLine = CartLine & { product: Product; lineTotal: number };
