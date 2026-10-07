@@ -45,6 +45,12 @@ export type MegaMenuLink = {
   q: string;
 };
 
+/** A titled column of the mega menu, so every section has its own structure. */
+export type MegaMenuGroup = {
+  title: string;
+  links: MegaMenuLink[];
+};
+
 export type Category = {
   id: CategoryId;
   title: string;
@@ -73,4 +79,8 @@ export type BlogPost = {
   excerpt: string;
   image: string;
   date: string;
+  author: string;
+  readTime: string;
+  /** Article paragraphs, rendered in order. */
+  body: string[];
 };

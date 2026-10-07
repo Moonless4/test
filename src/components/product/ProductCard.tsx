@@ -1,15 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
 import type { Product } from '../../lib/types';
-import { useStore } from '../../context/StoreContext';
 import DiscountBadge from '../ui/DiscountBadge';
 import Img from '../ui/Img';
 import PriceDisplay from '../ui/PriceDisplay';
 
 export default function ProductCard({ product }: { product: Product }) {
-  const { toggleWishlist, isWishlisted } = useStore();
-  const wishlisted = isWishlisted(product.id);
-
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-lg bg-white transition-all duration-300 hover:-translate-y-1">
       <div className="relative overflow-hidden">
@@ -33,19 +28,6 @@ export default function ProductCard({ product }: { product: Product }) {
           </span>
         ) : null}
 
-        <button
-          type="button"
-          onClick={() => toggleWishlist(product.id)}
-          aria-label={wishlisted ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
-          aria-pressed={wishlisted}
-          className={`absolute top-2 start-2 flex h-8 w-8 items-center justify-center rounded-full border backdrop-blur transition-all duration-300 ${
-            wishlisted
-              ? 'border-sale/20 bg-sale text-white shadow-soft'
-              : 'border-line bg-white/90 text-black hover:bg-white hover:shadow-soft'
-          }`}
-        >
-          <Heart className={`h-3.5 w-3.5 ${wishlisted ? 'fill-current' : ''}`} strokeWidth={1.8} />
-        </button>
       </div>
 
       <div className="flex flex-1 flex-col gap-1.5 p-2.5">

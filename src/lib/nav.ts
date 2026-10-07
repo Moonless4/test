@@ -9,6 +9,8 @@ export const NAV_LINKS: NavLink[] = [
   { label: 'زنانه', to: '/shop/women', category: 'women' },
   { label: 'کفش', to: '/shop/shoes', category: 'shoes' },
   { label: 'اکسسوری', to: '/shop/accessories', category: 'accessories' },
+  { label: 'کیف', to: '/shop/bags', category: 'bags' },
+  { label: 'زیبایی', to: '/shop/beauty', category: 'beauty' },
   { label: 'جدیدترین‌ها', to: '/shop?sort=newest' },
   { label: 'وبلاگ', to: '/blog' },
 ];

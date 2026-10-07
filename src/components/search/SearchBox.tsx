@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { MIN_QUERY } from '../../lib/search';
 import SearchSuggestions from './SearchSuggestions';
@@ -11,6 +11,12 @@ export default function SearchBox() {
   const boxRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Leaving the page must always close the suggestion panel.
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     const onPointerDown = (e: MouseEvent) => {

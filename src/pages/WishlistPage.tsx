@@ -21,7 +21,7 @@ export default function WishlistPage() {
         <EmptyState
           icon={<Heart className="h-7 w-7" />}
           title="لیست علاقه‌مندی‌های شما خالی است"
-          text="با زدن آیکون قلب روی هر کالا، آن را برای بررسی بعدی اینجا ذخیره کنید."
+          text="از صفحه‌ی هر کالا آیکون قلب را بزنید تا آن را برای بررسی بعدی اینجا ذخیره کنید."
           action={
             <Link
               to="/shop"

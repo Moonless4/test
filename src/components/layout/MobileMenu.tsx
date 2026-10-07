@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Heart, Instagram, Search, Send, ShoppingBag, User, X } from 'lucide-react';
 import { NAV_LINKS } from '../../lib/nav';
 import { MIN_QUERY } from '../../lib/search';
@@ -13,6 +13,13 @@ type Props = {
 export default function MobileMenu({ open, onClose }: Props) {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Navigating anywhere closes the drawer, including from the suggestion list.
+  useEffect(() => {
+    setQuery('');
+    onClose();
+  }, [location.pathname, location.search, onClose]);
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : '';
@@ -130,7 +137,7 @@ export default function MobileMenu({ open, onClose }: Props) {
               سبد خرید
             </Link>
             <Link
-              to="/checkout"
+              to="/account"
               onClick={onClose}
               className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl bg-cream text-[11px] font-medium text-black"
             >

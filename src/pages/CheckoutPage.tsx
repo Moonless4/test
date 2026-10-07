@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, CreditCard, MapPin, PackageCheck, ShoppingBag, Truck } from 'lucide-react';
 import { FREE_SHIPPING_THRESHOLD, useStore } from '../context/StoreContext';
+import { useAuth } from '../context/AuthContext';
 import { formatPrice, toFa } from '../lib/format';
 import EmptyState from '../components/ui/EmptyState';
 import Img from '../components/ui/Img';
@@ -66,6 +67,7 @@ const fieldClass =
 
 export default function CheckoutPage() {
   const { lines, subtotal, discountTotal, total, clearCart } = useStore();
+  const { addOrder } = useAuth();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<Form>(EMPTY_FORM);
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
@@ -98,6 +100,17 @@ export default function CheckoutPage() {
 
   const placeOrder = () => {
     const orderNumber = `ST-${Math.floor(100000 + Math.random() * 899999)}`;
+    // Signed-in shoppers keep the order in their account panel.
+    addOrder({
+      id: orderNumber,
+      total,
+      status: 'در حال پردازش',
+      lines: lines.map((line) => ({
+        name: line.product.name,
+        qty: line.qty,
+        price: line.product.price,
+      })),
+    });
     setPlaced(orderNumber);
     clearCart();
     window.scrollTo({ top: 0, behavior: 'smooth' });

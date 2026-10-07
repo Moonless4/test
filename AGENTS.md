@@ -42,12 +42,19 @@ curl -I http://localhost:3000/
 - `src/lib/data.ts` — the whole catalog (28 products), categories, hero slides, testimonials,
   blog posts. Prices are plain Toman integers.
 - `src/context/StoreContext.tsx` — cart + wishlist state, persisted to `localStorage`
-  (`styleon.cart`, `styleon.wishlist`). Adding to the cart opens the drawer.
+  (`styleon.cart`, `styleon.wishlist`). Adding to the cart opens the drawer. Wishlist is added from
+  the product page only; product cards carry no heart button.
+- `src/context/AuthContext.tsx` — demo accounts. Users, session, addresses and orders are kept in
+  `localStorage` (`styleon.users`, `styleon.session`, `styleon.addresses`, `styleon.orders`) because
+  the app ships without a server. Replace these helpers with real API calls when a backend exists.
+- `src/lib/filters.ts` + `src/components/shop/FilterLayout.tsx` — one filter model and layout shared
+  by `/shop` and `/search`. Filter groups are collapsible and start closed; their state resets when
+  the category, discount flag or search query changes.
 - `src/components/home/*` — the homepage sections in `src/pages/HomePage.tsx` order:
   Hero, CategoryCards, DiscountSection, PromoBanners, NewArrivals, Benefits, PromoCollection,
   Testimonials, Newsletter.
 - Other routes: `/shop`, `/shop/:category`, `/product/:id`, `/search?q=`, `/cart`, `/checkout`,
-  `/wishlist`, `/blog`.
+  `/wishlist`, `/blog`, `/blog/:id`, `/login`, `/register`, `/account`.
 
 ## Verifying a change
 

@@ -1,26 +1,8 @@
-import { RotateCcw } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { ChevronDown, RotateCcw } from 'lucide-react';
 import { allBrands, allColors, allSizes } from '../../lib/data';
+import { PRICE_CEILING, emptyFilters, isFiltersDirty, type Filters } from '../../lib/filters';
 import { formatPrice, toFa } from '../../lib/format';
-
-export type Filters = {
-  sizes: string[];
-  colors: string[];
-  brands: string[];
-  onlyDiscount: boolean;
-  minRating: number;
-  maxPrice: number;
-};
-
-export const PRICE_CEILING = 5000000;
-
-export const emptyFilters: Filters = {
-  sizes: [],
-  colors: [],
-  brands: [],
-  onlyDiscount: false,
-  minRating: 0,
-  maxPrice: PRICE_CEILING,
-};
 
 type Props = {
   filters: Filters;
@@ -34,26 +16,55 @@ function toggle(list: string[], value: string): string[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
+/** One collapsible filter group: closed by default so the user opens only what is needed. */
+function Group({
+  title,
+  badge,
+  children,
+}: {
+  title: string;
+  badge?: number;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <section className="border-b border-line last:border-b-0">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        className="flex min-h-11 w-full items-center justify-between gap-3 py-2.5 text-start"
+      >
+        <span className="flex items-center gap-2 text-[13px] font-bold text-ink">
+          {title}
+          {badge ? (
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-teal-800 px-1 text-[10px] font-bold text-white">
+              {toFa(badge)}
+            </span>
+          ) : null}
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 shrink-0 text-muted transition-transform duration-300 ${
+            open ? 'rotate-180' : ''
+          }`}
+        />
+      </button>
+      {open ? <div className="pb-4 pt-1">{children}</div> : null}
+    </section>
+  );
+}
+
 export default function FilterSidebar({ filters, onChange, resultCount }: Props) {
   const patch = (partial: Partial<Filters>) => onChange({ ...filters, ...partial });
 
-  const isDirty =
-    filters.sizes.length > 0 ||
-    filters.colors.length > 0 ||
-    filters.brands.length > 0 ||
-    filters.onlyDiscount ||
-    filters.minRating > 0 ||
-    filters.maxPrice < PRICE_CEILING;
-
-  const groupTitle = 'mb-3 text-[13px] font-bold text-ink';
-
   return (
-    <div className="space-y-7">
-      <div className="flex items-center justify-between">
+    <div>
+      <div className="mb-2 flex items-center justify-between gap-3 border-b border-line pb-4">
         <p className="text-[13px] text-muted">
           <span className="font-bold text-ink">{toFa(resultCount)}</span> کالا
         </p>
-        {isDirty ? (
+        {isFiltersDirty(filters) ? (
           <button
             type="button"
             onClick={() => onChange({ ...emptyFilters })}
@@ -65,8 +76,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
         ) : null}
       </div>
 
-      <section>
-        <h3 className={groupTitle}>محدوده قیمت</h3>
+      <Group title="محدوده قیمت" badge={filters.maxPrice < PRICE_CEILING ? 1 : 0}>
         <input
           type="range"
           min={200000}
@@ -81,10 +91,9 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
           <span>{formatPrice(200000)}</span>
           <span className="font-medium text-black">تا {formatPrice(filters.maxPrice)}</span>
         </div>
-      </section>
+      </Group>
 
-      <section>
-        <h3 className={groupTitle}>سایز</h3>
+      <Group title="سایز" badge={filters.sizes.length}>
         <div className="flex flex-wrap gap-2">
           {allSizes.map((size) => {
             const active = filters.sizes.includes(size);
@@ -105,10 +114,9 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
             );
           })}
         </div>
-      </section>
+      </Group>
 
-      <section>
-        <h3 className={groupTitle}>رنگ</h3>
+      <Group title="رنگ" badge={filters.colors.length}>
         <div className="flex flex-wrap gap-2">
           {allColors.map((color) => {
             const active = filters.colors.includes(color.name);
@@ -133,10 +141,9 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
             );
           })}
         </div>
-      </section>
+      </Group>
 
-      <section>
-        <h3 className={groupTitle}>برند</h3>
+      <Group title="برند" badge={filters.brands.length}>
         <div className="space-y-1">
           {allBrands.map((brand) => (
             <label
@@ -153,10 +160,9 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
             </label>
           ))}
         </div>
-      </section>
+      </Group>
 
-      <section>
-        <h3 className={groupTitle}>امتیاز</h3>
+      <Group title="امتیاز" badge={filters.minRating ? 1 : 0}>
         <div className="space-y-1">
           {RATINGS.map((rating) => (
             <label
@@ -181,11 +187,11 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
             بدون محدودیت امتیاز
           </button>
         </div>
-      </section>
+      </Group>
 
-      <section className="rounded-panel border border-line bg-cream p-4">
-        <label className="flex cursor-pointer items-center justify-between gap-3">
-          <span className="text-[13px] font-medium text-ink">فقط کالاهای تخفیف‌دار</span>
+      <Group title="فقط تخفیف‌دارها">
+        <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl bg-cream px-3 py-3">
+          <span className="text-[13px] font-medium text-ink">کالاهای تخفیف‌دار</span>
           <input
             type="checkbox"
             checked={filters.onlyDiscount}
@@ -193,7 +199,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
             className="h-4 w-4 accent-teal-800"
           />
         </label>
-      </section>
+      </Group>
     </div>
   );
 }

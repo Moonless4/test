@@ -25,7 +25,10 @@ export default function BlogPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {blogPosts.map((post, i) => (
           <Reveal key={post.id} delay={i * 90}>
-            <article className="group flex h-full flex-col overflow-hidden rounded-panel border border-line bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card">
+            <Link
+              to={`/blog/${post.id}`}
+              className="group flex h-full flex-col overflow-hidden rounded-panel border border-line bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
+            >
               <div className="aspect-[16/10] overflow-hidden bg-cream">
                 <img
                   src={post.image}
@@ -41,12 +44,15 @@ export default function BlogPage() {
                 </span>
                 <h2 className="text-[15px] font-bold leading-7 text-ink">{post.title}</h2>
                 <p className="text-[13px] leading-7 text-muted">{post.excerpt}</p>
-                <span className="mt-auto flex items-center gap-1.5 pt-2 text-[13px] font-medium text-black">
-                  ادامه مطلب
-                  <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
+                <span className="mt-auto flex items-center justify-between gap-1.5 pt-2 text-[13px] font-medium text-black">
+                  <span className="flex items-center gap-1.5">
+                    ادامه مطلب
+                    <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-1" />
+                  </span>
+                  <span className="text-[11.5px] font-normal text-muted">{post.readTime}</span>
                 </span>
               </div>
-            </article>
+            </Link>
           </Reveal>
         ))}
       </div>

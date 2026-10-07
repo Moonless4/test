@@ -92,7 +92,7 @@ export default function Header() {
                   </span>
                 ) : null}
               </Link>
-              <Link to="/checkout" aria-label="حساب کاربری" className={`${iconBtn} hidden sm:flex`}>
+              <Link to="/account" aria-label="حساب کاربری" className={`${iconBtn} hidden sm:flex`}>
                 <User className="h-5 w-5" />
               </Link>
               <button type="button" onClick={openCart} aria-label="سبد خرید" className={iconBtn}>

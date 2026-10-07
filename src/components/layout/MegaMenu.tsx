@@ -19,7 +19,7 @@ export default function MegaMenu({ category, onNavigate }: Props) {
 
   useEffect(() => setActive(category), [category]);
 
-  const links = megaMenu[active];
+  const groups = megaMenu[active];
   const current = categories.find((item) => item.id === active);
 
   return (
@@ -64,16 +64,24 @@ export default function MegaMenu({ category, onNavigate }: Props) {
             </Link>
           </div>
 
-          <div className="mt-5 grid grid-cols-4 gap-x-6 gap-y-2.5">
-            {links.map((link) => (
-              <Link
-                key={link.label}
-                to={`/search?q=${encodeURIComponent(link.q)}`}
-                onClick={onNavigate}
-                className="text-[13px] text-ink transition-colors hover:text-wine"
-              >
-                {link.label}
-              </Link>
+          <div className="mt-5 grid grid-cols-2 gap-x-8 gap-y-6 xl:grid-cols-4">
+            {groups.map((group) => (
+              <div key={group.title}>
+                <h4 className="mb-2.5 text-[12.5px] font-bold text-black">{group.title}</h4>
+                <ul className="space-y-1.5">
+                  {group.links.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        to={`/search?q=${encodeURIComponent(link.q)}`}
+                        onClick={onNavigate}
+                        className="text-[13px] text-muted transition-colors hover:text-wine"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
         </div>
