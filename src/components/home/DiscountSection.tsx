@@ -42,7 +42,7 @@ export default function DiscountSection() {
               {items.map((product) => (
                 <div
                   key={product.id}
-                  className="w-[150px] shrink-0 sm:w-[164px] xl:w-[172px]"
+                  className="w-[150px] shrink-0 sm:w-[164px] xl:w-[calc((100%-64px)/5)]"
                 >
                   <ProductCard product={product} />
                 </div>
