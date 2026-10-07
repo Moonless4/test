@@ -789,8 +789,11 @@ export const getProduct = (id?: string): Product | undefined =>
 export const getByCategory = (category: CategoryId): Product[] =>
   products.filter((p) => p.category === category);
 
+/** The «تخفیف شگفت‌انگیز» rail shows only the deepest deals. */
+export const DEAL_MIN_DISCOUNT = 20;
+
 export const discountedProducts = products
-  .filter((p) => p.discount > 0)
+  .filter((p) => p.discount > DEAL_MIN_DISCOUNT)
   .sort((a, b) => b.discount - a.discount);
 
 export const newArrivals = [

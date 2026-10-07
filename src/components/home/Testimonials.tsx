@@ -11,7 +11,7 @@ export default function Testimonials() {
   const railDrag = useDragScroll(railRef);
 
   return (
-    <section className="mt-12 bg-cream py-12 sm:mt-16 sm:py-16" aria-label="نظرات مشتریان">
+    <section className="mt-12 bg-white py-12 sm:mt-16 sm:py-16" aria-label="نظرات مشتریان">
       <div className="container">
         {/* grid-cols-1 keeps the auto track from stretching to the review carousel's
             max-content width on phones, which widened the whole document. */}

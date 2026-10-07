@@ -25,7 +25,7 @@ export default function DiscountSection() {
 
   return (
     <section
-      className="mt-12 bg-cream py-10 sm:mt-16 sm:py-14"
+      className="mt-12 bg-white py-10 sm:mt-16 sm:py-14"
       id="discounts"
       aria-label="تخفیف‌های ویژه"
     >
