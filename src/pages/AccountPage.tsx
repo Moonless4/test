@@ -13,8 +13,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext';
-import { formatPrice, toFa } from '../lib/format';
+import { toFa } from '../lib/format';
 import EmptyState from '../components/ui/EmptyState';
+import Price from '../components/ui/Price';
 
 type TabId = 'dashboard' | 'orders' | 'addresses' | 'profile';
 
@@ -205,13 +206,13 @@ export default function AccountPage() {
                         <li key={line.name} className="flex items-center justify-between gap-3">
                           <span>{line.name}</span>
                           <span>
-                            {toFa(line.qty)} × {formatPrice(line.price)}
+                            {toFa(line.qty)} × <Price value={line.price} />
                           </span>
                         </li>
                       ))}
                     </ul>
                     <p className="mt-4 border-t border-line pt-4 text-[13px] font-bold text-ink">
-                      مبلغ کل: {formatPrice(order.total)}
+                      مبلغ کل: <Price value={order.total} />
                     </p>
                   </li>
                 ))}

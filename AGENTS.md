@@ -24,8 +24,11 @@ curl -I http://localhost:3000/
 
 - **RTL**: `<html dir="rtl">`. Use logical Tailwind utilities (`start-*`, `end-*`, `ms-*`, `me-*`,
   `ps-*`, `pe-*`) instead of `left-*`/`right-*`, otherwise the layout flips incorrectly.
-- **Persian digits**: never print raw JS numbers into the UI. Use `toFa` / `formatNumber` /
-  `formatPrice` from `src/lib/format.ts`.
+- **Persian digits**: never print raw JS numbers into the UI. Use `toFa` / `formatNumber` from
+  `src/lib/format.ts`.
+- **Prices**: render every amount with `<Price value={…} />` (`src/components/ui/Price.tsx`) —
+  Persian digits followed by the Toman glyph (`TomanIcon`, also used for the accessible name).
+  Never print the word «تومان» as text.
 - **Discounted products must always show the original price with a strikethrough above the
   discounted price.** That rule lives in `src/components/ui/PriceDisplay.tsx`; the red badge is
   `DiscountBadge`. Both are driven by `price` / `originalPrice` in `src/lib/data.ts`.

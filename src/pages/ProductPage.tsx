@@ -13,11 +13,12 @@ import {
 } from 'lucide-react';
 import { getProduct, relatedProducts } from '../lib/data';
 import { toFa } from '../lib/format';
-import { useStore } from '../context/StoreContext';
+import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE, useStore } from '../context/StoreContext';
 import ProductGallery from '../components/product/ProductGallery';
 import ProductCarousel from '../components/product/ProductCarousel';
 import ProductReviews from '../components/product/ProductReviews';
 import DiscountBadge from '../components/ui/DiscountBadge';
+import Price from '../components/ui/Price';
 import PriceDisplay from '../components/ui/PriceDisplay';
 import QuantitySelector from '../components/ui/QuantitySelector';
 import Rating from '../components/ui/Rating';
@@ -125,7 +126,7 @@ export default function ProductPage() {
           {product.discount > 0 ? (
             <p className="mt-2 text-[12px] font-medium text-sale">
               {toFa(product.discount)}٪ تخفیف — سود شما{' '}
-              {toFa((product.originalPrice - product.price).toLocaleString('en-US'))} تومان
+              <Price value={product.originalPrice - product.price} />
             </p>
           ) : null}
 
@@ -290,8 +291,8 @@ export default function ProductPage() {
                   شرایط ارسال
                 </h3>
                 <p className="text-[13px] leading-7 text-muted">
-                  سفارش‌های ثبت‌شده تا ساعت ۱۴ در همان روز کاری ارسال می‌شوند. هزینه ارسال
-                  ۴۵٬۰۰۰ تومان است و برای سفارش‌های بالای ۵٬۰۰۰٬۰۰۰ تومان رایگان محاسبه می‌شود.
+                  سفارش‌های ثبت‌شده تا ساعت ۱۴ در همان روز کاری ارسال می‌شوند. هزینه ارسال{' '}
+                  <Price value={SHIPPING_FEE} /> است و برای سفارش‌های بالای <Price value={FREE_SHIPPING_THRESHOLD} /> رایگان محاسبه می‌شود.
                 </p>
               </div>
               <div className="rounded-panel border border-line p-5">

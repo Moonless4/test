@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { formatPrice } from '../../lib/format';
+import Price from './Price';
 
 type Props = {
   price: number;
@@ -43,12 +43,12 @@ export default function PriceDisplay({
         <span className="flex items-center gap-1.5">
           {tag}
           <span className={`${originalSize} text-muted line-through decoration-sale/50 decoration-[1.5px]`}>
-            {formatPrice(originalPrice)}
+            <Price value={originalPrice} />
           </span>
         </span>
       ) : null}
       <span className={`${currentSize} font-bold ${discounted ? 'text-black' : 'text-ink'}`}>
-        {formatPrice(price)}
+        <Price value={price} />
       </span>
     </div>
   );

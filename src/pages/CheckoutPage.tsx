@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { CheckCircle2, CreditCard, MapPin, PackageCheck, ShoppingBag, Truck } from 'lucide-react';
 import { FREE_SHIPPING_THRESHOLD, useStore } from '../context/StoreContext';
 import { useAuth } from '../context/AuthContext';
-import { formatPrice, toFa } from '../lib/format';
+import { toFa } from '../lib/format';
+import Price from '../components/ui/Price';
 import EmptyState from '../components/ui/EmptyState';
 import Img from '../components/ui/Img';
 import Reveal from '../components/ui/Reveal';
@@ -330,7 +331,7 @@ export default function CheckoutPage() {
                   <span className="shrink-0 text-[13px] font-medium text-black">
                     {total >= FREE_SHIPPING_THRESHOLD || method.price === 0
                       ? 'رایگان'
-                      : formatPrice(method.price)}
+                      : <Price value={method.price} />}
                   </span>
                 </label>
               ))}
@@ -419,7 +420,7 @@ export default function CheckoutPage() {
                       </span>
                     </span>
                     <span className="shrink-0 text-[13px] font-bold text-black">
-                      {formatPrice(line.lineTotal)}
+                      <Price value={line.lineTotal} />
                     </span>
                   </li>
                 ))}
@@ -480,7 +481,7 @@ export default function CheckoutPage() {
                     </span>
                   </span>
                   <span className="shrink-0 text-[12px] font-bold text-black">
-                    {formatPrice(line.lineTotal)}
+                    <Price value={line.lineTotal} />
                   </span>
                 </li>
               ))}
@@ -489,23 +490,23 @@ export default function CheckoutPage() {
             <dl className="space-y-3 border-t border-line pt-4 text-[13px]">
               <div className="flex items-center justify-between text-muted">
                 <dt>جمع کالاها</dt>
-                <dd className="text-ink">{formatPrice(subtotal)}</dd>
+                <dd className="text-ink"><Price value={subtotal} /></dd>
               </div>
               {discountTotal > 0 ? (
                 <div className="flex items-center justify-between text-sale">
                   <dt>تخفیف</dt>
-                  <dd>{formatPrice(discountTotal)}−</dd>
+                  <dd><Price value={discountTotal} />−</dd>
                 </div>
               ) : null}
               <div className="flex items-center justify-between text-muted">
                 <dt>هزینه ارسال</dt>
                 <dd className="text-ink">
-                  {shippingCost === 0 ? 'رایگان' : formatPrice(shippingCost)}
+                  {shippingCost === 0 ? 'رایگان' : <Price value={shippingCost} />}
                 </dd>
               </div>
               <div className="flex items-center justify-between border-t border-line pt-3.5 text-[15px] font-bold text-ink">
                 <dt>مبلغ قابل پرداخت</dt>
-                <dd>{formatPrice(total + shippingCost)}</dd>
+                <dd><Price value={total + shippingCost} /></dd>
               </div>
             </dl>
           </div>

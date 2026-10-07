@@ -8,5 +8,7 @@ export const toFa = (input: string | number): string =>
 export const formatNumber = (value: number): string =>
   toFa(value.toLocaleString('en-US'));
 
-/** 1980000 -> "۱,۹۸۰,۰۰۰ تومان" */
-export const formatPrice = (value: number): string => `${formatNumber(value)} تومان`;
+/**
+ * Amounts are rendered with the Toman glyph instead of the word "تومان":
+ * use `<Price value={…} />` from `src/components/ui/Price.tsx`.
+ */

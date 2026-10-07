@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ShoppingBag, Trash2, X } from 'lucide-react';
 import { FREE_SHIPPING_THRESHOLD, useStore } from '../../context/StoreContext';
-import { formatPrice, toFa } from '../../lib/format';
+import { toFa } from '../../lib/format';
+import Price from '../ui/Price';
 import EmptyState from '../ui/EmptyState';
 import Img from '../ui/Img';
 import QuantitySelector from '../ui/QuantitySelector';
@@ -136,7 +137,7 @@ export default function CartDrawer() {
                         onChange={(q) => updateQty(line.productId, line.size, line.color, q)}
                       />
                       <span className="text-sm font-bold text-black">
-                        {formatPrice(line.lineTotal)}
+                        <Price value={line.lineTotal} />
                       </span>
                     </div>
                   </div>
@@ -147,7 +148,7 @@ export default function CartDrawer() {
             <footer className="border-t border-line bg-cream/60 p-4">
               {remaining > 0 ? (
                 <p className="mb-3 rounded-xl bg-white px-3 py-2 text-[12px] leading-6 text-black ring-1 ring-line">
-                  تنها {formatPrice(remaining)} تا ارسال رایگان باقی مانده است.
+                  تنها <Price value={remaining} /> تا ارسال رایگان باقی مانده است.
                 </p>
               ) : (
                 <p className="mb-3 rounded-xl bg-teal-50 px-3 py-2 text-[12px] font-medium text-black">
@@ -158,21 +159,21 @@ export default function CartDrawer() {
               <dl className="space-y-2 text-[13px]">
                 <div className="flex items-center justify-between text-muted">
                   <dt>جمع کالاها</dt>
-                  <dd>{formatPrice(subtotal)}</dd>
+                  <dd><Price value={subtotal} /></dd>
                 </div>
                 {discountTotal > 0 ? (
                   <div className="flex items-center justify-between text-sale">
                     <dt>تخفیف</dt>
-                    <dd>{formatPrice(discountTotal)}−</dd>
+                    <dd><Price value={discountTotal} />−</dd>
                   </div>
                 ) : null}
                 <div className="flex items-center justify-between text-muted">
                   <dt>هزینه ارسال</dt>
-                  <dd>{shipping === 0 ? 'رایگان' : formatPrice(shipping)}</dd>
+                  <dd>{shipping === 0 ? 'رایگان' : <Price value={shipping} />}</dd>
                 </div>
                 <div className="flex items-center justify-between border-t border-line pt-2.5 text-[15px] font-bold text-ink">
                   <dt>مبلغ قابل پرداخت</dt>
-                  <dd>{formatPrice(total + shipping)}</dd>
+                  <dd><Price value={total + shipping} /></dd>
                 </div>
               </dl>
 

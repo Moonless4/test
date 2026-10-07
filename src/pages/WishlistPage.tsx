@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { products } from '../lib/data';
 import { useStore } from '../context/StoreContext';
-import { formatPrice, toFa } from '../lib/format';
-import { toFa as persian } from '../lib/format';
+import { toFa } from '../lib/format';
 import EmptyState from '../components/ui/EmptyState';
+import Price from '../components/ui/Price';
 import Img from '../components/ui/Img';
 import Rating from '../components/ui/Rating';
 import DiscountBadge from '../components/ui/DiscountBadge';
@@ -48,7 +48,7 @@ export default function WishlistPage() {
 
       <h1 className="mb-7 text-xl font-bold text-ink sm:text-2xl">
         علاقه‌مندی‌ها
-        <span className="ms-2 text-sm font-medium text-muted">({persian(items.length)} کالا)</span>
+        <span className="ms-2 text-sm font-medium text-muted">({toFa(items.length)} کالا)</span>
       </h1>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -113,7 +113,7 @@ export default function WishlistPage() {
       <p className="mt-6 text-[12px] text-muted">
         جمع مبلغ کالاهای ذخیره‌شده:{' '}
         <span className="font-bold text-black">
-          {formatPrice(items.reduce((sum, p) => sum + p.price, 0))}
+          <Price value={items.reduce((sum, p) => sum + p.price, 0)} />
         </span>{' '}
         ({toFa(items.length)} کالا)
       </p>

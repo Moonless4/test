@@ -2,7 +2,8 @@ import { useState, type ReactNode } from 'react';
 import { ChevronDown, RotateCcw } from 'lucide-react';
 import { allBrands, allColors, allSizes } from '../../lib/data';
 import { PRICE_CEILING, emptyFilters, isFiltersDirty, type Filters } from '../../lib/filters';
-import { formatPrice, toFa } from '../../lib/format';
+import { toFa } from '../../lib/format';
+import Price from '../ui/Price';
 
 type Props = {
   filters: Filters;
@@ -88,8 +89,8 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
           className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-line accent-teal-800"
         />
         <div className="mt-3 flex items-center justify-between text-[11px] text-muted">
-          <span>{formatPrice(200000)}</span>
-          <span className="font-medium text-black">تا {formatPrice(filters.maxPrice)}</span>
+          <span><Price value={200000} /></span>
+          <span className="font-medium text-black">تا <Price value={filters.maxPrice} /></span>
         </div>
       </Group>
 
