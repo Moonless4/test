@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { MIN_QUERY } from '../../lib/search';
 import SearchSuggestions from './SearchSuggestions';
 
@@ -9,6 +9,7 @@ export default function SearchBox() {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export default function SearchBox() {
       >
         <Search className="h-4 w-4 shrink-0 text-muted" />
         <input
+          ref={inputRef}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -59,10 +61,24 @@ export default function SearchBox() {
           placeholder="جستجوی محصول، برند یا دسته‌بندی..."
           className="h-11 w-full bg-transparent text-sm text-ink outline-none placeholder:text-muted"
         />
+        {query ? (
+          <button
+            type="button"
+            aria-label="پاک کردن جستجو"
+            onClick={() => {
+              setQuery('');
+              setOpen(false);
+              inputRef.current?.focus();
+            }}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted transition-colors hover:bg-white hover:text-ink"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        ) : null}
       </form>
 
       {open && query.trim().length >= MIN_QUERY ? (
-        <div className="absolute inset-x-0 top-[calc(100%+8px)] z-50 max-h-[420px] overflow-y-auto rounded-2xl border border-line bg-white shadow-lift">
+        <div className="absolute inset-x-0 top-[calc(100%+8px)] z-50 max-h-[520px] overflow-y-auto rounded-2xl border border-line bg-white shadow-lift">
           <SearchSuggestions query={query} onSelect={close} />
         </div>
       ) : null}

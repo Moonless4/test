@@ -1,12 +1,10 @@
 import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { SearchX, Sparkles } from 'lucide-react';
-import { searchCatalog } from '../lib/search';
+import { POPULAR_SEARCHES, searchCatalog } from '../lib/search';
 import { toFa } from '../lib/format';
 import ProductGrid from '../components/product/ProductGrid';
 import EmptyState from '../components/ui/EmptyState';
-
-const SUGGESTIONS = ['کت جین', 'مانتو کتان', 'کتانی کلاسیک', 'کیف دستی', 'عینک آفتابی', 'هودی'];
 
 export default function SearchPage() {
   const [params] = useSearchParams();
@@ -48,7 +46,7 @@ export default function SearchPage() {
           <Sparkles className="h-3.5 w-3.5 text-black" />
           جستجوهای پیشنهادی:
         </span>
-        {SUGGESTIONS.map((item) => (
+        {POPULAR_SEARCHES.map((item) => (
           <Link
             key={item}
             to={`/search?q=${encodeURIComponent(item)}`}
