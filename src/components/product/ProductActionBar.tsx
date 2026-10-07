@@ -8,12 +8,12 @@ type Props = {
 };
 
 /**
- * Phone-only sticky bar for a product page: the price and the add-to-cart action, in
- * place of the usual bottom tab bar.
+ * Phone and tablet sticky bar for a product page: the price and the add-to-cart action, in
+ * place of the usual bottom tab bar. Hides at the same `xl` cutoff as the tab bar.
  */
 export default function ProductActionBar({ price, onAdd }: Props) {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[60] px-3 pb-[max(10px,env(safe-area-inset-bottom))] lg:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-[60] px-3 pb-[max(10px,env(safe-area-inset-bottom))] xl:hidden">
       <div className="mx-auto flex h-[62px] w-full max-w-[430px] items-center justify-between gap-3 rounded-[26px] bg-white px-2.5 shadow-lift ring-1 ring-line">
         {/* First child renders on the right in RTL: the action, then the price. */}
         <button

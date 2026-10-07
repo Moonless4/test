@@ -32,7 +32,8 @@ export default function App() {
   const [categoriesOpen, setCategoriesOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white pb-[84px] lg:pb-0">
+    {/* Room for the floating bottom bar until the `xl` cutoff, where it disappears. */}
+    <div className="flex min-h-screen flex-col bg-white pb-[84px] xl:pb-0">
       <ScrollToTop />
       <Header />
 

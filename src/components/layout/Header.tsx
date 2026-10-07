@@ -75,8 +75,8 @@ export default function Header() {
               <Search className="h-5 w-5" />
             </Link>
             {/* Phones and tablets rely on the bottom bar for these two, so the header only
-                carries search and the basket below `lg`. */}
-            <Link to="/wishlist" aria-label="علاقه‌مندی‌ها" className={`${iconBtn} hidden lg:flex`}>
+                carries search and the basket below `xl`. */}
+            <Link to="/wishlist" aria-label="علاقه‌مندی‌ها" className={`${iconBtn} hidden xl:flex`}>
               <Heart className="h-5 w-5" />
               {wishlist.length > 0 ? (
                 <span className="absolute -top-0.5 end-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-teal-800 px-1 text-[10px] font-bold text-white">
@@ -84,7 +84,7 @@ export default function Header() {
                 </span>
               ) : null}
             </Link>
-            <Link to="/account" aria-label="حساب کاربری" className={`${iconBtn} hidden lg:flex`}>
+            <Link to="/account" aria-label="حساب کاربری" className={`${iconBtn} hidden xl:flex`}>
               <User className="h-5 w-5" />
             </Link>
             <button type="button" onClick={openCart} aria-label="سبد خرید" className={iconBtn}>
