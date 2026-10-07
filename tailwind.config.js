@@ -34,7 +34,7 @@ export default {
         cocoa: '#463630',
         wine: '#9A2B42',
         'wine-dark': '#7C2136',
-        ink: '#183744',
+        ink: '#000000',
         muted: '#71818A',
         sale: '#E84B3C',
         gold: '#F4A623',
@@ -49,9 +49,9 @@ export default {
         panel: '24px',
       },
       boxShadow: {
-        soft: '0 4px 20px -6px rgba(18, 63, 80, 0.10)',
-        card: '0 10px 30px -12px rgba(18, 63, 80, 0.18)',
-        lift: '0 18px 40px -16px rgba(18, 63, 80, 0.28)',
+        soft: '0 4px 20px -6px rgba(0, 0, 0, 0.10)',
+        card: '0 10px 30px -12px rgba(0, 0, 0, 0.18)',
+        lift: '0 18px 40px -16px rgba(0, 0, 0, 0.28)',
       },
       keyframes: {
         'fade-up': {
