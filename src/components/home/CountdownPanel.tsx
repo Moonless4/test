@@ -43,27 +43,30 @@ export default function CountdownPanel() {
           <span className="truncate text-[12px] font-black">تخفیف شگفت‌انگیز</span>
         </span>
 
-        <span className="flex shrink-0 items-center gap-1">
-          {units.map((unit, index) => (
-            <Fragment key={unit.label}>
-              {index > 0 ? (
-                <span aria-hidden className="text-[12px] font-bold text-white/60">
-                  :
+        {/* Countdown and arrow travel together at the end of the strip. */}
+        <span className="flex shrink-0 items-center gap-1.5">
+          <span className="flex shrink-0 items-center gap-1">
+            {units.map((unit, index) => (
+              <Fragment key={unit.label}>
+                {index > 0 ? (
+                  <span aria-hidden className="text-[12px] font-bold text-white/60">
+                    :
+                  </span>
+                ) : null}
+                <span className="flex flex-col items-center rounded-lg bg-white px-2 py-1.5 text-teal-950">
+                  <span className="text-[15px] font-black leading-5">{unit.value}</span>
+                  <span className="text-[9px] leading-3 text-teal-950/70">{unit.label}</span>
                 </span>
-              ) : null}
-              <span className="flex flex-col items-center rounded-lg bg-white px-2 py-1.5 text-teal-950">
-                <span className="text-[15px] font-black leading-5">{unit.value}</span>
-                <span className="text-[9px] leading-3 text-teal-950/70">{unit.label}</span>
-              </span>
-            </Fragment>
-          ))}
-        </span>
+              </Fragment>
+            ))}
+          </span>
 
-        <span
-          aria-hidden
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cream text-teal-900"
-        >
-          <ChevronLeft className="h-4 w-4" />
+          <span
+            aria-hidden
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cream text-teal-900"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </span>
         </span>
       </Link>
 
