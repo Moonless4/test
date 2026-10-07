@@ -1,7 +1,7 @@
 /* Persian UI font — IRANYekanX (see public/fonts/iranyekanx/SOURCE.txt). */
 @font-face {
   font-family: 'IRANYekanX';
-  src: url('/fonts/iranyekanx/IRANYekanX-Regular.ttf') format('truetype');
+  src: url('/fonts/iranyekanx/IRANYekanX-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -9,7 +9,7 @@
 
 @font-face {
   font-family: 'IRANYekanX';
-  src: url('/fonts/iranyekanx/IRANYekanX-Bold.ttf') format('truetype');
+  src: url('/fonts/iranyekanx/IRANYekanX-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;

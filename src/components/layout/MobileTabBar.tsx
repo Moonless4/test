@@ -91,7 +91,7 @@ export default function MobileTabBar({ onOpenCategories }: Props) {
           </button>
 
           <Link to="/" aria-label="مدورا" className={brand}>
-            <img src="/medora-mark.png" alt="" className="h-6 w-auto" />
+            <img src="/medora-mark.webp" alt="" width={96} height={72} className="h-6 w-auto" />
           </Link>
 
           <Link to="/wishlist" className={`${tab} ${tone(pathname === '/wishlist')}`}>

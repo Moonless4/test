@@ -77,6 +77,33 @@ curl -I http://localhost:3000/
   `trustseal.enamad.ir`.
 - `tsconfig` has `noUnusedLocals`; `npm run typecheck` is the quick sanity check.
 
+## Performance
+
+Measured on the production build (`npm run build` then `vite preview`) with mobile emulation and a
+4× CPU / Slow-4G throttle — baseline → now: **LCP 2715 → 1738 ms**, initial JS **109 → 85 KB**
+(111.8 → 86.8 KB gzip, 15 route chunks split out), fonts **168 KB TTF → 54 KB WOFF2**, logos
+**284 KB PNG → 23 KB WebP**, CLS **0 → 0**, TBT ~unchanged.
+
+- **Fonts** are WOFF2 (`public/fonts/iranyekanx/*.woff2`; the TTFs stay as the editable source) and
+  both weights are preloaded in `index.html` with `crossorigin`. The `@font-face` rules must keep
+  pointing at the WOFF2 files or the preload is wasted.
+- **The hero's first slide is preloaded per breakpoint** in `index.html` (phone crop under 640px, the
+  wide crop above it). Those two URLs must stay byte-identical to the ones `Hero` asks for, or the
+  photo downloads twice. `Hero` gives slide 0 `priority="high"` and the other slides `"low"`: all
+  three sit inside the viewport, so without it the followers compete with the LCP image.
+- `Img` exposes `priority`, which writes the lowercase `fetchpriority` attribute. React 18 drops the
+  camelCase `fetchPriority` prop with a console warning — use `priority`, never `fetchPriority`.
+- **Route chunks**: every page except `HomePage` is `lazy()` in `App.tsx`, inside one `Suspense`
+  whose fallback only reserves height (`min-h-[70vh]`) so the footer cannot jump while a chunk
+  arrives. `HomePage` stays in the entry chunk on purpose — it is the landing page.
+- **Static artwork** in `public/` is WebP at ~3× its display size (`medora-logo.webp` 565×120,
+  `medora-logo-white.webp`, `medora-mark.webp` 96×72) and carries `width`/`height` so the header logo
+  cannot shift the layout. The `.png` originals remain as the source and are no longer requested.
+- The dev server on port 3000 serves unbundled modules with no compression and no caching, so
+  Lighthouse numbers against it mean nothing — measure the built app.
+- Left to the host, not done here: Brotli/Gzip on the wire and long-lived caching for the hashed
+  `dist/assets/*` files (Vite already fingerprints them). See "Porting to WordPress".
+
 ## Where things live
 
 - `src/lib/data.ts` — the whole catalog (28 products), categories, hero slides, testimonials,

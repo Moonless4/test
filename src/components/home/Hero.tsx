@@ -41,10 +41,13 @@ export default function Hero() {
               }`}
               aria-hidden={i !== index}
             >
+              {/* The first slide is the page's LCP image; the other two sit inside the viewport as
+                  well, so without a low priority they would compete with it. */}
               <Img
                 src={phone ? slide.imagePhone : slide.image}
                 alt=""
                 loading={i === 0 ? 'eager' : 'lazy'}
+                priority={i === 0 ? 'high' : 'low'}
                 decoding="async"
                 className="h-full w-full object-cover object-center"
               />

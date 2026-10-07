@@ -47,7 +47,13 @@ export default function Header() {
           {/* Logo and the desktop search sit together, 12px apart. */}
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <Link to="/" className="flex shrink-0 items-center" onMouseEnter={closeMenu}>
-              <img src="/medora-logo.png" alt="مدورا" className="h-9 w-auto lg:h-10" />
+              <img
+                src="/medora-logo.webp"
+                alt="مدورا"
+                width={565}
+                height={120}
+                className="h-9 w-auto lg:h-10"
+              />
             </Link>
 
             {/* Desktop search: light pill, per the reference header */}

@@ -9,11 +9,39 @@
       content="مدورا | فروشگاه اینترنتی پوشاک و اکسسوری — جدیدترین ترندهای لباس مردانه، زنانه و اکسسوری‌های خاص."
     />
     <title>مدورا | MEDORA — پوشاک و اکسسوری</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Product photography is the only third-party host on the critical path. -->
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="dns-prefetch" href="https://images.unsplash.com" />
+    <!-- The two weights the first screen uses, before the CSS is parsed. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&family=Dancing+Script:wght@600;700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/iranyekanx/IRANYekanX-Regular.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/iranyekanx/IRANYekanX-Bold.woff2"
+      crossorigin
+    />
+    <!-- The hero's first slide, preloaded per breakpoint so the LCP image starts before React
+         renders. The URLs must stay identical to the ones Hero asks for (see AGENTS.md). -->
+    <link
+      rel="preload"
+      as="image"
+      media="(max-width: 639px)"
+      href="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1100&h=1000&q=72"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      as="image"
+      media="(min-width: 640px)"
+      href="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1800&h=780&q=72"
+      fetchpriority="high"
     />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23123F50'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='16' font-weight='700' fill='white' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E" />
   </head>
