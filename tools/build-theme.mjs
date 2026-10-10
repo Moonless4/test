@@ -4,6 +4,9 @@
  * 1. Compiles the theme's stylesheet (the same Tailwind tokens the React app uses).
  * 2. Zips wp-theme/medora into wp-theme/dist/medora.zip, the archive WordPress expects when a
  *    theme is uploaded from Appearance → Themes → Add New → Upload Theme.
+ * 3. Writes the same archive to public/medora-theme.zip, so the running app can hand it to a
+ *    browser at /medora-theme.zip. wp-theme/dist/ is gitignored, public/ is not — the copy in
+ *    public/ is what the owner actually downloads.
  *
  * The archive is written by hand with Node's own zlib, so packaging needs no `zip` binary and no
  * extra dependency.
@@ -22,6 +25,7 @@ const root = resolve(here, '..');
 const themeDir = join(root, 'wp-theme', 'medora');
 const distDir = join(root, 'wp-theme', 'dist');
 const zipPath = join(distDir, 'medora.zip');
+const publicZipPath = join(root, 'public', 'medora-theme.zip');
 
 /** Build the source never ships with the theme. */
 const EXCLUDED = [join('assets', 'src')];
@@ -161,9 +165,16 @@ if (!files.some((file) => file.name === 'style.css')) {
   process.exit(1);
 }
 
+const archive = buildZip(files);
+
 mkdirSync(distDir, { recursive: true });
 rmSync(zipPath, { force: true });
-writeFileSync(zipPath, buildZip(files));
+writeFileSync(zipPath, archive);
+
+// The copy the running app serves, so the archive can be downloaded from the preview at
+// /medora-theme.zip without digging into wp-theme/dist/.
+writeFileSync(publicZipPath, archive);
 
 console.log(`✔ ${zipPath} (${Math.round(statSync(zipPath).size / 1024)} KB, ${files.length} files)`);
+console.log(`  Download: /medora-theme.zip  →  ${publicZipPath}`);
 console.log('  Upload it at Appearance → Themes → Add New → Upload Theme.');

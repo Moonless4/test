@@ -245,6 +245,29 @@ Caveat when verifying payments here: the sandbox cannot reach `zarinpal.com` (th
 out), so the live gateway can only be exercised on a host that can. With a stub behind `fetch`, the
 request/verify/redirect logic can still be checked end to end.
 
+## WordPress theme
+
+`wp-theme/medora/` is the installable theme that mirrors this frontend's design (the same Tailwind
+tokens, compiled from `tailwind.tokens.cjs`). `npm run theme:build` compiles
+`assets/css/medora.css` and writes the archive twice:
+
+- `wp-theme/dist/medora.zip` — the raw build output. `dist` is gitignored, so this copy never
+  reaches the repository and disappears with the container.
+- `public/medora-theme.zip` — the tracked copy the dev server serves, so the archive can be
+  downloaded straight from the preview at **`/medora-theme.zip`**. `public/` is not gitignored,
+  which is why this is the one that survives.
+
+`assets/src/` is the stylesheet source and is deliberately excluded from the archive. A theme
+without `style.css` at its root is rejected by WordPress, and the build refuses to write one — if
+it exits with "style.css is missing", the wrong directory got packaged.
+
+The dev server answers a **HEAD** request for a `public/` file with the SPA shell (`text/html`),
+so verify a download with a GET (or `curl -s -o /dev/null -w '%{content_type} %{size_download}'`),
+not `curl -I` — a HEAD response says nothing about whether the file is served.
+
+`wp-theme/docker-compose.wordpress.yml` brings up a throwaway WordPress + WooCommerce stack to try
+the theme against; `wp-theme/dev/` holds what it needs.
+
 ## Verifying a change
 
 1. `curl -s http://localhost:3000/ | head` — dev server serves the live HTML shell.
