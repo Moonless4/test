@@ -105,7 +105,11 @@ const buildUrl = (path: string, query?: Query): string => {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
     if (value === undefined || value === null || value === '') continue;
-    params.set(key, String(value));
+    // A flag travels as `1`, never as the word `true`: Laravel's `boolean` rule accepts
+    // true/false/1/0/"1"/"0", so `discounted=true` would be refused with a 422. `false` is left
+    // out entirely, which leaves the API's own default (off) in place.
+    if (value === false) continue;
+    params.set(key, value === true ? '1' : String(value));
   }
   const qs = params.toString();
   return qs ? `${url}?${qs}` : url;

@@ -67,6 +67,15 @@ export type CartLine = {
   size: string;
   color: string;
   qty: number;
+  /**
+   * The product as it was when the shopper put it in the basket. The catalogue is the API's now, so
+   * a line cannot be looked up in a local list any more — the basket carries what was picked, and
+   * that is also what survives a reload (`StoreContext` persists the line as it is).
+   *
+   * Optional only for lines saved before this change: they name a product the current catalogue
+   * does not have, so they are dropped instead of being priced from a stale local catalogue.
+   */
+  product?: Product;
 };
 
 /** A discount code the shopper can type in the cart. Percent OR amount, never both. */

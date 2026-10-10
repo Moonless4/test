@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { COIN_MIN_REDEEM, COIN_VALUE, coinsFor, coupons, products } from '../lib/data';
+import { COIN_MIN_REDEEM, COIN_VALUE, coinsFor, coupons } from '../lib/data';
 import type { CartLine, Coupon, Product } from '../lib/types';
 
 const CART_KEY = 'styleon.cart';
@@ -114,7 +114,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             l === found ? { ...l, qty: Math.min(l.qty + qty, product.stock) } : l,
           );
         }
-        return [...prev, { productId: product.id, size: lineSize, color: lineColor, qty }];
+        return [
+          ...prev,
+          { productId: product.id, product, size: lineSize, color: lineColor, qty },
+        ];
       });
       setCartOpen(true);
     },
@@ -157,7 +160,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const value = useMemo<StoreValue>(() => {
     const lines: DetailedLine[] = cart
       .map((line) => {
-        const product = products.find((p) => p.id === line.productId);
+        const product = line.product;
         if (!product) return null;
         return { ...line, product, lineTotal: product.price * line.qty };
       })
