@@ -17,8 +17,10 @@ use App\Models\OrderStatusHistory;
 use App\Models\Product;
 use App\Models\User;
 use App\Support\Money;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Turns a basket into an order.
@@ -41,6 +43,7 @@ class CheckoutService
         private readonly InventoryService $inventory,
         private readonly CouponService $coupons,
         private readonly CartService $carts,
+        private readonly PaymentService $payments,
         private readonly AuditLogger $audit,
     ) {}
 
@@ -231,6 +234,199 @@ class CheckoutService
         }
 
         return $coupon;
+    }
+
+    /**
+     * Records a purchase the shop has already taken, from the shopper's own basket.
+     *
+     * The storefront's basket, its coupon and its «مدورا کوین» balance live in the browser, so a
+     * finished order arrives here as a list of slugs rather than as a server-side cart. Two things
+     * follow from that, and both are deliberate:
+     *
+     *  1. **The line money is the catalogue's.** Every slug is resolved and locked, and the order is
+     *     priced from those rows: a payload names products and quantities, never prices.
+     *  2. **Shipping and the discount are reported**, exactly as the checkout screen quoted them,
+     *     because the basket that produced them is not here. They are recorded as sent; only the
+     *     item money is proven. Handing the basket over to the cart endpoints is what would make
+     *     them proven too.
+     *
+     * Stock is taken through the same ledger as `place()`, so a recorded order shows up in
+     * inventory exactly like one that went through the cart.
+     *
+     * @param  array<string, mixed>  $payload
+     *
+     * @throws ValidationException
+     */
+    public function record(array $payload, ?User $user): Order
+    {
+        return DB::transaction(function () use ($payload, $user): Order {
+            /** @var \Illuminate\Support\Collection<int, array<string, mixed>> $requested */
+            $requested = collect($payload['items']);
+
+            $products = Product::query()
+                ->whereIn('slug', $requested->pluck('slug')->unique()->values())
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('slug');
+
+            $lines = [];
+            $missing = [];
+
+            foreach ($requested as $item) {
+                $product = $products->get((string) $item['slug']);
+
+                if ($product === null || ! $product->is_active || $product->published_at === null || $product->published_at->isFuture()) {
+                    $missing[] = (string) $item['slug'];
+
+                    continue;
+                }
+
+                $lines[] = [
+                    'product' => $product,
+                    'quantity' => (int) $item['quantity'],
+                    'attributes' => $item['attributes'] ?? null,
+                ];
+            }
+
+            if ($missing !== []) {
+                throw ValidationException::withMessages([
+                    'items' => 'این محصولات دیگر در فروشگاه نیستند: '.implode('، ', $missing),
+                ]);
+            }
+
+            $subtotal = 0;
+            $itemsCount = 0;
+
+            foreach ($lines as $line) {
+                $subtotal += (int) $line['product']->price * $line['quantity'];
+                $itemsCount += $line['quantity'];
+            }
+
+            $shipping = max(0, (int) ($payload['shipping']['cost'] ?? 0));
+            // Never more than the basket is worth: a larger discount would make the total negative,
+            // which no order may carry.
+            $discount = min(max(0, (int) ($payload['discount_total'] ?? 0)), $subtotal);
+            $grandTotal = max(0, $subtotal - $discount + $shipping);
+
+            $reported = (string) ($payload['payment']['status'] ?? 'pending');
+
+            // The reported outcome picks a status the lifecycle already allows — never an arbitrary
+            // one. A failed or cancelled payment cancels the order; anything else is unpaid.
+            $status = match ($reported) {
+                'paid' => OrderStatus::Paid,
+                'pending' => OrderStatus::Processing,
+                'failed', 'cancelled' => OrderStatus::Cancelled,
+                default => OrderStatus::PendingPayment,
+            };
+
+            $paymentStatus = match ($reported) {
+                'paid' => PaymentStatus::Succeeded,
+                'failed' => PaymentStatus::Failed,
+                'cancelled' => PaymentStatus::Cancelled,
+                default => PaymentStatus::Pending,
+            };
+
+            $customer = (array) $payload['customer'];
+
+            $order = new Order;
+
+            $order->user_id = $user?->getKey();
+            $order->number = $this->recordedNumber($payload['number'] ?? null);
+            $order->access_token = bin2hex(random_bytes(32));
+            $order->status = $status;
+            $order->payment_status = $paymentStatus;
+            $order->currency = Money::CURRENCY;
+            $order->subtotal = $subtotal;
+            $order->discount_total = $discount;
+            $order->shipping_total = $shipping;
+            $order->tax_total = 0;
+            $order->grand_total = $grandTotal;
+            $order->items_count = $itemsCount;
+            $order->customer_name = (string) $customer['name'];
+            $order->customer_email = $customer['email'] ?? $user?->email;
+            $order->customer_phone = (string) $customer['phone'];
+            $order->shipping_province = (string) $customer['province'];
+            $order->shipping_city = (string) $customer['city'];
+            $order->shipping_postal_code = (string) $customer['postal_code'];
+            $order->shipping_line1 = (string) $customer['line1'];
+            $order->note = $customer['note'] ?? null;
+            $order->placed_at = now();
+            $order->paid_at = $paymentStatus === PaymentStatus::Succeeded
+                ? (isset($payload['payment']['paid_at']) ? Carbon::parse((string) $payload['payment']['paid_at']) : now())
+                : null;
+            $order->save();
+
+            foreach ($lines as $line) {
+                /** @var Product $product */
+                $product = $line['product'];
+                $quantity = $line['quantity'];
+
+                $orderItem = new OrderItem;
+
+                $orderItem->order_id = $order->getKey();
+                $orderItem->product_id = $product->getKey();
+                $orderItem->name = (string) $product->name;
+                $orderItem->sku = (string) $product->sku;
+                $orderItem->unit_price = (int) $product->price;
+                $orderItem->quantity = $quantity;
+                $orderItem->line_total = (int) $product->price * $quantity;
+                // What the shopper picked on the product page — size and colour — when the
+                // storefront sent it; the catalogue's own attributes otherwise.
+                $picked = $line['attributes'] ?? null;
+                $orderItem->attributes = is_array($picked) && $picked !== [] ? $picked : $product->attributes;
+                $orderItem->save();
+            }
+
+            $this->inventory->reserve($lines, $order, $user);
+
+            $history = new OrderStatusHistory;
+
+            $history->order_id = $order->getKey();
+            $history->from_status = null;
+            $history->to_status = $status;
+            $history->changed_by = $user?->getKey();
+            $history->note = 'سفارش در فروشگاه ثبت شد';
+            $history->created_at = now();
+            $history->save();
+
+            if ($paymentStatus === PaymentStatus::Succeeded) {
+                $this->payments->recordSettled(
+                    $order,
+                    (string) ($payload['payment']['method'] ?? 'online'),
+                    $payload['payment']['reference'] ?? null,
+                );
+            }
+
+            $this->audit->log('order.recorded', $order, [
+                'number' => $order->number,
+                'total' => $order->grand_total,
+                'items' => $order->items_count,
+                'payment' => $paymentStatus->value,
+                'guest' => $user === null,
+            ], $user);
+
+            OrderPlaced::dispatch($order);
+
+            return $order->load('items', 'payments');
+        });
+    }
+
+    /**
+     * The number the shopper was already shown, when it is free — so the panel and the shopper's
+     * own account name the same order — and one of ours otherwise.
+     */
+    private function recordedNumber(?string $number): string
+    {
+        $candidate = is_string($number) ? mb_strtoupper(trim($number)) : '';
+
+        if ($candidate !== ''
+            && preg_match('/^[A-Z0-9-]{4,32}$/', $candidate) === 1
+            && ! Order::query()->where('number', $candidate)->exists()) {
+            return $candidate;
+        }
+
+        return $this->generateNumber();
     }
 
     /**

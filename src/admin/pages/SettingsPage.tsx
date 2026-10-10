@@ -10,6 +10,7 @@ import { useAdminAuth } from '../AdminAuthContext';
 import CrudPanel from '../components/CrudPanel';
 import StatusPill from '../components/StatusPill';
 import type { FieldSpec, FormValues } from '../components/Field';
+import { ADMIN_PATH_KEY, normalizeAdminPath } from '../lib/basePath';
 import { SETTING_TYPE } from '../lib/labels';
 
 /**
@@ -56,7 +57,7 @@ export default function SettingsPage() {
       name: 'value',
       label: 'مقدار',
       full: true,
-      hint: 'برای بله/خیر همان true یا false را بنویسید؛ JSON باید معتبر باشد.',
+      hint: 'برای بله/خیر همان true یا false را بنویسید؛ JSON باید معتبر باشد. کلید admin.path آدرس خود پنل است — یک بخش ساده مثل manage؛ پس از ذخیره، پنل روی آدرس تازه بازآوری می‌شود.',
     },
     { name: 'type', label: 'نوع', type: 'select', options: TYPE_OPTIONS, defaultValue: 'string' },
     {
@@ -76,11 +77,21 @@ export default function SettingsPage() {
   });
 
   // `key` is prohibited on update, so it is dropped from the PATCH body and only sent on create.
-  const update = (id: number, body: Record<string, unknown>) => {
+  const update = async (id: number, body: Record<string, unknown>) => {
     const payload = { ...body };
     delete payload.key;
 
-    return adminUpdateSetting(id, payload);
+    const result = await adminUpdateSetting(id, payload);
+
+    // The panel's address is read once, before the first render, so a new one only takes effect on
+    // the next load — and the page the operator is standing on stops existing with it. Reloading at
+    // the new address is the honest way to show them what they just did.
+    const edited = (all.data?.items ?? []).find((item) => item.id === id);
+    if (edited?.key === ADMIN_PATH_KEY) {
+      window.location.assign(`/${normalizeAdminPath(payload.value)}`);
+    }
+
+    return result;
   };
 
   return (

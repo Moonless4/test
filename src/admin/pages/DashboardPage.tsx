@@ -15,6 +15,7 @@ import Price from '../../components/ui/Price';
 import { SectionError, SectionLoading } from '../../components/ui/SectionState';
 import StatusPill from '../components/StatusPill';
 import { faDate, orderLabel, orderTone } from '../lib/labels';
+import { adminHref } from '../lib/basePath';
 
 /**
  * The landing screen: how much of the shop there is, and what needs attention today.
@@ -53,7 +54,7 @@ export default function DashboardPage() {
       key: 'products',
       label: 'محصولات',
       icon: Package,
-      to: '/admin/products',
+      to: adminHref('products'),
       total: products.data?.total,
       loading: products.loading,
       ready: can('products.view'),
@@ -62,7 +63,7 @@ export default function DashboardPage() {
       key: 'orders',
       label: 'سفارش‌ها',
       icon: ReceiptText,
-      to: '/admin/orders',
+      to: adminHref('orders'),
       total: orders.data?.total,
       loading: orders.loading,
       ready: can('orders.view'),
@@ -71,7 +72,7 @@ export default function DashboardPage() {
       key: 'coupons',
       label: 'کدهای تخفیف',
       icon: BadgePercent,
-      to: '/admin/coupons',
+      to: adminHref('coupons'),
       total: coupons.data?.total,
       loading: coupons.loading,
       ready: can('coupons.manage'),
@@ -80,7 +81,7 @@ export default function DashboardPage() {
       key: 'media',
       label: 'فایل‌های رسانه',
       icon: Images,
-      to: '/admin/media',
+      to: adminHref('media'),
       total: media.data?.total,
       loading: media.loading,
       ready: can('media.manage'),
@@ -126,7 +127,7 @@ export default function DashboardPage() {
           <section className="xl:col-span-2">
             <div className="mb-3 flex items-end justify-between gap-3">
               <h2 className="text-base font-bold text-ink">آخرین سفارش‌ها</h2>
-              <Link to="/admin/orders" className="text-[12.5px] text-teal-700 hover:underline">
+              <Link to={adminHref('orders')} className="text-[12.5px] text-teal-700 hover:underline">
                 همهٔ سفارش‌ها
               </Link>
             </div>
@@ -144,7 +145,7 @@ export default function DashboardPage() {
                 {(recent.data?.items ?? []).map((order) => (
                   <li key={order.id}>
                     <Link
-                      to={`/admin/orders/${order.id}`}
+                      to={adminHref(`orders/${order.id}`)}
                       className="flex flex-wrap items-center gap-3 px-4 py-3 transition-colors hover:bg-cream/50"
                     >
                       <span className="font-medium text-ink" dir="ltr">
@@ -174,7 +175,7 @@ export default function DashboardPage() {
           <section>
             <div className="mb-3 flex items-end justify-between gap-3">
               <h2 className="text-base font-bold text-ink">ناموجودها</h2>
-              <Link to="/admin/products" className="text-[12.5px] text-teal-700 hover:underline">
+              <Link to={adminHref('products')} className="text-[12.5px] text-teal-700 hover:underline">
                 محصولات
               </Link>
             </div>
@@ -192,7 +193,7 @@ export default function DashboardPage() {
                 {(lowStock.data?.items ?? []).map((product) => (
                   <li key={product.id}>
                     <Link
-                      to={`/admin/products/${product.id}`}
+                      to={adminHref(`products/${product.id}`)}
                       className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-cream/50"
                     >
                       <AlertTriangle className="h-4 w-4 shrink-0 text-gold" />

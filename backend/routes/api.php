@@ -60,6 +60,10 @@ Route::middleware('throttle:api')->group(function (): void {
     // a guest gets an access token that is the only way to read the order afterwards.
     Route::post('checkout', [CheckoutController::class, 'store'])->middleware('throttle:checkout');
 
+    // A purchase the storefront's own basket already finished (the basket and the gateway are the
+    // browser's). It is recorded here so the shop's panel and the shopper's account share one order.
+    Route::post('checkout/record', [CheckoutController::class, 'record'])->middleware('throttle:checkout');
+
     // Order detail: the owner's session, or the order access token handed out at checkout.
     // Bound on `number` (MD-…) and not the primary key: the number is what the shopper was given,
     // and an internal id must never be the thing a client has to know.

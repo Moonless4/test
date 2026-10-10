@@ -188,6 +188,33 @@ class PaymentService
     }
 
     /**
+     * Records a payment that was collected outside this service.
+     *
+     * The storefront's basket and its gateway live in the browser, so its money never travels
+     * through `start()`/`settle()`; the finished order reaches the API through
+     * `CheckoutService::record()` and the attempt is written here. The amount is read from the
+     * order — never from the caller, and never from the request.
+     */
+    public function recordSettled(Order $order, string $gateway, ?string $reference = null): Payment
+    {
+        $payment = new Payment;
+
+        $payment->order_id = $order->getKey();
+        $payment->gateway = mb_substr($gateway, 0, 32);
+        $payment->amount = (int) $order->grand_total;
+        $payment->currency = (string) $order->currency;
+        $payment->status = PaymentStatus::Succeeded;
+        $payment->reference_id = $reference !== null && $reference !== ''
+            ? mb_substr($reference, 0, 128)
+            : null;
+        $payment->meta = ['recorded_by' => 'storefront'];
+        $payment->paid_at = $order->paid_at ?? now();
+        $payment->save();
+
+        return $payment;
+    }
+
+    /**
      * A stable, unguessable value the client can use to follow a payment without an account.
      */
     public function statusToken(): string

@@ -31,7 +31,8 @@ curl -I http://localhost:3000/
 
 A second, separate application: the REST API (`/api/v1`) the storefront now reads its catalogue and
 content from (see `backend/docs/DEPLOYMENT-DIRECTADMIN.md`). The cart, checkout, wishlist and the
-account panel are still the browser's own (`src/lib/data.ts` + `localStorage`).
+account panel are still the browser's own (`src/lib/data.ts` + `localStorage`) — but an order they
+finish is recorded here, which is what puts it on the admin panel's orders screen.
 
 - **The catalogue lives in this database.** `CatalogSeeder` holds the store's 32 products and six
   categories — the same names, prices, photos and size/colour options the SPA shipped with — and the
@@ -54,6 +55,24 @@ account panel are still the browser's own (`src/lib/data.ts` + `localStorage`).
   (nullable — an unscored product says so instead of claiming a zero); review *texts* are still
   client-side, so nothing renders a review count nobody stored.
 
+- **The admin panel lists orders from this database**, so a purchase made in the storefront's own
+  basket is reported to `POST /api/v1/checkout/record` (`CheckoutService::record()`) once the money
+  outcome is known — from `PaymentPage` for the stand-in gateway, from `CheckoutPage`'s return effect
+  for Zarinpal, and immediately for pay-on-delivery. The line money is proven from the catalogue;
+  shipping and the discount are the shopper's own numbers, because the basket that produced them is
+  not here (moving the basket onto the cart endpoints is what would fix that). The number the shopper
+  was shown (`ST-…`, from `newOrderId()`) is kept when it is free, so the panel and the account panel
+  name the same order. `src/services/apiCheckout.ts` maps the ledger's `PaymentOrder` onto the
+  request and is deliberately fire-and-forget — a shopper who has paid must never see an error
+  because the panel's copy could not be written. Tests: `tests/Feature/RecordOrderTest.php`.
+- **The panel's address is a setting.** `admin.path` (public, default `admin`) is read once by
+  `src/admin/lib/basePath.ts` before the first render (`main.tsx` → `initAdminBase()`), and `App.tsx`
+  mounts `AdminApp` on that prefix alone — so the shop can move the panel from its own Settings
+  screen without a deployment (that screen reloads at the new address, since the prefix is fixed for
+  the life of a page load). Links inside the panel must go through `adminHref()`; a literal `/admin/…`
+  would navigate off the mounted prefix. `SettingRequest` validates the value as one URL segment and
+  refuses a path the storefront's own routes already own. The address is obscurity, never a lock:
+  `can:admin.access` guards every admin route whatever the URL says.
 - Compose services: `backend-db` (MariaDB 11), `backend-migrate` (one-shot: `composer install`,
   `migrate`, `db:seed`; the app waits for it), `backend` (PHP 8.4 dev image, `artisan serve` on host
   port **8000**), `backend-cron` (a loop standing in for the DirectAdmin cron entry).

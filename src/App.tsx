@@ -6,6 +6,7 @@ import CartDrawer from './components/layout/CartDrawer';
 import CategoryDrawer from './components/layout/CategoryDrawer';
 import MobileTabBar from './components/layout/MobileTabBar';
 import HomePage from './pages/HomePage';
+import { adminHref, isAdminPath } from './admin/lib/basePath';
 
 /**
  * Every page except the landing page ships as its own chunk: a phone opening the store pays for
@@ -42,14 +43,16 @@ export default function App() {
   const { pathname } = useLocation();
   const [categoriesOpen, setCategoriesOpen] = useState(false);
 
-  // The panel owns the whole `/admin` prefix and renders its own shell — mounting it *instead of*
-  // the storefront means no shop header, footer, cart drawer or bottom bar around it. It is nested
-  // under `/admin/*` so its own relative routes (`products`, `settings`, …) resolve underneath.
-  if (pathname.startsWith('/admin')) {
+  // The panel owns one URL prefix of its own — the shop sets it in the panel's settings
+  // (`admin.path`, read before the first render) — and renders its own shell: mounting it
+  // *instead of* the storefront means no shop header, footer, cart drawer or bottom bar around it.
+  // It is nested under the prefix so its own relative routes (`products`, `settings`, …) resolve
+  // underneath it, and the prefix is the only address the panel answers on.
+  if (isAdminPath(pathname)) {
     return (
       <Suspense fallback={<div className="min-h-screen bg-cream/50" />}>
         <Routes>
-          <Route path="/admin/*" element={<AdminApp />} />
+          <Route path={`${adminHref()}/*`} element={<AdminApp />} />
         </Routes>
       </Suspense>
     );

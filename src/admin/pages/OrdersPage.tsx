@@ -7,6 +7,7 @@ import { useAdminAuth } from '../AdminAuthContext';
 import CrudPanel from '../components/CrudPanel';
 import StatusPill from '../components/StatusPill';
 import { faDate, ORDER_STATUS, orderLabel, orderTone, paymentLabel, paymentTone } from '../lib/labels';
+import { adminHref } from '../lib/basePath';
 
 /**
  * Orders.
@@ -31,7 +32,7 @@ export default function OrdersPage() {
           header: 'شماره',
           render: (row) => (
             <Link
-              to={`/admin/orders/${row.id}`}
+              to={adminHref(`orders/${row.id}`)}
               dir="ltr"
               className="font-medium text-teal-800 hover:underline"
             >
@@ -89,7 +90,7 @@ export default function OrdersPage() {
       idOf={(row) => row.id}
       labelOf={(row) => row.number}
       list={adminOrders}
-      editHref={(row) => `/admin/orders/${row.id}`}
+      editHref={(row) => adminHref(`orders/${row.id}`)}
       filters={[
         {
           name: 'status',

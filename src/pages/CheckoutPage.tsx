@@ -20,8 +20,11 @@ import {
   newOrderId,
   readPayment,
   savePayment,
+  type PaymentLine,
+  type PaymentMethod,
   type PaymentOrder,
 } from '../lib/payment';
+import { recordFinishedOrder } from '../services/apiCheckout';
 import RewardPanel from '../components/cart/RewardPanel';
 import Price from '../components/ui/Price';
 import EmptyState from '../components/ui/EmptyState';
@@ -54,7 +57,7 @@ const SHIPPING_METHODS = [
   { id: 'pickup', title: 'تحویل حضوری', text: 'دریافت از فروشگاه', price: 0 },
 ];
 
-const PAYMENT_METHODS = [
+const PAYMENT_METHODS: Array<{ id: PaymentMethod; title: string; text: string }> = [
   { id: 'online', title: 'پرداخت آنلاین', text: 'درگاه امن بانکی، همه کارت‌های عضو شتاب' },
   { id: 'wallet', title: 'کیف پول', text: 'پرداخت از موجودی کیف پول شما' },
   { id: 'installment', title: 'پرداخت اعتباری', text: 'خرید اعتباری تا ۴ قسط بدون بهره' },
@@ -98,7 +101,7 @@ export default function CheckoutPage() {
     settleOrder,
     clearCart,
   } = useStore();
-  const { addOrder, updateOrderStatus, addresses } = useAuth();
+  const { addOrder, updateOrderStatus, addresses, user } = useAuth();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<Form>(EMPTY_FORM);
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
@@ -143,8 +146,20 @@ export default function CheckoutPage() {
       setPlacedRef(searchParams.get('ref') ?? undefined);
       setEarned(coinsEarned);
       setPlaced(returned.id);
+      // A gateway that verifies on its own server sends the shopper back here, so this is where the
+      // paid order reaches the shop's backend — once, on the same guard that settles the ledger.
+      recordFinishedOrder(
+        {
+          ...returned,
+          status: 'paid',
+          refId: searchParams.get('ref') ?? returned.refId,
+          paidAt: new Date().toISOString(),
+        },
+        'paid',
+        user?.email,
+      );
     }
-  }, [returned, paymentOutcome, searchParams, settleOrder, clearCart, updateOrderStatus]);
+  }, [returned, paymentOutcome, searchParams, settleOrder, clearCart, updateOrderStatus, user]);
 
   const shippingCost = useMemo(() => {
     const method = SHIPPING_METHODS.find((m) => m.id === shipMethod);
@@ -193,34 +208,42 @@ export default function CheckoutPage() {
     const shippingMethod = SHIPPING_METHODS.find((m) => m.id === shipMethod);
     if (!method || !shippingMethod) return;
 
-    const orderLines = lines.map((line) => ({
+    const orderLines: PaymentLine[] = lines.map((line) => ({
       name: line.product.name,
+      // The catalogue's own id and what was picked: the shop's backend re-prices the line from its
+      // own catalogue, and `slug` is what lets it find the product at all.
+      slug: line.productId,
+      size: line.size,
+      color: line.color,
       qty: line.qty,
       price: line.product.price,
     }));
 
+    // One record whichever way the order is paid: the gateway path stores it now and settles it on
+    // the way back, the offline path settles it here.
+    const record: PaymentOrder = {
+      id: orderNumber,
+      amount,
+      method: method.id,
+      methodTitle: method.title,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      customer: {
+        name: `${form.firstName} ${form.lastName}`.trim(),
+        mobile: form.mobile,
+        province: form.province,
+        city: form.city,
+        address: form.address,
+        postalCode: form.postalCode,
+        note: form.note || undefined,
+      },
+      shipping: { id: shippingMethod.id, title: shippingMethod.title, cost: shippingCost },
+      lines: orderLines,
+    };
+
     if (payMethod === 'online') {
       // Online payment leaves the site for the gateway: the order is registered here as
       // awaiting payment, and the basket only empties once the money is confirmed.
-      const record: PaymentOrder = {
-        id: orderNumber,
-        amount,
-        method: 'online',
-        methodTitle: method.title,
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-        customer: {
-          name: `${form.firstName} ${form.lastName}`.trim(),
-          mobile: form.mobile,
-          province: form.province,
-          city: form.city,
-          address: form.address,
-          postalCode: form.postalCode,
-          note: form.note || undefined,
-        },
-        shipping: { id: shippingMethod.id, title: shippingMethod.title, cost: shippingCost },
-        lines: orderLines,
-      };
       savePayment(record);
       addOrder({ id: orderNumber, total: amount, status: STATUS_LABEL.pending, lines: orderLines });
       setPayError(null);
@@ -238,8 +261,15 @@ export default function CheckoutPage() {
 
     // Coins are settled while the basket still holds this order's numbers.
     const coinsEarned = settleOrder(amount);
-    // Signed-in shoppers keep the order in their account panel.
+    // Signed-in shoppers keep the order in their account panel...
     addOrder({ id: orderNumber, total: amount, status: STATUS_LABEL.paid, lines: orderLines });
+    // ...and the shop's own panel lists orders from the backend, so it is recorded there as well.
+    // Paying at the door leaves the money uncollected, which is what the panel should show.
+    recordFinishedOrder(
+      { ...record, status: 'paid', paidAt: new Date().toISOString() },
+      payMethod === 'cod' ? 'pending' : 'paid',
+      user?.email,
+    );
     setEarned(coinsEarned);
     setPlaced(orderNumber);
     clearCart();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Checkout;
 use App\Exceptions\PaymentGatewayException;
 use App\Http\Controllers\Api\V1\Controller;
 use App\Http\Requests\Checkout\CheckoutRequest;
+use App\Http\Requests\Checkout\RecordOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Services\CartService;
 use App\Services\CheckoutService;
@@ -62,6 +63,26 @@ class CheckoutController extends Controller
                 'order' => (new OrderResource($order->load('items', 'payments')))->withAccessToken(),
                 'payment' => $paymentPayload,
             ],
+        ], 201);
+    }
+
+    /**
+     * A purchase the storefront already finished and paid for in the browser.
+     *
+     * This is a route of its own rather than a mode of `store()` because there is no server-side
+     * cart to hand over and no gateway to open here: the shopper's own checkout collected the
+     * money. The order is written so the shop's panel and the shopper's account finally share one
+     * record, and the response carries the same access token `store()` returns.
+     */
+    public function record(RecordOrderRequest $request): JsonResponse
+    {
+        $order = $this->checkout->record(
+            $request->validated(),
+            $request->user('sanctum'),
+        );
+
+        return response()->json([
+            'data' => ['order' => (new OrderResource($order))->withAccessToken()],
         ], 201);
     }
 }

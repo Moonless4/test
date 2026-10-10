@@ -11,6 +11,7 @@ import { useAdminAuth } from '../AdminAuthContext';
 import AdminPageHeader from '../components/AdminPageHeader';
 import StatusPill from '../components/StatusPill';
 import { faDate, ORDER_TRANSITIONS, orderLabel, orderTone, paymentLabel, paymentTone } from '../lib/labels';
+import { adminHref } from '../lib/basePath';
 
 /**
  * One order, read in full.
@@ -75,7 +76,7 @@ export default function OrderDetailPage() {
       <AdminPageHeader
         title={order.number}
         description={`ثبت‌شده در ${faDate(order.placed_at)} — ${order.customer.name}`}
-        backTo={{ to: '/admin/orders', label: 'بازگشت به فهرست سفارش‌ها' }}
+        backTo={{ to: adminHref('orders'), label: 'بازگشت به فهرست سفارش‌ها' }}
         actions={
           <span className="flex flex-wrap items-center gap-2">
             <StatusPill tone={paymentTone(order.payment_status)}>

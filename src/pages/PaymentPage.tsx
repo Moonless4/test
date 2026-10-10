@@ -10,6 +10,7 @@ import {
 } from '../lib/payment';
 import { useAuth } from '../context/AuthContext';
 import { useStore } from '../context/StoreContext';
+import { recordFinishedOrder } from '../services/apiCheckout';
 import { toFa } from '../lib/format';
 import Price from '../components/ui/Price';
 import EmptyState from '../components/ui/EmptyState';
@@ -25,7 +26,7 @@ const backLinkClass =
 export default function PaymentPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { updateOrderStatus } = useAuth();
+  const { updateOrderStatus, user } = useAuth();
   const { settleOrder, clearCart } = useStore();
   const [busy, setBusy] = useState(false);
   const order = useMemo(() => readPayment(id ?? ''), [id]);
@@ -65,7 +66,16 @@ export default function PaymentPage() {
       coinsEarned,
     });
     updateOrderStatus(order.id, STATUS_LABEL[result.status]);
-    if (result.ok) clearCart();
+    if (result.ok) {
+      clearCart();
+      // The shop's own panel lists orders from the backend, so a paid order is recorded there too
+      // — once the money is confirmed, never before.
+      recordFinishedOrder(
+        { ...order, status: 'paid', refId: result.refId, paidAt: new Date().toISOString() },
+        'paid',
+        user?.email,
+      );
+    }
 
     navigate(`/checkout?payment=${result.status}&order=${order.id}`);
   };

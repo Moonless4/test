@@ -28,6 +28,7 @@ import {
 import { SectionError, SectionLoading } from '../../components/ui/SectionState';
 import StatusPill from '../components/StatusPill';
 import { toDateTimeInput } from '../lib/labels';
+import { adminHref } from '../lib/basePath';
 
 /** The columns a product payload can carry. */
 const FIELDS: FieldSpec[] = [
@@ -252,7 +253,7 @@ export default function ProductFormPage() {
         const created = result.data?.product;
 
         if (created) {
-          navigate(`/admin/products/${created.id}`, { replace: true });
+          navigate(adminHref(`products/${created.id}`), { replace: true });
           return;
         }
 
@@ -278,7 +279,7 @@ export default function ProductFormPage() {
       <AdminPageHeader
         title={isEditing ? (product?.name ?? 'ویرایش محصول') : 'محصول جدید'}
         description="قیمت‌ها به تومان و از سمت سرور اعتبارسنجی می‌شوند؛ تخفیف از اختلاف دو قیمت ساخته می‌شود."
-        backTo={{ to: '/admin/products', label: 'بازگشت به فهرست محصولات' }}
+        backTo={{ to: adminHref('products'), label: 'بازگشت به فهرست محصولات' }}
       />
 
       {notice ? (
@@ -342,7 +343,7 @@ export default function ProductFormPage() {
             </button>
             <button
               type="button"
-              onClick={() => navigate('/admin/products')}
+              onClick={() => navigate(adminHref('products'))}
               className="inline-flex h-12 items-center rounded-xl border border-line bg-white px-5 text-[13.5px] font-medium text-ink transition-colors hover:border-teal-300"
             >
               بازگشت

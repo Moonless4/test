@@ -3,6 +3,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Loader2, LockKeyhole } from 'lucide-react';
 import { ApiError } from '../../lib/api/client';
 import { useAdminAuth } from '../AdminAuthContext';
+import { adminHref, isAdminPath } from '../lib/basePath';
 
 /**
  * Sign-in for the panel.
@@ -24,7 +25,7 @@ export default function AdminLoginPage() {
   const [busy, setBusy] = useState(false);
 
   if (user) {
-    return <Navigate to="/admin" replace />;
+    return <Navigate to={adminHref()} replace />;
   }
 
   const submit = async (event: FormEvent) => {
@@ -37,7 +38,7 @@ export default function AdminLoginPage() {
       await signIn(email.trim(), password);
 
       const from = (location.state as { from?: string } | null)?.from;
-      navigate(from && from.startsWith('/admin') ? from : '/admin', { replace: true });
+      navigate(from && isAdminPath(from) ? from : adminHref(), { replace: true });
     } catch (failure) {
       if (failure instanceof ApiError) {
         setFieldErrors(

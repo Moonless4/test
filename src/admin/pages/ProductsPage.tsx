@@ -14,6 +14,7 @@ import { useAdminAuth } from '../AdminAuthContext';
 import CrudPanel from '../components/CrudPanel';
 import Modal from '../components/Modal';
 import StatusPill from '../components/StatusPill';
+import { adminHref } from '../lib/basePath';
 
 /** One stock correction, in the modal the list opens. */
 function StockModal({
@@ -151,7 +152,7 @@ export default function ProductsPage() {
         headerAction={
           can('products.create') ? (
             <Link
-              to="/admin/products/new"
+              to={adminHref('products/new')}
               className="inline-flex h-11 items-center gap-2 rounded-xl bg-teal-800 px-4 text-[13px] font-medium text-white shadow-soft transition-colors hover:bg-teal-700"
             >
               <Plus className="h-4 w-4" />
@@ -236,7 +237,7 @@ export default function ProductsPage() {
         idOf={(row) => row.id}
         labelOf={(row) => row.name}
         list={adminProducts}
-        editHref={(row) => `/admin/products/${row.id}`}
+        editHref={(row) => adminHref(`products/${row.id}`)}
         remove={can('products.delete') ? adminDeleteProduct : undefined}
         rowActions={
           canUpdate

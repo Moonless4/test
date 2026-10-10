@@ -23,7 +23,20 @@ export type PaymentMethod = 'online' | 'wallet' | 'installment' | 'cod';
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'canceled';
 
-export type PaymentLine = { name: string; qty: number; price: number };
+/**
+ * A line of the order. `slug` is the catalogue's own id for the product, kept so the finished order
+ * can be recorded in the shop's backend (`src/services/apiCheckout.ts`); an order saved before this
+ * field existed simply has none and is not sent.
+ */
+export type PaymentLine = {
+  name: string;
+  slug?: string;
+  /** What the shopper picked, kept so the recorded order can carry the same choice. */
+  size?: string;
+  color?: string;
+  qty: number;
+  price: number;
+};
 
 export type PaymentCustomer = {
   name: string;

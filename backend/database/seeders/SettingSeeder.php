@@ -34,6 +34,10 @@ class SettingSeeder extends Seeder
             'shop.free_shipping_threshold' => ['value' => (string) config('shop.shipping.free_threshold'), 'type' => 'int', 'group' => 'shop', 'public' => true],
             'shop.shipping_flat_rate' => ['value' => (string) config('shop.shipping.flat_rate'), 'type' => 'int', 'group' => 'shop', 'public' => true],
             'shop.return_window_days' => ['value' => '7', 'type' => 'int', 'group' => 'shop', 'public' => true],
+            // The admin panel's own URL segment. The storefront reads it before its first render to
+            // know where the panel is mounted, so it has to be public — and it is only ever an
+            // address, never a lock: every admin route is guarded by the API's `can:admin.access`.
+            'admin.path' => ['value' => 'admin', 'type' => 'string', 'group' => 'admin', 'public' => true],
             // Internal keys: is_public = false, so they can never travel to the browser.
             'internal.support_email' => ['value' => '', 'type' => 'string', 'group' => 'internal', 'public' => false],
         ];

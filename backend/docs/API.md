@@ -91,7 +91,7 @@ Per minute, keyed on the account when signed in and on the IP otherwise:
 | --- | --- |
 | Everything (`api`) | 120 |
 | Sensitive endpoints (`sensitive`) | 20 |
-| `POST /checkout` | 15 |
+| `POST /checkout`, `POST /checkout/record` | 15 |
 | `POST /auth/login` | 10 (per email **and** IP) |
 | `POST /auth/register` | 5 (per IP) |
 | `POST /auth/password/forgot`, `/auth/password/reset` | 5 |
@@ -179,6 +179,7 @@ object and (for a guest) the `X-Cart-Token` header.
 | Method | Path | Notes |
 | --- | --- | --- |
 | `POST` | `/api/v1/checkout` | Turns the basket into an order and opens a payment. Works signed in or as a guest. |
+| `POST` | `/api/v1/checkout/record` | Records an order the storefront's own browser basket already placed and paid for. Line prices are re-read from the catalogue; shipping and the discount are reported by the caller. Answers 201 with the order and its access token. |
 | `GET` | `/api/v1/payments/callback` | Where the gateway returns the shopper. Not for clients to call. |
 | `GET` | `/api/v1/orders/{order:number}` | Reads one order — the owner's token, or a guest's `X-Order-Token`. |
 

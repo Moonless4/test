@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAdminAuth } from './AdminAuthContext';
+import { adminHref } from './lib/basePath';
 
 type NavItem = {
   to: string;
@@ -29,14 +30,14 @@ type NavItem = {
 const NAV: Array<{ group: string; items: NavItem[] }> = [
   {
     group: 'نمای کلی',
-    items: [{ to: '/admin', label: 'داشبورد', icon: LayoutDashboard, end: true }],
+    items: [{ to: adminHref(), label: 'داشبورد', icon: LayoutDashboard, end: true }],
   },
   {
     group: 'کاتالوگ',
     items: [
-      { to: '/admin/products', label: 'محصولات', icon: Package, permission: 'products.view' },
+      { to: adminHref('products'), label: 'محصولات', icon: Package, permission: 'products.view' },
       {
-        to: '/admin/categories',
+        to: adminHref('categories'),
         label: 'دسته‌بندی‌ها',
         icon: FolderTree,
         permission: 'categories.manage',
@@ -46,9 +47,9 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
   {
     group: 'فروش',
     items: [
-      { to: '/admin/orders', label: 'سفارش‌ها', icon: ReceiptText, permission: 'orders.view' },
+      { to: adminHref('orders'), label: 'سفارش‌ها', icon: ReceiptText, permission: 'orders.view' },
       {
-        to: '/admin/coupons',
+        to: adminHref('coupons'),
         label: 'کدهای تخفیف',
         icon: BadgePercent,
         permission: 'coupons.manage',
@@ -58,10 +59,10 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
   {
     group: 'محتوا',
     items: [
-      { to: '/admin/content', label: 'برگه‌ها و نوشته‌ها', icon: FileText, permission: 'content.manage' },
-      { to: '/admin/faqs', label: 'سوالات متداول', icon: HelpCircle, permission: 'content.manage' },
-      { to: '/admin/media', label: 'کتابخانهٔ رسانه', icon: Images, permission: 'media.manage' },
-      { to: '/admin/settings', label: 'تنظیمات', icon: Settings, permission: 'settings.manage' },
+      { to: adminHref('content'), label: 'برگه‌ها و نوشته‌ها', icon: FileText, permission: 'content.manage' },
+      { to: adminHref('faqs'), label: 'سوالات متداول', icon: HelpCircle, permission: 'content.manage' },
+      { to: adminHref('media'), label: 'کتابخانهٔ رسانه', icon: Images, permission: 'media.manage' },
+      { to: adminHref('settings'), label: 'تنظیمات', icon: Settings, permission: 'settings.manage' },
     ],
   },
 ];
