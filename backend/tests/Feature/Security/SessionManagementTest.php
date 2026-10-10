@@ -88,15 +88,23 @@ class SessionManagementTest extends TestCase
         $victimId = $this->withToken($victimSessions['first'])
             ->getJson('/api/v1/auth/sessions')->json('data.sessions.0.id');
 
-        // 404, never 403: a 403 would confirm that the session exists.
+        // 404, never 403: a 403 would confirm that the session exists. The guard is forgotten before
+        // each identity change — one test process shares a container across several requests, so
+        // without it the second request would still be answered as the identity the first resolved.
+        $this->forgetResolvedGuards();
         $this->withToken($attackerToken)
             ->deleteJson("/api/v1/auth/sessions/{$victimId}")
             ->assertStatus(404);
 
         // The victim's session is untouched.
+        $this->forgetResolvedGuards();
         $this->withToken($victimSessions['first'])->getJson('/api/v1/auth/me')->assertOk();
 
-        // And a signed-out caller cannot list anybody's sessions at all.
+        // And a signed-out caller cannot list anybody's sessions at all. `withToken()` leaves the
+        // header on the test client for the rest of the method, so it has to be dropped as well as
+        // the resolved guard.
+        $this->forgetResolvedGuards();
+        $this->flushHeaders();
         $this->getJson('/api/v1/auth/sessions')->assertStatus(401);
     }
 
@@ -131,9 +139,12 @@ class SessionManagementTest extends TestCase
 
         $this->assertDatabaseHas('audit_logs', ['event' => 'auth.password_changed']);
 
-        // The device in the shopper's hand keeps working; the other session is gone.
+        // The device in the shopper's hand keeps working; the other session is gone. The guard is
+        // forgotten before each request so both tokens are really resolved from their own header,
+        // rather than the second call reusing the identity the first one resolved.
         $this->forgetResolvedGuards();
         $this->withToken($sessions['second'])->getJson('/api/v1/auth/me')->assertOk();
+        $this->forgetResolvedGuards();
         $this->withToken($sessions['first'])->getJson('/api/v1/auth/me')->assertStatus(401);
 
         // The old password no longer signs in, and the owner is told without being told a secret.

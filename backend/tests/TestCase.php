@@ -43,6 +43,11 @@ abstract class TestCase extends BaseTestCase
         // configuration it needs per test; by default they must not block the test client.
         'TRUSTED_HOSTS' => '',
         'CORS_ALLOWED_ORIGINS' => '',
+        // The test client is not a proxy: nothing it sends in X-Forwarded-*/CF-IPCountry may be
+        // believed. Compose exports TRUST_PROXIES=* for the sandbox (there the preview really is
+        // behind one), and without this override the country- and address-based detections would
+        // run on values the caller chose — the opposite of what their tests assert.
+        'TRUST_PROXIES' => '',
     ];
 
     protected function setUp(): void

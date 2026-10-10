@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Security;
+namespace App\Support;
 
 use App\Exceptions\UnsafeUrlException;
 use Illuminate\Support\Str;

@@ -141,7 +141,11 @@ class WebhookSecurityTest extends TestCase
             ->assertOk();
 
         $this->assertSame(1, Payment::query()->where('status', 'succeeded')->count());
-        $this->assertSame(1, DB::table('order_status_histories')->where('order_id', $order->getKey())->count());
+
+        // Exactly two rows: the checkout wrote the "order placed" row when the order was created,
+        // and the settlement wrote exactly one more (pending → paid). If either replay had settled
+        // again there would be a third.
+        $this->assertSame(2, DB::table('order_status_histories')->where('order_id', $order->getKey())->count());
     }
 
     public function test_the_amount_is_never_read_from_the_request(): void
@@ -156,8 +160,10 @@ class WebhookSecurityTest extends TestCase
             ->assertOk();
 
         // The settlement used the amount from our own payment row, and every total on the order is
-        // exactly what the checkout computed.
-        $this->assertSame(300_000, $payment->fresh()->amount);
+        // exactly what the checkout computed. The gateway is charged the *grand* total — the
+        // subtotal plus the shipping the checkout added — so a query-string `amount=1` cannot
+        // shrink what is verified.
+        $this->assertSame(345_000, $payment->fresh()->amount);
         $this->assertSame(300_000, $order->fresh()->subtotal);
         $this->assertSame(345_000, $order->fresh()->grand_total);
     }

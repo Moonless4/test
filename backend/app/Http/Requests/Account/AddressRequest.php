@@ -3,14 +3,16 @@
 namespace App\Http\Requests\Account;
 
 use App\Http\Requests\Concerns\NormalizesInput;
-use App\Models\Address;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Creating or editing a saved address.
  *
- * On update, `authorize()` checks the policy against the *route model binding* — so an address id
- * belonging to somebody else is refused before validation even runs (IDOR/BOLA).
+ * Only the account is checked here. *Ownership* is decided in one place —
+ * `AddressController::addressFor()`, which every mutating method calls before its policy check —
+ * because a foreign address id has to be answered 404, and a FormRequest that fails `authorize()`
+ * can only answer 403. Keeping the rule in the controller also means the policy and the scoped
+ * `user_id` queries are the second and third checks, not the only one.
  */
 class AddressRequest extends FormRequest
 {
@@ -18,12 +20,6 @@ class AddressRequest extends FormRequest
 
     public function authorize(): bool
     {
-        $address = $this->route('address');
-
-        if ($address instanceof Address) {
-            return $this->user()?->can('update', $address) ?? false;
-        }
-
         return $this->user() !== null;
     }
 

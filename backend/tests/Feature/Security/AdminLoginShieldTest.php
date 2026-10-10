@@ -187,8 +187,11 @@ class AdminLoginShieldTest extends TestCase
 
     public function test_the_progressive_delay_grows_and_is_capped(): void
     {
-        $base = 120;
-        $cap = 300;
+        // base × 3 has to stay under the cap, otherwise the "it grows" assertion and the "it is
+        // capped" one contradict each other: with base 120 / cap 300 the third failure is already
+        // capped (120 × 3 = 360 → 300), so the growth the test asserts could never be observed.
+        $base = 100;
+        $cap = 350;
 
         config([
             'security.login_shield.progressive_delay_ms' => $base,

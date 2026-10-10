@@ -32,13 +32,26 @@ class PaymentWebhookRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        $unknown = array_diff(array_keys($this->all()), self::ALLOWED);
+        $unknown = array_diff(array_keys($this->validationData()), self::ALLOWED);
 
         if ($unknown !== []) {
             throw ValidationException::withMessages([
                 'payload' => ['بدنهٔ درخواست شامل فیلد ناشناخته است.'],
             ]);
         }
+    }
+
+    /**
+     * Only the signed body is judged.
+     *
+     * The signature covers `timestamp.body` and nothing else, so the query string is unsigned data
+     * a caller can add for free. `$this->all()` merges it into the payload, which silently turned
+     * the strictness below into "refuse any delivery carrying a query parameter" — a gateway that
+     * appends one (or a caller adding `?amount=1`) would have been answered 422 rather than ignored.
+     */
+    public function validationData(): array
+    {
+        return $this->isJson() ? (array) $this->json()->all() : $this->request->all();
     }
 
     /**

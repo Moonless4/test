@@ -7,6 +7,7 @@ use App\Http\Requests\Account\AddressRequest;
 use App\Http\Resources\AddressResource;
 use App\Models\Address;
 use App\Services\AuditLogger;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -15,10 +16,10 @@ use Illuminate\Support\Facades\DB;
 /**
  * Saved addresses.
  *
- * Every method goes through AddressPolicy, so an address id belonging to another account is a 403
- * from the policy before anything is read or written. The queries are also scoped by user_id: two
- * independent checks for the same rule, which is what makes an IDOR here a double failure rather
- * than a single one.
+ * An address id belonging to another account is answered as if it did not exist — a 404, never a
+ * 403, because a 403 would confirm that the id is real and belongs to somebody. AddressPolicy still
+ * runs after that check and the queries are scoped by user_id as well, so an IDOR here is a double
+ * failure rather than a single one.
  */
 class AddressController extends Controller
 {
@@ -71,6 +72,8 @@ class AddressController extends Controller
 
     public function update(AddressRequest $request, Address $address): JsonResponse
     {
+        $this->addressFor($request, $address);
+
         $this->authorize('update', $address);
 
         DB::transaction(function () use ($request, $address): void {
@@ -98,6 +101,8 @@ class AddressController extends Controller
 
     public function destroy(Request $request, Address $address): JsonResponse
     {
+        $this->addressFor($request, $address);
+
         $this->authorize('delete', $address);
 
         $address->delete();
@@ -109,6 +114,8 @@ class AddressController extends Controller
 
     public function makeDefault(Request $request, Address $address): JsonResponse
     {
+        $this->addressFor($request, $address);
+
         $this->authorize('update', $address);
 
         DB::transaction(function () use ($address): void {
@@ -119,6 +126,19 @@ class AddressController extends Controller
         });
 
         return response()->json(['data' => ['address' => new AddressResource($address)]]);
+    }
+
+    /**
+     * An address id belonging to somebody else must look like it does not exist. `apiResource`
+     * binds by id alone, so AddressPolicy would answer 403 — an oracle telling the caller the row
+     * is real and belongs to another account. A 404 keeps the id unguessable in effect as well as
+     * in name; the policy and the `user_id` scoped queries remain as the second and third checks.
+     */
+    private function addressFor(Request $request, Address $address): void
+    {
+        if ((int) $address->user_id !== (int) $request->user()->getKey()) {
+            throw (new ModelNotFoundException)->setModel(Address::class, [$address->getKey()]);
+        }
     }
 
     /**

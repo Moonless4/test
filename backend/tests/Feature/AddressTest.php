@@ -78,13 +78,14 @@ class AddressTest extends TestCase
         $stranger = User::factory()->create();
         $address = Address::factory()->create(['user_id' => $owner->getKey()]);
 
+        // 404, never 403: a 403 would confirm that the address id is real and belongs to somebody.
         $this->actingAs($stranger, 'sanctum')
             ->putJson("/api/v1/addresses/{$address->getKey()}", $this->payload())
-            ->assertStatus(403);
+            ->assertStatus(404);
 
         $this->actingAs($stranger, 'sanctum')
             ->deleteJson("/api/v1/addresses/{$address->getKey()}")
-            ->assertStatus(403);
+            ->assertStatus(404);
 
         $this->actingAs($stranger, 'sanctum')
             ->getJson('/api/v1/addresses')

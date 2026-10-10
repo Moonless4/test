@@ -29,6 +29,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        /*
+         * This is an API-only application: there is no `login` route and no browser sign-in page
+         * to send a guest to. Laravel 13 sets a default guest redirect of `fn () => route('login')`,
+         * and the `Authenticate` middleware resolves it *before* the exception handler runs — so a
+         * request without `Accept: application/json` threw `RouteNotFoundException: Route [login]
+         * not defined` and was answered with a 500 instead of a 401. Overriding it with a null
+         * redirect lets the handler answer 401 (JSON) for the API and 401 (no content) elsewhere.
+         * This never weakens a check: `auth:sanctum`, `full-auth`, `two-factor` and the policies
+         * still run — only the redirect target changes.
+         */
+        $middleware->redirectGuestsTo(null);
+
         // DirectAdmin runs Apache or LiteSpeed in front of PHP: TLS is terminated there and the
         // real client address arrives in X-Forwarded-*. TRUST_PROXIES is `*` only because the
         // application is reachable solely through that web server; a host with a load balancer
