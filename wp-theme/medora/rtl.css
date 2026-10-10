@@ -1,0 +1,89 @@
+/*
+ * Medora — right-to-left corrections.
+ *
+ * The theme is written with logical properties (`start`/`end`, `margin-inline`, `padding-inline`)
+ * and Tailwind's logical utilities, so RTL mostly takes care of itself. This file carries the
+ * handful of places where a physical direction is unavoidable — icon rotation, drawer edges,
+ * floated WooCommerce columns and LTR-only fields (prices with a currency glyph, email and
+ * phone inputs) — plus Persian text rhythm.
+ */
+
+body.medora-rtl {
+  text-align: start;
+}
+
+/* Icons that encode a direction have to flip. */
+.medora-rtl .medora-mega a svg,
+.medora-rtl .medora-faq-icon svg {
+  transform: none;
+}
+
+.medora-rtl [data-medora-rail-next] svg {
+  transform: rotate(180deg);
+}
+
+/* Star ratings are laid out left-to-right by WooCommerce's own CSS. */
+.medora-rtl .woocommerce .star-rating {
+  direction: ltr;
+  text-align: left;
+}
+
+.medora-rtl .woocommerce .star-rating span,
+.medora-rtl .woocommerce .star-rating::before {
+  right: auto;
+  left: 0;
+}
+
+/* Prices, phone numbers and emails stay LTR inside their RTL surroundings. */
+.medora-rtl .woocommerce-Price-amount,
+.medora-rtl .woocommerce table.shop_table td.product-subtotal,
+.medora-rtl input[type='email'],
+.medora-rtl input[type='tel'],
+.medora-rtl input[type='url'] {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.medora-rtl .woocommerce-Price-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* WooCommerce floats its single-product columns; keep them physically correct. */
+.medora-rtl.woocommerce div.product .woocommerce-product-gallery {
+  float: right !important;
+}
+
+.medora-rtl.woocommerce div.product .summary {
+  float: left !important;
+}
+
+.medora-rtl.woocommerce .cart-collaterals .cart_totals {
+  float: left;
+}
+
+/* The cart drawer sits on the left in RTL, the category drawer on the right. */
+.medora-rtl [data-medora-cart-drawer] > div[role='dialog'] {
+  inset-inline-end: 0;
+}
+
+.medora-rtl [data-medora-category-drawer] > div[role='dialog'] {
+  inset-inline-start: 0;
+}
+
+/* Persian typography: slightly looser leading and no Latin word spacing surprises. */
+.medora-rtl body,
+.medora-rtl .medora-prose {
+  line-height: 1.9;
+}
+
+.medora-rtl .medora-prose ul,
+.medora-rtl .medora-prose ol {
+  margin-inline: 1.25rem 0;
+}
+
+/* Keep the mobile tab bar and the footer strip aligned in RTL. */
+.medora-rtl .medora-faq-chip {
+  flex-direction: row-reverse;
+}

@@ -1,0 +1,15 @@
+Font: IRANYekanX (Eco) — Regular (400) + Bold (700)
+Source: IRANYekanXEco.zip, provided by the project owner. Publisher: FontIran (fontiran.com),
+author Moslem Ebrahimi. Version 2.4.
+Files kept next to the fonts: FontLicense.txt (as required by the licence) — it needs the project's
+6-digit licence code filled in where it says "(.....)".
+
+Usage in this project: served as the CSS family "IRANYekanX" (see the @font-face rules in
+src/index.css) and listed first in `font-sans` in tailwind.config.js, ahead of Vazirmatn.
+
+Notes:
+- Only these two weights ship in this folder. The UI also uses font-medium / font-semibold /
+  font-black, which the browser resolves to the nearest available face (400 or 700); add the other
+  IRANYekanX weights here and extend the @font-face rules if they become available.
+- This cut contains both Persian and Latin glyphs, so the whole UI renders in it.
+- Licensing/distribution of these font files is the responsibility of the project owner.

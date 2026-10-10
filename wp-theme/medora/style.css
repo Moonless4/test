@@ -1,0 +1,30 @@
+/*
+Theme Name: Medora
+Theme URI: https://medora.ir/
+Author: Medora
+Author URI: https://medora.ir/
+Description: قالب اختصاصی «مدورا» برای فروشگاه‌های ووکامرس فارسی و راست‌به‌چپ. طراحی فروشگاه پوشاک و اکسسوری با پشتیبانی کامل ووکامرس، مگا منو، اسلایدر قابل مدیریت، بخش تخفیف شگفت‌انگیز بر پایهٔ محصولات تخفیف‌دار واقعی و قالب‌های سازگار با المنتور.
+Version: 1.0.0
+Requires at least: 6.4
+Tested up to: 6.7
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: medora
+Tags: woocommerce, e-commerce, rtl-language-support, custom-logo, custom-menu, featured-images, translation-ready, block-styles, wide-blocks, threaded-comments
+WC requires at least: 8.0
+WC tested up to: 9.4
+*/
+
+/*
+ * This file carries the theme header WordPress reads for metadata only.
+ *
+ * Every rule the site actually renders lives in:
+ *   assets/css/medora.css      compiled from assets/src/theme.css (Tailwind, same design
+ *                              tokens as the original React frontend: tailwind.tokens.cjs)
+ *   assets/css/woocommerce.css hand written styling for WooCommerce's own templates
+ *   rtl.css                    right-to-left corrections
+ *
+ * Enqueued in inc/enqueue.php. Rebuild the compiled sheet with:
+ *   npm run theme:css
+ */

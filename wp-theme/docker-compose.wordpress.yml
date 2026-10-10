@@ -1,0 +1,80 @@
+# Local WordPress stack for developing the Medora theme.
+#
+# This is NOT part of the app's Base44 environment (docker-compose.base44.yml). It exists so the
+# theme can be developed and verified against a real WordPress + WooCommerce install:
+#
+#   docker compose -f wp-theme/docker-compose.wordpress.yml up -d
+#   docker compose -f wp-theme/docker-compose.wordpress.yml run --rm cli core install \
+#     --url="$WP_URL" --title="مدورا" --admin_user=admin --admin_password=medora-local \
+#     --admin_email=admin@example.com --skip-email
+#   docker compose -f wp-theme/docker-compose.wordpress.yml run --rm cli plugin install woocommerce --activate
+#   docker compose -f wp-theme/docker-compose.wordpress.yml run --rm cli theme activate medora
+#
+# The theme directory is bind mounted, so edits show up on the next request. Data lives in named
+# volumes; `docker compose ... down -v` throws the test store away.
+
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+      MARIADB_ROOT_PASSWORD: root
+    volumes:
+      - wp_db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: on-failure
+
+  wordpress:
+    image: wordpress:php8.2-apache
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DEBUG: "1"
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'WP_ENVIRONMENT_TYPE', 'local' );
+    volumes:
+      - wp_data:/var/www/html
+      - ./medora:/var/www/html/wp-content/themes/medora
+      # Local-only: the proxy in front of this stack forwards a different Host header than the
+      # site URL, so WordPress's canonical redirect has to stand down. Nothing here ships with
+      # the theme.
+      - ./dev/mu-plugins:/var/www/html/wp-content/mu-plugins
+    restart: on-failure
+
+  cli:
+    image: wordpress:cli-php8.2
+    depends_on:
+      db:
+        condition: service_healthy
+      wordpress:
+        condition: service_started
+    user: "33:33"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WP_CLI_ALLOW_ROOT: "1"
+    volumes:
+      - wp_data:/var/www/html
+      - ./medora:/var/www/html/wp-content/themes/medora
+      - ./dev/mu-plugins:/var/www/html/wp-content/mu-plugins
+    entrypoint: ["wp"]
+    command: ["--info"]
+
+volumes:
+  wp_data:
+  wp_db:

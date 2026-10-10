@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "theme:css": "tailwindcss -c wp-theme/medora/tailwind.config.mjs -i wp-theme/medora/assets/src/theme.css -o wp-theme/medora/assets/css/medora.css --minify",
+    "theme:build": "node tools/build-theme.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.451.0",
