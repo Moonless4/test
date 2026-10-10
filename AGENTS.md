@@ -86,6 +86,19 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   `phpunit.xml` sets `force="true"` on every env entry so the suite always runs on in-memory SQLite
   with the array cache, sync queue and the **fake** payment gateway — without it the compose
   `DB_CONNECTION=mysql` would win and `RefreshDatabase` would wipe the development database.
+- **The suite is PHPUnit 12, so data providers need the attribute**: `#[DataProvider('method')]`.
+  A `@dataProvider` doc-comment is not read any more — it does not warn, it just leaves the test
+  with no arguments, so `OutboundAndBotProtectionTest`'s eleven SSRF addresses never ran until the
+  annotation became an attribute. Each data set must also be an array of arguments, optionally
+  keyed to name it.
+- **`Http::fake()` merges stubs, it does not replace them.** A second `Http::fake([...])` in the
+  same test leaves the first, wildcarded stub in front, so the earlier answer keeps winning — the
+  Turnstile test's "accepted token" case was still judged by its "rejected token" stub. Either fake
+  once and branch on the request (as that test now does), or use `Http::fakeSequence()`.
+- **Tests must not need a resolver.** `SafeUrl` refuses a host that does not resolve, so a test
+  cannot assert anything about `gateway.test` or any name with no DNS record; the allowlist test
+  sets `security.outbound.allow_private_networks` to keep resolution out of what it is testing, and
+  the address cases use IP literals.
 - `PAYMENT_GATEWAY=fake` is the sandbox default (compose) because the sandbox cannot reach
   `zarinpal.com`; a host sets `zarinpal` plus the merchant id in its own `.env`.
 - Docs live in `backend/docs/` — `API.md` (endpoint reference), `SECURITY.md` (the threat model and
