@@ -1,7 +1,8 @@
-import { Building2, Mail, MessageSquare, TrendingUp, Users } from 'lucide-react'
+import { Building2, Mail, MessageSquare, Settings, TrendingUp, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import { useAdminRoutes } from '@/lib/adminRoutes'
 import { adminApi } from '@/lib/api'
 import { Container } from '@/components/ui/Container'
 import { toPersianDigits } from '@/lib/format'
@@ -20,6 +21,7 @@ interface DashboardStats {
 export default function AdminDashboard() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const [routes] = useAdminRoutes()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -51,7 +53,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center gap-3">
               <Link to="/" className="text-[13px] text-muted hover:text-navy">مشاهده سایت</Link>
-              <button onClick={() => { logout(); navigate('/login') }} className="rounded-lg bg-gold/10 px-4 py-2 text-[13px] text-gold-dark hover:bg-gold/20">
+              <button onClick={() => { logout(); navigate(routes.loginPath) }} className="rounded-lg bg-gold/10 px-4 py-2 text-[13px] text-gold-dark hover:bg-gold/20">
                 خروج
               </button>
             </div>
@@ -76,7 +78,7 @@ export default function AdminDashboard() {
           <div className="rounded-card border border-line bg-white p-6 lg:col-span-2">
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-[16px] font-bold text-ink">آخرین پیام‌ها</h2>
-              <Link to="/admin/inquiries" className="text-[13px] text-navy hover:underline">مشاهده همه</Link>
+              <Link to={`${routes.adminPath}/inquiries`} className="text-[13px] text-navy hover:underline">مشاهده همه</Link>
             </div>
             {stats && stats.recent_inquiries.length > 0 ? (
               <div className="space-y-3">
@@ -105,13 +107,17 @@ export default function AdminDashboard() {
           <div className="rounded-card border border-line bg-white p-6">
             <h2 className="mb-5 text-[16px] font-bold text-ink">مدیریت سریع</h2>
             <div className="space-y-2.5">
-              <Link to="/admin/properties" className="flex items-center gap-3 rounded-lg border border-line px-4 py-3 text-sm text-ink transition-colors hover:bg-mist">
+              <Link to={`${routes.adminPath}/properties`} className="flex items-center gap-3 rounded-lg border border-line px-4 py-3 text-sm text-ink transition-colors hover:bg-mist">
                 <Building2 className="h-4 w-4 text-gold" strokeWidth={1.8} />
                 مدیریت املاک
               </Link>
-              <Link to="/admin/inquiries" className="flex items-center gap-3 rounded-lg border border-line px-4 py-3 text-sm text-ink transition-colors hover:bg-mist">
+              <Link to={`${routes.adminPath}/inquiries`} className="flex items-center gap-3 rounded-lg border border-line px-4 py-3 text-sm text-ink transition-colors hover:bg-mist">
                 <MessageSquare className="h-4 w-4 text-gold" strokeWidth={1.8} />
                 مدیریت پیام‌ها و بازدیدها
+              </Link>
+              <Link to={`${routes.adminPath}/settings`} className="flex items-center gap-3 rounded-lg border border-line px-4 py-3 text-sm text-ink transition-colors hover:bg-mist">
+                <Settings className="h-4 w-4 text-gold" strokeWidth={1.8} />
+                تنظیمات آدرس پنل
               </Link>
             </div>
           </div>

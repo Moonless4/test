@@ -2,6 +2,7 @@ import { Building2, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import { useAdminRoutes } from '@/lib/adminRoutes'
 import { adminApi, type ApiProperty } from '@/lib/api'
 import { Container } from '@/components/ui/Container'
 import { fieldClasses } from '@/components/ui/fieldClasses'
@@ -9,6 +10,7 @@ import { formatPrice, toPersianDigits } from '@/lib/format'
 
 export default function AdminProperties() {
   const { user } = useAuth()
+  const [routes] = useAdminRoutes()
   const [properties, setProperties] = useState<ApiProperty[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
@@ -42,7 +44,7 @@ export default function AdminProperties() {
         <Container>
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center gap-3">
-              <Link to="/admin" className="text-[13px] text-muted hover:text-navy">داشبورد</Link>
+              <Link to={routes.adminPath} className="text-[13px] text-muted hover:text-navy">داشبورد</Link>
               <span className="text-muted/40">/</span>
               <h1 className="text-[18px] font-bold text-ink">مدیریت املاک</h1>
             </div>

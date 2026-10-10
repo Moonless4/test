@@ -4,6 +4,7 @@ import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { ScrollToTop } from '@/components/layout/ScrollToTop'
 import { useAuth } from '@/contexts/AuthContext'
+import { useAdminRoutes } from '@/lib/adminRoutes'
 import AboutPage from '@/pages/AboutPage'
 import ContactPage from '@/pages/ContactPage'
 import FavoritesPage from '@/pages/FavoritesPage'
@@ -16,6 +17,7 @@ import TeamPage from '@/pages/TeamPage'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
 import AdminInquiries from '@/pages/admin/AdminInquiries'
 import AdminProperties from '@/pages/admin/AdminProperties'
+import AdminSettings from '@/pages/admin/AdminSettings'
 import LoginPage from '@/pages/admin/LoginPage'
 
 function SiteLayout({ children }: { children: ReactNode }) {
@@ -30,13 +32,15 @@ function SiteLayout({ children }: { children: ReactNode }) {
 
 function AdminRoute({ children }: { children: ReactNode }) {
   const { user, loading, isAdmin } = useAuth()
+  const [routes] = useAdminRoutes()
   if (loading) return <div className="flex min-h-screen items-center justify-center text-muted">…</div>
-  if (!user) return <Navigate to="/login" replace />
+  if (!user) return <Navigate to={routes.loginPath} replace />
   if (!isAdmin) return <Navigate to="/" replace />
   return <>{children}</>
 }
 
 export default function App() {
+  const [routes] = useAdminRoutes()
   return (
     <div className="flex min-h-screen flex-col">
       <ScrollToTop />
@@ -52,12 +56,13 @@ export default function App() {
         <Route path="/favorites" element={<SiteLayout><FavoritesPage /></SiteLayout>} />
 
         {/* Auth route */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path={routes.loginPath} element={<LoginPage />} />
 
         {/* Admin routes */}
-        <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-        <Route path="/admin/properties" element={<AdminRoute><AdminProperties /></AdminRoute>} />
-        <Route path="/admin/inquiries" element={<AdminRoute><AdminInquiries /></AdminRoute>} />
+        <Route path={routes.adminPath} element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path={`${routes.adminPath}/properties`} element={<AdminRoute><AdminProperties /></AdminRoute>} />
+        <Route path={`${routes.adminPath}/inquiries`} element={<AdminRoute><AdminInquiries /></AdminRoute>} />
+        <Route path={`${routes.adminPath}/settings`} element={<AdminRoute><AdminSettings /></AdminRoute>} />
 
         {/* 404 */}
         <Route path="*" element={<SiteLayout><NotFoundPage /></SiteLayout>} />

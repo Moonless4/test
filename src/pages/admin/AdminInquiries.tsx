@@ -1,6 +1,7 @@
 import { Mail, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAdminRoutes } from '@/lib/adminRoutes'
 import { adminApi, ApiError } from '@/lib/api'
 import { Container } from '@/components/ui/Container'
 import { toPersianDigits } from '@/lib/format'
@@ -34,6 +35,7 @@ const formatDate = (iso: string): string => {
 }
 
 export default function AdminInquiries() {
+  const [routes] = useAdminRoutes()
   const [inquiries, setInquiries] = useState<InquiryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('')
@@ -73,7 +75,7 @@ export default function AdminInquiries() {
         <Container>
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center gap-3">
-              <Link to="/admin" className="text-[13px] text-muted hover:text-navy">داشبورد</Link>
+              <Link to={routes.adminPath} className="text-[13px] text-muted hover:text-navy">داشبورد</Link>
               <span className="text-muted/40">/</span>
               <h1 className="text-[18px] font-bold text-ink">پیام‌ها و بازدیدها</h1>
             </div>

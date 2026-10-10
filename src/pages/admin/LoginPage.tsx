@@ -2,6 +2,7 @@ import { LogIn } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import { useAdminRoutes } from '@/lib/adminRoutes'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { fieldClasses } from '@/components/ui/fieldClasses'
@@ -9,6 +10,7 @@ import { fieldClasses } from '@/components/ui/fieldClasses'
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const [routes] = useAdminRoutes()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -20,7 +22,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await login(email, password)
-      navigate('/admin')
+      navigate(routes.adminPath)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'خطای ورود به سیستم')
     } finally {
