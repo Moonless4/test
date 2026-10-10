@@ -26,6 +26,16 @@ curl -I http://localhost:3000/
 - Host/origin checks: `server.allowedHosts = true` in `vite.config.ts` plus the platform's
   `__VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS` env var. The preview proxy host is environment
   specific, so never hardcode it.
+- The dev server's root is the whole repository, so `server.fs.deny` names the **Laravel tree
+  absolutely** (`${laravelRoot}/**`): `/app/backend/.env`, `storage/logs/laravel.log` and the API's
+  sources are answered **403** from the public preview host. Scanners do probe for them, so log
+  lines ending in "outside of Vite serving allow list" are that guard working, not a fault — but
+  when touching `vite.config.ts`, check the guard still answers 403 (see "Verifying a change").
+- **A block comment in `vite.config.ts` must not contain a glob**: the `*/` inside a segment like a
+  two-star path closes the comment early, so the remainder is parsed as code and Vite dies with
+  `failed to load config … backend is not defined` (the previous fix for this missed one
+  occurrence, in the comment above `laravelRoot`). Write globs in the `fs.deny` array only, and
+  describe the tree in the comment with words.
 
 ## Laravel API (`backend/`)
 
@@ -377,6 +387,11 @@ the theme against; `wp-theme/dev/` holds what it needs.
    http://localhost:3000/api/payment/request -H 'content-type: application/json' -d
    '{"orderId":"../../x","amount":1000}'` (400) and the same with `-H 'Origin: https://evil.example'`
    (403). See "Security" below for the full list.
+6. Dev-server file guard (sandbox only): `curl -s -o /dev/null -w '%{http_code}'
+   http://localhost:3000/@fs/app/backend/.env` → **403**, same for `/backend/.env` and
+   `/@fs/app/backend/storage/logs/laravel.log`. A 200 here means `server.fs.deny` in
+   `vite.config.ts` stopped loading (a config that fails to parse leaves the last good one running,
+   so check the web log for `server restart failed`).
 
 ## Security
 

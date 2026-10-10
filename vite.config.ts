@@ -4,9 +4,13 @@ import { fileURLToPath } from 'node:url';
 
 /*
  * The Laravel API lives inside this project's root (`backend/`). Vite's `server.fs.deny` is matched
- * against absolute paths, so the tree is named absolutely — a bare `backend/**` would never match
- * `/app/backend/…`, and a `**/backend/**` would also catch a `backend/` folder inside a package in
- * `node_modules`.
+ * against absolute paths, so the tree is named absolutely — a glob relative to the project root
+ * would never match `/app/backend/…`, and a recursive glob would also catch a `backend/` folder
+ * inside a package in `node_modules`.
+ *
+ * Note: a block comment cannot contain a glob that closes it early (a two-star segment followed by
+ * a slash carries the closing sequence), so globs are only written in code below, never described
+ * verbatim in this comment.
  */
 const laravelRoot = fileURLToPath(new URL('./backend', import.meta.url));
 
