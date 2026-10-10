@@ -1,3 +1,4 @@
+import { inquiryApi } from '@/lib/api'
 import type { Inquiry } from '@/types'
 
 const STORAGE_KEY = 'horizon.inquiries'
@@ -14,9 +15,8 @@ const read = (): Inquiry[] => {
 }
 
 /**
- * Records a lead locally. This is the single seam where a real backend
- * (REST endpoint, CRM webhook or database insert) would be wired in —
- * every form in the app goes through this function.
+ * Records a lead. Tries the API first; falls back to localStorage so a
+ * failed network request doesn't lose the submission.
  */
 export async function submitInquiry(input: Omit<Inquiry, 'id' | 'createdAt'>): Promise<Inquiry> {
   const inquiry: Inquiry = {
@@ -25,11 +25,26 @@ export async function submitInquiry(input: Omit<Inquiry, 'id' | 'createdAt'>): P
     createdAt: new Date().toISOString(),
   }
 
-  const all = [...read(), inquiry]
+  // Try the API; if it fails, store locally as a fallback.
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(all))
+    await inquiryApi.store({
+      kind: input.kind,
+      name: input.name,
+      email: input.email,
+      phone: input.phone ?? '',
+      message: input.message,
+      property_slug: input.propertySlug,
+      preferred_date: input.preferredDate,
+      preferred_time: input.preferredTime,
+    })
   } catch {
-    /* storage unavailable — the confirmation still resolves */
+    // Fallback: store locally.
+    const all = [...read(), inquiry]
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(all))
+    } catch {
+      /* storage unavailable */
+    }
   }
 
   return inquiry

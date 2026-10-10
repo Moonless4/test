@@ -14,17 +14,79 @@ services:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
       - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+      - VITE_API_URL=https://8000-${BASE44_PUBLIC_HOST_SUFFIX}/api
     volumes:
       - .:/app
       - node_modules:/app/node_modules
     healthcheck:
-      test:
-        ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/ || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 12
       start_period: 120s
     restart: on-failure
 
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    working_dir: /var/www/backend
+    command:
+      - sh
+      - -ec
+      - |
+        mkdir -p bootstrap/cache storage/framework/sessions storage/framework/views storage/framework/cache
+        chmod -R 777 bootstrap/cache storage
+        composer config --global policy.advisories.block false
+        composer install --no-interaction --optimize-autoloader
+        php artisan key:generate --force
+        php artisan migrate:fresh --seed --force
+        exec php artisan serve --host=0.0.0.0 --port=8000
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=Ofogh
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=ofogh
+      - DB_USERNAME=ofogh
+      - DB_PASSWORD=ofogh_secret
+    volumes:
+      - ./backend:/var/www/backend
+      - backend_vendor:/var/www/backend/vendor
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://127.0.0.1:8000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 90s
+    restart: on-failure
+
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=ofogh
+      - MYSQL_USER=ofogh
+      - MYSQL_PASSWORD=ofogh_secret
+      - MYSQL_ROOT_PASSWORD=root_secret
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -proot_secret --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 30s
+    restart: on-failure
+
 volumes:
   node_modules:
+  backend_vendor:
+  db_data:
