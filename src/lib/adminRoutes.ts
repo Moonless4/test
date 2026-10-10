@@ -8,7 +8,7 @@ export interface AdminRouteConfig {
 }
 
 const DEFAULTS: AdminRouteConfig = {
-  loginPath: '/login',
+  loginPath: '/secret-login',
   adminPath: '/admin',
 }
 

@@ -24,7 +24,7 @@ export default function AdminSettings() {
 
   const handleReset = () => {
     reset()
-    setLoginPath('/login')
+    setLoginPath('/secret-login')
     setAdminPath('/admin')
     setSaved(true)
     if (routes.adminPath !== '/admin') {
@@ -74,10 +74,10 @@ export default function AdminSettings() {
                 onChange={(e) => { setLoginPath(e.target.value); setSaved(false) }}
                 className={fieldClasses}
                 dir="ltr"
-                placeholder="/login"
+                placeholder="/secret-login"
                 required
               />
-              <p className="mt-1.5 text-[11px] text-muted">پیش‌فرض: /login — آدرسی که از طریق آن وارد پنل مدیریت می‌شوید.</p>
+              <p className="mt-1.5 text-[11px] text-muted">پیش‌فرض: /secret-login — آدرسی که از طریق آن وارد پنل مدیریت می‌شوید.</p>
             </div>
 
             <div>
