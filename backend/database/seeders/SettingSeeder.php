@@ -39,7 +39,11 @@ class SettingSeeder extends Seeder
             // (`GET /content/admin-path`) — which is why this row can stay internal: the panel's
             // address is not part of the shop's published settings. It is only ever an address,
             // never a lock: every admin route is guarded by the API's `can:admin.access`.
-            'admin.path' => ['value' => 'admin', 'type' => 'string', 'group' => 'admin', 'public' => false],
+            //
+            // The default is the brand's own segment rather than the word `admin` every scanner
+            // tries first, and it must equal `Setting::DEFAULT_ADMIN_PATH` (the storefront's
+            // fallback) — an operator may move it from the panel's Settings screen at any time.
+            'admin.path' => ['value' => 'medora-panel', 'type' => 'string', 'group' => 'admin', 'public' => false],
             // Internal keys: is_public = false, so they can never travel to the browser.
             'internal.support_email' => ['value' => '', 'type' => 'string', 'group' => 'internal', 'public' => false],
         ];

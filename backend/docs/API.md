@@ -158,7 +158,7 @@ No token required. All of these are rate limited.
 | `GET` | `/api/v1/content/posts/{post}` | Published post by slug. |
 | `GET` | `/api/v1/content/faqs` | All active FAQ entries, grouped by the client. Optional `group`. Returns `meta.total`. |
 | `GET` | `/api/v1/content/settings` | Only settings marked public. A non-public key does not exist here. |
-| `GET` | `/api/v1/content/admin-path` | The admin panel's URL segment (`data.path`), for the storefront's router to read before it renders. Served whether `admin.path` is public or internal, so that setting can stay internal. An address, never a lock: every admin route is guarded on its own. |
+| `GET` | `/api/v1/content/admin-path` | The admin panel's URL segment (`data.path`), for the storefront's router to read before it renders. **Public by necessity**: the panel's login page lives under that prefix, so the address is needed before anyone holds a token — requiring authentication here would make the panel unreachable rather than hidden. The payload is exactly `{data:{path}}` and carries nothing else (no token, no key/value pair). Served whether `admin.path` is public or internal, so that setting can stay internal. An address, never a lock: every admin route is guarded on its own. |
 
 ### Basket (guest-friendly)
 

@@ -54,35 +54,35 @@ class AdminAccessTest extends TestCase
     {
         $admin = $this->userWithRole('super-admin');
 
-        $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/products')->assertOk();
-        $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/categories')->assertOk();
-        $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/orders')->assertOk();
-        $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/coupons')->assertOk();
-        $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/users')->assertOk();
-        $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/media')->assertOk();
-        $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/audit-logs')->assertOk();
-        $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/pages')->assertOk();
-        $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/settings')->assertOk();
+        $this->actingAsStaff($admin)->getJson('/api/v1/admin/products')->assertOk();
+        $this->actingAsStaff($admin)->getJson('/api/v1/admin/categories')->assertOk();
+        $this->actingAsStaff($admin)->getJson('/api/v1/admin/orders')->assertOk();
+        $this->actingAsStaff($admin)->getJson('/api/v1/admin/coupons')->assertOk();
+        $this->actingAsStaff($admin)->getJson('/api/v1/admin/users')->assertOk();
+        $this->actingAsStaff($admin)->getJson('/api/v1/admin/media')->assertOk();
+        $this->actingAsStaff($admin)->getJson('/api/v1/admin/audit-logs')->assertOk();
+        $this->actingAsStaff($admin)->getJson('/api/v1/admin/pages')->assertOk();
+        $this->actingAsStaff($admin)->getJson('/api/v1/admin/settings')->assertOk();
     }
 
     public function test_a_staff_member_is_limited_to_the_surfaces_their_role_names(): void
     {
         $staff = $this->userWithRole('staff');
 
-        $this->actingAs($staff, 'sanctum')->getJson('/api/v1/admin/products')->assertOk();
-        $this->actingAs($staff, 'sanctum')->getJson('/api/v1/admin/orders')->assertOk();
+        $this->actingAsStaff($staff)->getJson('/api/v1/admin/products')->assertOk();
+        $this->actingAsStaff($staff)->getJson('/api/v1/admin/orders')->assertOk();
 
         // The media library *is* on the staff role: they are the ones who photograph the stock.
-        $this->actingAs($staff, 'sanctum')->getJson('/api/v1/admin/media')->assertOk();
+        $this->actingAsStaff($staff)->getJson('/api/v1/admin/media')->assertOk();
 
         // Not on the staff role: privileges, settings, content and the audit trail.
-        $this->actingAs($staff, 'sanctum')->getJson('/api/v1/admin/users')->assertStatus(403);
-        $this->actingAs($staff, 'sanctum')->getJson('/api/v1/admin/settings')->assertStatus(403);
-        $this->actingAs($staff, 'sanctum')->getJson('/api/v1/admin/pages')->assertStatus(403);
-        $this->actingAs($staff, 'sanctum')->getJson('/api/v1/admin/audit-logs')->assertStatus(403);
+        $this->actingAsStaff($staff)->getJson('/api/v1/admin/users')->assertStatus(403);
+        $this->actingAsStaff($staff)->getJson('/api/v1/admin/settings')->assertStatus(403);
+        $this->actingAsStaff($staff)->getJson('/api/v1/admin/pages')->assertStatus(403);
+        $this->actingAsStaff($staff)->getJson('/api/v1/admin/audit-logs')->assertStatus(403);
 
         // Creating or deleting a product is not on the staff role either.
-        $this->actingAs($staff, 'sanctum')->postJson('/api/v1/admin/products', [])->assertStatus(403);
+        $this->actingAsStaff($staff)->postJson('/api/v1/admin/products', [])->assertStatus(403);
     }
 
     public function test_an_admin_may_not_manage_roles_without_the_permission(): void
@@ -90,7 +90,7 @@ class AdminAccessTest extends TestCase
         $admin = $this->userWithRole('admin');
         $target = User::factory()->create();
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/users/{$target->id}/roles", ['roles' => ['staff']])
             ->assertStatus(403);
     }
@@ -103,15 +103,16 @@ class AdminAccessTest extends TestCase
         $target = User::factory()->create();
 
         // Roles are a privilege operation: the password is required again before the change.
+        $this->actingAsStaff($admin);
         $this->confirmPassword($admin);
 
         // An administrator who may manage roles still may not mint a peer above themselves.
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/users/{$target->id}/roles", ['roles' => ['super-admin']])
             ->assertStatus(403);
 
         // Assigning a role at or below their own level is allowed.
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/users/{$target->id}/roles", ['roles' => ['staff']])
             ->assertOk();
 

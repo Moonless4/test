@@ -47,7 +47,33 @@ class AdminPanelPathTest extends TestCase
         // A value with a slash is not an address the router can mount, so the default is served.
         Setting::query()->where('key', Setting::ADMIN_PATH_KEY)->update(['value' => 'panel/secret']);
 
-        $this->getJson('/api/v1/content/admin-path')->assertOk()->assertJsonPath('data.path', 'admin');
+        $this->getJson('/api/v1/content/admin-path')
+            ->assertOk()
+            ->assertJsonPath('data.path', Setting::DEFAULT_ADMIN_PATH);
+    }
+
+    /**
+     * The endpoint is public because the panel's *login* page is the first screen an operator sees:
+     * the storefront has to learn the prefix before anyone holds a token. What travels is one URL
+     * segment and nothing else — the assertion below is the whole payload, so a key/value pair, a
+     * token or a hint about other addresses cannot be added to this answer unnoticed.
+     */
+    public function test_it_answers_the_address_and_nothing_else(): void
+    {
+        Setting::factory()->internal()->create([
+            'key' => Setting::ADMIN_PATH_KEY,
+            'value' => 'medora-panel',
+        ]);
+
+        // A neighbouring internal row, to prove nothing else is swept in with the answer.
+        Setting::factory()->internal()->create([
+            'key' => 'internal.support_email',
+            'value' => 'ops@example.test',
+        ]);
+
+        $this->getJson('/api/v1/content/admin-path')
+            ->assertOk()
+            ->assertExactJson(['data' => ['path' => 'medora-panel']]);
     }
 
     public function test_it_falls_back_to_the_default_when_no_address_is_stored(): void

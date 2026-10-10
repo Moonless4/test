@@ -16,8 +16,15 @@
 import { get } from '../../lib/api/client';
 import type { ApiAdminPath } from '../../lib/api/types';
 
-/** Used before the address has been read, and whenever it is missing or unusable. */
-export const DEFAULT_ADMIN_PATH = 'admin';
+/**
+ * Used before the address has been read, and whenever it is missing or unusable.
+ *
+ * It must equal the API's own fallback (`Setting::DEFAULT_ADMIN_PATH` and the seeded `admin.path`):
+ * if the lookup fails, the panel is drawn at the address the API would have served, so the shop
+ * never answers its own panel with a 404. The segment is the brand's, not the word `admin` every
+ * scanner tries first — and it stays an address, never a lock.
+ */
+export const DEFAULT_ADMIN_PATH = 'medora-panel';
 
 /** The setting that carries the address (see `Setting::ADMIN_PATH_KEY`). */
 export const ADMIN_PATH_KEY = 'admin.path';

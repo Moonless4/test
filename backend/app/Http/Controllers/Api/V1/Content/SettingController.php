@@ -24,11 +24,19 @@ class SettingController extends Controller
     /**
      * Where the storefront mounts the admin panel.
      *
-     * The panel is part of the storefront's own SPA, so the browser has to know the address before
-     * the router draws — the one value that cannot wait for a sign-in, which is why it travels on
-     * its own instead of in `content/settings`. That in turn is what lets `admin.path` be an
-     * internal setting: the panel's address is not part of the shop's published configuration, and
-     * it is an address and never a lock (see `Setting::adminPath()`).
+     * **Why this one route is public.** The panel is part of the storefront's own SPA, so the panel's
+     * *login* page lives under this prefix and is the first screen an operator sees — the address is
+     * needed before anyone has a token, so requiring authentication here would not hide the panel, it
+     * would make it unreachable (the SPA would fall back to `Setting::DEFAULT_ADMIN_PATH` and the
+     * shop would answer the operator's own URL with a 404). It travels on its own instead of in
+     * `content/settings`, which is what lets `admin.path` stay an internal setting: the panel's
+     * address is not part of the shop's published configuration.
+     *
+     * **What it must never answer.** One URL segment, and nothing else — no key/value pair, no
+     * token, no secret, no hint about which addresses are or are not the panel. The address is a
+     * convenience and never a lock: every admin route is guarded on its own by `auth:sanctum`,
+     * `full-auth`, `can:admin.access` and `two-factor` (see docs/SECURITY.md). Tests:
+     * `tests/Feature/AdminPanelPathTest.php` asserts the payload is exactly `{data:{path}}`.
      */
     public function adminPath(): JsonResponse
     {

@@ -43,7 +43,7 @@ class AdminCatalogTest extends TestCase
         $admin = $this->admin();
         $category = Category::factory()->create();
 
-        $response = $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/products', [
+        $response = $this->actingAsStaff($admin)->postJson('/api/v1/admin/products', [
             'name' => 'شلوار جین',
             'sku' => 'JN-1001',
             'price' => 1_250_000,
@@ -57,7 +57,7 @@ class AdminCatalogTest extends TestCase
         $this->assertSame(1_250_000, $response->json('data.product.price'));
 
         // A second product with the same name must not collide with the first.
-        $second = $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/products', [
+        $second = $this->actingAsStaff($admin)->postJson('/api/v1/admin/products', [
             'name' => 'شلوار جین',
             'sku' => 'JN-1002',
             'price' => 1_250_000,
@@ -71,7 +71,7 @@ class AdminCatalogTest extends TestCase
     {
         $admin = $this->admin();
 
-        $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/products', [
+        $this->actingAsStaff($admin)->postJson('/api/v1/admin/products', [
             'name' => 'پیراهن',
             'sku' => 'SH-1',
             'price' => 900_000,
@@ -86,7 +86,7 @@ class AdminCatalogTest extends TestCase
         $admin = $this->admin();
         $product = Product::factory()->create(['price' => 1_000_000, 'description' => 'توضیح اصلی']);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->patchJson("/api/v1/admin/products/{$product->id}", ['price' => 1_100_000])
             ->assertOk();
 
@@ -103,7 +103,7 @@ class AdminCatalogTest extends TestCase
         $admin = $this->admin();
         $product = Product::factory()->create(['stock_quantity' => 5]);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/products/{$product->id}/stock", [
                 'stock_quantity' => 12,
                 'note' => 'شمارش انبار',
@@ -128,7 +128,7 @@ class AdminCatalogTest extends TestCase
 
         // `stock_quantity` is not part of the product rules at all, so it is ignored rather than
         // applied — the number only ever moves through the inventory service.
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->patchJson("/api/v1/admin/products/{$product->id}", ['stock_quantity' => 999])
             ->assertOk();
 
@@ -141,7 +141,7 @@ class AdminCatalogTest extends TestCase
         $admin = $this->admin();
         $product = Product::factory()->create(['sku' => 'DEL-1']);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->deleteJson("/api/v1/admin/products/{$product->id}")
             ->assertOk();
 
@@ -155,7 +155,7 @@ class AdminCatalogTest extends TestCase
         Product::factory()->create();
         Product::factory()->draft()->create();
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->getJson('/api/v1/admin/products')
             ->assertOk()
             ->assertJsonPath('meta.total', 2);
@@ -163,7 +163,7 @@ class AdminCatalogTest extends TestCase
         // The public catalogue applies the `visible` scope, so the draft is not there.
         $this->getJson('/api/v1/products')->assertOk()->assertJsonPath('meta.total', 1);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->getJson('/api/v1/admin/products?status=draft')
             ->assertOk()
             ->assertJsonPath('meta.total', 1);
@@ -175,7 +175,7 @@ class AdminCatalogTest extends TestCase
         $product = Product::factory()->create();
         $media = Media::factory()->create();
 
-        $response = $this->actingAs($admin, 'sanctum')
+        $response = $this->actingAsStaff($admin)
             ->postJson("/api/v1/admin/products/{$product->id}/images", [
                 'media_id' => $media->getKey(),
                 'alt' => 'نمای جلو',
@@ -185,7 +185,7 @@ class AdminCatalogTest extends TestCase
         $imageId = $response->json('data.image.id');
         $this->assertSame('نمای جلو', $response->json('data.image.alt'));
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->deleteJson("/api/v1/admin/products/{$product->id}/images/{$imageId}")
             ->assertOk();
 
@@ -200,7 +200,7 @@ class AdminCatalogTest extends TestCase
 
         $admin = $this->admin();
 
-        $response = $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/media', [
+        $response = $this->actingAsStaff($admin)->postJson('/api/v1/admin/media', [
             'file' => UploadedFile::fake()->createWithContent('photo.png', base64_decode(self::PNG)),
         ])->assertCreated();
 
@@ -220,7 +220,7 @@ class AdminCatalogTest extends TestCase
         $admin = $this->admin();
 
         // Named like an image, but the bytes are PHP: the MIME check reads the content, not the name.
-        $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/media', [
+        $this->actingAsStaff($admin)->postJson('/api/v1/admin/media', [
             'file' => UploadedFile::fake()->createWithContent('shell.php', '<?php echo "pwned";'),
         ])->assertStatus(422)->assertJsonValidationErrors('file');
 
@@ -239,7 +239,7 @@ class AdminCatalogTest extends TestCase
             'position' => 1,
         ]);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->deleteJson("/api/v1/admin/media/{$media->getKey()}")
             ->assertStatus(422);
 
@@ -253,20 +253,20 @@ class AdminCatalogTest extends TestCase
         $parent = Category::factory()->create();
         Category::factory()->create(['parent_id' => $parent->getKey()]);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->deleteJson("/api/v1/admin/categories/{$parent->id}")
             ->assertStatus(422);
 
         $withProduct = Category::factory()->create();
         Product::factory()->create(['category_id' => $withProduct->getKey()]);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->deleteJson("/api/v1/admin/categories/{$withProduct->id}")
             ->assertStatus(422);
 
         $empty = Category::factory()->create();
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->deleteJson("/api/v1/admin/categories/{$empty->id}")
             ->assertOk();
 
@@ -280,7 +280,7 @@ class AdminCatalogTest extends TestCase
         $parent = Category::factory()->create();
         $child = Category::factory()->create(['parent_id' => $parent->getKey()]);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->patchJson("/api/v1/admin/categories/{$parent->id}", ['parent_id' => $child->getKey()])
             ->assertStatus(422)
             ->assertJsonValidationErrors('parent_id');

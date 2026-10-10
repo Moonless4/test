@@ -55,9 +55,10 @@ class PrivilegeEscalationTest extends TestCase
     public function test_nobody_may_change_their_own_roles(): void
     {
         $admin = $this->staff('super-admin');
+        $this->actingAsStaff($admin);
         $this->confirmPassword($admin);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/users/{$admin->id}/roles", ['roles' => ['admin']])
             ->assertStatus(403)
             ->assertJsonPath('code', 'self_role_change');
@@ -74,21 +75,21 @@ class PrivilegeEscalationTest extends TestCase
 
         // A valid, fully privileged token is not enough on its own: a token stolen from an unlocked
         // laptop does not know the password.
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/users/{$target->id}/roles", ['roles' => ['staff']])
             ->assertStatus(423)
             ->assertJsonPath('code', 'recent_auth_required');
 
         $this->assertCount(0, $target->fresh()->getRoleNames());
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->postJson('/api/v1/admin/settings', [
                 'key' => 'shop.name', 'value' => 'x', 'type' => 'string', 'group' => 'shop', 'is_public' => true,
             ])
             ->assertStatus(423);
 
         // A wrong password is refused — and counted as a failed credential check.
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->postJson('/api/v1/auth/confirm-password', ['password' => 'not-it'])
             ->assertStatus(422)
             ->assertJsonPath('code', 'invalid_password');
@@ -96,9 +97,10 @@ class PrivilegeEscalationTest extends TestCase
         $this->assertDatabaseHas('login_attempts', ['reason' => 'recent_auth', 'successful' => false]);
 
         // With the password, the same operations proceed.
+        $this->actingAsStaff($admin);
         $this->confirmPassword($admin);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/users/{$target->id}/roles", ['roles' => ['staff']])
             ->assertOk();
 
@@ -110,7 +112,7 @@ class PrivilegeEscalationTest extends TestCase
         $staff = $this->staff('staff');
 
         // Without the permission the request never reaches the controller.
-        $this->actingAs($staff, 'sanctum')
+        $this->actingAsStaff($staff)
             ->putJson("/api/v1/admin/users/{$staff->id}/roles", ['roles' => ['super-admin']])
             ->assertStatus(403);
 

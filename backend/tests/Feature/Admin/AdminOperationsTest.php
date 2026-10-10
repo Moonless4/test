@@ -68,12 +68,12 @@ class AdminOperationsTest extends TestCase
         $admin = $this->admin();
         $order = $this->placeOrder(Product::factory()->create(['stock_quantity' => 5]));
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->getJson('/api/v1/admin/orders?q='.$order->number)
             ->assertOk()
             ->assertJsonPath('meta.total', 1);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->getJson("/api/v1/admin/orders/{$order->id}")
             ->assertOk()
             ->assertJsonPath('data.number', $order->number)
@@ -85,7 +85,7 @@ class AdminOperationsTest extends TestCase
         $admin = $this->admin();
         $order = $this->placeOrder(Product::factory()->create(['stock_quantity' => 5]));
 
-        $response = $this->actingAs($admin, 'sanctum')
+        $response = $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/orders/{$order->id}/status", ['status' => 'shipped'])
             ->assertStatus(422);
 
@@ -104,7 +104,7 @@ class AdminOperationsTest extends TestCase
         // The checkout took two off the shelf.
         $this->assertSame(3, $product->fresh()->stock_quantity);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/orders/{$order->id}/status", [
                 'status' => 'cancelled',
                 'note' => 'درخواست مشتری',
@@ -138,11 +138,11 @@ class AdminOperationsTest extends TestCase
         $product = Product::factory()->create(['stock_quantity' => 5]);
         $order = $this->placeOrder($product, 2);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/orders/{$order->id}/status", ['status' => 'cancelled'])
             ->assertOk();
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/orders/{$order->id}/status", ['status' => 'cancelled'])
             ->assertStatus(422);
 
@@ -155,7 +155,7 @@ class AdminOperationsTest extends TestCase
     {
         $admin = $this->admin();
 
-        $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/coupons', [
+        $this->actingAsStaff($admin)->postJson('/api/v1/admin/coupons', [
             'code' => 'sale10',
             'type' => 'percent',
             'value' => 10,
@@ -163,13 +163,13 @@ class AdminOperationsTest extends TestCase
         ])->assertCreated()->assertJsonPath('data.coupon.code', 'SALE10');
 
         // A percentage coupon must carry a ceiling, and 90% is the hard limit.
-        $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/coupons', [
+        $this->actingAsStaff($admin)->postJson('/api/v1/admin/coupons', [
             'code' => 'BIG',
             'type' => 'percent',
             'value' => 95,
         ])->assertStatus(422)->assertJsonValidationErrors('value');
 
-        $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/coupons', [
+        $this->actingAsStaff($admin)->postJson('/api/v1/admin/coupons', [
             'code' => 'NOCAP',
             'type' => 'percent',
             'value' => 20,
@@ -190,13 +190,13 @@ class AdminOperationsTest extends TestCase
             'amount' => 100_000,
         ]);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->deleteJson("/api/v1/admin/coupons/{$coupon->id}")
             ->assertStatus(422);
 
         $this->assertDatabaseHas('coupons', ['id' => $coupon->getKey()]);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->patchJson("/api/v1/admin/coupons/{$coupon->id}", ['is_active' => false])
             ->assertOk()
             ->assertJsonPath('data.coupon.is_active', false);
@@ -207,9 +207,10 @@ class AdminOperationsTest extends TestCase
         $admin = $this->admin();
         $customer = User::factory()->create();
 
+        $this->actingAsStaff($admin);
         $this->confirmPassword($admin);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->patchJson("/api/v1/admin/users/{$customer->id}", ['status' => 'suspended'])
             ->assertOk()
             ->assertJsonPath('data.user.status', 'suspended');
@@ -217,7 +218,7 @@ class AdminOperationsTest extends TestCase
         $this->assertSame(User::query()->findOrFail($customer->getKey())->status->value, 'suspended');
 
         // Locking yourself out of the panel is refused, not merely discouraged.
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->patchJson("/api/v1/admin/users/{$admin->id}", ['status' => 'suspended'])
             ->assertStatus(422)
             ->assertJsonValidationErrors('status');
@@ -228,9 +229,10 @@ class AdminOperationsTest extends TestCase
         $admin = $this->admin();
         $target = User::factory()->create();
 
+        $this->actingAsStaff($admin);
         $this->confirmPassword($admin);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/users/{$target->id}/roles", ['roles' => ['staff']])
             ->assertOk()
             ->assertJsonPath('data.user.roles.0', 'staff');
@@ -238,7 +240,7 @@ class AdminOperationsTest extends TestCase
         $this->assertTrue($target->fresh()->hasRole('staff'));
 
         // A role that does not exist on the web guard is a validation error, not a silent no-op.
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->putJson("/api/v1/admin/users/{$target->id}/roles", ['roles' => ['wizard']])
             ->assertStatus(422)
             ->assertJsonValidationErrors('roles.0');
@@ -250,7 +252,7 @@ class AdminOperationsTest extends TestCase
     {
         $admin = $this->admin();
 
-        $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/pages', [
+        $this->actingAsStaff($admin)->postJson('/api/v1/admin/pages', [
             'slug' => 'about',
             'title' => 'درباره ما',
             'body' => 'متن صفحه',
@@ -261,7 +263,7 @@ class AdminOperationsTest extends TestCase
 
         $page = \App\Models\Page::query()->sole();
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->patchJson("/api/v1/admin/pages/{$page->id}", [
                 'status' => 'published',
                 'published_at' => now()->subMinute()->toIso8601String(),
@@ -273,7 +275,7 @@ class AdminOperationsTest extends TestCase
             ->assertJsonPath('data.title', 'درباره ما');
 
         // Drafts are visible to the panel, which is the whole point of the admin list.
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->getJson('/api/v1/admin/pages?status=published')
             ->assertOk()
             ->assertJsonPath('meta.total', 1);
@@ -283,7 +285,7 @@ class AdminOperationsTest extends TestCase
     {
         $admin = $this->admin();
 
-        $response = $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/posts', [
+        $response = $this->actingAsStaff($admin)->postJson('/api/v1/admin/posts', [
             'slug' => 'first-post',
             'title' => 'اولین نوشته',
             'body' => 'متن نوشته',
@@ -292,7 +294,7 @@ class AdminOperationsTest extends TestCase
         $post = Post::query()->sole();
         $this->assertSame($admin->getKey(), $post->author_id);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->deleteJson("/api/v1/admin/posts/{$post->id}")
             ->assertOk();
 
@@ -306,7 +308,7 @@ class AdminOperationsTest extends TestCase
     {
         $admin = $this->admin();
 
-        $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/faqs', [
+        $this->actingAsStaff($admin)->postJson('/api/v1/admin/faqs', [
             'group' => 'shipping',
             'question' => 'ارسال چند روز طول می‌کشد؟',
             'answer' => 'دو روز کاری.',
@@ -317,13 +319,13 @@ class AdminOperationsTest extends TestCase
 
         $faq = \App\Models\Faq::query()->sole();
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->patchJson("/api/v1/admin/faqs/{$faq->id}", ['is_active' => false])
             ->assertOk();
 
         $this->getJson('/api/v1/content/faqs')->assertOk()->assertJsonPath('meta.total', 0);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->deleteJson("/api/v1/admin/faqs/{$faq->id}")
             ->assertOk();
     }
@@ -333,9 +335,10 @@ class AdminOperationsTest extends TestCase
         $admin = $this->admin();
 
         // Settings are shared configuration: every write asks for the password again.
+        $this->actingAsStaff($admin);
         $this->confirmPassword($admin);
 
-        $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/settings', [
+        $this->actingAsStaff($admin)->postJson('/api/v1/admin/settings', [
             'key' => 'shop.free_shipping',
             'value' => true,
             'type' => 'bool',
@@ -346,12 +349,12 @@ class AdminOperationsTest extends TestCase
         $setting = Setting::query()->sole();
 
         // The key is what the storefront looks the row up by: renaming it is refused outright.
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->patchJson("/api/v1/admin/settings/{$setting->id}", ['key' => 'shop.renamed'])
             ->assertStatus(422)
             ->assertJsonValidationErrors('key');
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->patchJson("/api/v1/admin/settings/{$setting->id}", ['value' => false])
             ->assertOk()
             ->assertJsonPath('data.setting.value', false);
@@ -362,7 +365,7 @@ class AdminOperationsTest extends TestCase
             ->assertJsonPath('data.0.key', 'shop.free_shipping')
             ->assertJsonPath('data.0.value', false);
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->deleteJson("/api/v1/admin/settings/{$setting->id}")
             ->assertOk();
 
@@ -373,18 +376,18 @@ class AdminOperationsTest extends TestCase
     {
         $admin = $this->admin();
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->postJson('/api/v1/admin/categories', ['name' => 'دستهٔ تازه'])
             ->assertCreated();
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->getJson('/api/v1/admin/audit-logs?user_id='.$admin->getKey())
             ->assertOk()
             ->assertJsonPath('meta.total', 1)
             ->assertJsonPath('data.0.event', 'category.created');
 
         // The trail is append-only: there is no route that writes to it.
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->postJson('/api/v1/admin/audit-logs', ['event' => 'forged'])
             ->assertStatus(405);
     }
@@ -393,13 +396,13 @@ class AdminOperationsTest extends TestCase
     {
         $admin = $this->admin();
 
-        $response = $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/categories', [
+        $response = $this->actingAsStaff($admin)->postJson('/api/v1/admin/categories', [
             'name' => 'مانتو',
         ])->assertCreated();
 
         $id = $response->json('data.category.id');
 
-        $this->actingAs($admin, 'sanctum')
+        $this->actingAsStaff($admin)
             ->patchJson("/api/v1/admin/categories/{$id}", ['name' => 'مانتو و پالتو'])
             ->assertOk()
             ->assertJsonPath('data.category.name', 'مانتو و پالتو');

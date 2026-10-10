@@ -96,6 +96,19 @@ Two independent layers, on purpose:
 - **Money is never taken from a client.** No request carries an amount, price or total; totals are
   computed from locked catalogue rows inside a transaction (`CheckoutService`, `InventoryService`),
   and the payment callback reads the amount from the `payments` row, never from the query string.
+- **The admin panel's address is a convenience, never a control.** `admin.path` (default
+  `medora-panel`; the operator may move it from the panel's own Settings screen) decides only where
+  the SPA mounts the panel, and `GET /api/v1/content/admin-path` publishes that one URL segment. The
+  endpoint is public **by necessity**: the panel's login page sits under that prefix and is the first
+  screen an operator sees, so the address is needed before anyone holds a token — requiring
+  authentication there would not hide the panel, it would make it unreachable (the SPA would fall
+  back to the default segment and the operator's own URL would answer 404). What travels is exactly
+  `{data:{path}}`: no key/value pair, no token, no secret, and no hint about which addresses are or
+  are not the panel (`tests/Feature/AdminPanelPathTest.php` asserts the whole payload, and the SPA
+  bundle is public anyway). Nothing about the administrative API depends on the address:
+  `/api/v1/admin/*` passes `auth:sanctum` → `full-auth` → `can:admin.access` → `two-factor` whatever
+  `admin.path` holds (`tests/Feature/Security/AuthenticationRegressionTest.php` asserts the refusal
+  for a guest across several values of the setting).
 
 ## 5. Rate limiting
 

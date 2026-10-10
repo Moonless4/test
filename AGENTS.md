@@ -75,10 +75,15 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   name the same order. `src/services/apiCheckout.ts` maps the ledger's `PaymentOrder` onto the
   request and is deliberately fire-and-forget — a shopper who has paid must never see an error
   because the panel's copy could not be written. Tests: `tests/Feature/RecordOrderTest.php`.
-- **The panel's address is a setting, and it may stay internal.** `admin.path` (default `admin`) is
-  served on its own by `GET /api/v1/content/admin-path` (`Setting::adminPath()`) — never out of
-  `content/settings`, so `is_public` is the operator's own choice and changes nothing about where the
-  panel is mounted. `src/admin/lib/basePath.ts` reads it once before the first render
+- **The panel's address is a setting, and it may stay internal.** `admin.path` (default
+  `medora-panel`) is served on its own by `GET /api/v1/content/admin-path` (`Setting::adminPath()`) —
+  never out of `content/settings`, so `is_public` is the operator's own choice and changes nothing
+  about where the panel is mounted. That endpoint is **public by necessity** — the panel's login page
+  sits under the prefix, so the address is needed before anyone holds a token — and its payload is
+  exactly `{data:{path}}` (`tests/Feature/AdminPanelPathTest.php` asserts the whole body). The
+  segment must stay equal in all three places that name it: `Setting::DEFAULT_ADMIN_PATH`, the
+  `admin.path` row `SettingSeeder` writes, and `DEFAULT_ADMIN_PATH` in `src/admin/lib/basePath.ts`
+  (the SPA draws the panel at its own copy when the lookup fails). `src/admin/lib/basePath.ts` reads it once before the first render
   (`main.tsx` → `initAdminBase()`), and `App.tsx` mounts `AdminApp` on that prefix alone — so the
   shop can move the panel from its own Settings screen without a deployment (that screen reloads at
   the new address, since the prefix is fixed for the life of a page load). Links inside the panel
@@ -96,6 +101,16 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   `phpunit.xml` sets `force="true"` on every env entry so the suite always runs on in-memory SQLite
   with the array cache, sync queue and the **fake** payment gateway — without it the compose
   `DB_CONNECTION=mysql` would win and `RefreshDatabase` would wipe the development database.
+- **The admin tests sign in the way the panel does.** `Tests\TestCase::actingAsStaff($user)` issues a
+  bearer token that carries a confirmed second factor (`two_factor_confirmed_at` + the
+  `twofa:verified` ability), because `RequireTwoFactor` answers **403** to a session —
+  `actingAs()`, Sanctum's transient token, must never stand in for the MFA step. Two consequences
+  when writing or editing those tests: call `actingAsStaff()` *before* `confirmPassword()`, whose
+  proof is remembered **per token** (`recent-auth` keys on the token id, so a proof given in a
+  session leaves the next token request locked), and never call `actingAs()` on a staff account
+  mid-test — the resolved guard is cached for the rest of the method and every later token request is
+  then answered as that session. `TwoFactorTest`/`TwoFactorBypassTest` still use plain `actingAs()`
+  on purpose: their routes are under `/auth`, where a session is a legitimate state.
 - **The suite is PHPUnit 12, so data providers need the attribute**: `#[DataProvider('method')]`.
   A `@dataProvider` doc-comment is not read any more — it does not warn, it just leaves the test
   with no arguments, so `OutboundAndBotProtectionTest`'s eleven SSRF addresses never ran until the

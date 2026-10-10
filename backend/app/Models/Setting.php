@@ -25,8 +25,15 @@ class Setting extends Model
     /** The setting that carries the admin panel's own URL segment (`SettingRequest` validates it). */
     public const ADMIN_PATH_KEY = 'admin.path';
 
-    /** Used before that setting exists, and whenever its value is not one usable URL segment. */
-    public const DEFAULT_ADMIN_PATH = 'admin';
+    /**
+     * Used before that setting exists, and whenever its value is not one usable URL segment.
+     *
+     * `SettingSeeder` writes this same segment, and the storefront keeps its own copy of it
+     * (`DEFAULT_ADMIN_PATH` in `src/admin/lib/basePath.ts`): the SPA draws the panel at that address
+     * when this endpoint cannot be reached, so the two must stay equal — a shop whose API is briefly
+     * unreachable must not answer its own panel's address with a 404.
+     */
+    public const DEFAULT_ADMIN_PATH = 'medora-panel';
 
     /**
      * Where the storefront mounts the admin panel.

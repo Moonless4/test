@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Security;
 
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\Security\TwoFactorAuth;
 use Database\Seeders\RoleAndPermissionSeeder;
@@ -224,6 +225,26 @@ class AuthenticationRegressionTest extends TestCase
         $this->withToken($confirmed->json('data.token'))
             ->getJson('/api/v1/admin/products')
             ->assertOk();
+    }
+
+    /**
+     * The panel's address is a convenience, never a door. Nothing about the administrative API
+     * depends on it: a caller without a token is refused whatever `admin.path` holds — a value the
+     * router could not even mount included — so moving the panel can neither open nor close the API.
+     */
+    public function test_the_admin_api_refuses_a_guest_whatever_the_panel_is_called(): void
+    {
+        foreach (['admin', 'medora-panel', 'panel/secret', ''] as $path) {
+            Setting::query()->updateOrCreate(
+                ['key' => Setting::ADMIN_PATH_KEY],
+                ['value' => $path, 'type' => 'string', 'group' => 'admin', 'is_public' => false],
+            );
+
+            $this->getJson('/api/v1/admin/products')->assertUnauthorized();
+            $this->getJson('/api/v1/admin/orders')->assertUnauthorized();
+            $this->getJson('/api/v1/admin/users')->assertUnauthorized();
+            $this->getJson('/api/v1/admin/audit-logs')->assertUnauthorized();
+        }
     }
 
     /**
