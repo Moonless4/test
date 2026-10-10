@@ -23,8 +23,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * so that every movement lands in `stock_movements`.
  */
 #[Fillable([
-    'category_id', 'name', 'slug', 'sku', 'short_description', 'description',
-    'price', 'compare_at_price', 'stock_quantity', 'low_stock_threshold',
+    'category_id', 'name', 'slug', 'sku', 'brand', 'short_description', 'description',
+    'price', 'compare_at_price', 'rating', 'stock_quantity', 'low_stock_threshold',
     'is_active', 'is_featured', 'published_at', 'attributes',
 ])]
 class Product extends Model
@@ -40,6 +40,8 @@ class Product extends Model
         return [
             'price' => 'integer',
             'compare_at_price' => 'integer',
+            // A float, not a decimal string: the storefront reads the score as a number.
+            'rating' => 'float',
             'stock_quantity' => 'integer',
             'low_stock_threshold' => 'integer',
             'is_active' => 'boolean',

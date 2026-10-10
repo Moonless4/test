@@ -6,6 +6,7 @@
 import { useAsync, type AsyncState } from './useAsync';
 import {
   getProduct,
+  getProductFacets,
   listDeals,
   listFeatured,
   listNewArrivals,
@@ -16,6 +17,7 @@ import {
 } from '../services/products';
 import { listCategories } from '../services/catalog';
 import { suggestProducts } from '../services/search';
+import type { FilterOptions } from '../lib/filters';
 import type { Category, Product } from '../lib/types';
 
 /** A stable dependency for an inline query object. */
@@ -53,6 +55,10 @@ export const useDeals = (minDiscount?: number, count = 12): AsyncState<Product[]
 
 export const useCategories = (): AsyncState<Category[]> =>
   useAsync((signal) => listCategories(signal), []);
+
+/** The filter rail's option lists, the same ones on every screen. */
+export const useProductFacets = (): AsyncState<FilterOptions> =>
+  useAsync((signal) => getProductFacets(signal), []);
 
 /** The few products the search box drops down while the shopper types. */
 export const useProductSuggestions = (term: string, count = 6): AsyncState<Product[]> =>

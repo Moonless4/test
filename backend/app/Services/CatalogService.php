@@ -72,6 +72,59 @@ class CatalogService
         return $query->paginate(min(max($perPage, 1), self::MAX_PER_PAGE))->withQueryString();
     }
 
+    /**
+     * The options the filter rail offers: which sizes, colours and brands the published catalogue
+     * actually carries.
+     *
+     * It answers the whole catalogue, never the page a shopper is looking at. The rail has to be
+     * the same rail on every screen — a search that returns five coats must not shrink the size
+     * list to those five, or hide a size that only another page carries.
+     *
+     * Only the two attribute keys the rail reads are collected, so an unrelated attribute (fabric,
+     * fit) never becomes a filter nobody asked for.
+     *
+     * @return array{sizes: array<int, string>, colors: array<int, string>, brands: array<int, string>}
+     */
+    public function facets(): array
+    {
+        $sizes = [];
+        $colors = [];
+        $brands = [];
+
+        Product::query()
+            ->visible()
+            ->select(['id', 'brand', 'attributes'])
+            ->chunkById(200, function (Collection $products) use (&$sizes, &$colors, &$brands): void {
+                foreach ($products as $product) {
+                    $attributes = $product->attributes ?? [];
+
+                    foreach (['size', 'سایز'] as $key) {
+                        foreach ($attributes[$key] ?? [] as $value) {
+                            $sizes[] = (string) $value;
+                        }
+                    }
+
+                    foreach (['color', 'رنگ'] as $key) {
+                        foreach ($attributes[$key] ?? [] as $value) {
+                            $colors[] = (string) $value;
+                        }
+                    }
+
+                    if ($product->brand) {
+                        $brands[] = (string) $product->brand;
+                    }
+                }
+            });
+
+        // Lists, not array keys: PHP would turn a shoe size like "39" into the integer 39, and the
+        // rail compares every option as a string.
+        return [
+            'sizes' => array_values(array_unique($sizes)),
+            'colors' => array_values(array_unique($colors)),
+            'brands' => array_values(array_unique($brands)),
+        ];
+    }
+
     public function findVisibleProduct(int|string $key): Product
     {
         return Product::query()

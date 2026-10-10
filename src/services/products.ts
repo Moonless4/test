@@ -7,8 +7,9 @@
  * that wants more has to page.
  */
 import { get, getPage } from '../lib/api/client';
-import { toProduct } from '../lib/api/map';
-import type { ApiProduct, ApiProductSummary } from '../lib/api/types';
+import { toFilterFacets, toProduct } from '../lib/api/map';
+import type { ApiProduct, ApiProductFacets, ApiProductSummary } from '../lib/api/types';
+import type { FilterOptions } from '../lib/filters';
 import type { Product } from '../lib/types';
 
 /** The orderings `GET /products` accepts. */
@@ -55,6 +56,16 @@ export const listProducts = async (
   query: ProductQuery = {},
   signal?: AbortSignal,
 ): Promise<Product[]> => (await listProductsPage(query, signal)).products;
+
+/**
+ * The filter rail's own options: the sizes, colours and brands the published catalogue carries.
+ *
+ * It is deliberately not a product list and takes no query: the rail is built once for the whole
+ * catalogue, so it looks the same on `/shop`, in a category and in a search result instead of
+ * shrinking to whatever that one query happened to return.
+ */
+export const getProductFacets = async (signal?: AbortSignal): Promise<FilterOptions> =>
+  toFilterFacets(await get<ApiProductFacets>('/products/filters', undefined, signal));
 
 /** Accepts either the numeric id or the slug — the slug is what the routes carry. */
 export const getProduct = async (

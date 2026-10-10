@@ -22,6 +22,7 @@ customer accounts and administration.
 | **Phone** | `^09\d{9}$` (11 digits, starts `09`). |
 | **Postal code** | `^\d{10}$`. |
 | **Prices on products** | `price` is what the shopper pays; `compare_at_price` is the original. When `discount_percent > 0`, the storefront must show `compare_at_price` struck through above `price`. |
+| **Brand & rating on products** | `brand` is the product's own label and `rating` its score out of 5 — both nullable, and `null` means the catalogue has nothing to say (not "zero"). `POST/PUT /admin/products` edits them. |
 | **Success envelope** | A resource read returns `{"data": …}`; a write also returns `"message"` (Persian) where a human-readable result helps. |
 | **Ownership failures** | Answer **404**, never 403 — a 403 would confirm a record exists. |
 
@@ -129,6 +130,7 @@ No token required. All of these are rate limited.
 | Method | Path | Notes |
 | --- | --- | --- |
 | `GET` | `/api/v1/products` | Paginated, filterable. Returns summaries (no full descriptions). |
+| `GET` | `/api/v1/products/filters` | The filter rail's own options — `{ sizes, colors, brands }` — read from the **whole** published catalogue. Takes no parameters: one page's results must never shrink the rail. |
 | `GET` | `/api/v1/products/{product}` | Full product. `{product}` is the **id or the slug**. |
 | `GET` | `/api/v1/products/{product}/related` | Same-category, same-kind items; may be empty (hide the rail). |
 | `GET` | `/api/v1/categories` | All active categories. |

@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from 'react';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { toFa } from '../../lib/format';
-import type { Filters } from '../../lib/filters';
-import FilterSidebar, { type FilterOptions } from './FilterSidebar';
+import type { FilterOptions, Filters } from '../../lib/filters';
+import FilterSidebar from './FilterSidebar';
 
 type Props = {
   filters: Filters;

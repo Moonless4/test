@@ -4,13 +4,14 @@ import { ChevronLeft, SlidersHorizontal } from 'lucide-react';
 import { toFa } from '../lib/format';
 import {
   DEFAULT_SORT,
+  EMPTY_OPTIONS,
   emptyFilters,
   isSort,
-  optionSets,
+  narrowProducts,
   PRICE_CEILING,
   type Filters,
 } from '../lib/filters';
-import { useCategories, useProductsPage } from '../hooks/useCatalog';
+import { useCategories, useProductFacets, useProductsPage } from '../hooks/useCatalog';
 import FilterLayout from '../components/shop/FilterLayout';
 import SortSelect from '../components/shop/SortSelect';
 import ProductGrid from '../components/product/ProductGrid';
@@ -30,6 +31,8 @@ export default function ShopPage() {
   const discountParam = searchParams.get('discount') === 'true';
 
   const { data: categories } = useCategories();
+  // The rail's options are the catalogue's own, so its groups never depend on this page's list.
+  const { data: facets } = useProductFacets();
   // The route carries the category slug; the API resolves it, so an unknown slug yields nothing
   // rather than the whole catalogue.
   const activeCategory = category
@@ -50,20 +53,11 @@ export default function ShopPage() {
   });
 
   const products = data?.products ?? [];
-  const options = useMemo(() => optionSets(products), [products]);
+  const options = facets ?? EMPTY_OPTIONS;
 
-  // The price, the discount and the ordering are the API's; sizes and colours are attributes of
-  // each product, so those two are matched here against the products the API returned.
-  const results = useMemo(
-    () =>
-      products.filter(
-        (product) =>
-          (filters.sizes.length === 0 || product.sizes.some((s) => filters.sizes.includes(s))) &&
-          (filters.colors.length === 0 ||
-            product.colors.some((c) => filters.colors.includes(c.name))),
-      ),
-    [products, filters.sizes, filters.colors],
-  );
+  // The price, the discount and the ordering are the API's; size, colour, brand and score are
+  // attributes of each product, so those are matched here against the products the API returned.
+  const results = useMemo(() => narrowProducts(products, filters), [products, filters]);
 
   const heading = activeCategory
     ? activeCategory.title

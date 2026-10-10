@@ -21,9 +21,13 @@ class ProductSummaryResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
+            // The rail's «برند» group is built from this, and a product page shows it as the label.
+            'brand' => $this->brand,
             'price' => $this->price,
             'compare_at_price' => $this->compare_at_price,
             'discount_percent' => $this->discountPercent(),
+            // The «امتیاز» filter's own number; null for a product nobody has scored.
+            'rating' => $this->rating,
             'currency' => Money::CURRENCY,
             'is_in_stock' => $this->isInStock(),
             'is_featured' => (bool) $this->is_featured,

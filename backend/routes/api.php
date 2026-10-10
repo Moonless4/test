@@ -36,6 +36,8 @@ Route::middleware('throttle:api')->group(function (): void {
     Route::get('categories/{category}', [CategoryController::class, 'show']);
 
     Route::get('products', [ProductController::class, 'index']);
+    // Before `products/{product}`: the rail's options are a route of their own, not a product slug.
+    Route::get('products/filters', [ProductController::class, 'filters']);
     Route::get('products/{product}', [ProductController::class, 'show']);
     Route::get('products/{product}/related', [ProductController::class, 'related']);
 

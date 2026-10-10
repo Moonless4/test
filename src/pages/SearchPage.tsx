@@ -1,17 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, SearchX } from 'lucide-react';
+import { SlidersHorizontal, Sparkles, SearchX } from 'lucide-react';
 import { POPULAR_SEARCHES } from '../lib/search';
 import {
   DEFAULT_SORT,
+  EMPTY_OPTIONS,
   emptyFilters,
-  optionSets,
+  narrowProducts,
   PRICE_CEILING,
   type Filters,
 } from '../lib/filters';
 import { MIN_QUERY } from '../services/search';
 import { listProductsPage } from '../services/products';
 import { useAsync } from '../hooks/useAsync';
+import { useProductFacets } from '../hooks/useCatalog';
 import { toFa } from '../lib/format';
 import FilterLayout from '../components/shop/FilterLayout';
 import SortSelect from '../components/shop/SortSelect';
@@ -32,6 +34,9 @@ export default function SearchPage() {
     setFilters({ ...emptyFilters });
     setSort(DEFAULT_SORT);
   }, [query]);
+
+  // The rail is the catalogue's own, never a subset of this search's results.
+  const { data: facets } = useProductFacets();
 
   const term = query.trim();
   const searching = term.length >= MIN_QUERY;
@@ -54,19 +59,12 @@ export default function SearchPage() {
     [term, filters.onlyDiscount, filters.maxPrice, sort],
   );
 
-  const products = data?.products ?? [];
-  const options = useMemo(() => optionSets(products), [products]);
+  // What the search found, before the rail narrows it — the rail itself is shown as soon as there
+  // is something to filter, even when the shopper's own filters leave nothing of it.
+  const matches = data?.products ?? [];
+  const options = facets ?? EMPTY_OPTIONS;
 
-  const results = useMemo(
-    () =>
-      products.filter(
-        (product) =>
-          (filters.sizes.length === 0 || product.sizes.some((s) => filters.sizes.includes(s))) &&
-          (filters.colors.length === 0 ||
-            product.colors.some((c) => filters.colors.includes(c.name))),
-      ),
-    [products, filters.sizes, filters.colors],
-  );
+  const results = useMemo(() => narrowProducts(matches, filters), [matches, filters]);
 
   return (
     <div className="container py-8 sm:py-10">
@@ -98,7 +96,7 @@ export default function SearchPage() {
           )}
         </div>
 
-        {searching && results.length > 0 ? (
+        {searching && matches.length > 0 ? (
           <div className="flex w-full items-center gap-2 sm:w-auto">
             <SortSelect value={sort} onChange={setSort} id="search-sort" />
           </div>
@@ -133,7 +131,7 @@ export default function SearchPage() {
         />
       ) : null}
 
-      {!error && !loading && searching && results.length === 0 ? (
+      {!error && !loading && searching && matches.length === 0 ? (
         <EmptyState
           icon={<SearchX className="h-7 w-7" />}
           title="نتیجه‌ای برای این جستجو پیدا نشد"
@@ -149,14 +147,31 @@ export default function SearchPage() {
         />
       ) : null}
 
-      {!error && !loading && searching && results.length > 0 ? (
+      {!error && !loading && searching && matches.length > 0 ? (
         <FilterLayout
           filters={filters}
           onChange={setFilters}
           resultCount={results.length}
           options={options}
         >
-          <ProductGrid products={results} />
+          {results.length === 0 ? (
+            <EmptyState
+              icon={<SlidersHorizontal className="h-7 w-7" />}
+              title="با این فیلترها کالایی پیدا نشد"
+              text="فیلترها را تغییر دهید یا همه فیلترها را حذف کنید تا نتایج بیشتری ببینید."
+              action={
+                <button
+                  type="button"
+                  onClick={() => setFilters({ ...emptyFilters })}
+                  className="h-11 rounded-xl bg-teal-800 px-6 text-sm font-medium text-white transition-colors hover:bg-teal-700"
+                >
+                  حذف فیلترها
+                </button>
+              }
+            />
+          ) : (
+            <ProductGrid products={results} />
+          )}
         </FilterLayout>
       ) : null}
     </div>

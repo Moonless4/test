@@ -69,6 +69,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'men-denim-jacket',
             'name' => 'کت جین مردانه',
+            'brand' => 'MEDORA',
+            'rating' => 4.8,
             'category' => 'men',
             'sku' => 'ST-MEN-DENIM-JACKET',
             'price' => 1995000,
@@ -86,6 +88,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'men-ls-shirt',
             'name' => 'پیراهن مردانه آستین بلند',
+            'brand' => 'ATRI',
+            'rating' => 4.6,
             'category' => 'men',
             'sku' => 'ST-MEN-LS-SHIRT',
             'price' => 1605000,
@@ -103,6 +107,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'men-cotton-tee',
             'name' => 'تی‌شرت مردانه پنبه',
+            'brand' => 'MEDORA',
+            'rating' => 4.7,
             'category' => 'men',
             'sku' => 'ST-MEN-COTTON-TEE',
             'price' => 890000,
@@ -120,6 +126,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'men-linen-coat',
             'name' => 'کت کتان مردانه',
+            'brand' => 'MEDORA',
+            'rating' => 4.9,
             'category' => 'men',
             'sku' => 'ST-MEN-LINEN-COAT',
             'price' => 1800000,
@@ -137,6 +145,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'men-hoodie',
             'name' => 'هودی مردانه کلاه‌دار',
+            'brand' => 'KANOON',
+            'rating' => 4.5,
             'category' => 'men',
             'sku' => 'ST-MEN-HOODIE',
             'price' => 1200000,
@@ -154,6 +164,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'men-jeans',
             'name' => 'شلوار جین مردانه',
+            'brand' => 'ATRI',
+            'rating' => 4.4,
             'category' => 'men',
             'sku' => 'ST-MEN-JEANS',
             'price' => 1450000,
@@ -171,6 +183,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'men-polo',
             'name' => 'پولوشرت مردانه',
+            'brand' => 'PARSA',
+            'rating' => 4.3,
             'category' => 'men',
             'sku' => 'ST-MEN-POLO',
             'price' => 1020000,
@@ -188,6 +202,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'men-winter-jacket',
             'name' => 'کاپشن مردانه زمستانی',
+            'brand' => 'ARTA',
+            'rating' => 4.7,
             'category' => 'men',
             'sku' => 'ST-MEN-WINTER-JACKET',
             'price' => 3040000,
@@ -205,6 +221,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'women-linen-manteau',
             'name' => 'مانتو کتان زنانه',
+            'brand' => 'VENUS',
+            'rating' => 4.8,
             'category' => 'women',
             'sku' => 'ST-WOMEN-LINEN-MANTEAU',
             'price' => 2080000,
@@ -222,6 +240,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'women-floral-dress',
             'name' => 'پیراهن زنانه گل‌دار',
+            'brand' => 'VENUS',
+            'rating' => 4.6,
             'category' => 'women',
             'sku' => 'ST-WOMEN-FLORAL-DRESS',
             'price' => 1200000,
@@ -239,6 +259,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'women-ls-blouse',
             'name' => 'بلوز زنانه آستین بلند',
+            'brand' => 'ATRI',
+            'rating' => 4.5,
             'category' => 'women',
             'sku' => 'ST-WOMEN-LS-BLOUSE',
             'price' => 1150000,
@@ -256,6 +278,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'women-formal-coat',
             'name' => 'کت زنانه مجلسی',
+            'brand' => 'LUXE',
+            'rating' => 4.9,
             'category' => 'women',
             'sku' => 'ST-WOMEN-FORMAL-COAT',
             'price' => 2400000,
@@ -273,6 +297,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'women-trousers',
             'name' => 'شلوار پارچه‌ای زنانه',
+            'brand' => 'PARSA',
+            'rating' => 4.4,
             'category' => 'women',
             'sku' => 'ST-WOMEN-TROUSERS',
             'price' => 1000000,
@@ -290,6 +316,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'women-tunic',
             'name' => 'تونیک زنانه نخی',
+            'brand' => 'KANOON',
+            'rating' => 4.3,
             'category' => 'women',
             'sku' => 'ST-WOMEN-TUNIC',
             'price' => 980000,
@@ -307,6 +335,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'women-evening-dress',
             'name' => 'پیراهن مجلسی زنانه',
+            'brand' => 'LUXE',
+            'rating' => 4.8,
             'category' => 'women',
             'sku' => 'ST-WOMEN-EVENING-DRESS',
             'price' => 2320000,
@@ -324,6 +354,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'shoes-classic-sneaker',
             'name' => 'کتانی کلاسیک',
+            'brand' => 'MEDORA',
+            'rating' => 4.7,
             'category' => 'shoes',
             'sku' => 'ST-SHOES-CLASSIC-SNEAKER',
             'price' => 1870000,
@@ -341,6 +373,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'shoes-leather-men',
             'name' => 'کفش چرم مردانه',
+            'brand' => 'ARTA',
+            'rating' => 4.9,
             'category' => 'shoes',
             'sku' => 'ST-SHOES-LEATHER-MEN',
             'price' => 3400000,
@@ -358,6 +392,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'shoes-women-sandal',
             'name' => 'صندل زنانه تابستانی',
+            'brand' => 'VENUS',
+            'rating' => 4.2,
             'category' => 'shoes',
             'sku' => 'ST-SHOES-WOMEN-SANDAL',
             'price' => 935000,
@@ -375,6 +411,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'shoes-women-boot',
             'name' => 'بوت زنانه چرم',
+            'brand' => 'LUXE',
+            'rating' => 4.6,
             'category' => 'shoes',
             'sku' => 'ST-SHOES-WOMEN-BOOT',
             'price' => 2100000,
@@ -392,6 +430,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'shoes-running',
             'name' => 'کفش ورزشی رانینگ',
+            'brand' => 'KANOON',
+            'rating' => 4.8,
             'category' => 'shoes',
             'sku' => 'ST-SHOES-RUNNING',
             'price' => 2000000,
@@ -409,6 +449,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'shoes-men-boot',
             'name' => 'نیم‌بوت چرم مردانه',
+            'brand' => 'ARTA',
+            'rating' => 4.5,
             'category' => 'shoes',
             'sku' => 'ST-SHOES-MEN-BOOT',
             'price' => 2550000,
@@ -426,6 +468,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'acc-women-handbag',
             'name' => 'کیف دستی زنانه چرم',
+            'brand' => 'LUXE',
+            'rating' => 4.8,
             'category' => 'bags',
             'sku' => 'ST-ACC-WOMEN-HANDBAG',
             'price' => 1840000,
@@ -443,6 +487,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'acc-sunglasses',
             'name' => 'عینک آفتابی کلاسیک',
+            'brand' => 'MEDORA',
+            'rating' => 4.4,
             'category' => 'accessories',
             'sku' => 'ST-ACC-SUNGLASSES',
             'price' => 1190000,
@@ -460,6 +506,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'acc-belt',
             'name' => 'کمربند چرم مردانه',
+            'brand' => 'ARTA',
+            'rating' => 4.6,
             'category' => 'accessories',
             'sku' => 'ST-ACC-BELT',
             'price' => 850000,
@@ -477,6 +525,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'acc-watch',
             'name' => 'ساعت مچی مردانه',
+            'brand' => 'LUXE',
+            'rating' => 4.9,
             'category' => 'accessories',
             'sku' => 'ST-ACC-WATCH',
             'price' => 4050000,
@@ -494,6 +544,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'acc-shoulder-bag',
             'name' => 'کیف دوشی چرم',
+            'brand' => 'PARSA',
+            'rating' => 4.3,
             'category' => 'bags',
             'sku' => 'ST-ACC-SHOULDER-BAG',
             'price' => 1425000,
@@ -511,6 +563,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'acc-scarf',
             'name' => 'شال و روسری ابریشمی',
+            'brand' => 'VENUS',
+            'rating' => 4.5,
             'category' => 'accessories',
             'sku' => 'ST-ACC-SCARF',
             'price' => 624000,
@@ -528,6 +582,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'acc-crossbody',
             'name' => 'کیف دوشی کوچک زنانه',
+            'brand' => 'ATRI',
+            'rating' => 4.4,
             'category' => 'bags',
             'sku' => 'ST-ACC-CROSSBODY',
             'price' => 1250000,
@@ -545,6 +601,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'beauty-perfume',
             'name' => 'ادوپرفیوم زنانه گل‌دار',
+            'brand' => 'GLOW',
+            'rating' => 4.8,
             'category' => 'beauty',
             'sku' => 'ST-BEAUTY-PERFUME',
             'price' => 2450000,
@@ -562,6 +620,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'beauty-face-serum',
             'name' => 'سرم روشن‌کننده ویتامین C',
+            'brand' => 'GLOW',
+            'rating' => 4.7,
             'category' => 'beauty',
             'sku' => 'ST-BEAUTY-FACE-SERUM',
             'price' => 1290000,
@@ -579,6 +639,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'beauty-skin-spray',
             'name' => 'اسپری آبرسان پوست',
+            'brand' => 'GLOW',
+            'rating' => 4.5,
             'category' => 'beauty',
             'sku' => 'ST-BEAUTY-SKIN-SPRAY',
             'price' => 690000,
@@ -596,6 +658,8 @@ class CatalogSeeder extends Seeder
         [
             'slug' => 'beauty-lipstick',
             'name' => 'رژ لب مات مخملی',
+            'brand' => 'VENUS',
+            'rating' => 4.6,
             'category' => 'beauty',
             'sku' => 'ST-BEAUTY-LIPSTICK',
             'price' => 420000,
@@ -640,6 +704,8 @@ class CatalogSeeder extends Seeder
                     'category_id' => $categories[$seed['category']]->getKey(),
                     'name' => $seed['name'],
                     'sku' => $seed['sku'],
+                    'brand' => $seed['brand'],
+                    'rating' => $seed['rating'],
                     'short_description' => $seed['summary'],
                     'description' => $seed['description'],
                     'price' => $seed['price'],

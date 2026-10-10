@@ -49,10 +49,13 @@ class ProductRequest extends FormRequest
                 $required, 'string', 'max:64',
                 Rule::unique(Product::class, 'sku')->ignore($productId),
             ],
+            'brand' => ['sometimes', 'nullable', 'string', 'max:100'],
             'category_id' => ['sometimes', 'nullable', 'integer', Rule::exists('categories', 'id')],
             'short_description' => ['sometimes', 'nullable', 'string', 'max:500'],
             'description' => ['sometimes', 'nullable', 'string', 'max:20000'],
             'price' => [$required, 'integer', 'min:0', 'max:1000000000'],
+            // The rail's «امتیاز» group reads this, so it is a 0–5 score and nothing else.
+            'rating' => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:5'],
             'compare_at_price' => [
                 'sometimes', 'nullable', 'integer', 'min:1', 'max:1000000000',
                 function (string $attribute, mixed $value, Closure $fail) use ($product): void {

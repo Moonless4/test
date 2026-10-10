@@ -7,6 +7,7 @@ use App\Http\Requests\Catalog\ProductIndexRequest;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductSummaryResource;
 use App\Services\CatalogService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ProductController extends Controller
@@ -22,6 +23,17 @@ class ProductController extends Controller
         return ProductSummaryResource::collection(
             $this->catalog->paginate($request->filters()),
         );
+    }
+
+    /**
+     * The filter rail's own options — the sizes, colours and brands the published catalogue has.
+     *
+     * Deliberately not a listing and deliberately unfiltered: it is what makes the rail identical
+     * on `/shop`, a category and a search result (see CatalogService::facets()).
+     */
+    public function filters(): JsonResponse
+    {
+        return response()->json(['data' => $this->catalog->facets()]);
     }
 
     public function show(string $product): ProductResource

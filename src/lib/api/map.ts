@@ -12,12 +12,22 @@
  *    on: a struck-through price is only shown when there is a real one),
  *  - **sizes and colours** come from the product's own `attributes` (the admin panel edits them),
  *    so a product with no attributes simply offers no choice,
- *  - **rating / reviews** have no endpoint yet, so they are zero and the screens hide what has no
- *    data behind it instead of printing «۰ نظر»,
- *  - **brand** is not a catalogue field: the category name stands in for the card's label.
+ *  - **rating** is the product's own score, and the number the rail's «امتیاز» group filters on;
+ *    review texts still have no endpoint, so a screen hides what has no data behind it rather than
+ *    printing «۰ نظر»,
+ *  - **brand** is the product's own label, and a product the catalogue left without one falls back
+ *    to its category name instead of showing a blank line.
  */
+import type { FilterOptions } from '../filters';
 import type { BlogPost, Category, Product, ProductColor } from '../types';
-import type { ApiCategory, ApiFaq, ApiPost, ApiProduct, ApiProductSummary } from './types';
+import type {
+  ApiCategory,
+  ApiFaq,
+  ApiPost,
+  ApiProduct,
+  ApiProductFacets,
+  ApiProductSummary,
+} from './types';
 
 /** A product published within this window carries the «جدید» badge. */
 const NEW_WINDOW_DAYS = 14;
@@ -98,12 +108,12 @@ export const toProduct = (product: ApiProductSummary | ApiProduct): Product => {
     id: product.slug,
     name: product.name,
     category: product.category?.slug ?? '',
-    brand: product.category?.name ?? '',
+    brand: product.brand ?? product.category?.name ?? '',
     price: product.price,
     originalPrice,
     discount: product.discount_percent ?? 0,
-    // No ratings endpoint yet: a card and a product page must not claim a score nobody gave.
-    rating: 0,
+    // The catalogue's own score; a product nobody has scored stays at zero and the screens hide it.
+    rating: product.rating ?? 0,
     reviewCount: 0,
     images: imageUrls(product.images),
     sizes: toSizes(detail.attributes),
@@ -115,6 +125,16 @@ export const toProduct = (product: ApiProductSummary | ApiProduct): Product => {
     reviews: [],
   };
 };
+
+/**
+ * The rail's option lists, as the API publishes them. A colour arrives as a name only — the swatch
+ * ink is presentation and stays here, beside the one table that decides it.
+ */
+export const toFilterFacets = (facets: ApiProductFacets): FilterOptions => ({
+  sizes: facets.sizes,
+  colors: facets.colors.map((name) => ({ name, hex: colorHex(name) })),
+  brands: facets.brands,
+});
 
 export const toCategory = (category: ApiCategory): Category => ({
   id: category.slug,

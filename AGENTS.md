@@ -42,9 +42,17 @@ account panel are still the browser's own (`src/lib/data.ts` + `localStorage`).
   downloaded, so `size_bytes`/`checksum` are null for those rows; a photo uploaded in the admin panel
   is still a real file on the public disk. `php artisan db:seed --class=CatalogSeeder --force` re-runs
   it idempotently.
-- **Listing payloads carry `attributes`** (`ProductSummaryResource`) on purpose: the filter rail
-  builds its size and colour options from the products the list returned, so a page that dropped it
-  would lose half the filter sidebar.
+- **The filter rail's options are their own endpoint** — `GET /api/v1/products/filters`, registered
+  *before* `products/{product}`: the sizes, colours and brands of the **whole** published catalogue
+  (`attributes.size`/`attributes.color` plus the `brand` column). The rail is built from that and
+  never from the page on screen, so `/shop`, a category and a search result all show the same six
+  groups — a rail that shrank to the five coats a search returned was the regression this fixed.
+- **Listing payloads still carry `attributes`, `brand` and `rating`** (`ProductSummaryResource`):
+  size, colour, brand and score cannot be expressed as query parameters, so the browser matches
+  those four against the list it was given (`narrowProducts` in `src/lib/filters.ts`). Price,
+  discount and the search term remain the API's own. `brand`/`rating` are catalogue columns
+  (nullable — an unscored product says so instead of claiming a zero); review *texts* are still
+  client-side, so nothing renders a review count nobody stored.
 
 - Compose services: `backend-db` (MariaDB 11), `backend-migrate` (one-shot: `composer install`,
   `migrate`, `db:seed`; the app waits for it), `backend` (PHP 8.4 dev image, `artisan serve` on host
@@ -184,8 +192,14 @@ Measured on the production build (`npm run build` then `vite preview`) with mobi
   a restart forgets a payment still at the bank, and the shopper lands back on the checkout.
   The ledger is the only place a guest's order is recorded; the account panel still needs a session.
 - `src/lib/filters.ts` + `src/components/shop/FilterLayout.tsx` — one filter model and layout shared
-  by `/shop` and `/search`. Filter groups are collapsible and start closed; their state resets when
-  the category, discount flag or search query changes.
+  by `/shop` and `/search`. The rail is one stack of six groups — price, size, colour, brand, score,
+  sale — always all of them, in that order, with their option lists coming from
+  `GET /products/filters` (`useProductFacets`) rather than from the products on screen. Groups are
+  collapsible and start closed; their state resets when the category, discount flag or search query
+  changes. Price and the sale flag are the API's query parameters; size, colour, brand and score are
+  narrowed in the browser by `narrowProducts`. Both pages keep the rail mounted while filters zero
+  the results and show the "nothing matches these filters" state *inside* it — hiding the rail was
+  the other half of the same regression.
 - `src/components/home/*` — the homepage sections in `src/pages/HomePage.tsx` order:
   Hero, CategoryCards, DiscountSection, PromoBanners, NewArrivals, Benefits, PromoCollection,
   Testimonials, Newsletter.

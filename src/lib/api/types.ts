@@ -44,9 +44,13 @@ export type ApiProductSummary = {
   id: number;
   name: string;
   slug: string;
+  /** The rail's «برند» group reads this; null when the catalogue has no brand for the product. */
+  brand: string | null;
   price: number;
   compare_at_price: number | null;
   discount_percent: number;
+  /** The rail's «امتیاز» group reads this; null when nobody has scored the product. */
+  rating: number | null;
   currency: string;
   is_in_stock: boolean;
   is_featured: boolean;
@@ -64,6 +68,16 @@ export type ApiProduct = ApiProductSummary & {
   stock_quantity: number | null;
   attributes: Record<string, string[]> | null;
   published_at: string | null;
+};
+
+/**
+ * `GET /products/filters` — the option lists the filter rail offers, taken from the whole
+ * published catalogue rather than from one page of it.
+ */
+export type ApiProductFacets = {
+  sizes: string[];
+  colors: string[];
+  brands: string[];
 };
 
 export type ApiPost = {
