@@ -219,6 +219,9 @@ export const adminCreateSetting = (body: Record<string, unknown>) =>
 export const adminUpdateSetting = (id: number, body: Record<string, unknown>) =>
   write<{ setting: ApiAdminSetting }>(`/admin/settings/${id}`, 'PATCH', body);
 
+/** Retiring a key the storefront no longer reads. */
+export const adminDeleteSetting = (id: number) => write(`/admin/settings/${id}`, 'DELETE');
+
 export const adminMedia = (query: Query) => getPage<ApiAdminMedia>('/admin/media', query);
 
 export const adminUploadMedia = (file: File) =>

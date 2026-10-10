@@ -32,6 +32,16 @@
       "name": "WP_APP_PASSWORD",
       "description": "اختیاری: Application Password وردپرس از کاربران → پروفایل → Application Passwords.",
       "requiredAtBoot": false
+    },
+    {
+      "name": "ADMIN_EMAIL",
+      "description": "ایمیل مدیر فروشگاه. با این مقدار و ADMIN_PASSWORD، AdminUserSeeder در راه‌اندازی یک حساب super-admin می‌سازد که با آن می‌توان وارد پنل مدیریت (/admin) شد. روی هاست واقعی به‌جای این دو، فرمان `php artisan admin:create` را اجرا کنید تا گذرواژه در تاریخچهٔ شل ثبت نشود.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "ADMIN_PASSWORD",
+      "description": "گذرواژهٔ همان حساب مدیر. فقط در محیط توسعه از طریق متغیر محیطی خوانده می‌شود؛ روی هاست واقعی آن را با `php artisan admin:create` (ورودی پنهان) بسازید یا بعد از اولین ورود تغییر دهید.",
+      "requiredAtBoot": false
     }
   ]
 }

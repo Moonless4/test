@@ -143,6 +143,11 @@ services:
       - LOG_CHANNEL=stack
       - LOG_LEVEL=debug
       - PHP_CLI_SERVER_WORKERS=4
+    env_file:
+      # The one-shot run seeds the administrator from ADMIN_EMAIL/ADMIN_PASSWORD, which are
+      # platform-managed secrets — so this service needs the managed env file too, not only the
+      # long-running app. Kept last so a value from the dashboard always wins.
+      - /run/base44/app.env
     depends_on:
       backend-db:
         condition: service_healthy

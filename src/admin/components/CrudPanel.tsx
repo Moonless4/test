@@ -51,7 +51,10 @@ type Props<T> = {
   headerAction?: ReactNode;
   filters?: FilterSpec[];
   perPage?: number;
-  canWrite?: boolean;
+  /** What may be drawn — never a permission; the API re-checks the named permission on every route. */
+  canCreate?: boolean;
+  canUpdate?: boolean;
+  canDelete?: boolean;
 };
 
 const ICON_BUTTON =

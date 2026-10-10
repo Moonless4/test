@@ -26,6 +26,9 @@ const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const AccountPage = lazy(() => import('./pages/AccountPage'));
 const FaqPage = lazy(() => import('./pages/FaqPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+// The panel is the same SPA but its own shell, so it ships as its own chunk and shoppers never pay
+// for it.
+const AdminApp = lazy(() => import('./admin/AdminApp'));
 
 function ScrollToTop() {
   const { pathname, search } = useLocation();
@@ -38,6 +41,19 @@ function ScrollToTop() {
 export default function App() {
   const { pathname } = useLocation();
   const [categoriesOpen, setCategoriesOpen] = useState(false);
+
+  // The panel owns the whole `/admin` prefix and renders its own shell — mounting it *instead of*
+  // the storefront means no shop header, footer, cart drawer or bottom bar around it. It is nested
+  // under `/admin/*` so its own relative routes (`products`, `settings`, …) resolve underneath.
+  if (pathname.startsWith('/admin')) {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-cream/50" />}>
+        <Routes>
+          <Route path="/admin/*" element={<AdminApp />} />
+        </Routes>
+      </Suspense>
+    );
+  }
 
   // The bottom bar is sticky and the shell's last child, so it reserves its own height.
   return (
