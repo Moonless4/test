@@ -27,6 +27,9 @@ class ProductSummaryResource extends JsonResource
             'currency' => Money::CURRENCY,
             'is_in_stock' => $this->isInStock(),
             'is_featured' => (bool) $this->is_featured,
+            // The filter rail derives its size and colour options from the products it was given, so
+            // a listing has to carry `attributes` too — a handful of short strings per product.
+            'attributes' => $this->attributes,
             'category' => new CategoryResource($this->whenLoaded('category')),
             'images' => ProductImageResource::collection($this->whenLoaded('images')),
         ];

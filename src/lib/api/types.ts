@@ -50,6 +50,8 @@ export type ApiProductSummary = {
   currency: string;
   is_in_stock: boolean;
   is_featured: boolean;
+  /** Option lists the filter rail builds its size and colour choices from. */
+  attributes: Record<string, string[]> | null;
   category?: ApiCategory | null;
   images?: ApiProductImage[];
 };

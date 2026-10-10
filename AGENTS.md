@@ -29,9 +29,22 @@ curl -I http://localhost:3000/
 
 ## Laravel API (`backend/`)
 
-A second, separate application: the REST API (`/api/v1`) that the storefront will move onto, built
-for the owner's DirectAdmin host (see `backend/docs/DEPLOYMENT-DIRECTADMIN.md`). It is not consumed
-by the SPA yet — the screens still read `src/lib/data.ts`.
+A second, separate application: the REST API (`/api/v1`) the storefront now reads its catalogue and
+content from (see `backend/docs/DEPLOYMENT-DIRECTADMIN.md`). The cart, checkout, wishlist and the
+account panel are still the browser's own (`src/lib/data.ts` + `localStorage`).
+
+- **The catalogue lives in this database.** `CatalogSeeder` holds the store's 32 products and six
+  categories — the same names, prices, photos and size/colour options the SPA shipped with — and the
+  admin panel is what edits them from now on. The sample rows an earlier version of that seeder wrote
+  are removed by it, matched on their own SKUs.
+- **Catalogue photos are imported media**: the row records the address the photo is published at
+  (`media.source_url`) instead of a file here, and `Media::url()` hands that address out. Nothing is
+  downloaded, so `size_bytes`/`checksum` are null for those rows; a photo uploaded in the admin panel
+  is still a real file on the public disk. `php artisan db:seed --class=CatalogSeeder --force` re-runs
+  it idempotently.
+- **Listing payloads carry `attributes`** (`ProductSummaryResource`) on purpose: the filter rail
+  builds its size and colour options from the products the list returned, so a page that dropped it
+  would lose half the filter sidebar.
 
 - Compose services: `backend-db` (MariaDB 11), `backend-migrate` (one-shot: `composer install`,
   `migrate`, `db:seed`; the app waits for it), `backend` (PHP 8.4 dev image, `artisan serve` on host
