@@ -13,9 +13,16 @@ class ProfileController extends Controller
 {
     public function __construct(private readonly AuditLogger $audit) {}
 
-    public function show(Request $request): UserResource
+    /**
+     * The caller's own profile. Wrapped as `data.user` exactly like `update()` below (and like
+     * every other account endpoint), so a client that reads the profile it just wrote does not
+     * have to switch shapes between the two calls.
+     */
+    public function show(Request $request): JsonResponse
     {
-        return new UserResource($request->user()->load('roles', 'permissions'));
+        return response()->json([
+            'data' => ['user' => new UserResource($request->user()->load('roles', 'permissions'))],
+        ]);
     }
 
     /**

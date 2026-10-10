@@ -113,14 +113,95 @@ Route::middleware('auth:sanctum')->group(function (): void {
 });
 
 /* ---------------------------------------------------------------------------------------------
- | Administration — NOT WIRED YET.
+ | Administration
  |
- | The roles and permissions for it are seeded (RoleAndPermissionSeeder), the outer gate exists
- | (`can:admin.access` in App\Providers\AppServiceProvider), and the models, policies slots and
- | audit trail are in place. The controllers under App\Http\Controllers\Api\V1\Admin are the next
- | milestone; their routes are deliberately absent until they exist, because a route pointing at a
- | missing class breaks `php artisan route:cache` on a production host.
+ | Two gates, both decided here and never in the panel's UI:
  |
- | Planned surface: products (+ images, stock), categories, orders (+ status transitions), coupons,
- | users (+ roles), media upload/delete, audit log read, and CRUD for pages/posts/faqs/settings.
+ |  - `can:admin.access` (App\Providers\AppServiceProvider) — "is this person staff at all?". A
+ |    signed-in shopper is refused before any admin controller is reached.
+ |  - a named permission per route (RoleAndPermissionSeeder) — "may this person touch *this*
+ |    surface?". A staff member who may update products is still refused the users and audit log.
+ |
+ | A permission name that does not exist denies (Spatie resolves `can:` through the user's own
+ | permission set), so forgetting to seed one fails closed rather than open. There is no `admin`
+ | variant of a public route: the panel reads exactly what an operator needs and no more.
  -------------------------------------------------------------------------------------------- */
+Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin.access'])->group(function (): void {
+    /* Catalogue ------------------------------------------------------------------------------ */
+    Route::get('products', [Admin\ProductController::class, 'index'])->middleware('can:products.view');
+    Route::post('products', [Admin\ProductController::class, 'store'])->middleware('can:products.create');
+    Route::get('products/{product}', [Admin\ProductController::class, 'show'])->middleware('can:products.view');
+    Route::match(['put', 'patch'], 'products/{product}', [Admin\ProductController::class, 'update'])->middleware('can:products.update');
+    Route::delete('products/{product}', [Admin\ProductController::class, 'destroy'])->middleware('can:products.delete');
+
+    // Stock is a separate endpoint on purpose: it writes through App\Services\InventoryService, so
+    // a price edit and a stock correction are two different, separately audited actions.
+    Route::put('products/{product}/stock', [Admin\ProductStockController::class, 'update'])->middleware('can:products.update');
+
+    Route::post('products/{product}/images', [Admin\ProductImageController::class, 'store'])->middleware('can:products.update');
+    Route::delete('products/{product}/images/{image}', [Admin\ProductImageController::class, 'destroy'])->middleware('can:products.update');
+
+    Route::get('categories', [Admin\CategoryController::class, 'index'])->middleware('can:categories.manage');
+    Route::post('categories', [Admin\CategoryController::class, 'store'])->middleware('can:categories.manage');
+    Route::get('categories/{category}', [Admin\CategoryController::class, 'show'])->middleware('can:categories.manage');
+    Route::match(['put', 'patch'], 'categories/{category}', [Admin\CategoryController::class, 'update'])->middleware('can:categories.manage');
+    Route::delete('categories/{category}', [Admin\CategoryController::class, 'destroy'])->middleware('can:categories.manage');
+
+    /* Orders --------------------------------------------------------------------------------- */
+    Route::get('orders', [Admin\OrderController::class, 'index'])->middleware('can:orders.view');
+    Route::get('orders/{order}', [Admin\OrderController::class, 'show'])->middleware('can:orders.view');
+    // Status only: the money on an order was computed by the checkout, and no admin route rewrites
+    // it. The transition itself is validated against App\Enums\OrderStatus.
+    Route::put('orders/{order}/status', [Admin\OrderController::class, 'updateStatus'])->middleware('can:orders.update');
+
+    /* Discount codes ------------------------------------------------------------------------- */
+    Route::get('coupons', [Admin\CouponController::class, 'index'])->middleware('can:coupons.manage');
+    Route::post('coupons', [Admin\CouponController::class, 'store'])->middleware('can:coupons.manage');
+    Route::get('coupons/{coupon}', [Admin\CouponController::class, 'show'])->middleware('can:coupons.manage');
+    Route::match(['put', 'patch'], 'coupons/{coupon}', [Admin\CouponController::class, 'update'])->middleware('can:coupons.manage');
+    Route::delete('coupons/{coupon}', [Admin\CouponController::class, 'destroy'])->middleware('can:coupons.manage');
+
+    /* Customers ------------------------------------------------------------------------------ */
+    Route::get('users', [Admin\UserController::class, 'index'])->middleware('can:users.view');
+    Route::get('users/{user}', [Admin\UserController::class, 'show'])->middleware('can:users.view');
+    Route::match(['put', 'patch'], 'users/{user}', [Admin\UserController::class, 'update'])->middleware('can:users.update');
+    // Roles are their own permission: being allowed to edit an account is not being allowed to
+    // hand out privileges.
+    Route::put('users/{user}/roles', [Admin\UserController::class, 'updateRoles'])->middleware('can:users.roles');
+
+    /* Media library -------------------------------------------------------------------------- */
+    Route::get('media', [Admin\MediaController::class, 'index'])->middleware('can:media.manage');
+    Route::post('media', [Admin\MediaController::class, 'store'])->middleware('can:media.manage');
+    Route::delete('media/{media}', [Admin\MediaController::class, 'destroy'])->middleware('can:media.manage');
+
+    /* Audit trail — read only, by construction ----------------------------------------------- */
+    Route::get('audit-logs', [Admin\AuditLogController::class, 'index'])->middleware('can:audit.view');
+    Route::get('audit-logs/{auditLog}', [Admin\AuditLogController::class, 'show'])->middleware('can:audit.view');
+
+    /* Content -------------------------------------------------------------------------------- */
+    Route::middleware('can:content.manage')->group(function (): void {
+        Route::get('pages', [Admin\PageController::class, 'index']);
+        Route::post('pages', [Admin\PageController::class, 'store']);
+        Route::get('pages/{page}', [Admin\PageController::class, 'show']);
+        Route::match(['put', 'patch'], 'pages/{page}', [Admin\PageController::class, 'update']);
+        Route::delete('pages/{page}', [Admin\PageController::class, 'destroy']);
+
+        Route::get('posts', [Admin\PostController::class, 'index']);
+        Route::post('posts', [Admin\PostController::class, 'store']);
+        Route::get('posts/{post}', [Admin\PostController::class, 'show']);
+        Route::match(['put', 'patch'], 'posts/{post}', [Admin\PostController::class, 'update']);
+        Route::delete('posts/{post}', [Admin\PostController::class, 'destroy']);
+
+        Route::get('faqs', [Admin\FaqController::class, 'index']);
+        Route::post('faqs', [Admin\FaqController::class, 'store']);
+        Route::match(['put', 'patch'], 'faqs/{faq}', [Admin\FaqController::class, 'update']);
+        Route::delete('faqs/{faq}', [Admin\FaqController::class, 'destroy']);
+    });
+
+    // Settings are separate from the content surfaces: they are key/value rows the storefront reads
+    // by key, and only this permission may change what a page actually renders.
+    Route::get('settings', [Admin\SettingController::class, 'index'])->middleware('can:settings.manage');
+    Route::post('settings', [Admin\SettingController::class, 'store'])->middleware('can:settings.manage');
+    Route::match(['put', 'patch'], 'settings/{setting}', [Admin\SettingController::class, 'update'])->middleware('can:settings.manage');
+    Route::delete('settings/{setting}', [Admin\SettingController::class, 'destroy'])->middleware('can:settings.manage');
+});

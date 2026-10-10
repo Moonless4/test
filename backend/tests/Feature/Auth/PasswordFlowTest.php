@@ -113,8 +113,12 @@ class PasswordFlowTest extends TestCase
 
         $this->assertSame(1, $user->tokens()->count());
 
+        // The guard caches the user it resolved, so it must be dropped between requests inside one
+        // test — otherwise the second call would still look authenticated with the revoked token.
         $this->forgetResolvedGuards();
         $this->withToken('a')->getJson('/api/v1/auth/me')->assertOk();
+
+        $this->forgetResolvedGuards();
         $this->withToken('b')->getJson('/api/v1/auth/me')->assertStatus(401);
     }
 }
