@@ -35,6 +35,7 @@ import type {
   ApiAdminSetting,
   ApiAdminUser,
   ApiProductImage,
+  ApiTwoFactorState,
 } from '../lib/api/types';
 
 /** A write answers with the changed resource and the API's own message; both are optional. */
@@ -73,19 +74,143 @@ export const fileForm = (file: File, fields: Record<string, string> = {}): FormD
 
 export type AdminSession = { user: ApiAdminUser; token: string; expires_at: string | null };
 
-export const adminLogin = async (email: string, password: string): Promise<AdminSession> => {
-  const payload = await request<Body<AdminSession>>('/auth/login', {
+/** A password that checked out but still owes the second factor. */
+export type AdminTwoFactorChallenge = {
+  two_factor_required: true;
+  challenge_token: string;
+  expires_at: string | null;
+};
+
+/**
+ * The shop requires a second factor and this account has not enrolled yet. The token this answer
+ * carries reaches the enrollment endpoints and nothing else.
+ */
+export type AdminTwoFactorSetup = {
+  two_factor_setup_required: true;
+  user: ApiAdminUser;
+  token: string;
+  expires_at: string | null;
+};
+
+export type AdminLoginResult = AdminSession | AdminTwoFactorChallenge | AdminTwoFactorSetup;
+
+/** What the authenticator app needs: the secret itself, and the `otpauth://` address that carries it. */
+export type AdminTwoFactorEnrollment = { secret: string; otpauth_url: string };
+
+export type AdminTwoFactorConfirmation = {
+  recovery_codes: string[];
+  user: ApiAdminUser;
+  token: string;
+  expires_at: string | null;
+};
+
+const MALFORMED = 'پاسخ نامعتبر از سرور فروشگاه.';
+
+/**
+ * Sign in.
+ *
+ * A password alone is not always the whole answer: an account with a second factor gets
+ * `two_factor_required` (answer the challenge), and a staff account that has not enrolled gets
+ * `two_factor_setup_required` (enroll first). Both carry a short-lived token that reaches only its
+ * own endpoint, which is why the caller keeps it and sends it back explicitly.
+ */
+export const adminLogin = async (email: string, password: string): Promise<AdminLoginResult> => {
+  const payload = await request<Body<AdminLoginResult>>('/auth/login', {
     method: 'POST',
     // The device name is the token's own label, not a credential.
     body: { email, password, device_name: 'admin-panel' },
   });
 
-  const session = payload?.data;
+  const result = payload?.data;
 
-  if (!session?.token) throw new ApiError('پاسخ نامعتبر از سرور فروشگاه.', 0);
+  if (!result) throw new ApiError(MALFORMED, 0);
+
+  if ('two_factor_required' in result) {
+    if (!result.challenge_token) throw new ApiError(MALFORMED, 0);
+
+    return result;
+  }
+
+  if (!result.token || !result.user) throw new ApiError(MALFORMED, 0);
+
+  return result;
+};
+
+/**
+ * One call with a token the browser is *not* holding. The challenge and the enrollment both run on
+ * such a token, and it never touches the shared session slot — a half-finished login must not look
+ * like a session to the next request that reads storage.
+ */
+const withToken = async <T>(
+  path: string,
+  method: Mutation,
+  token: string | undefined,
+  body?: unknown,
+): Promise<T | undefined> => {
+  const payload = await request<Body<T>>(path, { method, token, body });
+  clearCache();
+  return payload?.data;
+};
+
+/** Answer the second factor. The challenge token dies here; a full session token replaces it. */
+export const adminTwoFactorChallenge = async (
+  challengeToken: string,
+  code: string,
+  recoveryCode?: string,
+): Promise<AdminSession> => {
+  const session = await withToken<AdminSession>(
+    '/auth/two-factor/challenge',
+    'POST',
+    challengeToken,
+    recoveryCode ? { recovery_code: recoveryCode } : { code },
+  );
+
+  if (!session?.token) throw new ApiError(MALFORMED, 0);
 
   return session;
 };
+
+/** Is a second factor armed, is it required, and how many recovery codes are left. Never the secret. */
+export const adminTwoFactorState = () => get<ApiTwoFactorState>('/auth/two-factor');
+
+/** Start enrollment. The secret is answered once; the API keeps only an encrypted copy of it. */
+export const adminTwoFactorEnroll = async (token?: string) => {
+  const enrollment = await withToken<AdminTwoFactorEnrollment>(
+    '/auth/two-factor/enroll',
+    'POST',
+    token,
+  );
+
+  if (!enrollment?.secret) throw new ApiError(MALFORMED, 0);
+
+  return enrollment;
+};
+
+/** Confirm enrollment: answers the recovery codes once, and a token replacing the one that asked. */
+export const adminTwoFactorConfirm = async (code: string, token?: string) => {
+  const confirmation = await withToken<AdminTwoFactorConfirmation>(
+    '/auth/two-factor/confirm',
+    'POST',
+    token,
+    { code },
+  );
+
+  if (!confirmation?.token) throw new ApiError(MALFORMED, 0);
+
+  return confirmation;
+};
+
+/** New recovery codes; every previous one stops working. Asks for the password again (423). */
+export const adminTwoFactorRecoveryCodes = () =>
+  write<{ recovery_codes: string[] }>('/auth/two-factor/recovery-codes', 'POST');
+
+/** Turn the second factor off. Asks for the password again and closes every other session. */
+export const adminTwoFactorDisable = () =>
+  write<{ revoked_tokens: number }>('/auth/two-factor', 'DELETE');
+
+/** Prove the password again for this token — what a 423 from a sensitive route asks for. */
+export const adminConfirmPassword = (password: string) =>
+  write<{ confirmed_for_minutes: number }>('/auth/confirm-password', 'POST', { password });
 
 /** Who am I and what may I do. Read-only: the server decides again on every route. */
 export const adminMe = () => get<ApiAdminUser>('/auth/me');

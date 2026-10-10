@@ -122,6 +122,12 @@ type RequestOptions = {
   /** A multipart body (a file upload). Never combined with `body`. */
   form?: FormData;
   signal?: AbortSignal;
+  /**
+   * A bearer token to use *instead* of the stored one. The second-factor flow needs it: the
+   * challenge and the enrollment run on the short-lived token the login handed out, while the
+   * browser is not signed in yet and has no session to spend.
+   */
+  token?: string | null;
 };
 
 /**
@@ -145,7 +151,11 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   const method = options.method ?? 'GET';
   const url = buildUrl(path, options.query);
   // A session-bound read (the basket) must never be served from a shared cache.
-  const cacheable = method === 'GET' && !path.startsWith('/cart') && authToken() === null;
+  const cacheable =
+    method === 'GET' &&
+    !path.startsWith('/cart') &&
+    authToken() === null &&
+    options.token === undefined;
 
   if (cacheable) {
     const hit = cache.get(url);
@@ -159,7 +169,9 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
       headers['Content-Type'] = 'application/json';
     }
 
-    const token = authToken();
+    // An explicit token wins over the stored one: the second-factor challenge travels on the
+    // short-lived token the login handed out, while the browser holds no session yet.
+    const token = options.token === undefined ? authToken() : options.token;
     if (token) headers.Authorization = `Bearer ${token}`;
     const cart = cartToken();
     if (cart) headers['X-Cart-Token'] = cart;

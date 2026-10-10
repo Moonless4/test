@@ -236,6 +236,16 @@ export type ApiPaginated<T> = {
 export type ApiAdminUser = ApiUser & {
   permissions?: string[];
   last_login_at?: string | null;
+  /** Whether a second factor is armed — a status, never the secret. */
+  two_factor_enabled?: boolean;
+};
+
+/** `GET /auth/two-factor` — the state of the account's second factor, and never its secret. */
+export type ApiTwoFactorState = {
+  enabled: boolean;
+  required: boolean;
+  confirmed_at: string | null;
+  recovery_codes_remaining: number;
 };
 
 export type ApiAdminProduct = ApiProduct & {

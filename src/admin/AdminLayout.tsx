@@ -13,6 +13,7 @@ import {
   ReceiptText,
   Settings,
   FileText,
+  ShieldCheck,
   X,
 } from 'lucide-react';
 import { useAdminAuth } from './AdminAuthContext';
@@ -64,6 +65,12 @@ const NAV: Array<{ group: string; items: NavItem[] }> = [
       { to: adminHref('media'), label: 'کتابخانهٔ رسانه', icon: Images, permission: 'media.manage' },
       { to: adminHref('settings'), label: 'تنظیمات', icon: Settings, permission: 'settings.manage' },
     ],
+  },
+  {
+    // No permission name: the second factor is every staff member's own, and the API guards it on
+    // the account rather than on a role.
+    group: 'حساب کاربری',
+    items: [{ to: adminHref('security'), label: 'امنیت حساب', icon: ShieldCheck }],
   },
 ];
 

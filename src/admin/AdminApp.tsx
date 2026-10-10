@@ -14,6 +14,7 @@ import CouponsPage from './pages/CouponsPage';
 import ContentPage from './pages/ContentPage';
 import FaqsPage from './pages/FaqsPage';
 import SettingsPage from './pages/SettingsPage';
+import SecurityPage from './pages/SecurityPage';
 import MediaPage from './pages/MediaPage';
 import { adminHref } from './lib/basePath';
 
@@ -74,6 +75,8 @@ export default function AdminApp() {
             <Route path="faqs" element={<FaqsPage />} />
             <Route path="media" element={<MediaPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            {/* The operator's own second factor: every staff member manages their own. */}
+            <Route path="security" element={<SecurityPage />} />
             {/* A surface the visitor may not open still has to land somewhere inside the panel. */}
             <Route path="*" element={<Navigate to={adminHref()} replace />} />
           </Route>
