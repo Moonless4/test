@@ -22,8 +22,8 @@ Route::get('/agents', [PropertyController::class, 'agents']);
 // Public inquiry submission
 Route::post('/inquiries', [InquiryController::class, 'store']);
 
-// Auth routes
-Route::prefix('auth')->group(function () {
+// Auth routes (rate-limited to prevent brute-force)
+Route::prefix('auth')->middleware('throttle:5,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 });
