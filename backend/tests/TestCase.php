@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 /**
@@ -58,6 +59,21 @@ abstract class TestCase extends BaseTestCase
             $_ENV[$key] = $value;
             $_SERVER[$key] = $value;
         }
+    }
+
+    /**
+     * Re-authenticate for a sensitive operation, the way the panel does.
+     *
+     * Routes that change privileges or shop-wide settings sit behind `recent-auth`, so a test about
+     * (say) suspending an account has to prove the password first — exactly as an operator does —
+     * instead of the test suite having a way around the control. The factory password is
+     * "password"; pass another value when a test sets its own.
+     */
+    protected function confirmPassword(User $user, string $password = 'password'): void
+    {
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/auth/confirm-password', ['password' => $password])
+            ->assertOk();
     }
 
     /**

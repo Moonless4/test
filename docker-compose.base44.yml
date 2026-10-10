@@ -140,6 +140,12 @@ services:
       # deterministic fake gateway. A host sets PAYMENT_GATEWAY=zarinpal and the merchant id in
       # its own .env — this value is sandbox-only and never reaches production.
       - PAYMENT_GATEWAY=${BACKEND_PAYMENT_GATEWAY:-fake}
+      # Administrator two-factor authentication is enforced here as well, so the flow exercised in
+      # the preview is the one production runs. Set BACKEND_TWO_FACTOR_ENFORCE_ADMINS=false to work
+      # on the panel without an authenticator app; the application's own default stays `true`.
+      - TWO_FACTOR_ENFORCE_ADMINS=${BACKEND_TWO_FACTOR_ENFORCE_ADMINS:-true}
+      # Turnstile stays off in the sandbox (no site key); flipping it on needs a real pair.
+      - TURNSTILE_ENABLED=${BACKEND_TURNSTILE_ENABLED:-false}
       - LOG_CHANNEL=stack
       - LOG_LEVEL=debug
       - PHP_CLI_SERVER_WORKERS=4

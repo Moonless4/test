@@ -207,6 +207,8 @@ class AdminOperationsTest extends TestCase
         $admin = $this->admin();
         $customer = User::factory()->create();
 
+        $this->confirmPassword($admin);
+
         $this->actingAs($admin, 'sanctum')
             ->patchJson("/api/v1/admin/users/{$customer->id}", ['status' => 'suspended'])
             ->assertOk()
@@ -225,6 +227,8 @@ class AdminOperationsTest extends TestCase
     {
         $admin = $this->admin();
         $target = User::factory()->create();
+
+        $this->confirmPassword($admin);
 
         $this->actingAs($admin, 'sanctum')
             ->putJson("/api/v1/admin/users/{$target->id}/roles", ['roles' => ['staff']])
@@ -327,6 +331,9 @@ class AdminOperationsTest extends TestCase
     public function test_a_setting_can_be_created_changed_and_its_key_is_immutable(): void
     {
         $admin = $this->admin();
+
+        // Settings are shared configuration: every write asks for the password again.
+        $this->confirmPassword($admin);
 
         $this->actingAs($admin, 'sanctum')->postJson('/api/v1/admin/settings', [
             'key' => 'shop.free_shipping',

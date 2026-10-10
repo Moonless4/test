@@ -35,6 +35,13 @@ class UserResource extends JsonResource
             ),
             'created_at' => $this->created_at?->toIso8601String(),
             'last_login_at' => $this->last_login_at?->toIso8601String(),
+            /*
+             * Whether a second factor is armed — a status, never the secret. The panel needs it to
+             * decide between "set up 2FA" and "enter your code"; the secret and the recovery codes
+             * are in the model's hidden list and only ever leave the server once, from the
+             * enrollment endpoints.
+             */
+            'two_factor_enabled' => $this->hasTwoFactorEnabled(),
         ];
     }
 }

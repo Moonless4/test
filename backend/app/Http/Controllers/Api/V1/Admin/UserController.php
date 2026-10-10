@@ -98,6 +98,23 @@ class UserController extends Controller
             abort(403);
         }
 
+        /*
+         * Nobody changes their own roles.
+         *
+         * Without this, an account holding `users.roles` could hand itself another role — the
+         * classic self-escalation. The permission says "may administer roles", not "may promote
+         * yourself"; granting one's own privileges needs a second pair of eyes, so it is refused
+         * even for a super-admin (a shop with one operator does it from the database, deliberately).
+         */
+        if ($actor->is($user)) {
+            $this->audit->log('security.self_role_change_blocked', $user, ['attempted' => $roles], $actor);
+
+            return response()->json([
+                'message' => 'نقش‌های حساب خودتان را نمی‌توانید تغییر دهید.',
+                'code' => 'self_role_change',
+            ], 403);
+        }
+
         // A non-super-admin may not touch a super-admin, and may not create one.
         $protectsSuperAdmin = $user->hasRole('super-admin') || in_array('super-admin', $roles, true);
 

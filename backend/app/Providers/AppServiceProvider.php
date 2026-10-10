@@ -155,5 +155,34 @@ class AppServiceProvider extends ServiceProvider
             ->by(mb_strtolower((string) $request->input('email')).'|'.$request->ip()));
 
         RateLimiter::for('verification', fn (Request $request) => Limit::perMinute($limitFor('verification'))->by($byUserOrIp($request)));
+
+        /*
+         * Endpoint-specific budgets.
+         *
+         * One global limit would be either too loose for a second-factor code or too tight for
+         * reading the catalogue, so each surface that an attacker values differently gets its own.
+         */
+        // A six-digit code: a person mistypes once or twice, a script wants thousands of tries.
+        // Keyed on the account *and* the address, so neither alone can exhaust another's budget.
+        RateLimiter::for('two_factor', fn (Request $request) => Limit::perMinute($limitFor('two_factor'))
+            ->by('two-factor:'.($request->user()?->getAuthIdentifier() ?? 'guest').'|'.$request->ip()));
+
+        // Re-authentication: guessing a password here must be as expensive as guessing at login.
+        RateLimiter::for('recent_auth', fn (Request $request) => Limit::perMinute($limitFor('recent_auth'))
+            ->by('recent-auth:'.($request->user()?->getAuthIdentifier() ?? 'guest').'|'.$request->ip()));
+
+        // The admin API: generous for an operator clicking through the panel, a hard ceiling for a
+        // script walking every list.
+        RateLimiter::for('admin', fn (Request $request) => Limit::perMinute($limitFor('admin'))->by($byUserOrIp($request)));
+
+        // Token and session operations: enumerating or revoking sessions is not a bulk operation.
+        RateLimiter::for('token', fn (Request $request) => Limit::perMinute($limitFor('token'))->by($byUserOrIp($request)));
+
+        // Inbound webhooks are keyed on the address they arrive from: a gateway retrying a delivery
+        // must not be confused with an attacker, and an attacker must not exhaust the gateway.
+        RateLimiter::for('webhook', fn (Request $request) => Limit::perMinute($limitFor('webhook'))->by('webhook:'.$request->ip()));
+
+        // Uploads are the most expensive thing an authenticated caller can ask for.
+        RateLimiter::for('upload', fn (Request $request) => Limit::perMinute($limitFor('upload'))->by($byUserOrIp($request)));
     }
 }

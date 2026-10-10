@@ -24,3 +24,7 @@ Schedule::command('queue:prune-failed --hours=168')->daily()->withoutOverlapping
 
 // Nightly database dump into the private disk (see docs/DEPLOYMENT-DIRECTADMIN.md, "Backup").
 Schedule::command('db:backup')->dailyAt('02:30')->withoutOverlapping();
+
+// Retention for the security logs. Runs after the backup so the night's evidence is captured
+// before anything ages out (docs/SECURITY.md §9, docs/BACKUP.md).
+Schedule::command('security:prune')->dailyAt('03:10')->withoutOverlapping();

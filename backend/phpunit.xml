@@ -47,5 +47,21 @@
         <!-- Host checking is off by default in tests; RequestGuardTest switches it on deliberately. -->
         <env name="TRUSTED_HOSTS" value="" force="true"/>
         <env name="CORS_ALLOWED_ORIGINS" value="" force="true"/>
+
+        <!--
+            Second factor: available everywhere, but *not* enforced for staff here.
+
+            Most feature tests are about catalogue, orders and the panel, and they sign in as a
+            member of staff with no authenticator. Turning the requirement off for them keeps those
+            tests about what they are testing; the enforcement itself is covered by
+            tests/Feature/Security/TwoFactorTest.php, which switches it on per test and exercises
+            the setup-required and challenge-required refusals directly.
+        -->
+        <env name="TWO_FACTOR_ENABLED" value="true" force="true"/>
+        <env name="TWO_FACTOR_ENFORCE_ADMINS" value="false" force="true"/>
+        <!-- No outbound call in the suite; Turnstile tests fake the HTTP client instead. -->
+        <env name="TURNSTILE_ENABLED" value="false" force="true"/>
+        <!-- The webhook secret is deliberately absent: WebhookSecurityTest sets its own. -->
+        <env name="PAYMENT_WEBHOOK_SECRET" value="" force="true"/>
     </php>
 </phpunit>

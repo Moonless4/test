@@ -78,15 +78,30 @@ Route::middleware('throttle:api')->group(function (): void {
     // Where the payment gateway sends the browser back. No authentication: the authority in the
     // query string is the gateway's own handle, and the amount is read from our own payment row.
     Route::get('payments/callback', [PaymentController::class, 'callback'])->middleware('throttle:sensitive');
+
+    /*
+     | Server-to-server payment notification.
+     |
+     | A public URL is not a credential, so nothing here is trusted because of where it came from:
+     | the request must carry an HMAC signature over its body, a timestamp inside the tolerance
+     | window and an idempotency key that has not been used (App\Http\Middleware\
+     | VerifyWebhookSignature). It settles through the same idempotent service the browser callback
+     | uses, so a duplicate delivery cannot double-apply a payment.
+     */
+    Route::post('payments/webhook', [PaymentController::class, 'webhook'])
+        ->middleware(['throttle:webhook', 'webhook.signature']);
 });
 
 /* ---------------------------------------------------------------------------------------------
  | Authentication
  -------------------------------------------------------------------------------------------- */
 Route::prefix('auth')->group(function (): void {
-    Route::post('register', [Auth\RegisterController::class, 'store'])->middleware('throttle:register');
-    Route::post('login', [Auth\LoginController::class, 'store'])->middleware('throttle:login');
-    Route::post('password/forgot', [Auth\ForgotPasswordController::class, 'store'])->middleware('throttle:password-reset');
+    // `turnstile` is a pass-through unless the feature is switched on (TURNSTILE_ENABLED), and it
+    // only sits on the three endpoints where automation buys an attacker something: mass account
+    // creation, credential stuffing and reset-mail flooding.
+    Route::post('register', [Auth\RegisterController::class, 'store'])->middleware(['throttle:register', 'turnstile']);
+    Route::post('login', [Auth\LoginController::class, 'store'])->middleware(['throttle:login', 'turnstile']);
+    Route::post('password/forgot', [Auth\ForgotPasswordController::class, 'store'])->middleware(['throttle:password-reset', 'turnstile']);
     Route::post('password/reset', [Auth\ResetPasswordController::class, 'store'])->middleware('throttle:password-reset');
 
     // The emailed verification link. Laravel's `signed` middleware rejects a tampered or expired
@@ -101,6 +116,28 @@ Route::prefix('auth')->group(function (): void {
         Route::post('logout-all', [Auth\LogoutController::class, 'destroyAll']);
         Route::put('password', [Auth\UpdatePasswordController::class, 'update'])->middleware('throttle:sensitive');
         Route::post('email/resend', [Auth\EmailVerificationController::class, 'resend'])->middleware('throttle:verification');
+
+        /* Second factor ----------------------------------------------------------------------- */
+        // Reachable with the *challenge* token the login handed out, and with nothing else: the
+        // rate limit here is its own small budget (a person mistypes once or twice, a script does
+        // not get a thousand tries).
+        Route::post('two-factor/challenge', [Auth\TwoFactorChallengeController::class, 'store'])->middleware('throttle:two_factor');
+        Route::get('two-factor', [Auth\TwoFactorController::class, 'show']);
+        Route::post('two-factor/enroll', [Auth\TwoFactorController::class, 'enroll'])->middleware('throttle:sensitive');
+        Route::post('two-factor/confirm', [Auth\TwoFactorController::class, 'confirm'])->middleware('throttle:two_factor');
+        // Downgrading the account (or reissuing its recovery codes) needs the password again.
+        Route::post('two-factor/recovery-codes', [Auth\TwoFactorController::class, 'regenerate'])->middleware(['throttle:sensitive', 'recent-auth']);
+        Route::delete('two-factor', [Auth\TwoFactorController::class, 'destroy'])->middleware(['throttle:sensitive', 'recent-auth']);
+
+        /* Sessions ---------------------------------------------------------------------------- */
+        Route::get('sessions', [Auth\SessionController::class, 'index'])->middleware('throttle:sensitive');
+        Route::post('sessions/revoke-others', [Auth\SessionController::class, 'destroyOthers'])->middleware('throttle:token');
+        Route::delete('sessions/{token}', [Auth\SessionController::class, 'destroy'])
+            ->whereNumber('token')
+            ->middleware('throttle:token');
+
+        // Re-authentication for the sensitive admin operations below.
+        Route::post('confirm-password', [Auth\ConfirmPasswordController::class, 'store'])->middleware('throttle:recent_auth');
 
         // Handing a guest basket to an account after signing in.
         Route::post('cart/merge', [CartController::class, 'merge']);
@@ -138,7 +175,14 @@ Route::middleware('auth:sanctum')->group(function (): void {
  | permission set), so forgetting to seed one fails closed rather than open. There is no `admin`
  | variant of a public route: the panel reads exactly what an operator needs and no more.
  -------------------------------------------------------------------------------------------- */
-Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin.access'])->group(function (): void {
+/*
+ | Every route below also passes through `two-factor`: for a staff account on a shop that requires
+ | a second factor, only a token that answered the TOTP challenge reaches a controller. A token that
+ | has not is refused with `two_factor_required`; an administrator who has not enrolled at all is
+ | refused with `two_factor_setup_required`. `admin` is its own rate-limit budget, so the panel's
+ | traffic never eats the storefront's and vice versa.
+ */
+Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin.access', 'two-factor', 'throttle:admin'])->group(function (): void {
     /* Catalogue ------------------------------------------------------------------------------ */
     Route::get('products', [Admin\ProductController::class, 'index'])->middleware('can:products.view');
     Route::post('products', [Admin\ProductController::class, 'store'])->middleware('can:products.create');
@@ -150,7 +194,7 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin.access'])->group(
     // a price edit and a stock correction are two different, separately audited actions.
     Route::put('products/{product}/stock', [Admin\ProductStockController::class, 'update'])->middleware('can:products.update');
 
-    Route::post('products/{product}/images', [Admin\ProductImageController::class, 'store'])->middleware('can:products.update');
+    Route::post('products/{product}/images', [Admin\ProductImageController::class, 'store'])->middleware(['can:products.update', 'throttle:upload']);
     Route::delete('products/{product}/images/{image}', [Admin\ProductImageController::class, 'destroy'])->middleware('can:products.update');
 
     Route::get('categories', [Admin\CategoryController::class, 'index'])->middleware('can:categories.manage');
@@ -176,14 +220,20 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin.access'])->group(
     /* Customers ------------------------------------------------------------------------------ */
     Route::get('users', [Admin\UserController::class, 'index'])->middleware('can:users.view');
     Route::get('users/{user}', [Admin\UserController::class, 'show'])->middleware('can:users.view');
-    Route::match(['put', 'patch'], 'users/{user}', [Admin\UserController::class, 'update'])->middleware('can:users.update');
+    // Changing an account's status and handing out roles are privilege operations: both ask for the
+    // password again (`recent-auth`), so a token stolen from an unlocked laptop is not enough.
+    Route::match(['put', 'patch'], 'users/{user}', [Admin\UserController::class, 'update'])
+        ->middleware(['can:users.update', 'recent-auth']);
     // Roles are their own permission: being allowed to edit an account is not being allowed to
     // hand out privileges.
-    Route::put('users/{user}/roles', [Admin\UserController::class, 'updateRoles'])->middleware('can:users.roles');
+    Route::put('users/{user}/roles', [Admin\UserController::class, 'updateRoles'])
+        ->middleware(['can:users.roles', 'recent-auth']);
 
     /* Media library -------------------------------------------------------------------------- */
     Route::get('media', [Admin\MediaController::class, 'index'])->middleware('can:media.manage');
-    Route::post('media', [Admin\MediaController::class, 'store'])->middleware('can:media.manage');
+    // Uploads get their own budget: a file write is the most expensive thing an authenticated
+    // caller can ask for, and no operator needs to push images faster than this.
+    Route::post('media', [Admin\MediaController::class, 'store'])->middleware(['can:media.manage', 'throttle:upload']);
     Route::delete('media/{media}', [Admin\MediaController::class, 'destroy'])->middleware('can:media.manage');
 
     /* Audit trail — read only, by construction ----------------------------------------------- */
@@ -211,9 +261,11 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin.access'])->group(
     });
 
     // Settings are separate from the content surfaces: they are key/value rows the storefront reads
-    // by key, and only this permission may change what a page actually renders.
+    // by key, and only this permission may change what a page actually renders. A setting is shared
+    // configuration — the panel's own address lives here — so every write asks for the password
+    // again; reads stay on the plain permission.
     Route::get('settings', [Admin\SettingController::class, 'index'])->middleware('can:settings.manage');
-    Route::post('settings', [Admin\SettingController::class, 'store'])->middleware('can:settings.manage');
-    Route::match(['put', 'patch'], 'settings/{setting}', [Admin\SettingController::class, 'update'])->middleware('can:settings.manage');
-    Route::delete('settings/{setting}', [Admin\SettingController::class, 'destroy'])->middleware('can:settings.manage');
+    Route::post('settings', [Admin\SettingController::class, 'store'])->middleware(['can:settings.manage', 'recent-auth']);
+    Route::match(['put', 'patch'], 'settings/{setting}', [Admin\SettingController::class, 'update'])->middleware(['can:settings.manage', 'recent-auth']);
+    Route::delete('settings/{setting}', [Admin\SettingController::class, 'destroy'])->middleware(['can:settings.manage', 'recent-auth']);
 });

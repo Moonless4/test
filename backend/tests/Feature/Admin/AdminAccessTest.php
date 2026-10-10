@@ -102,6 +102,9 @@ class AdminAccessTest extends TestCase
 
         $target = User::factory()->create();
 
+        // Roles are a privilege operation: the password is required again before the change.
+        $this->confirmPassword($admin);
+
         // An administrator who may manage roles still may not mint a peer above themselves.
         $this->actingAs($admin, 'sanctum')
             ->putJson("/api/v1/admin/users/{$target->id}/roles", ['roles' => ['super-admin']])

@@ -80,16 +80,43 @@ class RequestGuardTest extends TestCase
 
     public function test_login_attempts_are_rate_limited(): void
     {
-        $limit = (int) config('security.rate_limits.login');
+        /*
+         * Two independent bounds answer a brute force, and the *tighter* one wins first:
+         *
+         *  - the `login` limiter (per minute, keyed on email + address), and
+         *  - the login shield's temporary lockout after N failures for the same pair.
+         *
+         * The shield is the one that fires here (fewer failures than the per-minute limit), which is
+         * why this asserts its `login_throttled` code rather than a bare 429.
+         */
+        $maxFailures = (int) config('security.login_shield.max_failures');
+        $this->assertLessThan((int) config('security.rate_limits.login'), $maxFailures);
 
-        for ($attempt = 0; $attempt < $limit; $attempt++) {
+        for ($attempt = 0; $attempt < $maxFailures; $attempt++) {
             $this->postJson('/api/v1/auth/login', ['email' => 'target@example.com', 'password' => 'wrong'])->assertStatus(422);
         }
 
         $limited = $this->postJson('/api/v1/auth/login', ['email' => 'target@example.com', 'password' => 'wrong']);
 
-        $limited->assertStatus(429);
+        $limited->assertStatus(429)->assertJsonPath('code', 'login_throttled');
         $this->assertNotNull($limited->headers->get('Retry-After'));
+        $this->assertGreaterThan(0, (int) $limited->json('retry_after'));
+
+        // The lock is keyed on the email *and* the address, so failing logins against a known
+        // administrator cannot be used to shut them out: another account from the same address is
+        // still answered normally.
+        $this->postJson('/api/v1/auth/login', ['email' => 'someone-else@example.com', 'password' => 'wrong'])
+            ->assertStatus(422);
+
+        // Every attempt that reached the password check was recorded — the data the detection rules
+        // read. The locked request above is not: it is refused before any work is done, so a locked
+        // attacker neither learns anything nor costs the server a hash.
+        $this->assertDatabaseCount('login_attempts', $maxFailures + 1);
+        $this->assertDatabaseHas('login_attempts', [
+            'email' => 'target@example.com',
+            'successful' => false,
+            'reason' => 'password',
+        ]);
     }
 
     public function test_registration_is_rate_limited_per_ip(): void

@@ -35,6 +35,36 @@ class UpdateProfileRequest extends FormRequest
                 Rule::unique(User::class, 'email')->ignore($this->user()?->getKey()),
             ],
             'phone' => ['sometimes', 'nullable', 'string', 'regex:/^09\d{9}$/'],
+            /*
+             * Changing the address is an account-takeover route — it is how a password reset finds
+             * you — so it asks for the current password, which the controller then verifies. A
+             * name or phone edit does not, so ordinary profile upkeep stays frictionless.
+             */
+            'current_password' => [
+                'nullable',
+                'string',
+                'max:200',
+                Rule::requiredIf(fn (): bool => $this->emailIsChanging()),
+            ],
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'current_password.required' => 'برای تغییر ایمیل، رمز عبور فعلی را وارد کنید.',
+        ];
+    }
+
+    public function emailIsChanging(): bool
+    {
+        $email = $this->input('email');
+
+        return is_string($email)
+            && $email !== ''
+            && $email !== $this->user()?->email;
     }
 }

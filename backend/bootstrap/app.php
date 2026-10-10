@@ -2,7 +2,11 @@
 
 use App\Http\Middleware\EnforceTrustedHost;
 use App\Http\Middleware\RejectForeignOrigin;
+use App\Http\Middleware\RequireRecentAuth;
+use App\Http\Middleware\RequireTwoFactor;
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\VerifyTurnstile;
+use App\Http\Middleware\VerifyWebhookSignature;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -47,6 +51,21 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api(prepend: [
             EnforceTrustedHost::class,
             RejectForeignOrigin::class,
+        ]);
+
+        /*
+         * Named middleware for the security phase:
+         *
+         *  - `two-factor`: an administrator's token must have answered the TOTP challenge.
+         *  - `recent-auth`: the password was re-entered recently for this token.
+         *  - `turnstile`: bot challenge, a pass-through unless TURNSTILE_ENABLED is on.
+         *  - `webhook.signature`: HMAC + timestamp + idempotency for inbound gateway notifications.
+         */
+        $middleware->alias([
+            'two-factor' => RequireTwoFactor::class,
+            'recent-auth' => RequireRecentAuth::class,
+            'turnstile' => VerifyTurnstile::class,
+            'webhook.signature' => VerifyWebhookSignature::class,
         ]);
 
         // Headers are applied to every response, health route included.
