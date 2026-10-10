@@ -210,3 +210,121 @@ export type ApiPaginated<T> = {
     total: number;
   };
 };
+
+/* ---------------------------------------------------------------------------------------------
+ | Administration (`/api/v1/admin`)
+ |
+ | The shapes the panel reads and writes. Each mirrors an `Admin*Resource` in
+ | `backend/app/Http/Resources/`: the public resource plus the fields only an operator sees
+ | (`status`, `is_active`, `is_public`, `is_featured`) and the `id` the admin routes bind on — a
+ | public payload deliberately keeps the internal id out of reach, the panel cannot address a row
+ | without it.
+ |
+ | Same conventions as above: money is an integer in Toman, and a resource body is wrapped in
+ | `{ "data": … }`.
+ -------------------------------------------------------------------------------------------- */
+
+export type ApiAdminUser = ApiUser & {
+  permissions?: string[];
+  last_login_at?: string | null;
+};
+
+export type ApiAdminProduct = ApiProduct & {
+  category_id: number | null;
+  is_active: boolean;
+  is_featured: boolean;
+  low_stock_threshold: number | null;
+  is_low_on_stock: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
+export type ApiAdminCategory = ApiCategory & {
+  parent_id: number | null;
+  image_media_id: number | null;
+  is_active: boolean;
+  active_products_count?: number;
+};
+
+export type ApiAdminCoupon = {
+  id: number;
+  code: string;
+  /** `value` means percent or Toman depending on this, exactly as the column does. */
+  type: 'percent' | 'fixed';
+  value: number;
+  min_subtotal: number | null;
+  max_discount: number | null;
+  usage_limit: number | null;
+  usage_limit_per_user: number | null;
+  used_count: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  is_active: boolean;
+};
+
+export type ApiPayment = {
+  id: number;
+  gateway: string;
+  status: string;
+  amount: number;
+  currency: string;
+  reference_id: string | null;
+  card_mask: string | null;
+  paid_at: string | null;
+};
+
+export type ApiOrderHistoryEntry = {
+  from: string | null;
+  to: string;
+  note: string | null;
+  at: string | null;
+};
+
+export type ApiAdminOrder = ApiOrder & {
+  id: number;
+  payments?: ApiPayment[];
+  history?: ApiOrderHistoryEntry[];
+};
+
+/** Editorial state of a page or a post: a draft is visible in the panel and nowhere else. */
+export type ContentStatus = 'draft' | 'published';
+
+export type ApiAdminPage = {
+  id: number;
+  slug: string;
+  title: string;
+  body: string;
+  meta: Record<string, string> | null;
+  status: ContentStatus;
+  published_at: string | null;
+};
+
+export type ApiAdminPost = {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  body: string;
+  tags: string[] | null;
+  cover: ApiMedia | null;
+  status: ContentStatus;
+  published_at: string | null;
+};
+
+export type ApiAdminFaq = ApiFaq & { is_active: boolean };
+
+export type ApiAdminSetting = {
+  id: number;
+  key: string;
+  /** `type` is what turns the stored string back into a number, a boolean or a JSON document. */
+  value: string | number | boolean | null;
+  type: 'string' | 'int' | 'float' | 'bool' | 'json';
+  group: string;
+  is_public: boolean;
+};
+
+export type ApiAdminMedia = ApiMedia & {
+  size_bytes: number | null;
+  /** The stored filename, shown to operators as a label. */
+  alt_source: string | null;
+};

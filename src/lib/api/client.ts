@@ -119,6 +119,8 @@ type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   query?: Query;
   body?: unknown;
+  /** A multipart body (a file upload). Never combined with `body`. */
+  form?: FormData;
   signal?: AbortSignal;
 };
 
@@ -152,7 +154,10 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 
   const send = async (): Promise<T> => {
     const headers: Record<string, string> = { Accept: 'application/json' };
-    if (options.body !== undefined) headers['Content-Type'] = 'application/json';
+    // A multipart body writes its own Content-Type (with the boundary), so it must not be set here.
+    if (options.body !== undefined && options.form === undefined) {
+      headers['Content-Type'] = 'application/json';
+    }
 
     const token = authToken();
     if (token) headers.Authorization = `Bearer ${token}`;
@@ -164,7 +169,8 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
       response = await fetch(url, {
         method,
         headers,
-        body: options.body === undefined ? undefined : JSON.stringify(options.body),
+        body:
+          options.form ?? (options.body === undefined ? undefined : JSON.stringify(options.body)),
         signal: options.signal,
         credentials: 'same-origin',
       });

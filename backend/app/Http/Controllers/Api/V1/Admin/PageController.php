@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Api\V1\Controller;
 use App\Http\Requests\Admin\AdminIndexRequest;
 use App\Http\Requests\Admin\PageRequest;
-use App\Http\Resources\PageResource;
+use App\Http\Resources\AdminPageResource;
 use App\Models\Page;
 use App\Services\AuditLogger;
 use Illuminate\Http\JsonResponse;
@@ -38,12 +38,12 @@ class PageController extends Controller
             $query->where('status', (string) $request->string('status')->value());
         }
 
-        return PageResource::collection($query->orderByDesc('id')->paginate($request->perPage(20)));
+        return AdminPageResource::collection($query->orderByDesc('id')->paginate($request->perPage(20)));
     }
 
-    public function show(Page $page): PageResource
+    public function show(Page $page): AdminPageResource
     {
-        return new PageResource($page);
+        return new AdminPageResource($page);
     }
 
     public function store(PageRequest $request): JsonResponse
@@ -55,7 +55,7 @@ class PageController extends Controller
         $this->audit->log('page.created', $page, ['slug' => $page->slug, 'status' => $page->status]);
 
         return response()->json([
-            'data' => ['page' => new PageResource($page)],
+            'data' => ['page' => new AdminPageResource($page)],
             'message' => 'صفحه ایجاد شد.',
         ], 201);
     }
@@ -76,7 +76,7 @@ class PageController extends Controller
         $this->audit->log('page.updated', $page, ['slug' => $page->slug, 'changed' => array_keys($data)]);
 
         return response()->json([
-            'data' => ['page' => new PageResource($page)],
+            'data' => ['page' => new AdminPageResource($page)],
             'message' => 'صفحه ذخیره شد.',
         ]);
     }

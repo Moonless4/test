@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Api\V1\Controller;
 use App\Http\Requests\Admin\AdminIndexRequest;
 use App\Http\Requests\Admin\FaqRequest;
-use App\Http\Resources\FaqResource;
+use App\Http\Resources\AdminFaqResource;
 use App\Models\Faq;
 use App\Services\AuditLogger;
 use Illuminate\Http\JsonResponse;
@@ -40,7 +40,7 @@ class FaqController extends Controller
             $query->where('is_active', $request->string('status')->value() === 'active');
         }
 
-        return FaqResource::collection(
+        return AdminFaqResource::collection(
             $query->orderBy('group')->orderBy('position')->paginate($request->perPage(50)),
         );
     }
@@ -54,7 +54,7 @@ class FaqController extends Controller
         $this->audit->log('faq.created', $faq, ['group' => $faq->group]);
 
         return response()->json([
-            'data' => ['faq' => new FaqResource($faq)],
+            'data' => ['faq' => new AdminFaqResource($faq)],
             'message' => 'پرسش ایجاد شد.',
         ], 201);
     }
@@ -69,7 +69,7 @@ class FaqController extends Controller
         $this->audit->log('faq.updated', $faq, ['changed' => array_keys($data)]);
 
         return response()->json([
-            'data' => ['faq' => new FaqResource($faq)],
+            'data' => ['faq' => new AdminFaqResource($faq)],
             'message' => 'پرسش ذخیره شد.',
         ]);
     }

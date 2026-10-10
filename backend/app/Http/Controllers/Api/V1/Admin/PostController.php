@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Api\V1\Controller;
 use App\Http\Requests\Admin\AdminIndexRequest;
 use App\Http\Requests\Admin\PostRequest;
-use App\Http\Resources\PostResource;
+use App\Http\Resources\AdminPostResource;
 use App\Models\Post;
 use App\Services\AuditLogger;
 use Illuminate\Http\JsonResponse;
@@ -38,12 +38,12 @@ class PostController extends Controller
             $query->where('status', (string) $request->string('status')->value());
         }
 
-        return PostResource::collection($query->orderByDesc('id')->paginate($request->perPage(20)));
+        return AdminPostResource::collection($query->orderByDesc('id')->paginate($request->perPage(20)));
     }
 
-    public function show(Post $post): PostResource
+    public function show(Post $post): AdminPostResource
     {
-        return new PostResource($post->load('cover'));
+        return new AdminPostResource($post->load('cover'));
     }
 
     public function store(PostRequest $request): JsonResponse
@@ -58,7 +58,7 @@ class PostController extends Controller
         $this->audit->log('post.created', $post, ['slug' => $post->slug, 'status' => $post->status]);
 
         return response()->json([
-            'data' => ['post' => new PostResource($post->load('cover'))],
+            'data' => ['post' => new AdminPostResource($post->load('cover'))],
             'message' => 'نوشته ایجاد شد.',
         ], 201);
     }
@@ -79,7 +79,7 @@ class PostController extends Controller
         $this->audit->log('post.updated', $post, ['slug' => $post->slug, 'changed' => array_keys($data)]);
 
         return response()->json([
-            'data' => ['post' => new PostResource($post->load('cover'))],
+            'data' => ['post' => new AdminPostResource($post->load('cover'))],
             'message' => 'نوشته ذخیره شد.',
         ]);
     }

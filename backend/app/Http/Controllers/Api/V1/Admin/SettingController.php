@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Api\V1\Controller;
 use App\Http\Requests\Admin\AdminIndexRequest;
 use App\Http\Requests\Admin\SettingRequest;
-use App\Http\Resources\SettingResource;
+use App\Http\Resources\AdminSettingResource;
 use App\Models\Setting;
 use App\Services\AuditLogger;
 use Illuminate\Http\JsonResponse;
@@ -40,7 +40,7 @@ class SettingController extends Controller
             $query->where('group', (string) $request->string('category')->value());
         }
 
-        return SettingResource::collection(
+        return AdminSettingResource::collection(
             $query->orderBy('group')->orderBy('key')->paginate($request->perPage(50)),
         );
     }
@@ -58,7 +58,7 @@ class SettingController extends Controller
         $this->audit->log('setting.created', $setting, ['key' => $setting->key, 'public' => $setting->is_public]);
 
         return response()->json([
-            'data' => ['setting' => new SettingResource($setting)],
+            'data' => ['setting' => new AdminSettingResource($setting)],
             'message' => 'تنظیم ایجاد شد.',
         ], 201);
     }
@@ -88,7 +88,7 @@ class SettingController extends Controller
         $this->audit->log('setting.updated', $setting, ['key' => $setting->key, 'public' => $setting->is_public]);
 
         return response()->json([
-            'data' => ['setting' => new SettingResource($setting)],
+            'data' => ['setting' => new AdminSettingResource($setting)],
             'message' => 'تنظیم ذخیره شد.',
         ]);
     }

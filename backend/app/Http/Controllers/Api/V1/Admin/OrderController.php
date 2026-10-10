@@ -7,7 +7,7 @@ use App\Enums\PaymentStatus;
 use App\Http\Controllers\Api\V1\Controller;
 use App\Http\Requests\Admin\AdminIndexRequest;
 use App\Http\Requests\Admin\OrderStatusRequest;
-use App\Http\Resources\OrderResource;
+use App\Http\Resources\AdminOrderResource;
 use App\Models\Order;
 use App\Models\OrderStatusHistory;
 use App\Models\StockMovement;
@@ -61,15 +61,15 @@ class OrderController extends Controller
             $query->where('status', (string) $request->string('status')->value());
         }
 
-        return OrderResource::collection(
+        return AdminOrderResource::collection(
             $query->orderByDesc('placed_at')->orderByDesc('id')
                 ->paginate($request->perPage(20)),
         );
     }
 
-    public function show(Order $order): OrderResource
+    public function show(Order $order): AdminOrderResource
     {
-        return new OrderResource(
+        return new AdminOrderResource(
             $order->load(['items', 'payments', 'statusHistories', 'user:id,name,email']),
         );
     }
@@ -131,7 +131,7 @@ class OrderController extends Controller
         ], $request->user(), $request->string('note')->value() ?: null);
 
         return response()->json([
-            'data' => ['order' => new OrderResource($order->load(['items', 'payments', 'statusHistories']))],
+            'data' => ['order' => new AdminOrderResource($order->load(['items', 'payments', 'statusHistories']))],
             'message' => 'وضعیت سفارش به‌روزرسانی شد.',
         ]);
     }
