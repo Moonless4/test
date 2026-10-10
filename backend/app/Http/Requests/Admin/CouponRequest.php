@@ -46,13 +46,15 @@ class CouponRequest extends FormRequest
                 },
             ],
             'min_subtotal' => ['sometimes', 'integer', 'min:0', 'max:1000000000'],
+            // `requiredIf` is implicit, so it fires on an absent field — a closure under
+            // `sometimes`/`nullable` would never run and the ceiling could be skipped entirely.
+            // A stored ceiling counts: a partial update must not be forced to resend it.
             'max_discount' => [
-                'sometimes', 'nullable', 'integer', 'min:0', 'max:1000000000',
-                function (string $attribute, mixed $value, Closure $fail): void {
-                    if ($this->input('type') === CouponType::Percent->value && $value === null) {
-                        $fail('برای کد درصدی، سقف تخفیف الزامی است.');
-                    }
-                },
+                Rule::requiredIf(
+                    fn (): bool => $this->input('type') === CouponType::Percent->value
+                        && ! $this->storedCeiling(),
+                ),
+                'nullable', 'integer', 'min:0', 'max:1000000000',
             ],
             'usage_limit' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:1000000'],
             'usage_limit_per_user' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:1000'],
@@ -60,6 +62,16 @@ class CouponRequest extends FormRequest
             'ends_at' => ['sometimes', 'nullable', 'date', 'after:starts_at'],
             'is_active' => ['sometimes', 'boolean'],
         ];
+    }
+
+    /**
+     * The ceiling already on the coupon being edited, if any.
+     */
+    private function storedCeiling(): bool
+    {
+        $coupon = $this->route('coupon');
+
+        return $coupon instanceof Coupon && (int) $coupon->max_discount > 0;
     }
 
     /**

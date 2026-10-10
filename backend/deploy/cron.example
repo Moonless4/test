@@ -1,0 +1,62 @@
+# =============================================================================
+# Medora API — DirectAdmin cron entries
+# =============================================================================
+#
+# DirectAdmin shared hosting has no Supervisor and no long-running daemon, so the panel owns
+# exactly two cron entries and routes/console.php decides what actually runs inside them:
+#
+#   1. `schedule:run`        — every minute; runs whatever is due (cart purge, token pruning,
+#                              failed-job pruning, the nightly database dump).
+#   2. `queue:work --stop-when-empty`
+#                            — every minute; drains whatever is waiting and exits. `--stop-when-empty`
+#                              is what keeps this a cron job instead of a daemon, and `--max-time`
+#                              keeps one run from overlapping the next.
+#
+# Replace both placeholders below before pasting:
+#
+#   /usr/local/php83/bin/php        the PHP binary DirectAdmin selected for the domain
+#                                   (PHP Selector shows the path; it changes per PHP version)
+#   /home/USER/domains/api.example.com
+#                                   the absolute path where the application lives
+#                                   (the *application* folder, i.e. the one holding `artisan`,
+#                                   NOT its public/ subfolder)
+#
+# -----------------------------------------------------------------------------
+# Raw crontab block (paste into DirectAdmin → Advanced Features → Cron Jobs → "Edit crontab")
+# -----------------------------------------------------------------------------
+# MAILTO=""
+# * * * * * /usr/local/php83/bin/php /home/USER/domains/api.example.com/artisan schedule:run --no-interaction >> /dev/null 2>&1
+# * * * * * /usr/local/php83/bin/php /home/USER/domains/api.example.com/artisan queue:work --stop-when-empty --tries=3 --max-time=55 >> /dev/null 2>&1
+#
+# -----------------------------------------------------------------------------
+# The same two jobs as DirectAdmin UI fields
+# -----------------------------------------------------------------------------
+# Job 1 — scheduler
+#   Minute:  *        Hour: *        Day of Month: *        Month: *        Day of Week: *
+#   Command: /usr/local/php83/bin/php /home/USER/domains/api.example.com/artisan schedule:run --no-interaction
+#
+# Job 2 — queue worker
+#   Minute:  *        Hour: *        Day of Month: *        Month: *        Day of Week: *
+#   Command: /usr/local/php83/bin/php /home/USER/domains/api.example.com/artisan queue:work --stop-when-empty --tries=3 --max-time=55
+#
+# -----------------------------------------------------------------------------
+# Notes
+# -----------------------------------------------------------------------------
+#
+# * The scheduler writes to storage/logs/laravel.log. If the panel's cron output is mailed to you,
+#   keep the `>> /dev/null 2>&1` redirect so a healthy minute is silent; remove it temporarily
+#   while diagnosing.
+#
+# * Every scheduled task uses withoutOverlapping(), which takes a cache lock. With CACHE_STORE=database
+#   that lock lives in the `cache` table, so a slow `db:backup` cannot stack up behind itself.
+#
+# * A queued job that keeps failing is retried 3 times and recorded in `failed_jobs`.
+#   `php artisan queue:failed` lists it; `queue:prune-failed` (scheduled daily) clears old ones.
+#
+# * Mail: with MAIL_MAILER=smtp the queue drains in these cron minutes, so a signup email can
+#   take up to a minute. That is normal for shared hosting and is why the queue is not `sync`.
+#
+# * Check the entries are firing:
+#       php artisan schedule:list          # what the scheduler would run
+#       php artisan queue:monitor default  # pending jobs
+#   and confirm a row appears in `cache` under a `framework/schedule-*` key.

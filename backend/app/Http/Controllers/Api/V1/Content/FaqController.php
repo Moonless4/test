@@ -18,6 +18,10 @@ class FaqController extends Controller
             $query->where('group', $group);
         }
 
-        return FaqResource::collection($query->get());
+        $faqs = $query->get();
+
+        // The FAQ page is built from one call, so the list is not paginated — but the response
+        // still reports how many entries the filter matched, like every other public list.
+        return FaqResource::collection($faqs)->additional(['meta' => ['total' => $faqs->count()]]);
     }
 }

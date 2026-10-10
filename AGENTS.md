@@ -27,6 +27,28 @@ curl -I http://localhost:3000/
   `__VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS` env var. The preview proxy host is environment
   specific, so never hardcode it.
 
+## Laravel API (`backend/`)
+
+A second, separate application: the REST API (`/api/v1`) that the storefront will move onto, built
+for the owner's DirectAdmin host (see `backend/docs/DEPLOYMENT-DIRECTADMIN.md`). It is not consumed
+by the SPA yet — the screens still read `src/lib/data.ts`.
+
+- Compose services: `backend-db` (MariaDB 11), `backend-migrate` (one-shot: `composer install`,
+  `migrate`, `db:seed`; the app waits for it), `backend` (PHP 8.4 dev image, `artisan serve` on host
+  port **8000**), `backend-cron` (a loop standing in for the DirectAdmin cron entry).
+- `php artisan serve --no-reload` in compose is deliberate and load-bearing: with a `.env` present the
+  reload wrapper passes the container's environment to `php -S` as *unset*, so Compose
+  `environment:` and `/run/base44/app.env` would never reach the application.
+- Tests: `docker compose -f docker-compose.base44.yml exec -T backend sh -c 'cd /app/backend && php artisan test'`.
+  `phpunit.xml` sets `force="true"` on every env entry so the suite always runs on in-memory SQLite
+  with the array cache, sync queue and the **fake** payment gateway — without it the compose
+  `DB_CONNECTION=mysql` would win and `RefreshDatabase` would wipe the development database.
+- `PAYMENT_GATEWAY=fake` is the sandbox default (compose) because the sandbox cannot reach
+  `zarinpal.com`; a host sets `zarinpal` plus the merchant id in its own `.env`.
+- Docs live in `backend/docs/` — `API.md` (endpoint reference), `SECURITY.md` (the threat model and
+  what the host owns), `DEPLOYMENT-DIRECTADMIN.md`, `IONCUBE.md`. The cron entries a host pastes into
+  the panel are in `backend/deploy/cron.example`. `php artisan app:preflight` is the host check.
+
 ## Things that are easy to get wrong
 
 - **RTL**: `<html dir="rtl">`. Use logical Tailwind utilities (`start-*`, `end-*`, `ms-*`, `me-*`,
