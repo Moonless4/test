@@ -24,8 +24,14 @@ use Laravel\Sanctum\PersonalAccessToken;
  *  - `show()` reports *state* (`enabled`, how many recovery codes are left) and never the secret.
  *    The secret leaves the server exactly once, in `enroll()` and `confirm()` answers, to the
  *    authenticated owner.
- *  - Turning the second factor **off** — and regenerating recovery codes — sits behind
- *    `recent-auth`, so a stolen token alone cannot downgrade the account.
+ *  - **Enrollment belongs to the "you must enroll" step.** A token that is still holding a
+ *    *challenge* is refused here: enrolling under a half-finished login would otherwise be a way to
+ *    replace the operator's authenticator with one the caller controls.
+ *  - Turning the second factor **off** — and reissuing recovery codes — needs the password again
+ *    (`recent-auth`) **and a code from the authenticator**: a token stolen from an unlocked laptop
+ *    knows neither, and a token plus a keylogged password is still not enough. A recovery code may
+ *    be used to reissue recovery codes (the operator who lost the phone is the one case that needs
+ *    it), but never to turn the second factor off.
  *  - Confirming enrollment rotates the token: the token that was used to set the account up is
  *    deleted and replaced with a verified one, so nothing that was in flight during enrollment
  *    survives it.
@@ -65,6 +71,10 @@ class TwoFactorController extends Controller
     {
         $user = $request->user();
 
+        if ($this->isHoldingAChallenge($request)) {
+            return $this->challengeFirst();
+        }
+
         if ($user->hasTwoFactorEnabled()) {
             return response()->json([
                 'message' => 'ورود دو مرحله‌ای از قبل فعال است. برای شروع دوباره، ابتدا آن را غیرفعال کنید.',
@@ -73,6 +83,14 @@ class TwoFactorController extends Controller
         }
 
         $secret = $this->twoFactor->enroll($user);
+
+        // Enrollment replaces the second factor, so the owner is told it started — on the address
+        // the account already owns, which is the one channel an attacker who only has the password
+        // does not control.
+        $this->shield->notify($user, 'فعال‌سازی ورود دو مرحله‌ای برای حساب شما آغاز شد.', [
+            'ip' => (string) $request->ip(),
+            'at' => now()->toIso8601String(),
+        ]);
 
         return response()->json([
             'data' => [
@@ -90,6 +108,10 @@ class TwoFactorController extends Controller
     public function confirm(TwoFactorCodeRequest $request): JsonResponse
     {
         $user = $request->user();
+
+        if ($this->isHoldingAChallenge($request)) {
+            return $this->challengeFirst();
+        }
 
         if ($user->hasTwoFactorEnabled()) {
             return response()->json([
@@ -153,9 +175,12 @@ class TwoFactorController extends Controller
     }
 
     /**
-     * New recovery codes; every previous one stops working. Behind `recent-auth`.
+     * New recovery codes; every previous one stops working.
+     *
+     * Behind `full-auth` + `recent-auth` + a current second factor: a password alone may not reissue
+     * them, which is what stops "I know the password" from becoming "I hold a working code".
      */
-    public function regenerate(Request $request): JsonResponse
+    public function regenerate(TwoFactorCodeRequest $request): JsonResponse
     {
         $user = $request->user();
 
@@ -166,6 +191,13 @@ class TwoFactorController extends Controller
             ], 409);
         }
 
+        // A recovery code is accepted here on purpose: the operator who lost the phone has no other
+        // way back, and reissuing is the step that gives them a fresh set.
+        if (! $this->proveSecondFactor($user, $request, allowRecoveryCode: true)) {
+            return $this->invalidProof($user, 'recovery_codes');
+        }
+
+        // The reissue itself is audited (and the old set invalidated) inside TwoFactorAuth.
         $codes = $this->twoFactor->regenerateRecoveryCodes($user);
 
         $this->shield->notify($user, 'کدهای بازیابی حساب شما بازتولید شد.', [
@@ -180,10 +212,11 @@ class TwoFactorController extends Controller
     }
 
     /**
-     * Turn the second factor off. Requires re-authentication (middleware) and ends every other
-     * session: an account that just became weaker must not keep sessions an attacker opened.
+     * Turn the second factor off. Requires re-authentication (middleware), a current code from the
+     * app, and ends every other session: an account that just became weaker must not keep sessions
+     * an attacker opened.
      */
-    public function destroy(Request $request): JsonResponse
+    public function destroy(TwoFactorCodeRequest $request): JsonResponse
     {
         $user = $request->user();
 
@@ -195,12 +228,20 @@ class TwoFactorController extends Controller
         }
 
         // The shop requires it of administrators: turning it off would lock them out of the panel
-        // anyway, so it is refused with an explanation rather than silently accepted.
+        // anyway, so it is refused with an explanation rather than silently accepted. Checked before
+        // the code so a required account is told *why* it is refused, not asked for a code it would
+        // be refused anyway.
         if ($user->requiresTwoFactor()) {
             return response()->json([
                 'message' => 'برای حساب‌های مدیریتی، ورود دو مرحله‌ای الزامی است و غیرفعال نمی‌شود.',
                 'code' => 'two_factor_required',
             ], 403);
+        }
+
+        // A recovery code gets somebody back *into* an account; it may never be the thing that
+        // removes the second factor.
+        if (! $this->proveSecondFactor($user, $request, allowRecoveryCode: false)) {
+            return $this->invalidProof($user, 'disable');
         }
 
         $token = $request->user()?->currentAccessToken();
@@ -221,5 +262,80 @@ class TwoFactorController extends Controller
             'data' => ['revoked_tokens' => $revoked],
             'message' => 'ورود دو مرحله‌ای غیرفعال شد و سایر نشست‌ها بسته شدند.',
         ]);
+    }
+
+    /**
+     * Is this request carrying a half-finished *challenge* rather than a setup or a finished login?
+     *
+     * Deliberately not `$token->can(…challenge…)`: a staff token carries `*`, which Sanctum answers
+     * `true` to for every ability. The token's whole ability set is what identifies it.
+     */
+    private function isHoldingAChallenge(Request $request): bool
+    {
+        $token = $request->user()?->currentAccessToken();
+
+        return Tokens::pendingStep($token) === Tokens::twoFactorChallengeAbility();
+    }
+
+    private function challengeFirst(): JsonResponse
+    {
+        return response()->json([
+            'message' => 'برای ادامه، ابتدا کد ورود دو مرحله‌ای را وارد کنید.',
+            'code' => 'two_factor_required',
+        ], 403);
+    }
+
+    /**
+     * A current code from the app — the second proof a downgrade needs on top of the password.
+     *
+     * Bounded the same way the login challenge is, so guessing here is as expensive as guessing
+     * there.
+     */
+    private function proveSecondFactor(User $user, TwoFactorCodeRequest $request, bool $allowRecoveryCode): bool
+    {
+        if ($this->twoFactor->tooManyAttempts($user)) {
+            return false;
+        }
+
+        $recoveryCode = (string) $request->string('recovery_code');
+        $code = (string) $request->string('code');
+
+        $passed = false;
+
+        if ($recoveryCode !== '') {
+            // Short-circuited on purpose: a recovery code that may not stand in for this action must
+            // not be *consumed* by the refused attempt either.
+            $passed = $allowRecoveryCode && $this->twoFactor->consumeRecoveryCode($user, $recoveryCode);
+        } elseif ($code !== '') {
+            $passed = $this->twoFactor->verify($user, $code);
+        }
+
+        $passed
+            ? $this->twoFactor->clearAttempts($user)
+            : $this->twoFactor->registerFailedAttempt($user);
+
+        return $passed;
+    }
+
+    /**
+     * One answer for every way a second-factor proof can fail: the caller is never told whether the
+     * code was wrong, replayed, missing or unrecognized.
+     */
+    private function invalidProof(User $user, string $context): JsonResponse
+    {
+        $this->shield->registerFailedCheck($user, 'two_factor_failed');
+        $this->audit->log('auth.two_factor_failed', $user, ['context' => $context], $user);
+
+        if ($this->twoFactor->tooManyAttempts($user)) {
+            return response()->json([
+                'message' => 'تلاش‌های ناموفق زیاد بود. دوباره وارد شوید.',
+                'code' => 'two_factor_locked',
+            ], 429);
+        }
+
+        return response()->json([
+            'message' => 'کد وارد شده معتبر نیست.',
+            'code' => 'invalid_two_factor_code',
+        ], 422);
     }
 }

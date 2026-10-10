@@ -22,10 +22,14 @@ class TwoFactorCodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => ['nullable', 'string', 'digits:6', 'required_without:recovery_code'],
+            // Only the *shape* is checked here. Whether a code is required at all, and whether a
+            // recovery code may stand in for it, is a decision per endpoint (a recovery code gets
+            // somebody back into an account; it never turns the second factor off) — and the
+            // decision has to be made *after* the route's own guards, not before them.
+            'code' => ['nullable', 'string', 'digits:6'],
             // Recovery codes are 5+5 characters from a restricted alphabet; the shape is checked
             // here and the value is verified against the stored hashes, never trusted.
-            'recovery_code' => ['nullable', 'string', 'max:32', 'required_without:code'],
+            'recovery_code' => ['nullable', 'string', 'max:32'],
             'device_name' => ['nullable', 'string', 'max:100'],
         ];
     }

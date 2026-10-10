@@ -26,10 +26,11 @@ import { faDate } from '../lib/labels';
  * no endpoint that would give the secret or the codes back a second time: the secret is encrypted
  * at rest and the codes are bcrypt hashes, so both are shown once, in the answer that creates them.
  *
- * Two of the actions here (new recovery codes, turning the factor off) are sensitive enough that the
- * API asks for the password again — it answers **423** with `recent_auth_required`. Rather than
- * pretending the session expired, the password is asked for and the same action is retried once the
- * API is satisfied.
+ * Two of the actions here (new recovery codes, turning the factor off) are sensitive enough that they
+ * need the password again **and** a current code from the authenticator: the API answers **423**
+ * with `recent_auth_required` until the password is re-entered, and refuses the action with **422**
+ * without a code that verifies. The panel asks for both up front — a password on its own is never
+ * treated as enough to reissue the codes that stand in for the second factor, or to remove it.
  */
 
 const PRIMARY =
@@ -50,10 +51,11 @@ export default function SecurityPage() {
   const [error, setError] = useState<string | undefined>(undefined);
   const [busy, setBusy] = useState(false);
 
-  /** The refused action, kept so it can be retried once the password has been given again. */
-  const [retry, setRetry] = useState<(() => Promise<void>) | undefined>(undefined);
+  /** The action waiting on its proof (password + a current code from the app). */
+  const [proof, setProof] = useState<((code: string) => Promise<void>) | undefined>(undefined);
   const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState<string | undefined>(undefined);
+  const [code, setCode] = useState('');
+  const [proofError, setProofError] = useState<string | undefined>(undefined);
   const [confirming, setConfirming] = useState(false);
 
   const enabled = state.data?.enabled === true;
@@ -66,51 +68,54 @@ export default function SecurityPage() {
     try {
       await action();
     } catch (failure) {
-      if (failure instanceof ApiError && failure.status === 423) {
-        // `setRetry(() => action)` stores the function itself, not its result.
-        setRetry(() => action);
-        setPassword('');
-        setPasswordError(undefined);
-        return;
-      }
-
       setError(failure instanceof ApiError ? failure.message : 'انجام نشد؛ دوباره تلاش کنید.');
     } finally {
       setBusy(false);
     }
   };
 
-  const confirmPassword = async (event: FormEvent) => {
+  /** `setProof(() => action)` stores the function itself, not its result. */
+  const askForProof = (action: (code: string) => Promise<void>) => {
+    setError(undefined);
+    setNotice(undefined);
+    setPassword('');
+    setCode('');
+    setProofError(undefined);
+    setProof(() => action);
+  };
+
+  const submitProof = async (event: FormEvent) => {
     event.preventDefault();
     setConfirming(true);
-    setPasswordError(undefined);
+    setProofError(undefined);
 
     try {
+      // The re-authentication comes first: without it the API answers 423 and the action is refused
+      // before the code is ever looked at.
       await adminConfirmPassword(password);
 
-      const action = retry;
-      setRetry(undefined);
-      setPassword('');
+      const action = proof;
+      setProof(undefined);
 
-      if (action) await run(action);
+      if (action) await action(code);
     } catch (failure) {
-      setPasswordError(failure instanceof ApiError ? failure.message : 'تأیید نشد.');
+      setProofError(failure instanceof ApiError ? failure.message : 'تأیید نشد.');
     } finally {
       setConfirming(false);
     }
   };
 
-  const regenerate = () =>
+  const regenerate = (value: string) =>
     run(async () => {
-      const result = await adminTwoFactorRecoveryCodes();
+      const result = await adminTwoFactorRecoveryCodes(value);
 
       setCodes(result.data?.recovery_codes ?? []);
       setNotice('کدهای بازیابی جدید ساخته شد؛ کدهای قبلی دیگر کار نمی‌کنند.');
     });
 
-  const disable = () =>
+  const disable = (value: string) =>
     run(async () => {
-      await adminTwoFactorDisable();
+      await adminTwoFactorDisable(value);
 
       setCodes([]);
       setNotice('ورود دو مرحله‌ای غیرفعال شد و سایر نشست‌ها بسته شدند.');
@@ -179,7 +184,7 @@ export default function SecurityPage() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button
                     type="button"
-                    onClick={() => void regenerate()}
+                    onClick={() => askForProof(regenerate)}
                     disabled={busy}
                     className={SECONDARY}
                   >
@@ -189,7 +194,7 @@ export default function SecurityPage() {
                   {state.data?.required ? null : (
                     <button
                       type="button"
-                      onClick={() => void disable()}
+                      onClick={() => askForProof(disable)}
                       disabled={busy}
                       className={DANGER}
                     >
@@ -245,19 +250,19 @@ export default function SecurityPage() {
       </div>
 
       <Modal
-        open={retry !== undefined}
-        title="تأیید گذرواژه"
-        description="این تغییر حساس است؛ برای ادامه، گذرواژهٔ خود را دوباره وارد کنید."
-        onClose={() => setRetry(undefined)}
+        open={proof !== undefined}
+        title="تأیید تغییر حساس"
+        description="برای این تغییر، گذرواژهٔ خود را دوباره وارد کنید و کد شش‌رقمی برنامهٔ احراز هویت را بنویسید."
+        onClose={() => setProof(undefined)}
         footer={
           <>
-            <button type="button" onClick={() => setRetry(undefined)} className={SECONDARY}>
+            <button type="button" onClick={() => setProof(undefined)} className={SECONDARY}>
               انصراف
             </button>
             <button
               type="submit"
-              form="admin-confirm-password"
-              disabled={confirming || password === ''}
+              form="admin-security-proof"
+              disabled={confirming || password === '' || code.length !== 6}
               className={PRIMARY}
             >
               {confirming ? 'در حال تأیید…' : 'تأیید'}
@@ -265,15 +270,15 @@ export default function SecurityPage() {
           </>
         }
       >
-        <form id="admin-confirm-password" onSubmit={(event) => void confirmPassword(event)}>
+        <form id="admin-security-proof" onSubmit={(event) => void submitProof(event)}>
           <label
-            htmlFor="admin-confirm-password-input"
+            htmlFor="admin-security-password"
             className="mb-1.5 block text-[12.5px] font-medium text-cocoa"
           >
             گذرواژه
           </label>
           <input
-            id="admin-confirm-password-input"
+            id="admin-security-password"
             type="password"
             dir="ltr"
             autoComplete="current-password"
@@ -281,7 +286,27 @@ export default function SecurityPage() {
             onChange={(event) => setPassword(event.target.value)}
             className={INPUT}
           />
-          {passwordError ? <p className="mt-1.5 text-[12px] text-wine">{passwordError}</p> : null}
+
+          <label
+            htmlFor="admin-security-code"
+            className="mt-4 mb-1.5 block text-[12.5px] font-medium text-cocoa"
+          >
+            کد برنامهٔ احراز هویت
+          </label>
+          <input
+            id="admin-security-code"
+            type="text"
+            dir="ltr"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            placeholder="۱۲۳۴۵۶"
+            value={code}
+            onChange={(event) => setCode(event.target.value)}
+            className={INPUT}
+          />
+
+          {proofError ? <p className="mt-1.5 text-[12px] text-wine">{proofError}</p> : null}
         </form>
       </Modal>
     </>

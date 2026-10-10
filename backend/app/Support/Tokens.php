@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\User;
 use DateTimeInterface;
 use Illuminate\Support\Facades\Request;
+use Laravel\Sanctum\PersonalAccessToken;
 
 /**
  * Token issuing, kept in one place so every endpoint that hands out a token does it the same way:
@@ -98,5 +99,40 @@ final class Tokens
     public static function twoFactorSetupAbility(): string
     {
         return (string) config('security.tokens.abilities.two_factor_setup', 'twofa:setup');
+    }
+
+    /**
+     * Which second-factor step, if any, this token is still holding.
+     *
+     * A token is *pending* only when **every** ability it carries belongs to a step: the login hands
+     * out `twofa:challenge` or `twofa:setup` and nothing else, while a finished token carries the
+     * account's own abilities (and `*` for staff). This is deliberately not `$token->can(…)` —
+     * Sanctum answers `true` to every ability for a `*` token, so an ability *check* would report a
+     * full staff token as a pending one and a pending one as whatever it was asked about.
+     *
+     * @return string|null The ability of the step it holds, or null when this is not a pending token.
+     */
+    public static function pendingStep(?PersonalAccessToken $token): ?string
+    {
+        if (! $token instanceof PersonalAccessToken) {
+            // A session-authenticated request has no ability row to read.
+            return null;
+        }
+
+        $abilities = array_values(array_unique((array) $token->abilities));
+        $steps = [self::twoFactorChallengeAbility(), self::twoFactorSetupAbility()];
+
+        if ($abilities === [] || array_diff($abilities, $steps) !== []) {
+            return null;
+        }
+
+        return in_array(self::twoFactorSetupAbility(), $abilities, true)
+            ? self::twoFactorSetupAbility()
+            : self::twoFactorChallengeAbility();
+    }
+
+    public static function isPendingSecondFactor(?PersonalAccessToken $token): bool
+    {
+        return self::pendingStep($token) !== null;
     }
 }

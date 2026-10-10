@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnforceTrustedHost;
 use App\Http\Middleware\RejectForeignOrigin;
+use App\Http\Middleware\RequireFullAuthentication;
 use App\Http\Middleware\RequireRecentAuth;
 use App\Http\Middleware\RequireTwoFactor;
 use App\Http\Middleware\SecurityHeaders;
@@ -57,12 +58,15 @@ return Application::configure(basePath: dirname(__DIR__))
          * Named middleware for the security phase:
          *
          *  - `two-factor`: an administrator's token must have answered the TOTP challenge.
+         *  - `full-auth`: the request carries a finished login, not a token that is still holding a
+         *    second-factor step (`twofa:challenge` / `twofa:setup`).
          *  - `recent-auth`: the password was re-entered recently for this token.
          *  - `turnstile`: bot challenge, a pass-through unless TURNSTILE_ENABLED is on.
          *  - `webhook.signature`: HMAC + timestamp + idempotency for inbound gateway notifications.
          */
         $middleware->alias([
             'two-factor' => RequireTwoFactor::class,
+            'full-auth' => RequireFullAuthentication::class,
             'recent-auth' => RequireRecentAuth::class,
             'turnstile' => VerifyTurnstile::class,
             'webhook.signature' => VerifyWebhookSignature::class,

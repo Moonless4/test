@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Services\Security\TwoFactorAuth;
 use Database\Seeders\RoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use PragmaRX\Google2FA\Google2FA;
@@ -66,6 +67,10 @@ class TwoFactorTest extends TestCase
 
     public function test_enrollment_returns_the_secret_once_and_the_status_endpoint_never_does(): void
     {
+        // The status endpoint reports `required` from the shop's own policy, so the policy has to be
+        // on for the answer to mean anything (phpunit.xml leaves it off for the other suites).
+        config(['security.two_factor.enforce_admins' => true]);
+
         $user = $this->staff();
 
         $enrolled = $this->actingAs($user, 'sanctum')
@@ -90,7 +95,9 @@ class TwoFactorTest extends TestCase
         $me = $this->actingAs($user, 'sanctum')->getJson('/api/v1/auth/me')->assertOk();
 
         $this->assertStringNotContainsString($secret, $me->getContent());
-        $this->assertFalse($me->json('data.user.two_factor_enabled'));
+        // `/auth/me` answers the account itself as `data` (only the account surfaces wrap it in
+        // `data.user`).
+        $this->assertFalse($me->json('data.two_factor_enabled'));
     }
 
     public function test_confirming_stores_the_secret_encrypted_and_the_recovery_codes_hashed(): void
@@ -176,6 +183,11 @@ class TwoFactorTest extends TestCase
 
         $this->assertNotEmpty($token);
 
+        // The guard caches the identity it resolved for the *previous* request inside one test
+        // method (in production each request is its own process), so it is dropped before the token
+        // that replaced the challenge is spent.
+        $this->forgetResolvedGuards();
+
         $this->withToken($token)->getJson('/api/v1/admin/products')->assertOk();
 
         // The challenge token is gone.
@@ -206,12 +218,17 @@ class TwoFactorTest extends TestCase
             ->postJson('/api/v1/auth/two-factor/challenge', ['code' => $code])
             ->assertStatus(422);
 
-        // A code from the next window works again.
-        $this->travel(31)->seconds();
+        // The refusal is time-boxed, not permanent: the claim is keyed on the code itself and lives
+        // a few minutes, so the next window's code (six different digits) is a different key. The
+        // window cannot be advanced from here — pragmarx/google2fa reads the real wall clock
+        // (`time()`), which `travel()` does not move — so the claim itself is asserted.
+        $this->assertTrue(Cache::has('two-factor:used:'.$user->getKey().':'.$code));
 
+        // And the replay did not abandon the challenge: a wrong code is still answered as wrong,
+        // not as a lockout.
         $this->withToken($login())
-            ->postJson('/api/v1/auth/two-factor/challenge', ['code' => $this->currentCode($armed['secret'])])
-            ->assertOk();
+            ->postJson('/api/v1/auth/two-factor/challenge', ['code' => '000002'])
+            ->assertStatus(422);
     }
 
     public function test_a_recovery_code_works_exactly_once(): void
@@ -237,7 +254,11 @@ class TwoFactorTest extends TestCase
             ->postJson('/api/v1/auth/two-factor/challenge', ['recovery_code' => $code])
             ->assertStatus(422);
 
-        $status = $this->actingAs($user, 'sanctum')->getJson('/api/v1/auth/two-factor')->assertOk();
+        // A fresh copy of the account: the answer must come from the stored row, and the model this
+        // test method is holding still has the code it started with.
+        $this->forgetResolvedGuards();
+
+        $status = $this->actingAs($user->fresh(), 'sanctum')->getJson('/api/v1/auth/two-factor')->assertOk();
 
         $this->assertSame(
             (int) config('security.two_factor.recovery_codes') - 1,
@@ -278,6 +299,8 @@ class TwoFactorTest extends TestCase
 
         // Confirmation hands out a *verified* token, so the operator is not sent through a
         // challenge they cannot satisfy without restarting the login.
+        $this->forgetResolvedGuards();
+
         $this->withToken($confirmed->json('data.token'))->getJson('/api/v1/admin/products')->assertOk();
 
         // The setup token is gone.

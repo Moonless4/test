@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Services\AuditLogger;
 use App\Support\Tokens;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
@@ -119,46 +120,61 @@ class TwoFactorAuth
         }
 
         // A code that has already been used for this account is refused, so a code captured from a
-        // shoulder or a screenshot cannot be replayed inside its own 30-second window.
-        $cacheKey = 'two-factor:used:'.$user->getKey().':'.preg_replace('/\D/', '', $code);
-
-        if (Cache::has($cacheKey)) {
-            return false;
-        }
-
-        Cache::put($cacheKey, true, now()->addMinutes(5));
-
-        return true;
+        // shoulder or a screenshot cannot be replayed inside its own 30-second window — and the
+        // claim is made with `add()`, which only writes when the key is absent. A `has()` followed
+        // by a `put()` would let two requests carrying the same code both be told yes.
+        return Cache::add(
+            $this->usedCodeKey($user, (string) preg_replace('/\D/', '', $code)),
+            true,
+            now()->addMinutes(5),
+        );
     }
 
     /**
      * Consume a recovery code: it must match, and matching consumes it.
+     *
+     * Single use has to survive two requests arriving together, so the row is re-read under a lock
+     * inside a transaction and the code is removed from *that* copy. Two callers holding the same
+     * stale model would otherwise both find the code and both report success.
      */
     public function consumeRecoveryCode(User $user, string $code): bool
     {
         $candidate = mb_strtoupper(trim($code));
-        $hashes = $user->twoFactorRecoveryCodeHashes();
 
-        foreach ($hashes as $index => $hash) {
-            if (! Hash::check($candidate, $hash)) {
-                continue;
+        return DB::transaction(function () use ($user, $candidate): bool {
+            $locked = User::query()->whereKey($user->getKey())->lockForUpdate()->first();
+
+            if (! $locked instanceof User) {
+                return false;
             }
 
-            // Single use: the hash is removed as it is accepted, inside the same save.
-            unset($hashes[$index]);
+            $hashes = $locked->twoFactorRecoveryCodeHashes();
 
-            $user->forceFill([
-                'two_factor_recovery_codes' => $hashes === [] ? null : json_encode(array_values($hashes)),
-            ])->save();
+            foreach ($hashes as $index => $hash) {
+                if (! Hash::check($candidate, $hash)) {
+                    continue;
+                }
 
-            $this->audit->log('security.two_factor.recovery_code_used', $user, [
-                'remaining' => count($hashes),
-            ], $user);
+                // Single use: the hash is removed as it is accepted, inside the same save.
+                unset($hashes[$index]);
 
-            return true;
-        }
+                $locked->forceFill([
+                    'two_factor_recovery_codes' => $hashes === [] ? null : json_encode(array_values($hashes)),
+                ])->save();
 
-        return false;
+                // The caller's copy is brought up to date, so a status read in the same request does
+                // not answer from the row that was just replaced.
+                $user->setRawAttributes($locked->getAttributes(), true);
+
+                $this->audit->log('security.two_factor.recovery_code_used', $locked, [
+                    'remaining' => count($hashes),
+                ], $locked);
+
+                return true;
+            }
+
+            return false;
+        });
     }
 
     /**
@@ -300,5 +316,14 @@ class TwoFactorAuth
     private function attemptKey(User $user): string
     {
         return 'two-factor:attempts:'.Str::of((string) $user->getKey())->value;
+    }
+
+    /**
+     * The claim that one already-accepted code cannot be spent twice. Keyed on the account and the
+     * digits, and short-lived: the window it guards is 30 seconds long.
+     */
+    private function usedCodeKey(User $user, string $digits): string
+    {
+        return 'two-factor:used:'.$user->getKey().':'.$digits;
     }
 }

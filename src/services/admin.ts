@@ -200,13 +200,24 @@ export const adminTwoFactorConfirm = async (code: string, token?: string) => {
   return confirmation;
 };
 
-/** New recovery codes; every previous one stops working. Asks for the password again (423). */
-export const adminTwoFactorRecoveryCodes = () =>
-  write<{ recovery_codes: string[] }>('/auth/two-factor/recovery-codes', 'POST');
+/**
+ * New recovery codes; every previous one stops working.
+ *
+ * Two proofs are required, and both travel in the request: the password again (answered by
+ * `adminConfirmPassword`, which the API remembers for a few minutes per token — a 423 asks for it)
+ * **and** a current code from the authenticator app. A password alone may not reissue the codes that
+ * stand in for the second factor, or knowing the password would be the whole game.
+ */
+export const adminTwoFactorRecoveryCodes = (code: string) =>
+  write<{ recovery_codes: string[] }>('/auth/two-factor/recovery-codes', 'POST', { code });
 
-/** Turn the second factor off. Asks for the password again and closes every other session. */
-export const adminTwoFactorDisable = () =>
-  write<{ revoked_tokens: number }>('/auth/two-factor', 'DELETE');
+/**
+ * Turn the second factor off. Needs the password again, a current code from the app (a recovery code
+ * may get somebody back *into* an account, but never remove the second factor), and closes every
+ * other session.
+ */
+export const adminTwoFactorDisable = (code: string) =>
+  write<{ revoked_tokens: number }>('/auth/two-factor', 'DELETE', { code });
 
 /** Prove the password again for this token — what a 423 from a sensitive route asks for. */
 export const adminConfirmPassword = (password: string) =>

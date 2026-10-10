@@ -111,43 +111,66 @@ Route::prefix('auth')->group(function (): void {
         ->name('verification.verify');
 
     Route::middleware('auth:sanctum')->group(function (): void {
-        Route::get('me', [Auth\MeController::class, 'show']);
-        Route::post('logout', [Auth\LogoutController::class, 'destroy']);
-        Route::post('logout-all', [Auth\LogoutController::class, 'destroyAll']);
-        Route::put('password', [Auth\UpdatePasswordController::class, 'update'])->middleware('throttle:sensitive');
-        Route::post('email/resend', [Auth\EmailVerificationController::class, 'resend'])->middleware('throttle:verification');
-
-        /* Second factor ----------------------------------------------------------------------- */
-        // Reachable with the *challenge* token the login handed out, and with nothing else: the
-        // rate limit here is its own small budget (a person mistypes once or twice, a script does
-        // not get a thousand tries).
+        /* Second factor — the two steps of a login ------------------------------------------- */
+        // These four are the *only* routes a half-finished login can reach, and each answers with
+        // the kind of token it holds:
+        //
+        //  - `challenge` is answered with the `twofa:challenge` token the login handed out, and with
+        //    nothing else (the controller checks the token's whole ability set, because a staff
+        //    token's `*` makes Sanctum answer `true` to every ability *check*).
+        //  - `enroll` / `confirm` are the "the shop requires a second factor and this account has
+        //    not enrolled" step, and are refused for a token that is holding a challenge.
+        //
+        // The rate limits are their own small budgets: a person mistypes once or twice, a script
+        // does not get a thousand tries.
         Route::post('two-factor/challenge', [Auth\TwoFactorChallengeController::class, 'store'])->middleware('throttle:two_factor');
         Route::get('two-factor', [Auth\TwoFactorController::class, 'show']);
         Route::post('two-factor/enroll', [Auth\TwoFactorController::class, 'enroll'])->middleware('throttle:sensitive');
         Route::post('two-factor/confirm', [Auth\TwoFactorController::class, 'confirm'])->middleware('throttle:two_factor');
-        // Downgrading the account (or reissuing its recovery codes) needs the password again.
-        Route::post('two-factor/recovery-codes', [Auth\TwoFactorController::class, 'regenerate'])->middleware(['throttle:sensitive', 'recent-auth']);
-        Route::delete('two-factor', [Auth\TwoFactorController::class, 'destroy'])->middleware(['throttle:sensitive', 'recent-auth']);
 
-        /* Sessions ---------------------------------------------------------------------------- */
-        Route::get('sessions', [Auth\SessionController::class, 'index'])->middleware('throttle:sensitive');
-        Route::post('sessions/revoke-others', [Auth\SessionController::class, 'destroyOthers'])->middleware('throttle:token');
-        Route::delete('sessions/{token}', [Auth\SessionController::class, 'destroy'])
-            ->whereNumber('token')
-            ->middleware('throttle:token');
+        // Abandoning a half-finished login is allowed: it deletes only the token that made the
+        // request, and without it a mistyped second step would trap the browser until it expired.
+        Route::post('logout', [Auth\LogoutController::class, 'destroy']);
 
-        // Re-authentication for the sensitive admin operations below.
-        Route::post('confirm-password', [Auth\ConfirmPasswordController::class, 'store'])->middleware('throttle:recent_auth');
+        /*
+         | Everything below needs a **finished** login. `full-auth` is the second half of the second
+         | factor: a token that is still holding `twofa:challenge` or `twofa:setup` is refused here,
+         | so "the password was right" can never re-authenticate itself, reissue the account's
+         | recovery codes, change the password, read the account or revoke a session.
+         */
+        Route::middleware('full-auth')->group(function (): void {
+            Route::get('me', [Auth\MeController::class, 'show']);
+            Route::post('logout-all', [Auth\LogoutController::class, 'destroyAll']);
+            Route::put('password', [Auth\UpdatePasswordController::class, 'update'])->middleware('throttle:sensitive');
+            Route::post('email/resend', [Auth\EmailVerificationController::class, 'resend'])->middleware('throttle:verification');
 
-        // Handing a guest basket to an account after signing in.
-        Route::post('cart/merge', [CartController::class, 'merge']);
+            // Downgrading the account (or reissuing its recovery codes) needs the password again
+            // *and* a code from the authenticator app (checked in the controller).
+            Route::post('two-factor/recovery-codes', [Auth\TwoFactorController::class, 'regenerate'])->middleware(['throttle:sensitive', 'recent-auth']);
+            Route::delete('two-factor', [Auth\TwoFactorController::class, 'destroy'])->middleware(['throttle:sensitive', 'recent-auth']);
+
+            /* Sessions ------------------------------------------------------------------------ */
+            Route::get('sessions', [Auth\SessionController::class, 'index'])->middleware('throttle:sensitive');
+            Route::post('sessions/revoke-others', [Auth\SessionController::class, 'destroyOthers'])->middleware('throttle:token');
+            Route::delete('sessions/{token}', [Auth\SessionController::class, 'destroy'])
+                ->whereNumber('token')
+                ->middleware('throttle:token');
+
+            // Re-authentication for the sensitive admin operations below.
+            Route::post('confirm-password', [Auth\ConfirmPasswordController::class, 'store'])->middleware('throttle:recent_auth');
+
+            // Handing a guest basket to an account after signing in.
+            Route::post('cart/merge', [CartController::class, 'merge']);
+        });
     });
 });
 
 /* ---------------------------------------------------------------------------------------------
  | The signed-in shopper's own data. Every controller here decides ownership through a policy.
+ | `full-auth` for the same reason the admin area has `two-factor`: a token that is still holding a
+ | second-factor step is not a session, and must not read a profile, an order or a wishlist.
  -------------------------------------------------------------------------------------------- */
-Route::middleware('auth:sanctum')->group(function (): void {
+Route::middleware(['auth:sanctum', 'full-auth'])->group(function (): void {
     Route::get('profile', [ProfileController::class, 'show']);
     Route::put('profile', [ProfileController::class, 'update']);
 
@@ -182,7 +205,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
  | refused with `two_factor_setup_required`. `admin` is its own rate-limit budget, so the panel's
  | traffic never eats the storefront's and vice versa.
  */
-Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin.access', 'two-factor', 'throttle:admin'])->group(function (): void {
+Route::prefix('admin')->middleware(['auth:sanctum', 'full-auth', 'can:admin.access', 'two-factor', 'throttle:admin'])->group(function (): void {
     /* Catalogue ------------------------------------------------------------------------------ */
     Route::get('products', [Admin\ProductController::class, 'index'])->middleware('can:products.view');
     Route::post('products', [Admin\ProductController::class, 'store'])->middleware('can:products.create');
