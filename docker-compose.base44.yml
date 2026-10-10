@@ -59,3 +59,172 @@ services:
       timeout: 5s
       retries: 6
       start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # Laravel API (`backend/`) — the application that will be deployed to the
+  # Linux DirectAdmin host. Locally it runs on the same PHP major (8.4) with a
+  # MySQL-compatible database, the PHP built-in server and a cron-style runner
+  # that mirrors the DirectAdmin cron entries documented in
+  # backend/docs/DEPLOYMENT-DIRECTADMIN.md.
+  # ---------------------------------------------------------------------------
+
+  # MySQL-compatible database. DirectAdmin ships MySQL 8.0 or MariaDB 10.11+; the schema and
+  # queries stay inside what both accept (utf8mb4_unicode_ci, no vendor-specific SQL).
+  backend-db:
+    image: mariadb:11
+    environment:
+      - MARIADB_DATABASE=${BACKEND_DB_DATABASE:-medora_api}
+      - MARIADB_USER=${BACKEND_DB_USERNAME:-medora_api}
+      - MARIADB_PASSWORD=${BACKEND_DB_PASSWORD:-medora_local_dev}
+      - MARIADB_ROOT_PASSWORD=${BACKEND_DB_ROOT_PASSWORD:-medora_local_root_dev}
+    volumes:
+      - backend-db-data:/var/lib/mysql
+    restart: on-failure
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mariadb-admin ping -h 127.0.0.1 -u root -p\"$$MARIADB_ROOT_PASSWORD\" --silent",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  # One-shot: schema + reference data (roles, permissions, settings, admin account).
+  # Exits when done; the web service waits for it.
+  backend-migrate:
+    build:
+      context: ./backend/docker
+      dockerfile: Dockerfile.dev
+    working_dir: /app/backend
+    command:
+      - sh
+      - -ec
+      - >-
+        composer install --no-interaction --prefer-dist --no-progress
+        && { [ -f .env ] || cp .env.example .env; }
+        && { grep -q '^APP_KEY=base64' .env || php artisan key:generate --force; }
+        && php artisan migrate --force
+        && php artisan db:seed --force
+    volumes:
+      - ./backend:/app/backend
+      - backend-composer-cache:/root/.composer
+    environment: &backend-env
+      - APP_ENV=local
+      - APP_DEBUG=${BACKEND_APP_DEBUG:-false}
+      - APP_URL=https://8000-${BASE44_PUBLIC_HOST_SUFFIX}
+      - APP_TIMEZONE=Asia/Tehran
+      # Set by the platform; the app only relaxes anything when this is exactly "1".
+      - BASE44_PREVIEW_MODE
+      # Sandbox-only frontend origin(s) — the storefront dev server, which reaches the API
+      # through the browser at the public host. Production sets its own list in .env.
+      - CORS_ALLOWED_ORIGINS=https://3000-${BASE44_PUBLIC_HOST_SUFFIX}
+      # The proxy rewrites Host to `<port>-<sandbox id>.<domain>`; the sandbox id rotates, so
+      # the allowlist is a domain wildcard plus the public host and the container itself.
+      - TRUSTED_HOSTS=.${BASE44_SANDBOX_HOST_DOMAIN},.${BASE44_PUBLIC_HOST_SUFFIX},localhost,127.0.0.1
+      - TRUST_PROXIES=*
+      # Local database. These are sandbox-local values, not application secrets: production
+      # credentials live in the host's .env only.
+      - DB_CONNECTION=mysql
+      - DB_HOST=backend-db
+      - DB_PORT=3306
+      - DB_DATABASE=${BACKEND_DB_DATABASE:-medora_api}
+      - DB_USERNAME=${BACKEND_DB_USERNAME:-medora_api}
+      - DB_PASSWORD=${BACKEND_DB_PASSWORD:-medora_local_dev}
+      - SESSION_DRIVER=database
+      - CACHE_STORE=database
+      - QUEUE_CONNECTION=database
+      - MAIL_MAILER=log
+      # The sandbox cannot reach zarinpal.com (restricted network), so checkout runs against the
+      # deterministic fake gateway. A host sets PAYMENT_GATEWAY=zarinpal and the merchant id in
+      # its own .env — this value is sandbox-only and never reaches production.
+      - PAYMENT_GATEWAY=${BACKEND_PAYMENT_GATEWAY:-fake}
+      - LOG_CHANNEL=stack
+      - LOG_LEVEL=debug
+      - PHP_CLI_SERVER_WORKERS=4
+    depends_on:
+      backend-db:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    build:
+      context: ./backend/docker
+      dockerfile: Dockerfile.dev
+    working_dir: /app/backend
+    command:
+      - sh
+      - -ec
+      - >-
+        composer install --no-interaction --prefer-dist --no-progress
+        && { [ -f .env ] || cp .env.example .env; }
+        && { grep -q '^APP_KEY=base64' .env || php artisan key:generate --force; }
+        && exec php artisan serve --no-reload --host=0.0.0.0 --port=8000
+    # `--no-reload` is not cosmetic. With a .env file present, Laravel's serve command passes
+    # every environment variable through to its `php -S` child as *unset*, keeping only a small
+    # passthrough list (ServeCommand::startProcess). Under `--no-reload` the whole environment is
+    # forwarded, which is what lets this container's `environment:` block — and the platform's
+    # /run/base44/app.env — actually reach the application.
+    volumes:
+      - ./backend:/app/backend
+      - backend-composer-cache:/root/.composer
+    ports:
+      - "8000:8000"
+    environment: *backend-env
+    env_file:
+      # Platform-managed secrets last, so a value added in the dashboard always wins
+      # (mail credentials, Zarinpal merchant id, …). Optional for local development.
+      - /run/base44/app.env
+    depends_on:
+      backend-db:
+        condition: service_healthy
+      backend-migrate:
+        condition: service_completed_successfully
+    restart: on-failure
+    healthcheck:
+      # `/up` is Laravel's own health route — no application code exists for this check.
+      # No shell variables in the probe: compose would interpolate `$name` as its own variable.
+      test:
+        [
+          "CMD-SHELL",
+          "php -r 'exit(@file_get_contents(\"http://127.0.0.1:8000/up\") === false ? 1 : 0);'",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 180s
+
+  # Stands in for the DirectAdmin cron entry. On shared hosting the panel runs
+  # `php artisan schedule:run` every minute and a short `queue:work --stop-when-empty` drains the
+  # queue — no Supervisor, no long-lived daemon.
+  backend-cron:
+    build:
+      context: ./backend/docker
+      dockerfile: Dockerfile.dev
+    working_dir: /app/backend
+    command:
+      - sh
+      - -ec
+      - >-
+        while true; do
+          php artisan schedule:run --no-interaction || true;
+          php artisan queue:work --stop-when-empty --tries=3 --max-time=55 || true;
+          sleep 60;
+        done
+    volumes:
+      - ./backend:/app/backend
+      - backend-composer-cache:/root/.composer
+    environment: *backend-env
+    env_file:
+      - /run/base44/app.env
+    depends_on:
+      backend-db:
+        condition: service_healthy
+      backend-migrate:
+        condition: service_completed_successfully
+    restart: on-failure
+
+volumes:
+  backend-db-data:
+  backend-composer-cache:

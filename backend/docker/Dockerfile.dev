@@ -1,0 +1,18 @@
+# Sandbox/dev image only.
+#
+# Production does NOT run in Docker: the application is deployed on the owner's Linux
+# DirectAdmin host and runs on that host's own PHP (see backend/docs/DEPLOYMENT-DIRECTADMIN.md).
+# This image exists so the sandbox can run the same PHP major (8.4) with the one extension the
+# official php image lacks and Laravel needs, `pdo_mysql`, plus Composer for the startup install.
+#
+# It is a plain runtime base image: the source is bind mounted by compose, never baked in.
+FROM php:8.4-cli
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip \
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+COPY php-dev.ini /usr/local/etc/php/conf.d/zz-medora-dev.ini

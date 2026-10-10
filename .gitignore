@@ -5,6 +5,8 @@ dist-ssr
 .env
 .env.*
 !.env.base44-defaults
+# The generic .env.* rule above would also swallow the templates that must be committed.
+!**/.env.example
 .DS_Store
 npm-debug.log*
 .vite
