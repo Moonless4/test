@@ -20,7 +20,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       await login(email, password)
-      window.location.href = '/admin'
+      navigate('/admin')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'خطای ورود به سیستم')
     } finally {
