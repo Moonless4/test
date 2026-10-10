@@ -106,6 +106,15 @@ export type ApiSetting = {
   group: string;
 };
 
+/**
+ * The admin panel's mount point, served on its own (`GET /content/admin-path`) so that `admin.path`
+ * can be an internal setting while the storefront's router still learns the address before it
+ * renders.
+ */
+export type ApiAdminPath = {
+  path: string;
+};
+
 export type ApiUser = {
   id: number;
   name: string;

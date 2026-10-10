@@ -57,7 +57,7 @@ export default function SettingsPage() {
       name: 'value',
       label: 'مقدار',
       full: true,
-      hint: 'برای بله/خیر همان true یا false را بنویسید؛ JSON باید معتبر باشد. کلید admin.path آدرس خود پنل است — یک بخش ساده مثل manage؛ پس از ذخیره، پنل روی آدرس تازه بازآوری می‌شود.',
+      hint: 'برای بله/خیر همان true یا false را بنویسید؛ JSON باید معتبر باشد. کلید admin.path آدرس خود پنل است — یک بخش ساده مثل manage؛ پس از ذخیره، پنل روی آدرس تازه بازآوری می‌شود. این ردیف می‌تواند داخلی (غیرعمومی) بماند: آدرس پنل از مسیر خودش خوانده می‌شود، نه از تنظیمات عمومی فروشگاه.',
     },
     { name: 'type', label: 'نوع', type: 'select', options: TYPE_OPTIONS, defaultValue: 'string' },
     {

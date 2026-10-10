@@ -2,20 +2,24 @@
  * Where the admin panel is mounted.
  *
  * The panel is part of the storefront's own SPA, so its address has to be known *before* the router
- * renders: `main.tsx` reads it once from the public settings (`admin.path`) and every link inside
- * the panel is built from it. That is what lets the shop move the panel to another address from its
- * own settings screen, without a deployment.
+ * renders: `main.tsx` reads it once and every link inside the panel is built from it. That is what
+ * lets the shop move the panel to another address from its own settings screen, without a
+ * deployment.
+ *
+ * It is read from its own endpoint (`GET /content/admin-path`) rather than out of the public
+ * settings, which is what lets `admin.path` stay an internal setting — the panel's URL is not part
+ * of the shop's published configuration.
  *
  * The address is a convenience and never a lock: every admin route is guarded by the API's own
  * `can:admin.access`, and the panel's data is only ever readable with a staff token.
  */
 import { get } from '../../lib/api/client';
-import type { ApiSetting } from '../../lib/api/types';
+import type { ApiAdminPath } from '../../lib/api/types';
 
-/** Used before the setting has been read, and whenever it is missing or unusable. */
+/** Used before the address has been read, and whenever it is missing or unusable. */
 export const DEFAULT_ADMIN_PATH = 'admin';
 
-/** The setting key that carries the address (see `SettingRequest::ADMIN_PATH_KEY`). */
+/** The setting that carries the address (see `Setting::ADMIN_PATH_KEY`). */
 export const ADMIN_PATH_KEY = 'admin.path';
 
 /**
@@ -56,14 +60,14 @@ export const isAdminPath = (pathname: string): boolean =>
  */
 export const initAdminBase = async (): Promise<void> => {
   try {
-    const settings = await Promise.race([
-      get<ApiSetting[]>('/content/settings'),
+    const mounted = await Promise.race([
+      get<ApiAdminPath>('/content/admin-path'),
       new Promise<never>((_, reject) => {
         window.setTimeout(() => reject(new Error('timeout')), LOOKUP_TIMEOUT_MS);
       }),
     ]);
 
-    base = normalizeAdminPath(settings.find((setting) => setting.key === ADMIN_PATH_KEY)?.value);
+    base = normalizeAdminPath(mounted?.path);
   } catch {
     // The shop still works without its panel's address; the default is what it was before.
     base = DEFAULT_ADMIN_PATH;

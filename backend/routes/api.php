@@ -47,6 +47,12 @@ Route::middleware('throttle:api')->group(function (): void {
     Route::get('content/faqs', [FaqController::class, 'index']);
     Route::get('content/settings', [SettingController::class, 'index']);
 
+    // The admin panel's address, for the storefront's router to read before it renders. Served
+    // here rather than in `content/settings` so that `admin.path` can stay an internal setting: the
+    // panel's URL is not the shop's published configuration. It is an address, never a lock — every
+    // admin route is guarded by `can:admin.access`.
+    Route::get('content/admin-path', [SettingController::class, 'adminPath']);
+
     // The basket. Guests are first-class here: the X-Cart-Token header identifies their cart, and
     // no endpoint ever accepts a cart id from the client.
     Route::get('cart', [CartController::class, 'show']);

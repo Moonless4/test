@@ -65,14 +65,17 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   name the same order. `src/services/apiCheckout.ts` maps the ledger's `PaymentOrder` onto the
   request and is deliberately fire-and-forget — a shopper who has paid must never see an error
   because the panel's copy could not be written. Tests: `tests/Feature/RecordOrderTest.php`.
-- **The panel's address is a setting.** `admin.path` (public, default `admin`) is read once by
-  `src/admin/lib/basePath.ts` before the first render (`main.tsx` → `initAdminBase()`), and `App.tsx`
-  mounts `AdminApp` on that prefix alone — so the shop can move the panel from its own Settings
-  screen without a deployment (that screen reloads at the new address, since the prefix is fixed for
-  the life of a page load). Links inside the panel must go through `adminHref()`; a literal `/admin/…`
-  would navigate off the mounted prefix. `SettingRequest` validates the value as one URL segment and
-  refuses a path the storefront's own routes already own. The address is obscurity, never a lock:
-  `can:admin.access` guards every admin route whatever the URL says.
+- **The panel's address is a setting, and it may stay internal.** `admin.path` (default `admin`) is
+  served on its own by `GET /api/v1/content/admin-path` (`Setting::adminPath()`) — never out of
+  `content/settings`, so `is_public` is the operator's own choice and changes nothing about where the
+  panel is mounted. `src/admin/lib/basePath.ts` reads it once before the first render
+  (`main.tsx` → `initAdminBase()`), and `App.tsx` mounts `AdminApp` on that prefix alone — so the
+  shop can move the panel from its own Settings screen without a deployment (that screen reloads at
+  the new address, since the prefix is fixed for the life of a page load). Links inside the panel
+  must go through `adminHref()`; a literal `/admin/…` would navigate off the mounted prefix.
+  `SettingRequest` validates the value as one URL segment and refuses a path the storefront's own
+  routes already own. The address is obscurity, never a lock: `can:admin.access` guards every admin
+  route whatever the URL says. Tests: `tests/Feature/AdminPanelPathTest.php`.
 - Compose services: `backend-db` (MariaDB 11), `backend-migrate` (one-shot: `composer install`,
   `migrate`, `db:seed`; the app waits for it), `backend` (PHP 8.4 dev image, `artisan serve` on host
   port **8000**), `backend-cron` (a loop standing in for the DirectAdmin cron entry).

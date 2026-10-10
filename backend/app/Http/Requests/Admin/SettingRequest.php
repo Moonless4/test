@@ -19,12 +19,14 @@ use Illuminate\Validation\Rule;
  * the old one.
  *
  * One key is special: `admin.path` is the URL segment the storefront mounts the admin panel on, so
- * its value is validated as a path rather than as free text (see `adminPathRule()`).
+ * its value is validated as a path rather than as free text (see `adminPathRule()`). Whether the
+ * row is public is the operator's own choice and changes nothing about where the panel is mounted:
+ * the storefront reads the address from `GET /content/admin-path`, never from the public settings.
  */
 class SettingRequest extends FormRequest
 {
     /** The setting that carries the admin panel's own URL segment. */
-    public const ADMIN_PATH_KEY = 'admin.path';
+    public const ADMIN_PATH_KEY = Setting::ADMIN_PATH_KEY;
 
     /**
      * Top-level paths the storefront's router already owns. The panel is mounted at an address the
