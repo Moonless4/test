@@ -1,9 +1,12 @@
 # MEDORA («مدورا») — Base44 dev environment notes
 
 Persian (RTL) fashion storefront. Single-page **React 18 + TypeScript + Vite + Tailwind** app, plus
-a dependency-free Node payment service (`server/`). No database and no external credential except
-the payment merchant id: the catalog, the cart and the accounts render from local mock data and
-localStorage.
+a dependency-free Node service (`server/`) that hosts the payment path and the commerce proxy.
+
+The store is being moved onto the owner's own **WordPress + WooCommerce** site. The API layer for
+it is in place (`server/commerce.mjs`, `src/lib/woo/`, `src/services/`, `src/hooks/`); the screens
+still render from the old catalogue in `src/lib/data.ts` and the localStorage stores, and are being
+moved over one surface at a time. See "Headless WooCommerce".
 
 ## Running it
 
@@ -160,15 +163,83 @@ Measured on the production build (`npm run build` then `vite preview`) with mobi
 - Other routes: `/shop`, `/shop/:category`, `/product/:id`, `/search?q=`, `/cart`, `/checkout`,
   `/wishlist`, `/blog`, `/blog/:id`, `/login`, `/register`, `/account`, `/faq`.
 
-## Porting to WordPress
+## Headless WooCommerce
 
-The owner's plan is to move the storefront to WordPress and host it. Nothing here is a WordPress
-theme, so the port means rebuilding the pages as a theme (or running this SPA headless) and moving
-the catalog, the accounts and the orders into WooCommerce — `src/lib/data.ts` and the localStorage
-stores in the contexts are what get replaced. The payment path is the piece that does *not* carry
-over: on WordPress, WooCommerce plus the زرین‌پال gateway plugin owns it, and `server/index.mjs`
-exists for the SPA while it stands alone. `src/lib/payment.ts` stays the contract either way — a
-headless build would point it at WooCommerce's REST API instead.
+The storefront is being moved onto the owner's WordPress + WooCommerce site. The browser never talks
+to WordPress: every storefront call goes to the **commerce proxy** in `server/commerce.mjs`, served
+on the app's own origin under `/api/commerce/*` (the dev server already proxies `/api` to the `api`
+service, so there is one origin, no CORS and no cookie games).
+
+```
+browser ──/api/commerce/*──▶ server/commerce.mjs ──▶ WordPress + WooCommerce
+                             the only place the store URL
+                             and the credentials exist
+```
+
+| route | reaches | credential |
+| --- | --- | --- |
+| `GET /api/commerce/store/*` | WooCommerce **Store API** (`wc/store/v1`): products, categories, attributes, reviews, the cart, checkout | none — it is public by design |
+| `GET /api/commerce/content/*` | WordPress REST (`wp/v2`): posts, media, menus | application password, when configured |
+| `GET /api/commerce/admin/*` | WooCommerce REST (`wc/v3`): the reads the Store API cannot serve | consumer key + secret |
+| `GET /api/commerce/health` | — | reports `configured` / `admin` / `content` only |
+
+- Only those three namespaces are routable, `content` and `admin` are **GET-only**, and a
+  state-changing call carrying a foreign `Origin` is refused (403). The proxy is not an open
+  forwarder: `/wp-json/wp/v2/users`, `/wp-admin` and every other path are unreachable through it.
+- Reads are cached in memory for `WOO_CACHE_TTL_MS` (45 s) with request de-duplication in the
+  client. Anything session-bound — cart, checkout, an order, or any request carrying a cookie or a
+  cart token — never touches the cache.
+- Cart sessions round-trip untouched: the shopper's cookie and the Store API's `Cart-Token` /
+  `X-WC-Store-API-Nonce` headers are forwarded both ways. The one rewrite is the `Domain` attribute
+  WordPress puts on its cookie — the browser is on *our* host, so a cookie naming the store's domain
+  would be rejected. Nothing else about the cookie is touched.
+- An upstream failure never reaches the browser verbatim: a 5xx is logged server-side and answered
+  as a Persian 502/504, so a WordPress stack trace, a path or a token cannot leak through the proxy.
+- **No credential ever goes under compose `environment:`** — the store URL and keys arrive through
+  `/run/base44/app.env` and nowhere else, so a value added in the dashboard always wins. Without
+  `WOO_STORE_URL` every commerce route answers 503 and the UI renders a "store not connected" state.
+
+### Frontend data layer
+
+| layer | file | what it owns |
+| --- | --- | --- |
+| transport | `src/lib/woo/client.ts` | de-duplication, the 30 s read cache, the cart session, `CommerceError` |
+| wire types | `src/lib/woo/types.ts` | the Store API / WP REST shapes, for the subset used |
+| models | `src/lib/woo/map.ts` | WooCommerce → the app's own `Product` / `Category` / `BlogPost` |
+| services | `src/services/*.ts` | products, catalog + filters, search, content, cart, checkout, orders |
+| hooks | `src/hooks/useAsync.ts`, `src/hooks/useCatalog.ts` | loading / error / retry, one hook per read |
+
+- Components consume the **services or the hooks**. No component builds a query string, calls
+  `fetch`, or sees a WordPress shape.
+- **Money** is converted once, in `map.ts`: the Store API sends prices as strings in the store's
+  minor unit with a currency code, and Rial is divided by ten to reach the Toman the UI renders.
+  `cartTotals()` in `src/services/cart.ts` is the only place the cart's money is read, so the app
+  cannot disagree with the total WooCommerce will put on the order.
+- The sale rail's minimum discount is a **parameter** (`DEFAULT_MIN_DISCOUNT`, overridable per
+  call), and the discount itself is computed from the two prices the store publishes, never stored.
+- Categories are whatever the store has: `CategoryId` is now `string`, so nothing may assume the
+  original six slugs.
+- The filter rail (`buildFilterGroups` in `src/services/catalog.ts`) is derived from the store's
+  categories and attributes on every load — add or rename an attribute in WooCommerce and it follows.
+- Colours carry no hex in the Store API (term meta is not exposed), so `map.ts` honours a `#rrggbb`
+  written into the term description and otherwise matches the term name against the usual names.
+- The Store API publishes an exact `stock_quantity` only while stock is low
+  (`low_stock_remaining`); the real number lives behind the admin namespace.
+
+### Still to wire
+
+The API layer is in place; these screens still read `src/lib/data.ts`. Order: catalog surfaces
+(home rails, shop, category, product, search, sale) → cart and checkout → content surfaces (header,
+mega menu, footer, blog, FAQ) → customer accounts.
+
+Customer sign-in is the one piece needing a decision before it is written: the Store API has no
+account endpoints, so it is either WordPress **application passwords** proxied server-side or a JWT
+plugin on the site. Never add a proxy route that trusts a client-supplied customer id — that is how
+one shopper reads another's orders. Orders are read back one at a time with the `order_key`
+WooCommerce issued (`src/services/orders.ts`), which is what makes "own orders only" true.
+
+The payment path does *not* carry over to WooCommerce: on WordPress the زرین‌پال gateway plugin
+owns it, and `server/index.mjs` exists for the SPA while it stands alone.
 
 Caveat when verifying payments here: the sandbox cannot reach `zarinpal.com` (the request times
 out), so the live gateway can only be exercised on a host that can. With a stub behind `fetch`, the
@@ -179,7 +250,22 @@ request/verify/redirect logic can still be checked end to end.
 1. `curl -s http://localhost:3000/ | head` — dev server serves the live HTML shell.
 2. `docker compose -f docker-compose.base44.yml ps` — web service must be `healthy`.
 3. Drive the real UI in the preview: add to cart, wishlist, search, filters, checkout steps.
-4. Security regressions: `curl -i http://localhost:3000/api/payment/health` (headers present, no
+4. Commerce proxy: `curl -s http://localhost:3000/api/commerce/health` — `configured: false` until
+   `WOO_STORE_URL` is set, `true` after. `content`/`admin` are GET-only, so a POST answers 405, and
+   an unknown namespace answers 404. To exercise the whole path without the real store, point a
+   throwaway instance at any WordPress site and read its posts:
+
+   ```bash
+   docker compose -f docker-compose.base44.yml exec -T api sh -c '
+     PAYMENT_API_PORT=8999 WOO_STORE_URL=https://wordpress.org/news node server/index.mjs &
+     sleep 1.5
+     curl -s "http://127.0.0.1:8999/api/commerce/content/posts?per_page=2" | head -c 200
+     kill %1'
+   ```
+
+   `x-wp-total` / `x-wp-totalpages` coming back proves pagination survives the proxy, and
+   `x-commerce-cache` flips `miss` → `hit` on the second call.
+5. Security regressions: `curl -i http://localhost:3000/api/payment/health` (headers present, no
    configuration in the body), then `curl -s -o /dev/null -w '%{http_code}' -X POST
    http://localhost:3000/api/payment/request -H 'content-type: application/json' -d
    '{"orderId":"../../x","amount":1000}'` (400) and the same with `-H 'Origin: https://evil.example'`

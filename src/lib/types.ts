@@ -1,10 +1,9 @@
-export type CategoryId =
-  | 'men'
-  | 'women'
-  | 'shoes'
-  | 'accessories'
-  | 'bags'
-  | 'beauty';
+/**
+ * A WooCommerce product-category slug. It used to be a closed union of the six demo
+ * categories; with a real store the taxonomy belongs to WordPress, so this is whatever the
+ * owner creates there and nothing in the app may assume a fixed list.
+ */
+export type CategoryId = string;
 
 export type ProductColor = {
   name: string;

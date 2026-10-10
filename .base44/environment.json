@@ -7,6 +7,31 @@
       "name": "ZARINPAL_MERCHANT_ID",
       "description": "شناسه پذیرنده زرین‌پال (۳۶ کاراکتری) از پنل zarinpal.com → درگاه پرداخت → تنظیمات درگاه. برای پرداخت واقعی لازم است؛ بدون آن سرویس پرداخت با پیام خطا پاسخ می‌دهد.",
       "requiredAtBoot": false
+    },
+    {
+      "name": "WOO_STORE_URL",
+      "description": "آدرس ریشهٔ سایت وردپرس، بدون اسلش انتهایی (مثل https://shop.example.com). لایهٔ /api/commerce محصولات، دسته‌ها، سبد، سفارش و محتوا را از همین آدرس می‌خواند. بدون آن همهٔ مسیرهای فروشگاه پیام «تنظیم نشده» می‌دهند.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "WOO_CONSUMER_KEY",
+      "description": "کلید ووکامرس: ووکامرس → تنظیمات → پیشرفته → REST API → Add key (سطح Read کافی است). فقط سمت سرور استفاده می‌شود و هرگز به مرورگر نمی‌رسد.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "WOO_CONSUMER_SECRET",
+      "description": "Secret همان کلید ووکامرس (همان صفحه، ستون Consumer secret).",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "WP_APP_USER",
+      "description": "اختیاری: نام کاربری وردپرس برای Application Password — برای خواندن منوها و محتوای غیرعمومی از wp/v2. اگر منوها عمومی باشند لازم نیست.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "WP_APP_PASSWORD",
+      "description": "اختیاری: Application Password وردپرس از کاربران → پروفایل → Application Passwords.",
+      "requiredAtBoot": false
     }
   ]
 }

@@ -10,6 +10,10 @@
  *   GET  /api/payment/callback  ?Authority=..&Status=OK&orderId=..      -> 302 back to the site
  *   GET  /api/payment/health                                            -> { ok, ... }
  *
+ * The same process also hosts the commerce proxy (`server/commerce.mjs`), which is the only
+ * place the WooCommerce/WordPress credentials exist; it serves `/api/commerce/*` and is
+ * dispatched below.
+ *
  * Amounts travel in Toman (the store's unit, what the shopper saw) and are sent to
  * Zarinpal in Rial. Requests in flight are held in memory: a restart forgets a payment
  * that is still at the bank, and the shopper lands back on the checkout to try again.
@@ -21,6 +25,7 @@
  * internal detail back to the caller.
  */
 import { createServer } from 'node:http';
+import { handleCommerce } from './commerce.mjs';
 
 const PORT = Number(process.env.PAYMENT_API_PORT ?? 8000);
 const MERCHANT_ID = process.env.ZARINPAL_MERCHANT_ID ?? '';
@@ -315,6 +320,11 @@ const server = createServer(async (req, res) => {
       }
       return await handleCallback(req, res, url);
     }
+
+    // The commerce proxy owns the whole `/api/commerce/*` namespace: the storefront's
+    // catalog, cart, checkout and content all reach WordPress through it, and it is the
+    // only process that holds the WooCommerce credentials. See `server/commerce.mjs`.
+    if (await handleCommerce(req, res, url)) return;
 
     // Nothing else exists: answer without hinting at the routes that do.
     return sendJson(req, res, 404, { error: 'نشانی مورد نظر پیدا نشد.' });
