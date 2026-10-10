@@ -1,22 +1,22 @@
 /**
  * One async read, with the three states every screen has to draw.
  *
- * `loading` starts true so a section can reserve its space (a skeleton) rather than flash
- * empty; a reload keeps the previous data visible while it refreshes; and an abort on
- * unmount or on a dependency change means a slow response can never overwrite a newer one.
+ * `loading` starts true so a section can reserve its space rather than flash empty; a reload keeps
+ * the previous data visible while it refreshes; and an abort on unmount or on a dependency change
+ * means a slow response can never overwrite a newer one.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { CommerceError } from '../lib/woo/client';
+import { ApiError } from '../lib/api/client';
 
 export type AsyncState<T> = {
   data: T | undefined;
   loading: boolean;
   /** `error.unreachable` separates "the store is down" from "this request was refused". */
-  error: CommerceError | undefined;
+  error: ApiError | undefined;
   reload: () => void;
 };
 
-type State<T> = { data?: T; loading: boolean; error?: CommerceError };
+type State<T> = { data?: T; loading: boolean; error?: ApiError };
 
 export const useAsync = <T>(
   loader: (signal: AbortSignal) => Promise<T>,
@@ -44,9 +44,9 @@ export const useAsync = <T>(
         setState({
           loading: false,
           error:
-            error instanceof CommerceError
+            error instanceof ApiError
               ? error
-              : new CommerceError('خطای غیرمنتظره در ارتباط با فروشگاه.', 0),
+              : new ApiError('خطای غیرمنتظره در ارتباط با فروشگاه.', 0),
         });
       });
 

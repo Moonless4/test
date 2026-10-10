@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Heart, ShoppingBag } from 'lucide-react';
-import { products } from '../lib/data';
+import { useProductsByIds } from '../hooks/useCatalog';
+import { SectionError, SectionLoading } from '../components/ui/SectionState';
 import { useStore } from '../context/StoreContext';
 import { toFa } from '../lib/format';
 import EmptyState from '../components/ui/EmptyState';
@@ -12,7 +13,28 @@ import PriceDisplay from '../components/ui/PriceDisplay';
 
 export default function WishlistPage() {
   const { wishlist, toggleWishlist, addToCart } = useStore();
-  const items = products.filter((p) => wishlist.includes(p.id));
+  // The wishlist holds product ids; the products themselves come from the API, and one that has
+  // been retired from the catalogue is left out rather than breaking the page.
+  const { data, loading, error, reload } = useProductsByIds(wishlist);
+  const items = data ?? [];
+
+  if (error && wishlist.length > 0) {
+    return (
+      <div className="container py-10 sm:py-16">
+        <h1 className="mb-6 text-xl font-bold text-ink sm:text-2xl">علاقه‌مندی‌ها</h1>
+        <SectionError error={error} onRetry={reload} />
+      </div>
+    );
+  }
+
+  if (loading && wishlist.length > 0) {
+    return (
+      <div className="container py-10 sm:py-16">
+        <h1 className="mb-6 text-xl font-bold text-ink sm:text-2xl">علاقه‌مندی‌ها</h1>
+        <SectionLoading label="در حال دریافت کالاها…" />
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -80,7 +102,9 @@ export default function WishlistPage() {
                 {product.discount > 0 ? <DiscountBadge value={product.discount} /> : null}
               </div>
 
-              <Rating value={product.rating} count={product.reviewCount} />
+              {product.reviewCount > 0 ? (
+                <Rating value={product.rating} count={product.reviewCount} />
+              ) : null}
 
               <PriceDisplay
                 price={product.price}

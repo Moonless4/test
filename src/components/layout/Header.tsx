@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown, Heart, Search, ShoppingBag, User } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
-import { NAV_LINKS } from '../../lib/nav';
+import { mainMenu } from '../../lib/nav';
+import { useCategories } from '../../hooks/useCatalog';
 import type { CategoryId } from '../../lib/types';
 import { toFa } from '../../lib/format';
 import MegaMenu from './MegaMenu';
@@ -10,6 +11,9 @@ import SearchBox from '../search/SearchBox';
 
 export default function Header() {
   const { cartCount, wishlist, openCart } = useStore();
+  // The menu's category entries are the shop's own: the header follows the catalogue.
+  const { data: categories } = useCategories();
+  const navLinks = mainMenu(categories ?? []);
   const [openMenu, setOpenMenu] = useState<CategoryId | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -96,7 +100,7 @@ export default function Header() {
 
         {/* Second row: the main menu sits under the search bar */}
         <nav className="hidden items-center gap-1 pb-2 min-[769px]:flex" aria-label="ناوبری اصلی">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}

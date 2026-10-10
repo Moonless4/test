@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { ChevronLeft } from 'lucide-react';
-import { discountedProducts } from '../../lib/data';
+import { useDeals } from '../../hooks/useCatalog';
+import { SectionError, SectionLoading } from '../ui/SectionState';
 import CountdownPanel from './CountdownPanel';
 import ProductCard from '../product/ProductCard';
 import Reveal from '../ui/Reveal';
@@ -8,7 +9,8 @@ import { useDragScroll } from '../../hooks/useDragScroll';
 
 /** "Off-time" strip: scrolling deal cards next to the countdown panel. */
 export default function DiscountSection() {
-  const items = discountedProducts;
+  const { data, loading, error, reload } = useDeals();
+  const items = data ?? [];
   const railRef = useRef<HTMLDivElement>(null);
   const railDrag = useDragScroll(railRef);
 
@@ -22,6 +24,30 @@ export default function DiscountSection() {
     const delta = Math.max(el.clientWidth * 0.8, 260);
     el.scrollBy({ left: isRtl ? -delta : delta, behavior: 'smooth' });
   }, []);
+
+  if (error) {
+    return (
+      <section className="mt-12 bg-white py-10 sm:mt-16 sm:py-14">
+        <div className="container">
+          <SectionError error={error} onRetry={reload} />
+        </div>
+      </section>
+    );
+  }
+
+  if (loading) {
+    return (
+      <section className="mt-12 bg-white py-10 sm:mt-16 sm:py-14">
+        <div className="container">
+          <SectionLoading label="در حال دریافت پیشنهادها…" />
+        </div>
+      </section>
+    );
+  }
+
+  // No product is discounted deeply enough: a countdown next to an empty rail is worse than no
+  // section at all, so the whole strip steps out.
+  if (items.length === 0) return null;
 
   return (
     <section

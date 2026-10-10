@@ -1,20 +1,12 @@
-import { categories, megaMenu, products } from './data';
-import type { Category, Product } from './types';
+/**
+ * Search helpers that belong to the browser rather than to the API.
+ *
+ * Matching a term against the catalogue is the API's job (`GET /products?q=`); what is left here
+ * is the Persian text normalisation the suggestion box uses to match a typed term against the
+ * category names it already has, plus the curated chips the search surfaces offer.
+ */
 
-/** Shortest query that starts showing suggestions. */
-export const MIN_QUERY = 2;
-
-/** Candidate chips for "popular searches"; only the ones with real results are offered. */
-const POPULAR_SEARCH_CANDIDATES = [
-  'کت جین',
-  'مانتو کتان',
-  'کتانی کلاسیک',
-  'کیف دستی',
-  'عینک آفتابی',
-  'هودی',
-];
-
-/** Normalises Persian/Arabic glyph variants so search matches either spelling. */
+/** Normalises Persian/Arabic glyph variants so a search matches either spelling. */
 export const normalise = (value: string): string =>
   value
     .replace(/[\u200c\u200f\u200e]/g, '')
@@ -25,71 +17,16 @@ export const normalise = (value: string): string =>
     .trim()
     .toLowerCase();
 
-export type SearchMatches = {
-  products: Product[];
-  categories: Category[];
-};
+/** True when the text contains the term, ignoring spelling variants and spacing. */
+export const matchesTerm = (text: string, term: string): boolean =>
+  normalise(text).includes(normalise(term));
 
-/**
- * Every word of the query must appear in the haystack. Products are matched on name,
- * brand and category title only: descriptions name other items ("با شلوار جین ست میشود"),
- * which made unrelated products show up for a query like "شلوار جین".
- */
-function matches(haystack: string, words: string[]) {
-  const plain = normalise(haystack);
-  return words.every((word) => plain.includes(word));
-}
-
-/** Products and categories matching the query, used by the results page and the live suggestions. */
-export function searchCatalog(query: string): SearchMatches {
-  const term = normalise(query);
-  if (!term) return { products: [], categories: [] };
-  const words = term.split(' ');
-
-  return {
-    products: products.filter((product) => {
-      const categoryTitle =
-        categories.find((c) => c.id === product.category)?.title ?? '';
-      return matches([product.name, product.brand, categoryTitle].join(' '), words);
-    }),
-    categories: categories.filter((category) => matches(category.title, words)),
-  };
-}
-
-/** True when searching the phrase actually returns products or categories. */
-export function hasMatches(phrase: string): boolean {
-  const { products: hits, categories: matched } = searchCatalog(phrase);
-  return hits.length + matched.length > 0;
-}
-
-/** Chips shown under "popular searches" in the search overlay and on the results page. */
-export const POPULAR_SEARCHES = POPULAR_SEARCH_CANDIDATES.filter(hasMatches);
-
-/**
- * Search phrases containing what has been typed so far: the curated mega menu labels
- * first, then categories and product names. Each one is a query of its own.
- */
-export function searchTerms(query: string, limit = 6): string[] {
-  const term = normalise(query);
-  if (term.length < MIN_QUERY) return [];
-
-  const pool = [
-    ...Object.values(megaMenu)
-      .flat()
-      .flatMap((section) => section.links.map((link) => link.label)),
-    ...categories.map((category) => category.title),
-    ...products.map((product) => product.name),
-  ];
-
-  const seen = new Set<string>();
-  const hits: string[] = [];
-  for (const phrase of pool) {
-    const plain = normalise(phrase);
-    // Never suggest a phrase that leads to an empty result page.
-    if (seen.has(plain) || !plain.includes(term) || !hasMatches(phrase)) continue;
-    seen.add(plain);
-    hits.push(phrase);
-    if (hits.length >= limit) break;
-  }
-  return hits;
-}
+/** Chips shown under «جستجوهای پیشنهادی» — a starting point, not a catalogue query. */
+export const POPULAR_SEARCHES = [
+  'پالتو',
+  'مانتو',
+  'شال',
+  'کیف چرم',
+  'کتانی',
+  'نیم‌بوت',
+];

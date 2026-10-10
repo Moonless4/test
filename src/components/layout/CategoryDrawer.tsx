@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronDown, Search, X } from 'lucide-react';
-import { categories, megaMenu } from '../../lib/data';
+import { megaMenu } from '../../lib/data';
 import type { CategoryId } from '../../lib/types';
-import { MIN_QUERY } from '../../lib/search';
-import { NAV_LINKS } from '../../lib/nav';
+import { MIN_QUERY } from '../../services/search';
+import { NAV_HEAD, NAV_TAIL } from '../../lib/nav';
+import { useCategories } from '../../hooks/useCatalog';
+import { SectionLoading } from '../ui/SectionState';
 import Img from '../ui/Img';
 import SearchSuggestions from '../search/SearchSuggestions';
 
@@ -17,12 +19,17 @@ type Props = {
  * Phone category browser: the search field on top, the category rail on the start side
  * and the sub-sections of the selected category in the panel beside it. Sub-section rows
  * expand to the same catalog searches the header mega menu links to.
+ *
+ * The categories are the shop's own — read from the API while the drawer opens — so a category
+ * added in the admin panel shows up here without a code change.
  */
 export default function CategoryDrawer({ open, onClose }: Props) {
   const [query, setQuery] = useState('');
-  const [activeId, setActiveId] = useState<CategoryId>(categories[0].id);
+  const [activeId, setActiveId] = useState<CategoryId | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { data, loading } = useCategories();
+  const categories = data ?? [];
 
   // Every link in the drawer closes it, so the panel only has to reset on close.
   useEffect(() => {
@@ -49,8 +56,9 @@ export default function CategoryDrawer({ open, onClose }: Props) {
   if (!open) return null;
 
   const activeCategory = categories.find((category) => category.id === activeId) ?? categories[0];
-  const sections = megaMenu[activeCategory.id];
-  const quickLinks = NAV_LINKS.filter((link) => !link.category);
+  // A category without sub-sections shows an empty panel rather than crashing on a missing map.
+  const sections = activeCategory ? megaMenu[activeCategory.id] ?? [] : [];
+  const quickLinks = [...NAV_HEAD, ...NAV_TAIL];
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +115,7 @@ export default function CategoryDrawer({ open, onClose }: Props) {
         <div className="flex min-h-0 flex-1">
           <div className="no-scrollbar flex w-[104px] shrink-0 flex-col gap-1.5 overflow-y-auto border-e border-line bg-cream/60 p-2">
             {categories.map((category) => {
-              const isActive = category.id === activeCategory.id;
+              const isActive = category.id === activeCategory?.id;
               return (
                 <button
                   key={category.id}
@@ -139,72 +147,80 @@ export default function CategoryDrawer({ open, onClose }: Props) {
           </div>
 
           <div className="min-w-0 flex-1 overflow-y-auto">
-            <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3.5">
-              <h2 className="text-[15px] font-bold text-ink">{activeCategory.title}</h2>
-              <Link
-                to={`/shop/${activeCategory.id}`}
-                onClick={onClose}
-                className="text-[12.5px] font-medium text-teal-800 transition-colors hover:text-teal-700"
-              >
-                مشاهده همه
-              </Link>
-            </div>
+            {activeCategory ? (
+              <>
+                <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3.5">
+                  <h2 className="text-[15px] font-bold text-ink">{activeCategory.title}</h2>
+                  <Link
+                    to={`/shop/${activeCategory.id}`}
+                    onClick={onClose}
+                    className="text-[12.5px] font-medium text-teal-800 transition-colors hover:text-teal-700"
+                  >
+                    مشاهده همه
+                  </Link>
+                </div>
 
-            <ul>
-              {sections.map((section) => {
-                const isOpen = expanded === section.id;
-                return (
-                  <li key={section.id} className="border-b border-line last:border-0">
-                    <button
-                      type="button"
-                      aria-expanded={isOpen}
-                      onClick={() => setExpanded(isOpen ? null : section.id)}
-                      className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-cream"
-                    >
-                      <Img
-                        src={section.image}
-                        alt=""
-                        loading="lazy"
-                        className="h-10 w-10 shrink-0 rounded-full object-cover"
-                      />
-                      <span className="flex-1 text-start text-[13.5px] font-medium text-ink">
-                        {section.title}
-                      </span>
-                      <ChevronDown
-                        className={`h-4 w-4 shrink-0 transition-transform ${
-                          isOpen ? 'rotate-180 text-teal-800' : 'text-ink/45'
-                        }`}
-                      />
-                    </button>
+                <ul>
+                  {sections.map((section) => {
+                    const isOpen = expanded === section.id;
+                    return (
+                      <li key={section.id} className="border-b border-line last:border-0">
+                        <button
+                          type="button"
+                          aria-expanded={isOpen}
+                          onClick={() => setExpanded(isOpen ? null : section.id)}
+                          className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-cream"
+                        >
+                          <Img
+                            src={section.image}
+                            alt=""
+                            loading="lazy"
+                            className="h-10 w-10 shrink-0 rounded-full object-cover"
+                          />
+                          <span className="flex-1 text-start text-[13.5px] font-medium text-ink">
+                            {section.title}
+                          </span>
+                          <ChevronDown
+                            className={`h-4 w-4 shrink-0 transition-transform ${
+                              isOpen ? 'rotate-180 text-teal-800' : 'text-ink/45'
+                            }`}
+                          />
+                        </button>
 
-                    {isOpen ? (
-                      <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 px-4 pb-4">
-                        {section.links.map((link) => (
-                          <li key={link.label}>
-                            <Link
-                              to={`/search?q=${encodeURIComponent(link.q)}`}
-                              onClick={onClose}
-                              className="block py-1 text-[12.5px] text-muted transition-colors hover:text-teal-800"
-                            >
-                              {link.label}
-                            </Link>
-                          </li>
-                        ))}
-                        <li className="col-span-2">
-                          <Link
-                            to={`/search?q=${encodeURIComponent(section.q)}`}
-                            onClick={onClose}
-                            className="mt-1 inline-block text-[12.5px] font-medium text-teal-800"
-                          >
-                            همه {section.title}
-                          </Link>
-                        </li>
-                      </ul>
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ul>
+                        {isOpen ? (
+                          <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 px-4 pb-4">
+                            {section.links.map((link) => (
+                              <li key={link.label}>
+                                <Link
+                                  to={`/search?q=${encodeURIComponent(link.q)}`}
+                                  onClick={onClose}
+                                  className="block py-1 text-[12.5px] text-muted transition-colors hover:text-teal-800"
+                                >
+                                  {link.label}
+                                </Link>
+                              </li>
+                            ))}
+                            <li className="col-span-2">
+                              <Link
+                                to={`/search?q=${encodeURIComponent(section.q)}`}
+                                onClick={onClose}
+                                className="mt-1 inline-block text-[12.5px] font-medium text-teal-800"
+                              >
+                                همه {section.title}
+                              </Link>
+                            </li>
+                          </ul>
+                        ) : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            ) : (
+              <div className="p-3">
+                <SectionLoading label={loading ? 'در حال دریافت دسته‌بندی‌ها…' : 'دسته‌بندی‌ای ثبت نشده است.'} />
+              </div>
+            )}
 
             <div className="flex flex-wrap gap-2 px-4 pb-6 pt-4">
               {quickLinks.map((link) => (

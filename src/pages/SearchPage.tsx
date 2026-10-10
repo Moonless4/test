@@ -1,31 +1,71 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal, Sparkles, SearchX } from 'lucide-react';
-import { POPULAR_SEARCHES, searchCatalog } from '../lib/search';
-import { applyFilters, emptyFilters, sortProducts, type Filters } from '../lib/filters';
+import { Sparkles, SearchX } from 'lucide-react';
+import { POPULAR_SEARCHES } from '../lib/search';
+import {
+  DEFAULT_SORT,
+  emptyFilters,
+  optionSets,
+  PRICE_CEILING,
+  type Filters,
+} from '../lib/filters';
+import { MIN_QUERY } from '../services/search';
+import { listProductsPage } from '../services/products';
+import { useAsync } from '../hooks/useAsync';
 import { toFa } from '../lib/format';
 import FilterLayout from '../components/shop/FilterLayout';
 import SortSelect from '../components/shop/SortSelect';
 import ProductGrid from '../components/product/ProductGrid';
 import EmptyState from '../components/ui/EmptyState';
+import { SectionError, SectionLoading } from '../components/ui/SectionState';
+
+const PAGE_SIZE = 48;
 
 export default function SearchPage() {
   const [params] = useSearchParams();
   const query = params.get('q') ?? '';
   const [filters, setFilters] = useState<Filters>(emptyFilters);
-  const [sort, setSort] = useState('newest');
+  const [sort, setSort] = useState(DEFAULT_SORT);
 
   // A new query starts from a clean filter set.
   useEffect(() => {
     setFilters({ ...emptyFilters });
-    setSort('newest');
+    setSort(DEFAULT_SORT);
   }, [query]);
 
-  const matches = useMemo(() => searchCatalog(query).products, [query]);
+  const term = query.trim();
+  const searching = term.length >= MIN_QUERY;
+
+  // The search itself is the API's `q` parameter: the store decides what matches, not the browser.
+  const { data, loading, error, reload } = useAsync(
+    (signal) =>
+      searching
+        ? listProductsPage(
+            {
+              search: term,
+              discounted: filters.onlyDiscount || undefined,
+              maxPrice: filters.maxPrice < PRICE_CEILING ? filters.maxPrice : undefined,
+              sort,
+              perPage: PAGE_SIZE,
+            },
+            signal,
+          )
+        : Promise.resolve({ products: [], total: 0, totalPages: 1 }),
+    [term, filters.onlyDiscount, filters.maxPrice, sort],
+  );
+
+  const products = data?.products ?? [];
+  const options = useMemo(() => optionSets(products), [products]);
 
   const results = useMemo(
-    () => sortProducts(applyFilters(matches, filters), sort),
-    [matches, filters, sort],
+    () =>
+      products.filter(
+        (product) =>
+          (filters.sizes.length === 0 || product.sizes.some((s) => filters.sizes.includes(s))) &&
+          (filters.colors.length === 0 ||
+            product.colors.some((c) => filters.colors.includes(c.name))),
+      ),
+    [products, filters.sizes, filters.colors],
   );
 
   return (
@@ -49,7 +89,7 @@ export default function SearchPage() {
               'جستجو در فروشگاه'
             )}
           </h1>
-          {query ? (
+          {searching ? (
             <p className="mt-2 text-[13px] text-muted">{toFa(results.length)} کالا پیدا شد</p>
           ) : (
             <p className="mt-2 text-[13px] text-muted">
@@ -58,7 +98,7 @@ export default function SearchPage() {
           )}
         </div>
 
-        {query && results.length > 0 ? (
+        {searching && results.length > 0 ? (
           <div className="flex w-full items-center gap-2 sm:w-auto">
             <SortSelect value={sort} onChange={setSort} id="search-sort" />
           </div>
@@ -81,7 +121,19 @@ export default function SearchPage() {
         ))}
       </div>
 
-      {matches.length === 0 ? (
+      {error ? <SectionError error={error} onRetry={reload} /> : null}
+
+      {!error && loading ? <SectionLoading label="در حال جستجو…" /> : null}
+
+      {!error && !loading && !searching ? (
+        <EmptyState
+          icon={<SearchX className="h-7 w-7" />}
+          title="عبارتی برای جستجو وارد کنید"
+          text="نام محصول، دسته‌بندی یا بخشی از توضیح کالا را بنویسید تا نتیجه‌ها را ببینید."
+        />
+      ) : null}
+
+      {!error && !loading && searching && results.length === 0 ? (
         <EmptyState
           icon={<SearchX className="h-7 w-7" />}
           title="نتیجه‌ای برای این جستجو پیدا نشد"
@@ -95,28 +147,18 @@ export default function SearchPage() {
             </Link>
           }
         />
-      ) : (
-        <FilterLayout filters={filters} onChange={setFilters} resultCount={results.length}>
-          {results.length === 0 ? (
-            <EmptyState
-              icon={<SlidersHorizontal className="h-7 w-7" />}
-              title="با این فیلترها کالایی پیدا نشد"
-              text="فیلترها را تغییر دهید یا همه فیلترها را حذف کنید تا نتایج بیشتری ببینید."
-              action={
-                <button
-                  type="button"
-                  onClick={() => setFilters({ ...emptyFilters })}
-                  className="h-11 rounded-xl bg-teal-800 px-6 text-sm font-medium text-white transition-colors hover:bg-teal-700"
-                >
-                  حذف فیلترها
-                </button>
-              }
-            />
-          ) : (
-            <ProductGrid products={results} />
-          )}
+      ) : null}
+
+      {!error && !loading && searching && results.length > 0 ? (
+        <FilterLayout
+          filters={filters}
+          onChange={setFilters}
+          resultCount={results.length}
+          options={options}
+        >
+          <ProductGrid products={results} />
         </FilterLayout>
-      )}
+      ) : null}
     </div>
   );
 }

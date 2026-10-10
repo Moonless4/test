@@ -2,12 +2,14 @@ import { useState, type ReactNode } from 'react';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { toFa } from '../../lib/format';
 import type { Filters } from '../../lib/filters';
-import FilterSidebar from './FilterSidebar';
+import FilterSidebar, { type FilterOptions } from './FilterSidebar';
 
 type Props = {
   filters: Filters;
   onChange: (next: Filters) => void;
   resultCount: number;
+  /** The size and colour options the products on screen published. */
+  options: FilterOptions;
   children: ReactNode;
 };
 
@@ -15,7 +17,7 @@ type Props = {
  * Desktop filter sidebar plus the mobile filter drawer, shared by the shop and
  * the search results page.
  */
-export default function FilterLayout({ filters, onChange, resultCount, children }: Props) {
+export default function FilterLayout({ filters, onChange, resultCount, options, children }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
@@ -32,7 +34,12 @@ export default function FilterLayout({ filters, onChange, resultCount, children 
       <div className="grid gap-8 lg:grid-cols-[260px_1fr] lg:gap-10">
         <aside className="hidden lg:block">
           <div className="sticky top-24 max-h-[calc(100vh-7.5rem)] overflow-y-auto rounded-panel border border-line bg-white p-5">
-            <FilterSidebar filters={filters} onChange={onChange} resultCount={resultCount} />
+            <FilterSidebar
+              filters={filters}
+              onChange={onChange}
+              resultCount={resultCount}
+              options={options}
+            />
           </div>
         </aside>
 
@@ -60,7 +67,12 @@ export default function FilterLayout({ filters, onChange, resultCount, children 
               </button>
             </header>
             <div className="flex-1 overflow-y-auto p-5">
-              <FilterSidebar filters={filters} onChange={onChange} resultCount={resultCount} />
+              <FilterSidebar
+                filters={filters}
+                onChange={onChange}
+                resultCount={resultCount}
+                options={options}
+              />
             </div>
             <footer className="border-t border-line p-4">
               <button

@@ -1,17 +1,21 @@
 import { useState, type ReactNode } from 'react';
 import { ChevronDown, RotateCcw } from 'lucide-react';
-import { allBrands, allColors, allSizes } from '../../lib/data';
-import { PRICE_CEILING, emptyFilters, isFiltersDirty, type Filters } from '../../lib/filters';
+import { PRICE_CEILING, PRICE_FLOOR, emptyFilters, isFiltersDirty, type Filters } from '../../lib/filters';
 import { toFa } from '../../lib/format';
 import Price from '../ui/Price';
+
+/** The size and colour options the catalogue actually has, derived from the products on screen. */
+export type FilterOptions = {
+  sizes: string[];
+  colors: { name: string; hex: string }[];
+};
 
 type Props = {
   filters: Filters;
   onChange: (next: Filters) => void;
   resultCount: number;
+  options: FilterOptions;
 };
-
-const RATINGS = [4.5, 4, 3.5, 3];
 
 function toggle(list: string[], value: string): string[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
@@ -56,7 +60,12 @@ function Group({
   );
 }
 
-export default function FilterSidebar({ filters, onChange, resultCount }: Props) {
+/**
+ * The filter rail. Every group here narrows the result set for real: the price and the sale flag
+ * are asked of the API, while sizes and colours are matched against the product attributes the
+ * catalogue published — and a group with no options behind it is not rendered at all.
+ */
+export default function FilterSidebar({ filters, onChange, resultCount, options }: Props) {
   const patch = (partial: Partial<Filters>) => onChange({ ...filters, ...partial });
 
   return (
@@ -80,7 +89,7 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
       <Group title="محدوده قیمت" badge={filters.maxPrice < PRICE_CEILING ? 1 : 0}>
         <input
           type="range"
-          min={200000}
+          min={PRICE_FLOOR}
           max={PRICE_CEILING}
           step={50000}
           value={filters.maxPrice}
@@ -89,106 +98,64 @@ export default function FilterSidebar({ filters, onChange, resultCount }: Props)
           className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-line accent-teal-800"
         />
         <div className="mt-3 flex items-center justify-between text-[11px] text-muted">
-          <span><Price value={200000} /></span>
+          <span><Price value={PRICE_FLOOR} /></span>
           <span className="font-medium text-black">تا <Price value={filters.maxPrice} /></span>
         </div>
       </Group>
 
-      <Group title="سایز" badge={filters.sizes.length}>
-        <div className="flex flex-wrap gap-2">
-          {allSizes.map((size) => {
-            const active = filters.sizes.includes(size);
-            return (
-              <button
-                key={size}
-                type="button"
-                onClick={() => patch({ sizes: toggle(filters.sizes, size) })}
-                aria-pressed={active}
-                className={`h-10 min-w-11 rounded-xl border px-3 text-[13px] font-medium transition-all ${
-                  active
-                    ? 'border-teal-800 bg-teal-800 text-white'
-                    : 'border-line bg-white text-ink hover:border-teal-300'
-                }`}
-              >
-                {toFa(size)}
-              </button>
-            );
-          })}
-        </div>
-      </Group>
+      {options.sizes.length > 0 ? (
+        <Group title="سایز" badge={filters.sizes.length}>
+          <div className="flex flex-wrap gap-2">
+            {options.sizes.map((size) => {
+              const active = filters.sizes.includes(size);
+              return (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => patch({ sizes: toggle(filters.sizes, size) })}
+                  aria-pressed={active}
+                  className={`h-10 min-w-11 rounded-xl border px-3 text-[13px] font-medium transition-all ${
+                    active
+                      ? 'border-teal-800 bg-teal-800 text-white'
+                      : 'border-line bg-white text-ink hover:border-teal-300'
+                  }`}
+                >
+                  {toFa(size)}
+                </button>
+              );
+            })}
+          </div>
+        </Group>
+      ) : null}
 
-      <Group title="رنگ" badge={filters.colors.length}>
-        <div className="flex flex-wrap gap-2">
-          {allColors.map((color) => {
-            const active = filters.colors.includes(color.name);
-            return (
-              <button
-                key={color.name}
-                type="button"
-                onClick={() => patch({ colors: toggle(filters.colors, color.name) })}
-                aria-pressed={active}
-                className={`flex h-10 items-center gap-2 rounded-xl border px-2.5 text-[12px] font-medium transition-all ${
-                  active
-                    ? 'border-teal-800 bg-teal-50 text-black'
-                    : 'border-line bg-white text-ink hover:border-teal-300'
-                }`}
-              >
-                <span
-                  className="h-5 w-5 rounded-full ring-1 ring-black/10"
-                  style={{ backgroundColor: color.hex }}
-                />
-                {color.name}
-              </button>
-            );
-          })}
-        </div>
-      </Group>
-
-      <Group title="برند" badge={filters.brands.length}>
-        <div className="space-y-1">
-          {allBrands.map((brand) => (
-            <label
-              key={brand}
-              className="flex min-h-10 cursor-pointer items-center gap-2.5 rounded-lg px-1 text-[13px] text-ink transition-colors hover:bg-cream"
-            >
-              <input
-                type="checkbox"
-                checked={filters.brands.includes(brand)}
-                onChange={() => patch({ brands: toggle(filters.brands, brand) })}
-                className="h-4 w-4 rounded border-line accent-teal-800"
-              />
-              <span dir="ltr">{brand}</span>
-            </label>
-          ))}
-        </div>
-      </Group>
-
-      <Group title="امتیاز" badge={filters.minRating ? 1 : 0}>
-        <div className="space-y-1">
-          {RATINGS.map((rating) => (
-            <label
-              key={rating}
-              className="flex min-h-10 cursor-pointer items-center gap-2.5 rounded-lg px-1 text-[13px] text-ink transition-colors hover:bg-cream"
-            >
-              <input
-                type="radio"
-                name="rating-filter"
-                checked={filters.minRating === rating}
-                onChange={() => patch({ minRating: rating })}
-                className="h-4 w-4 border-line accent-teal-800"
-              />
-              بالای {toFa(rating)} ستاره
-            </label>
-          ))}
-          <button
-            type="button"
-            onClick={() => patch({ minRating: 0 })}
-            className="px-1 pt-1 text-[12px] text-muted transition-colors hover:text-black"
-          >
-            بدون محدودیت امتیاز
-          </button>
-        </div>
-      </Group>
+      {options.colors.length > 0 ? (
+        <Group title="رنگ" badge={filters.colors.length}>
+          <div className="flex flex-wrap gap-2">
+            {options.colors.map((color) => {
+              const active = filters.colors.includes(color.name);
+              return (
+                <button
+                  key={color.name}
+                  type="button"
+                  onClick={() => patch({ colors: toggle(filters.colors, color.name) })}
+                  aria-pressed={active}
+                  className={`flex h-10 items-center gap-2 rounded-xl border px-2.5 text-[12px] font-medium transition-all ${
+                    active
+                      ? 'border-teal-800 bg-teal-50 text-black'
+                      : 'border-line bg-white text-ink hover:border-teal-300'
+                  }`}
+                >
+                  <span
+                    className="h-5 w-5 rounded-full ring-1 ring-black/10"
+                    style={{ backgroundColor: color.hex }}
+                  />
+                  {color.name}
+                </button>
+              );
+            })}
+          </div>
+        </Group>
+      ) : null}
 
       <Group title="فقط تخفیف‌دارها">
         <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl bg-cream px-3 py-3">

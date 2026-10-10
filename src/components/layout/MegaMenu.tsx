@@ -13,12 +13,17 @@ type Props = {
 /**
  * Header mega menu: the sub-sections of the category on the start side, the links
  * of the selected sub-section in the panel on the end side.
+ *
+ * The sub-sections are editorial (they live in `src/lib/data.ts`), while the categories themselves
+ * come from the shop. A category the menu has no sub-sections for simply does not open a panel.
  */
 export default function MegaMenu({ category, onNavigate }: Props) {
-  const sections = megaMenu[category];
-  const [activeId, setActiveId] = useState(sections[0].id);
+  const sections = megaMenu[category] ?? [];
+  const [activeId, setActiveId] = useState(sections[0]?.id ?? '');
 
-  useEffect(() => setActiveId(megaMenu[category][0].id), [category]);
+  useEffect(() => setActiveId(megaMenu[category]?.[0]?.id ?? ''), [category]);
+
+  if (sections.length === 0) return null;
 
   const active = sections.find((section) => section.id === activeId) ?? sections[0];
 

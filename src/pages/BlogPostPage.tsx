@@ -1,35 +1,50 @@
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, CalendarDays, Clock, User } from 'lucide-react';
-import { blogPosts } from '../lib/data';
+import { ArrowLeft, ArrowRight, CalendarDays } from 'lucide-react';
+import { usePost, usePosts } from '../hooks/useContent';
+import { SectionError, SectionLoading } from '../components/ui/SectionState';
 import EmptyState from '../components/ui/EmptyState';
 import Reveal from '../components/ui/Reveal';
 
 /** Single blog article with its remaining posts below. */
 export default function BlogPostPage() {
   const { id } = useParams<{ id: string }>();
-  const post = blogPosts.find((item) => item.id === id);
+  // The API resolves the post by slug; a draft and a missing slug are the same 404.
+  const { data: post, error, reload } = usePost(id ?? '');
+  const { data: more } = usePosts({ perPage: 4 });
 
-  if (!post) {
+  if (error) {
     return (
       <div className="container py-10 sm:py-16">
-        <EmptyState
-          icon={<ArrowRight className="h-7 w-7" />}
-          title="این مقاله پیدا نشد"
-          text="ممکن است نشانی تغییر کرده باشد."
-          action={
-            <Link
-              to="/blog"
-              className="inline-flex h-11 items-center rounded-xl bg-teal-800 px-5 text-sm font-medium text-white transition-colors hover:bg-teal-700"
-            >
-              بازگشت به وبلاگ
-            </Link>
-          }
-        />
+        {error.status === 404 ? (
+          <EmptyState
+            icon={<ArrowRight className="h-7 w-7" />}
+            title="این مقاله پیدا نشد"
+            text="ممکن است نشانی تغییر کرده باشد."
+            action={
+              <Link
+                to="/blog"
+                className="inline-flex h-11 items-center rounded-xl bg-teal-800 px-5 text-sm font-medium text-white transition-colors hover:bg-teal-700"
+              >
+                بازگشت به وبلاگ
+              </Link>
+            }
+          />
+        ) : (
+          <SectionError error={error} onRetry={reload} />
+        )}
       </div>
     );
   }
 
-  const others = blogPosts.filter((item) => item.id !== post.id);
+  if (!post) {
+    return (
+      <div className="container py-10 sm:py-16">
+        <SectionLoading label="در حال دریافت مقاله…" />
+      </div>
+    );
+  }
+
+  const others = (more?.posts ?? []).filter((item) => item.id !== post.id);
 
   return (
     <article className="container py-8 sm:py-10">
@@ -54,14 +69,14 @@ export default function BlogPostPage() {
             <CalendarDays className="h-3.5 w-3.5" />
             {post.date}
           </span>
-          <span className="flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5" />
-            {post.readTime}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <User className="h-3.5 w-3.5" />
-            {post.author}
-          </span>
+          {/* Nothing is invented for these: the API publishes neither an author nor a reading
+              time, so a line with no value behind it is simply not shown. */}
+          {post.readTime ? (
+            <span className="flex items-center gap-1.5">{post.readTime}</span>
+          ) : null}
+          {post.author ? (
+            <span className="flex items-center gap-1.5">{post.author}</span>
+          ) : null}
         </div>
       </header>
 

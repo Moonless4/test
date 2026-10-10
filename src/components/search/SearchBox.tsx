@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
-import { MIN_QUERY } from '../../lib/search';
+import { MIN_QUERY } from '../../services/search';
 import SearchSuggestions from './SearchSuggestions';
 
 /** Header search field: shows live matches while typing and submits to /search. */

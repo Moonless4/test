@@ -1,26 +1,29 @@
 /**
- * Search — the storefront's own search, run against WooCommerce.
+ * Search — the API's own product search.
  *
- * Keyword, category, attribute, price and sale filtering are the same product query the
- * shop uses; search only decides the ordering and what a suggestion asks for.
+ * Relevance is what a shopper means by "search", so it is not the caller's to change; the API
+ * orders results itself and refuses a term shorter than two characters, which is the same
+ * threshold the suggestion box uses.
  */
 import { listProducts, listProductsPage, type ProductQuery } from './products';
 
-export type SearchQuery = Omit<ProductQuery, 'orderby'>;
+export type SearchQuery = Omit<ProductQuery, 'sort'>;
 
-/** Relevance is what a shopper means by "search", so it is not the caller's to change. */
+/** Shortest query worth asking the store about. */
+export const MIN_QUERY = 2;
+
 export const searchProducts = (query: SearchQuery, signal?: AbortSignal) =>
-  listProducts({ ...query, orderby: 'relevance' }, signal);
+  listProducts(query, signal);
 
 export const searchProductsPage = (query: SearchQuery, signal?: AbortSignal) =>
-  listProductsPage({ ...query, orderby: 'relevance' }, signal);
+  listProductsPage(query, signal);
 
 /**
- * The few products the search box drops down. One character matches half the catalog, so
- * the box stays quiet until the shopper has typed something worth asking for.
+ * The few products the search box drops down. One character matches half the catalogue, so the
+ * box stays quiet until the shopper has typed something worth asking for.
  */
-export const suggestProducts = (term: string, count = 5, signal?: AbortSignal) => {
+export const suggestProducts = (term: string, count = 6, signal?: AbortSignal) => {
   const search = term.trim();
-  if (search.length < 2) return Promise.resolve([]);
-  return listProducts({ search, perPage: count, orderby: 'popularity' }, signal);
+  if (search.length < MIN_QUERY) return Promise.resolve([]);
+  return listProducts({ search, perPage: count }, signal);
 };

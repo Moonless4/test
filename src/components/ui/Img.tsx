@@ -16,6 +16,10 @@ type Props = ImgHTMLAttributes<HTMLImageElement> & {
  * with a burst of requests some of them are aborted by the network layer and the
  * slot would stay empty forever. A failed element gets a fresh, unique URL after
  * a short pause, which recovers the image.
+ *
+ * A product in the catalogue may not have a photo yet (images are uploaded in the admin
+ * panel), so a missing `src` renders a plain cream tile of the same size instead of a broken
+ * image: the layout stays identical whether or not the shop has uploaded artwork.
  */
 export default function Img({ src, alt = '', maxRetries = 2, priority, ...rest }: Props) {
   const [attempt, setAttempt] = useState(0);
@@ -24,6 +28,10 @@ export default function Img({ src, alt = '', maxRetries = 2, priority, ...rest }
 
   const url =
     !src || attempt === 0 ? src : `${src}${src.includes('?') ? '&' : '?'}r=${attempt}`;
+
+  if (!src) {
+    return <div className={`${rest.className ?? ''} bg-cream`} aria-hidden="true" />;
+  }
 
   return (
     <img

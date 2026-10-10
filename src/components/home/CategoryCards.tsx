@@ -1,15 +1,19 @@
 import { useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
-import { categories } from '../../lib/data';
+import { useCategories } from '../../hooks/useCatalog';
 import Img from '../ui/Img';
 import Reveal from '../ui/Reveal';
+import { SectionError, SectionLoading } from '../ui/SectionState';
 import { useDragScroll } from '../../hooks/useDragScroll';
 
 /** Category carousel: rounded photo tiles, swipeable on phones, a single row on desktop. */
 export default function CategoryCards() {
   const railRef = useRef<HTMLDivElement>(null);
   const railDrag = useDragScroll(railRef);
+  // The tiles are whatever the catalogue has — no list of categories is written down here.
+  const { data, loading, error, reload } = useCategories();
+  const categories = data ?? [];
 
   const step = useCallback(() => {
     const el = railRef.current;
@@ -21,6 +25,25 @@ export default function CategoryCards() {
     const delta = Math.max(el.clientWidth * 0.8, 260);
     el.scrollBy({ left: isRtl ? -delta : delta, behavior: 'smooth' });
   }, []);
+
+  if (error) {
+    return (
+      <section className="container mt-10 sm:mt-14">
+        <SectionError error={error} onRetry={reload} />
+      </section>
+    );
+  }
+
+  if (loading) {
+    return (
+      <section className="container mt-10 sm:mt-14">
+        <SectionLoading label="در حال دریافت دسته‌بندی‌ها…" />
+      </section>
+    );
+  }
+
+  // A store with no categories yet has nothing to browse, so the rail stays out of the page.
+  if (categories.length === 0) return null;
 
   return (
     <section className="container mt-10 sm:mt-14" aria-label="دسته‌بندی‌ها">

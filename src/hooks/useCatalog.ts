@@ -1,10 +1,9 @@
 /**
- * The catalog, as hooks. A component asks for what it needs and gets data, a loading flag,
- * an error and a retry — it never calls `fetch`, builds a query string or sees a WordPress
- * shape. Query objects are compared by value, so an inline literal in a component is fine.
+ * The catalogue, as hooks. A component asks for what it needs and gets data, a loading flag, an
+ * error and a retry — it never calls `fetch`, builds a query string or sees a Laravel shape.
+ * Query objects are compared by value, so an inline literal in a component is fine.
  */
 import { useAsync, type AsyncState } from './useAsync';
-import { storeStatus, type StoreStatus } from '../lib/woo/client';
 import {
   getProduct,
   listDeals,
@@ -13,18 +12,14 @@ import {
   listProducts,
   listProductsPage,
   listRelated,
-  listReviews,
   type ProductQuery,
 } from '../services/products';
-import { buildFilterGroups, listRootCategories } from '../services/catalog';
-import { getPost, listPosts, type PostQuery } from '../services/content';
-import type { BlogPost, Category, Product, ProductReview } from '../lib/types';
+import { listCategories } from '../services/catalog';
+import { suggestProducts } from '../services/search';
+import type { Category, Product } from '../lib/types';
 
 /** A stable dependency for an inline query object. */
 const asKey = (value: unknown) => JSON.stringify(value);
-
-/** Whether a store is wired behind the app at all, so a screen can explain itself. */
-export const useStoreStatus = (): AsyncState<StoreStatus> => useAsync(() => storeStatus(), []);
 
 export const useProducts = (query: ProductQuery = {}): AsyncState<Product[]> =>
   useAsync((signal) => listProducts(query, signal), [asKey(query)]);
@@ -37,16 +32,13 @@ export const useProductsPage = (
 export const useProduct = (idOrSlug: string): AsyncState<Product> =>
   useAsync((signal) => getProduct(idOrSlug, signal), [idOrSlug]);
 
-export const useProductReviews = (productId: string): AsyncState<ProductReview[]> =>
-  useAsync((signal) => listReviews(productId, {}, signal), [productId]);
-
 export const useRelatedProducts = (
   product: Product | undefined,
   count = 6,
 ): AsyncState<Product[]> =>
   useAsync(
     (signal) => (product ? listRelated(product, count, signal) : Promise.resolve<Product[]>([])),
-    [product?.id, product?.category, count],
+    [product?.id, count],
   );
 
 export const useNewArrivals = (count = 8): AsyncState<Product[]> =>
@@ -60,16 +52,24 @@ export const useDeals = (minDiscount?: number, count = 12): AsyncState<Product[]
   useAsync((signal) => listDeals({ minDiscount, count }, signal), [minDiscount, count]);
 
 export const useCategories = (): AsyncState<Category[]> =>
-  useAsync((signal) => listRootCategories(signal), []);
+  useAsync((signal) => listCategories(signal), []);
 
-/** The filter rail: groups derived from the store's own categories and attributes. */
-export const useFilterGroups = (): AsyncState<Awaited<ReturnType<typeof buildFilterGroups>>> =>
-  useAsync((signal) => buildFilterGroups(signal), []);
+/** The few products the search box drops down while the shopper types. */
+export const useProductSuggestions = (term: string, count = 6): AsyncState<Product[]> =>
+  useAsync((signal) => suggestProducts(term, count, signal), [term.trim(), count]);
 
-export const usePosts = (
-  query: PostQuery = {},
-): AsyncState<{ posts: BlogPost[]; total: number; totalPages: number }> =>
-  useAsync((signal) => listPosts(query, signal), [asKey(query)]);
-
-export const usePost = (idOrSlug: string): AsyncState<BlogPost> =>
-  useAsync((signal) => getPost(idOrSlug, signal), [idOrSlug]);
+/**
+ * Products by the ids a browser-side list holds (the wishlist). An id the catalogue no longer has
+ * is skipped rather than failing the whole page — a saved product can be retired.
+ */
+export const useProductsByIds = (ids: string[]): AsyncState<Product[]> =>
+  useAsync(
+    async (signal) => {
+      if (ids.length === 0) return [];
+      const found = await Promise.all(
+        ids.map((id) => getProduct(id, signal).catch(() => null)),
+      );
+      return found.filter((product): product is Product => product !== null);
+    },
+    [ids.join(',')],
+  );

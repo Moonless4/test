@@ -12,7 +12,9 @@ import {
   Truck,
   Zap,
 } from 'lucide-react';
-import { COIN_TITLE, COIN_VALUE, coinsFor, getProduct, relatedProducts } from '../lib/data';
+import { COIN_TITLE, COIN_VALUE, coinsFor } from '../lib/data';
+import { useProduct, useRelatedProducts } from '../hooks/useCatalog';
+import { SectionError, SectionLoading } from '../components/ui/SectionState';
 import { toFa } from '../lib/format';
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE, useStore } from '../context/StoreContext';
 import ProductActionBar from '../components/product/ProductActionBar';
@@ -36,8 +38,10 @@ const TABS = [
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
-  const product = getProduct(id);
   const navigate = useNavigate();
+  // The API resolves the product by slug or id, so this page carries no catalogue of its own.
+  const { data: product, error, reload } = useProduct(id ?? '');
+  const { data: related } = useRelatedProducts(product, 6);
   const { addToCart, toggleWishlist, isWishlisted } = useStore();
 
   const [size, setSize] = useState<string>();
@@ -45,15 +49,27 @@ export default function ProductPage() {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<(typeof TABS)[number]['id']>('desc');
 
+  if (error) {
+    return (
+      <div className="container py-16">
+        {error.status === 404 ? (
+          <EmptyState
+            icon={<ShoppingBag className="h-7 w-7" />}
+            title="این محصول پیدا نشد"
+            text="ممکن است آدرس صفحه تغییر کرده باشد. از فروشگاه، محصول دیگری انتخاب کنید."
+            action={<Button to="/shop">بازگشت به فروشگاه</Button>}
+          />
+        ) : (
+          <SectionError error={error} onRetry={reload} />
+        )}
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="container py-16">
-        <EmptyState
-          icon={<ShoppingBag className="h-7 w-7" />}
-          title="این محصول پیدا نشد"
-          text="ممکن است آدرس صفحه تغییر کرده باشد. از فروشگاه، محصول دیگری انتخاب کنید."
-          action={<Button to="/shop">بازگشت به فروشگاه</Button>}
-        />
+        <SectionLoading label="در حال دریافت اطلاعات کالا…" />
       </div>
     );
   }
@@ -62,7 +78,7 @@ export default function ProductPage() {
   const selectedColor = color ?? product.colors[0]?.name ?? '';
   const wishlisted = isWishlisted(product.id);
   const earnedCoins = coinsFor(product.price * qty);
-  const sameCategory = relatedProducts(product, 6);
+  const sameCategory = related ?? [];
 
   const handleAdd = () => addToCart(product, selectedSize, selectedColor, qty);
   const handleBuyNow = () => {
@@ -95,9 +111,7 @@ export default function ProductPage() {
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-[12px] font-medium uppercase tracking-wide text-black" dir="ltr">
-              {product.brand}
-            </span>
+            <span className="text-[12px] font-medium text-muted">{product.brand}</span>
             {product.discount > 0 ? <DiscountBadge value={product.discount} /> : null}
           </div>
 
@@ -106,9 +120,14 @@ export default function ProductPage() {
           </h1>
 
           <div className="mt-3 flex items-center gap-3">
-            <Rating value={product.rating} size="md" showValue />
-            <span className="text-[12px] text-muted">({toFa(product.reviewCount)} نظر)</span>
-            <span className="h-1 w-1 rounded-full bg-line" />
+            {/* No ratings endpoint yet, so a score appears only when the catalogue has one. */}
+            {product.reviewCount > 0 ? (
+              <>
+                <Rating value={product.rating} size="md" showValue />
+                <span className="text-[12px] text-muted">({toFa(product.reviewCount)} نظر)</span>
+                <span className="h-1 w-1 rounded-full bg-line" />
+              </>
+            ) : null}
             <span
               className={`text-[12px] font-medium ${
                 product.stock > 5 ? 'text-black' : 'text-sale'
@@ -136,6 +155,7 @@ export default function ProductPage() {
 
           <div className="my-6 h-px bg-line" />
 
+          {product.sizes.length > 0 ? (
           <div>
             <h2 className="mb-3 text-[13px] font-bold text-ink">انتخاب سایز</h2>
             <div className="flex flex-wrap gap-2">
@@ -156,7 +176,9 @@ export default function ProductPage() {
               ))}
             </div>
           </div>
+          ) : null}
 
+          {product.colors.length > 0 ? (
           <div className="mt-6">
             <h2 className="mb-3 text-[13px] font-bold text-ink">انتخاب رنگ</h2>
             <div className="flex flex-wrap gap-2">
@@ -182,6 +204,7 @@ export default function ProductPage() {
               ))}
             </div>
           </div>
+          ) : null}
 
           <div className="mt-6 flex items-center gap-3">
             <span className="text-[13px] font-bold text-ink">تعداد:</span>
@@ -328,7 +351,9 @@ export default function ProductPage() {
 
           {tab === 'reviews' ? (
             <div className="max-w-4xl rounded-panel border border-line bg-cream p-5 sm:p-6">
-              <div className="flex items-center gap-4">
+              <div
+                className={`flex items-center gap-4 ${product.reviewCount === 0 ? 'hidden' : ''}`}
+              >
                 <span className="text-3xl font-black text-black">{toFa(product.rating)}</span>
                 <div>
                   <Rating value={product.rating} size="md" />
@@ -337,6 +362,11 @@ export default function ProductPage() {
                   </p>
                 </div>
               </div>
+              {product.reviewCount === 0 ? (
+                <p className="text-[13px] leading-7 text-muted">
+                  برای این کالا هنوز امتیازی ثبت نشده است؛ اولین نظر را شما ثبت کنید.
+                </p>
+              ) : null}
               <p className="mt-4 text-[13px] leading-7 text-muted">
                 نظرات خریداران و فرم ثبت نظر در بخش «نظرات مشتریان» پایین همین صفحه است.
               </p>

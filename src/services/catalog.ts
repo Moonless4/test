@@ -1,47 +1,28 @@
 /**
- * Catalog structure — categories, attributes and the filter model built from them.
+ * Catalog structure — the categories the store actually has.
  *
- * The filter groups are derived from whatever the store has: add an attribute in
- * WooCommerce and it appears here on the next load, rename it and the label follows, remove
- * it and the group is gone. No option list is written down in the frontend.
+ * Nothing here is written down in the frontend: add, rename or deactivate a category in the admin
+ * panel and every surface (header, drawer, home tiles, shop heading, breadcrumb) follows on the
+ * next load. `Category.id` is the category's **slug**, which is both what the routes carry and
+ * what `GET /products?category=` expects.
  */
-import { get, getList } from '../lib/woo/client';
-import { toCategory } from '../lib/woo/map';
-import type { WooAttribute, WooCategory, WooTerm } from '../lib/woo/types';
+import { get } from '../lib/api/client';
+import { toCategory } from '../lib/api/map';
+import type { ApiCategory } from '../lib/api/types';
 import type { Category } from '../lib/types';
 
-export const listCategories = async (
-  { parent, hideEmpty = true, perPage = 100 }: { parent?: number; hideEmpty?: boolean; perPage?: number } = {},
-  signal?: AbortSignal,
-): Promise<Category[]> => {
-  const { items } = await getList<WooCategory>(
-    '/store/products/categories',
-    { parent, hide_empty: hideEmpty, per_page: perPage },
-    signal,
-  );
-  return items.map(toCategory);
+export const listCategories = async (signal?: AbortSignal): Promise<Category[]> => {
+  const categories = await get<ApiCategory[]>('/categories', undefined, signal);
+  return categories.map(toCategory);
 };
 
-/** Only the top level of the category tree — the children of any category are `parent`. */
+/** The API returns the active categories flat, so the root list is the list. */
 export const listRootCategories = (signal?: AbortSignal): Promise<Category[]> =>
-  listCategories({ parent: 0 }, signal);
-
-export const listAttributes = (signal?: AbortSignal): Promise<WooAttribute[]> =>
-  get<WooAttribute[]>('/store/products/attributes', { per_page: 100 }, signal);
-
-export const listAttributeTerms = (attributeId: number, signal?: AbortSignal): Promise<WooTerm[]> =>
-  get<WooTerm[]>(`/store/products/attributes/${attributeId}/terms`, { per_page: 100 }, signal);
-
-/* ------------------------------------------------------------------ *
- * Filter model
- * ------------------------------------------------------------------ */
+  listCategories(signal);
 
 export type FilterOption = {
   label: string;
-  /** The term slug (or literal) the option stands for. */
   value: string;
-  /** The attribute taxonomy this option belongs to, for a product-attribute group. */
-  taxonomy?: string;
 };
 
 export type FilterGroup = {
@@ -51,16 +32,15 @@ export type FilterGroup = {
 };
 
 /**
- * Built from the store, not from a list in the code: the category tree, sale and stock
- * flags, then one group per WooCommerce attribute that actually has terms.
+ * The groups the catalogue can actually be filtered by server-side: its categories, its sale flag
+ * and its stock. Size, colour and brand are attributes of an individual product rather than a
+ * filterable taxonomy in this API, so they are not offered here — the filter rail must only show
+ * filters that really narrow the result set.
  */
 export const buildFilterGroups = async (signal?: AbortSignal): Promise<FilterGroup[]> => {
-  const [categories, attributes] = await Promise.all([
-    listCategories({}, signal),
-    listAttributes(signal),
-  ]);
+  const categories = await listCategories(signal);
 
-  const groups: FilterGroup[] = [
+  return [
     {
       id: 'category',
       label: 'دسته‌بندی',
@@ -71,29 +51,5 @@ export const buildFilterGroups = async (signal?: AbortSignal): Promise<FilterGro
       label: 'پیشنهاد ویژه',
       options: [{ label: 'فقط تخفیف‌دارها', value: 'true' }],
     },
-    {
-      id: 'stock',
-      label: 'موجودی',
-      options: [{ label: 'فقط کالاهای موجود', value: 'instock' }],
-    },
   ];
-
-  const attributeGroups = await Promise.all(
-    attributes.map(async (attribute) => {
-      const terms = await listAttributeTerms(attribute.id, signal);
-      if (terms.length === 0) return null;
-      const group: FilterGroup = {
-        id: `attribute-${attribute.id}`,
-        label: attribute.name,
-        options: terms.map((term) => ({
-          label: term.name,
-          value: term.slug,
-          taxonomy: attribute.taxonomy ?? undefined,
-        })),
-      };
-      return group;
-    }),
-  );
-
-  return [...groups, ...attributeGroups.filter((group): group is FilterGroup => group !== null)];
 };

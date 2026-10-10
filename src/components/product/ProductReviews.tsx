@@ -23,7 +23,13 @@ export default function ProductReviews({ product }: { product: Product }) {
     <section id="product-reviews" className="mt-12 scroll-mt-24 sm:mt-16">
       <SectionHeader eyebrow="تجربه خریداران" title="نظرات مشتریان" />
 
-      <div className="flex flex-wrap items-center gap-x-8 gap-y-4 rounded-panel border border-line bg-cream p-5 sm:p-6">
+      {/* The catalogue has no rating yet, so the summary appears only once a review exists — a
+          block reading «۰ از ۰» would say less than the empty note below it. */}
+      <div
+        className={`flex-wrap items-center gap-x-8 gap-y-4 rounded-panel border border-line bg-cream p-5 sm:p-6 ${
+          total === 0 ? 'hidden' : 'flex'
+        }`}
+      >
         <div className="flex items-center gap-3">
           <span className="text-3xl font-black text-black">{toFa(average.toFixed(1))}</span>
           <div>

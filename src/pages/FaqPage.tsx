@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Phone } from 'lucide-react';
-import { faqGroups } from '../lib/faq';
+import { useFaqGroups } from '../hooks/useContent';
+import { SectionError, SectionLoading } from '../components/ui/SectionState';
 import FaqAccordion from '../components/faq/FaqAccordion';
 import Reveal from '../components/ui/Reveal';
 import SectionHeader from '../components/ui/SectionHeader';
@@ -11,6 +12,9 @@ const ALL = 'all';
 
 export default function FaqPage() {
   const [activeGroup, setActiveGroup] = useState<string>(ALL);
+  // The FAQ lives in the admin panel; the API groups its entries the same way this page shows them.
+  const { data, loading, error, reload } = useFaqGroups();
+  const faqGroups = data ?? [];
 
   const total = faqGroups.reduce((count, group) => count + group.items.length, 0);
   const groups =
@@ -24,6 +28,24 @@ export default function FaqPage() {
     }`;
 
   const countClass = (isActive: boolean) => `text-[11px] ${isActive ? 'text-white/70' : 'text-muted'}`;
+
+  if (error) {
+    return (
+      <div className="container py-8 sm:py-10">
+        <SectionHeader eyebrow="پشتیبانی مدورا" title="سوالات متداول" />
+        <SectionError error={error} onRetry={reload} />
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="container py-8 sm:py-10">
+        <SectionHeader eyebrow="پشتیبانی مدورا" title="سوالات متداول" />
+        <SectionLoading label="در حال دریافت پرسش‌ها…" />
+      </div>
+    );
+  }
 
   return (
     <div className="container py-8 sm:py-10">

@@ -1,13 +1,14 @@
 import { ChevronLeft } from 'lucide-react';
-import { sortOptions } from '../../lib/data';
+import { SORT_OPTIONS } from '../../lib/filters';
+import type { ProductSort } from '../../services/products';
 
 type Props = {
-  value: string;
-  onChange: (value: string) => void;
+  value: ProductSort;
+  onChange: (value: ProductSort) => void;
   id?: string;
 };
 
-/** Ordering dropdown shared by the shop and the search results. */
+/** Ordering dropdown shared by the shop and the search results — the API's own sort values. */
 export default function SortSelect({ value, onChange, id = 'sort' }: Props) {
   return (
     <div className="relative flex-1 sm:flex-none">
@@ -17,10 +18,10 @@ export default function SortSelect({ value, onChange, id = 'sort' }: Props) {
       <select
         id={id}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value as ProductSort)}
         className="h-11 w-full appearance-none rounded-xl border border-line bg-white ps-4 pe-9 text-[13px] font-medium text-ink outline-none transition-colors hover:border-teal-300 sm:w-[190px]"
       >
-        {sortOptions.map((option) => (
+        {SORT_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>

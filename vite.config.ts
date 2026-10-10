@@ -10,9 +10,17 @@ export default defineConfig({
     // The sandbox preview reaches the dev server through a proxy whose host
     // is environment-specific, so all hosts must be allowed.
     allowedHosts: true,
-    // The payment service runs beside the dev server; keeping it behind /api gives the
-    // app, the Zarinpal callback and the session one origin — no CORS, no cookie games.
+    // Two services sit behind /api, both so the browser keeps one origin (no CORS, no
+    // cookie games): the Laravel API under /api/v1, and the payment service for the rest.
+    // The order matters — Vite takes the first matching key.
     proxy: {
+      // `changeOrigin` stays off: the Laravel app allowlists the preview's own Host
+      // (TRUSTED_HOSTS in docker-compose.base44.yml), so rewriting it to the container
+      // name would be answered with 400.
+      '/api/v1': {
+        target: process.env.BACKEND_API_ORIGIN ?? 'http://backend:8000',
+        changeOrigin: false,
+      },
       '/api': {
         target: process.env.PAYMENT_API_ORIGIN ?? 'http://api:8000',
         changeOrigin: true,
