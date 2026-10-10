@@ -209,6 +209,19 @@ class PreflightCommand extends Command
             $hosts === [] ? 'Empty — host header checking is disabled.' : implode(', ', $hosts),
         );
 
+        $anyProxy = (bool) config('security.trust_any_proxy');
+        $proxies = (array) config('security.trust_proxies');
+
+        $this->add(
+            $results,
+            'Application',
+            'TRUST_PROXIES',
+            $anyProxy ? 'WARN' : 'PASS',
+            $anyProxy
+                ? '`*` — every peer is believed to be a proxy, so any caller can forge X-Forwarded-For and bypass the login lockout and the per-IP limits. List the real proxy\'s addresses, or leave it empty on plain DirectAdmin hosting.'
+                : ($proxies === [] ? 'empty (correct: the web server supplies REMOTE_ADDR)' : implode(', ', $proxies)),
+        );
+
         $this->add(
             $results,
             'Application',

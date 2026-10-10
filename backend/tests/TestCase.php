@@ -44,9 +44,9 @@ abstract class TestCase extends BaseTestCase
         'TRUSTED_HOSTS' => '',
         'CORS_ALLOWED_ORIGINS' => '',
         // The test client is not a proxy: nothing it sends in X-Forwarded-*/CF-IPCountry may be
-        // believed. Compose exports TRUST_PROXIES=* for the sandbox (there the preview really is
-        // behind one), and without this override the country- and address-based detections would
-        // run on values the caller chose — the opposite of what their tests assert.
+        // believed. The suite and compose both leave TRUST_PROXIES empty, and this override pins
+        // that here so the country- and address-based detections can never run on values the caller
+        // chose — the opposite of what their tests assert (see AdminLoginShieldTest).
         'TRUST_PROXIES' => '',
     ];
 

@@ -6,6 +6,7 @@ use App\Http\Middleware\RequireFullAuthentication;
 use App\Http\Middleware\RequireRecentAuth;
 use App\Http\Middleware\RequireTwoFactor;
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\TrustConfiguredProxies;
 use App\Http\Middleware\VerifyTurnstile;
 use App\Http\Middleware\VerifyWebhookSignature;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -41,23 +42,19 @@ return Application::configure(basePath: dirname(__DIR__))
          */
         $middleware->redirectGuestsTo(null);
 
-        // DirectAdmin runs Apache or LiteSpeed in front of PHP: TLS is terminated there and the
-        // real client address arrives in X-Forwarded-*. TRUST_PROXIES is `*` only because the
-        // application is reachable solely through that web server; a host with a load balancer
-        // sets the balancer's address instead.
-        $proxies = env('TRUST_PROXIES');
-
-        if (is_string($proxies) && $proxies !== '') {
-            $middleware->trustProxies(
-                at: $proxies === '*' ? '*' : explode(',', $proxies),
-                // X-Forwarded-Host is deliberately not trusted: the Host header is checked
-                // against the allowlist instead of being taken from a header a client can set.
-                headers: Request::HEADER_X_FORWARDED_FOR
-                    | Request::HEADER_X_FORWARDED_PROTO
-                    | Request::HEADER_X_FORWARDED_PORT
-                    | Request::HEADER_X_FORWARDED_PREFIX,
-            );
-        }
+        /*
+         * Reverse-proxy trust (`TRUST_PROXIES` → config/security.php).
+         *
+         * Replace the framework's TrustProxies rather than configure it from here: this callback
+         * runs before the configuration is loaded, so neither `config()` nor `env()` can see the
+         * host's value — and `env()` would return null anyway once `php artisan optimize` has
+         * cached the configuration. App\Http\Middleware\TrustConfiguredProxies reads the value per
+         * request, and trusts nobody unless a host named a real proxy.
+         */
+        $middleware->replace(
+            \Illuminate\Http\Middleware\TrustProxies::class,
+            TrustConfiguredProxies::class,
+        );
 
         // Both run before routing, so a request for the wrong domain, or a write coming from a
         // foreign page, never reaches a controller.

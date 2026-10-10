@@ -90,7 +90,7 @@ Fill in at minimum:
 | `DB_*` | The database and user from §3. |
 | `CORS_ALLOWED_ORIGINS` | The storefront origins, comma-separated, e.g. `https://example.com,https://www.example.com`. Never `*`. |
 | `TRUSTED_HOSTS` | `api.example.com,example.com,.example.com` — a leading dot matches the domain and its subdomains. Empty disables host checking. |
-| `TRUST_PROXIES` | `*` when the app is reachable only through the web server (the normal DirectAdmin setup). |
+| `TRUST_PROXIES` | Leave **empty** on plain DirectAdmin hosting — Apache/LiteSpeed runs PHP and puts the real client address in `REMOTE_ADDR`, so `X-Forwarded-For` must not be believed. Set it only to a proxy that really is in front of the app (a CDN's published ranges, a load balancer's address, or `127.0.0.1,::1` for a loopback reverse proxy); `*` is only safe when there is no other way in. `app:preflight` warns when it is `*`. |
 | `SESSION_SECURE_COOKIE` | `true`. |
 | `MAIL_*` | The mailbox created in DirectAdmin; otherwise password-reset mail cannot be delivered. |
 | `PAYMENT_GATEWAY` | `zarinpal` (the `fake` gateway exists for the sandbox/test suite only). |

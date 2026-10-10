@@ -1,5 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { fileURLToPath } from 'node:url';
+
+/*
+ * The Laravel API lives inside this project's root (`backend/`). Vite's `server.fs.deny` is matched
+ * against absolute paths, so the tree is named absolutely — a bare `backend/**` would never match
+ * `/app/backend/…`, and a `**/backend/**` would also catch a `backend/` folder inside a package in
+ * `node_modules`.
+ */
+const laravelRoot = fileURLToPath(new URL('./backend', import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
@@ -33,6 +42,26 @@ export default defineConfig({
       // Bind mounts do not always emit inotify events — poll instead.
       usePolling: true,
       interval: 300,
+    },
+    fs: {
+      /*
+       * The dev server is publicly reachable through the preview proxy, and this project's root is
+       * the whole repository — the Laravel API lives inside it at `backend/`. Serving the root
+       * therefore published the API's log file (`backend/storage/logs/laravel.log`, which carries
+       * shopper emails, addresses and user agents), its compiled Blade templates, its sources and
+       * its `composer.json`. Vite's own defaults already deny `.env`; this adds the server-side
+       * tree the SPA never imports.
+       *
+       * On a real host this does not apply — the SPA is served from the built `dist/` and the API
+       * from its own document root — but the preview is a shared, public address.
+       */
+      deny: [
+        '.env',
+        '.env.*',
+        '*.{crt,pem}',
+        '**/.git/**',
+        `${laravelRoot}/**`,
+      ],
     },
   },
   build: {

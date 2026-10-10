@@ -20,9 +20,18 @@ Request ──▶ [1] Host allowlist ──▶ [2] Origin check ──▶ [3] Ra
   **400** before routing or authentication runs. A leading dot matches the domain and its
   subdomains. On shared hosting, where one IP serves many domains, this closes host-header
   injection. An empty list disables the check — a production host must set it.
-- **Proxies are trusted explicitly.** `TRUST_PROXIES` decides whose `X-Forwarded-*` headers are
-  believed (`bootstrap/app.php`). `X-Forwarded-Host` is deliberately **not** trusted: the Host header
-  is checked against the allowlist instead of being taken from a client-settable header.
+- **No proxy is trusted by default.** `TRUST_PROXIES` (read in `bootstrap/app.php` from
+  `config/security.php`) decides whose `X-Forwarded-*` headers are believed. **Empty is the correct
+  value on the target platform**: DirectAdmin runs Apache or LiteSpeed as the SAPI, so PHP already
+  receives the real client address in `REMOTE_ADDR` and `X-Forwarded-For` is only a header the caller
+  chose. Believing it would let any client pick its own address — and the login lockout
+  (`LoginShield`), the per-IP rate limits (`AppServiceProvider`) and the "new address" sign-in signal
+  are all keyed on that address. Set it only to addresses that can *only* be the app's own front-end
+  proxy: a CDN's published ranges, a load balancer's address, or `127.0.0.1,::1` when the host's web
+  server reverse-proxies to the app over loopback. `*` ("every peer is a proxy") is only safe when
+  the application is unreachable by any other path — never on shared hosting. `app:preflight` warns
+  when it is `*`. `X-Forwarded-Host` is deliberately **not** trusted in any configuration: the Host
+  header is checked against the allowlist instead of being taken from a client-settable header.
 - **HSTS** is emitted only when the request arrived over TLS (`SecurityHeaders`), with a one-year
   `max-age` and `includeSubDomains` by default. `preload` is off: a wrong preload is hard to undo.
 - TLS itself is the host's job. The API never terminates it, and neither `curl` configuration nor
@@ -189,8 +198,11 @@ These are not bugs and no application change removes them:
    DirectAdmin, and a host that serves plain HTTP gets no HSTS at all.
 2. **No WAF, no IP reputation.** Rate limits slow an attacker; they do not stop a distributed
    password-spray. A host under sustained attack needs edge filtering.
-3. **`TRUST_PROXIES=*` assumes the app is reachable only through the web server.** A host with a load
-   balancer must set the balancer's address instead.
+3. **`TRUST_PROXIES` is the host's own claim about its network.** It is empty by default, which is
+   correct for plain DirectAdmin hosting; a host behind a CDN or a load balancer must list that
+   proxy's addresses, and `*` is only safe where there is no other way in. A host that sets `*` on a
+   shared account re-opens client address spoofing for the lockout, the per-IP limits and the
+   sign-in monitoring — `app:preflight` warns about it.
 4. **Rate limiting for guests is per IP**, so shoppers behind one carrier NAT share a budget. The
    defaults are generous enough for a shop; tighten them deliberately, not by accident.
 5. **Log files and the audit trail contain personal data** (email addresses, IPs, user agents) and

@@ -171,6 +171,58 @@ class AdminLoginShieldTest extends TestCase
         $this->assertSame('IR', $user->fresh()->last_login_country);
     }
 
+    public function test_a_spoofed_forwarding_header_cannot_reset_the_lockout_or_forge_the_address(): void
+    {
+        $user = $this->user();
+        $max = (int) config('security.login_shield.max_failures');
+
+        for ($attempt = 0; $attempt < $max; $attempt++) {
+            $this->failLogin($user->email)->assertStatus(422);
+        }
+
+        // The pair is locked. Claiming a different address in `X-Forwarded-For` must not buy a fresh
+        // budget: no peer is trusted as a proxy here (`TRUST_PROXIES` is empty — DirectAdmin's web
+        // server hands PHP the real client address in REMOTE_ADDR, and on the sandbox the API is
+        // reachable directly), so the header cannot change which address the request is keyed on.
+        $this->withHeaders(['X-Forwarded-For' => '198.51.100.99'])
+            ->postJson('/api/v1/auth/login', ['email' => $user->email, 'password' => 'password'])
+            ->assertStatus(429)
+            ->assertJsonPath('code', 'login_throttled');
+
+        $this->travel((int) config('security.login_shield.lockout_minutes') + 1)->minutes();
+
+        // A sign-in that succeeds afterwards is still recorded against the address that connected,
+        // never the one the caller claimed — the audit trail and the "new address" signal depend on
+        // it.
+        $this->withHeaders(['X-Forwarded-For' => '198.51.100.99'])
+            ->postJson('/api/v1/auth/login', ['email' => $user->email, 'password' => 'password'])
+            ->assertOk();
+
+        $this->assertDatabaseHas('login_attempts', ['email' => $user->email, 'ip' => '127.0.0.1']);
+        $this->assertDatabaseMissing('login_attempts', ['email' => $user->email, 'ip' => '198.51.100.99']);
+        $this->assertSame('127.0.0.1', $user->fresh()->last_login_ip);
+    }
+
+    /**
+     * The other half of the same coin: it is the *configuration* that decides whether the header is
+     * believable. With `*` the claimed address is taken at face value — which is exactly why the
+     * shipped value is empty — and this assertion is what proves the check above is not simply
+     * inert (a middleware that never trusted anything would pass the previous test too).
+     */
+    public function test_the_proxy_allowlist_is_what_makes_the_forwarding_header_believable(): void
+    {
+        config(['security.trust_any_proxy' => true]);
+
+        $user = $this->user();
+
+        $this->withHeaders(['X-Forwarded-For' => '198.51.100.99'])
+            ->postJson('/api/v1/auth/login', ['email' => $user->email, 'password' => 'password'])
+            ->assertOk();
+
+        $this->assertDatabaseHas('login_attempts', ['email' => $user->email, 'ip' => '198.51.100.99']);
+        $this->assertSame('198.51.100.99', $user->fresh()->last_login_ip);
+    }
+
     public function test_an_unusual_number_of_live_sessions_is_recorded(): void
     {
         $user = $this->user();

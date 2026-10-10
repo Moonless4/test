@@ -123,7 +123,13 @@ services:
       # The proxy rewrites Host to `<port>-<sandbox id>.<domain>`; the sandbox id rotates, so
       # the allowlist is a domain wildcard plus the public host and the container itself.
       - TRUSTED_HOSTS=.${BASE44_SANDBOX_HOST_DOMAIN},.${BASE44_PUBLIC_HOST_SUFFIX},localhost,127.0.0.1
-      - TRUST_PROXIES=*
+      # Trust nobody as a proxy. The API is reachable directly on its own host port here, and the
+      # preview's proxy chain ends at addresses we cannot pin (the platform's edge and the docker
+      # gateway) — believing X-Forwarded-For would let any caller pick its own address and walk
+      # around the login lockout and the per-IP limits. Empty = `X-Forwarded-*` is ignored; the
+      # client address is the peer that actually connected. A real host sets the verified proxy
+      # address instead (see backend/.env.example).
+      - TRUST_PROXIES=
       # Local database. These are sandbox-local values, not application secrets: production
       # credentials live in the host's .env only.
       - DB_CONNECTION=mysql

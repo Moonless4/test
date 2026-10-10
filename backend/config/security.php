@@ -21,6 +21,35 @@ return [
     'enforce_trusted_hosts' => (bool) env('ENFORCE_TRUSTED_HOSTS', true),
 
     /*
+     * Reverse-proxy trust — whose `X-Forwarded-*` headers are believed (bootstrap/app.php).
+     *
+     * Empty is the correct value for the platform this application targets: DirectAdmin serves PHP
+     * through Apache or LiteSpeed, which hands PHP the real client address in `REMOTE_ADDR`. The
+     * client's `X-Forwarded-For` is only a request header there, so believing it would let any
+     * caller choose its own address and walk around the login lockout, the per-IP rate limits and
+     * the sign-in monitoring.
+     *
+     * Set it only to addresses that can *only* be the app's own front-end proxy:
+     *   - a CDN in front of the site (Cloudflare, ArvanCloud, …): that provider's published ranges,
+     *   - a load balancer: the balancer's address,
+     *   - the host's own web server, when it reverse-proxies to the app over loopback: 127.0.0.1,::1.
+     *
+     * `*` says "every peer is a proxy". It is only ever safe when the application cannot be reached
+     * except through that one proxy — on shared hosting it can, so never set it there.
+     *
+     * This lives in a config file, not in bootstrap/app.php, on purpose: `env()` outside config
+     * files returns null once `php artisan optimize` has cached the configuration, which would have
+     * silently turned the setting off on a correctly-deployed host.
+     */
+    'trust_proxies' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env('TRUST_PROXIES', '')),
+    ))),
+
+    // The explicit `*`: an operator's deliberate "the only way in is through my proxy".
+    'trust_any_proxy' => trim((string) env('TRUST_PROXIES', '')) === '*',
+
+    /*
      * CORS origins allowed to make state-changing calls. Kept in one place so the CORS handler
      * and the origin check cannot drift apart. Never `*` for an authenticated API.
      */
