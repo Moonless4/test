@@ -303,6 +303,3 @@ export function SimpleSearchForm({ service, className }: { service: SimpleServic
     </form>
   );
 }
-
-export { VISA_TYPES, VISA_COUNTRIES, INSURANCE_TYPES, INSURANCE_DURATIONS, TOUR_DURATIONS };
-export type { SimpleService };

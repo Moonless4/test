@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Drawer } from '@/components/ui/Drawer';
 import { Icon } from '@/components/ui/Icon';
 import { Logo } from './Logo';
-import { NAV_ITEMS } from './Header';
+import { NAV_ITEMS } from '@/data/navigation';
 import { MORE_SERVICES, OTHER_SERVICES } from '@/data/services';
 import { DOMESTIC_DESTINATIONS, INTERNATIONAL_DESTINATIONS } from '@/data/destinations';
 import { SUPPORT_CONTACT } from '@/data/content';

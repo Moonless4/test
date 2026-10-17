@@ -7,22 +7,8 @@ import { Icon } from '@/components/ui/Icon';
 import { useApp } from '@/context/AppContext';
 import { OTHER_SERVICES } from '@/data/services';
 import { SUPPORT_CONTACT } from '@/data/content';
+import { NAV_ITEMS } from '@/data/navigation';
 import { cn } from '@/lib/utils';
-
-interface NavItem {
-  label: string;
-  href: string;
-  /** منوی کشویی این آیتم (فعلاً فقط «سایر خدمات») */
-  menu?: 'more';
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { label: 'پرواز', href: '/flights' },
-  { label: 'هتل', href: '/hotels' },
-  { label: 'قطار', href: '/trains' },
-  { label: 'تور', href: '/tours' },
-  { label: 'سایر خدمات', href: '/services', menu: 'more' },
-];
 
 export function Header() {
   const location = useLocation();
@@ -240,5 +226,3 @@ function ServicesMenu({ onClose }: { onClose: () => void }) {
     </div>
   );
 }
-
-export { NAV_ITEMS };
