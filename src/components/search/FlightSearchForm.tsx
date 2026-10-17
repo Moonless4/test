@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CityField } from '@/components/ui/CityField';
 import { DateField } from '@/components/ui/DateField';
 import { PassengerField } from '@/components/ui/PassengerField';
+import { PillSelect } from '@/components/ui/PillSelect';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { cn } from '@/lib/utils';
@@ -11,10 +12,17 @@ import { addDays, startOfDay } from '@/lib/jalali';
 import { faDigits } from '@/lib/jalali';
 import type { CabinClass, City, PassengerSelection, TripType } from '@/types';
 
-const TRIP_TYPES: Array<{ key: TripType; label: string }> = [
-  { key: 'oneway', label: 'یک‌طرفه' },
-  { key: 'round', label: 'رفت و برگشت' },
-  { key: 'multi', label: 'چند مقصد' },
+const TRIP_TYPES: Array<{ key: TripType; title: string }> = [
+  { key: 'oneway', title: 'یک‌طرفه' },
+  { key: 'round', title: 'رفت و برگشت' },
+  { key: 'multi', title: 'چند مقصد' },
+];
+
+const CABIN_OPTIONS: Array<{ key: CabinClass; title: string }> = [
+  { key: 'economy', title: 'اقتصادی' },
+  { key: 'comfort', title: 'کامفورت' },
+  { key: 'business', title: 'بیزینس' },
+  { key: 'first', title: 'فرست کلاس' },
 ];
 
 interface MultiLeg {
@@ -93,25 +101,21 @@ export function FlightSearchForm({ className }: FlightSearchFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className={cn('space-y-3.5', className)} noValidate>
-      {/* نوع سفر */}
+      {/* نوع سفر و کلاس پروازی */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="inline-flex rounded-lg border border-ink-200 bg-ink-50 p-0.5" role="group" aria-label="نوع سفر">
-          {TRIP_TYPES.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              onClick={() => setTripType(item.key)}
-              aria-pressed={tripType === item.key}
-              className={cn(
-                'rounded-md px-3 py-1.5 text-xs font-medium transition sm:text-[0.8rem]',
-                tripType === item.key
-                  ? 'bg-white text-brand-700 shadow-card'
-                  : 'text-ink-500 hover:text-ink-800',
-              )}
-            >
-              {item.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2">
+          <PillSelect
+            ariaLabel="نوع سفر"
+            value={tripType}
+            options={TRIP_TYPES}
+            onChange={(key) => setTripType(key as TripType)}
+          />
+          <PillSelect
+            ariaLabel="کلاس پروازی"
+            value={cabin}
+            options={CABIN_OPTIONS}
+            onChange={(key) => setCabin(key as CabinClass)}
+          />
         </div>
 
         <div className="flex items-center gap-2 text-2xs text-ink-500">
@@ -252,13 +256,7 @@ export function FlightSearchForm({ className }: FlightSearchFormProps) {
           </div>
 
           <div className={narrowField}>
-            <PassengerField
-              passengers={passengers}
-              onChange={setPassengers}
-              cabin={cabin}
-              onCabinChange={setCabin}
-              align="end"
-            />
+            <PassengerField passengers={passengers} onChange={setPassengers} align="end" />
           </div>
         </div>
       )}
