@@ -108,12 +108,16 @@ export function Header() {
 
             {/* اقدامات */}
             <div className="ms-auto flex items-center gap-2 lg:ms-0">
+              {/* فقط آیکون هدفون — شماره با هاور باز می‌شود */}
               <a
                 href={`tel:${SUPPORT_CONTACT.phoneRaw}`}
-                className="hidden items-center gap-2 rounded-lg px-3 py-2 text-xs text-ink-600 transition hover:bg-ink-50 xl:flex"
+                aria-label={`تماس با پشتیبانی ${SUPPORT_CONTACT.phone}`}
+                className="group hidden h-10 items-center rounded-lg px-2.5 text-xs font-medium text-ink-600 transition hover:text-brand-700 xl:flex"
               >
-                <Icon name="support" className="h-4 w-4 text-brand-600" />
-                <span className="num">{SUPPORT_CONTACT.phone}</span>
+                <Icon name="support" className="h-5 w-5 text-brand-600" />
+                <span className="num max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-200 group-hover:ms-1.5 group-hover:max-w-[110px] group-hover:opacity-100">
+                  {SUPPORT_CONTACT.phone}
+                </span>
               </a>
 
               {/* فقط آیکون کیف — متن با هاور باز می‌شود */}
