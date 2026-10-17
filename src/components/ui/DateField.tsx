@@ -3,7 +3,7 @@ import { Popover } from './Popover';
 import { JalaliCalendar } from './JalaliCalendar';
 import { Icon } from './Icon';
 import { cn } from '@/lib/utils';
-import { faDigits, formatJalaliWithWeekday, formatJalaliNumeric, JALALI_WEEKDAYS_FULL, jalaliWeekday, jalaliMonthLength, toJalali, fromJalali, addDays } from '@/lib/jalali';
+import { faDigits, formatJalaliWithWeekdayAndYear, JALALI_WEEKDAYS_FULL, jalaliWeekday, jalaliMonthLength, toJalali, fromJalali, addDays } from '@/lib/jalali';
 
 interface DateFieldProps {
   value: Date | null;
@@ -63,21 +63,16 @@ export function DateField({
         >
           <Icon name="calendar" className="h-5 w-5 shrink-0 text-ink-400" />
           <span className="min-w-0 flex-1">
-            {!compact && <span className="block text-2xs text-ink-500">{label}</span>}
+            {!compact && <span className="block truncate text-2xs text-ink-500">{label}</span>}
             <span
               className={cn(
                 'block truncate text-sm',
                 value ? 'font-medium text-ink-900' : 'text-ink-400',
               )}
             >
-              {value ? formatJalaliWithWeekday(value) : placeholder}
+              {value ? formatJalaliWithWeekdayAndYear(value) : placeholder}
             </span>
           </span>
-          {value && (
-            <span className="num hidden shrink-0 text-2xs text-ink-400 xs:block">
-              {formatJalaliNumeric(value)}
-            </span>
-          )}
         </button>
       }
     >

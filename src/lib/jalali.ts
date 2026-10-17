@@ -182,6 +182,12 @@ export function formatJalaliWithWeekday(date: Date): string {
   return `${JALALI_WEEKDAYS_FULL[jalaliWeekday(date)]} ${faDigits(jd)} ${JALALI_MONTHS[jm - 1]}`;
 }
 
+/** شنبه ۲۵ مهر ۱۴۰۴ — تاریخ کامل با روز هفته و سال، برای فیلدهای تاریخ */
+export function formatJalaliWithWeekdayAndYear(date: Date): string {
+  const { jy, jm, jd } = toJalali(date);
+  return `${JALALI_WEEKDAYS_FULL[jalaliWeekday(date)]} ${faDigits(jd)} ${JALALI_MONTHS[jm - 1]} ${faDigits(jy)}`;
+}
+
 export function todayJalali(): JalaliDate {
   return toJalali(new Date());
 }

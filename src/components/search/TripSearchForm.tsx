@@ -50,6 +50,10 @@ export function TripSearchForm({ service, className }: TripSearchFormProps) {
     navigate(`/${isTrain ? 'trains' : 'buses'}?${buildTripQuery({ origin, destination, departDate, returnDate, passengers })}`);
   };
 
+  // در دسکتاپ باریک (lg) فیلدها دو ردیفه می‌شوند تا متنشان بریده نشود؛ از xl به بعد چیدمان یک‌ردیفه‌ی فعلی حفظ می‌شود
+  const wideField = 'lg:col-span-6 xl:col-span-3';
+  const narrowField = 'lg:col-span-4 xl:col-span-2';
+
   return (
     <form onSubmit={handleSubmit} className={cn('space-y-3.5', className)} noValidate>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -62,7 +66,7 @@ export function TripSearchForm({ service, className }: TripSearchFormProps) {
       </div>
 
       <div className="grid gap-3 lg:grid-cols-12">
-        <div className="relative lg:col-span-3">
+        <div className={cn('relative', wideField)}>
           <CityField
             label="مبدا"
             placeholder="شهر مبدا"
@@ -81,7 +85,7 @@ export function TripSearchForm({ service, className }: TripSearchFormProps) {
           </button>
         </div>
 
-        <div className="lg:col-span-3">
+        <div className={wideField}>
           <CityField
             label="مقصد"
             placeholder="شهر مقصد"
@@ -92,7 +96,7 @@ export function TripSearchForm({ service, className }: TripSearchFormProps) {
           />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className={narrowField}>
           <DateField
             label="تاریخ رفت"
             value={departDate}
@@ -105,7 +109,7 @@ export function TripSearchForm({ service, className }: TripSearchFormProps) {
           />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className={narrowField}>
           <DateField
             label="تاریخ برگشت (اختیاری)"
             value={returnDate}
@@ -114,7 +118,7 @@ export function TripSearchForm({ service, className }: TripSearchFormProps) {
           />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className={narrowField}>
           <Popover
             open={paxOpen}
             onClose={() => setPaxOpen(false)}

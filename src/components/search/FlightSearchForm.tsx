@@ -28,7 +28,7 @@ interface FlightSearchFormProps {
   className?: string;
 }
 
-export function FlightSearchForm({ variant = 'hero', className }: FlightSearchFormProps) {
+export function FlightSearchForm({ className }: FlightSearchFormProps) {
   const navigate = useNavigate();
   const today = startOfDay(new Date());
 
@@ -87,7 +87,9 @@ export function FlightSearchForm({ variant = 'hero', className }: FlightSearchFo
     );
   };
 
-  const fieldShell = variant === 'hero' ? 'lg:col-span-3' : '';
+  // در دسکتاپ باریک (lg) فیلدها دو ردیفه می‌شوند تا متنشان بریده نشود؛ از xl به بعد چیدمان یک‌ردیفه‌ی فعلی حفظ می‌شود
+  const wideField = 'lg:col-span-6 xl:col-span-3';
+  const narrowField = 'lg:col-span-4 xl:col-span-2';
 
   return (
     <form onSubmit={handleSubmit} className={cn('space-y-3.5', className)} noValidate>
@@ -192,7 +194,7 @@ export function FlightSearchForm({ variant = 'hero', className }: FlightSearchFo
         </div>
       ) : (
         <div className="grid gap-3 lg:grid-cols-12">
-          <div className={cn('relative', fieldShell)}>
+          <div className={cn('relative', wideField)}>
             <CityField
               label="مبدا"
               placeholder="شهر یا فرودگاه مبدا"
@@ -212,7 +214,7 @@ export function FlightSearchForm({ variant = 'hero', className }: FlightSearchFo
             </button>
           </div>
 
-          <div className={fieldShell}>
+          <div className={wideField}>
             <CityField
               label="مقصد"
               placeholder="شهر یا فرودگاه مقصد"
@@ -223,7 +225,7 @@ export function FlightSearchForm({ variant = 'hero', className }: FlightSearchFo
             />
           </div>
 
-          <div className={variant === 'hero' ? 'lg:col-span-2' : ''}>
+          <div className={narrowField}>
             <DateField
               label="تاریخ رفت"
               value={departDate}
@@ -236,7 +238,7 @@ export function FlightSearchForm({ variant = 'hero', className }: FlightSearchFo
             />
           </div>
 
-          <div className={variant === 'hero' ? 'lg:col-span-2' : ''}>
+          <div className={narrowField}>
             <DateField
               label="تاریخ برگشت"
               value={tripType === 'round' ? returnDate : null}
@@ -249,7 +251,7 @@ export function FlightSearchForm({ variant = 'hero', className }: FlightSearchFo
             />
           </div>
 
-          <div className={variant === 'hero' ? 'lg:col-span-2' : ''}>
+          <div className={narrowField}>
             <PassengerField
               passengers={passengers}
               onChange={setPassengers}

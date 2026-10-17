@@ -212,7 +212,7 @@ export function SimpleSearchForm({ service, className }: { service: SimpleServic
               />
               {errors.city && <p className="mt-1 text-2xs text-danger-600">{errors.city}</p>}
             </div>
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-3 xl:col-span-2">
               <DateField
                 label="تاریخ ورود"
                 value={checkIn}
@@ -225,7 +225,7 @@ export function SimpleSearchForm({ service, className }: { service: SimpleServic
               />
               {errors.checkIn && <p className="mt-1 text-2xs text-danger-600">{errors.checkIn}</p>}
             </div>
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-3 xl:col-span-2">
               <DateField
                 label="تاریخ خروج"
                 value={checkOut}
@@ -271,7 +271,7 @@ export function SimpleSearchForm({ service, className }: { service: SimpleServic
                 icon="clock"
               />
             </div>
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-4 xl:col-span-2">
               <DateField label="تاریخ شروع" value={travelDate} min={today} onChange={setTravelDate} />
             </div>
             <div className="lg:col-span-2">{guestsField}</div>

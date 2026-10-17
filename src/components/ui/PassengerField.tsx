@@ -55,10 +55,10 @@ export function PassengerField({
         >
           <Icon name="users" className="h-5 w-5 shrink-0 text-ink-400" />
           <span className="min-w-0 flex-1">
-            <span className="block text-2xs text-ink-500">مسافران و کلاس پروازی</span>
+            <span className="block truncate text-2xs text-ink-500">مسافران و کلاس</span>
             <span className="block truncate text-sm font-medium text-ink-900">
               {faDigits(total)} مسافر
-              <span className="mx-1 text-ink-300">·</span>
+              <span className="mx-0.5 text-ink-300">·</span>
               {CABIN_LABELS.find((c) => c.key === cabin)?.title}
             </span>
           </span>

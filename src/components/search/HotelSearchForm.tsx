@@ -71,7 +71,7 @@ export function HotelSearchForm({ className }: { className?: string }) {
           {errors.destination && <p className="mt-1 text-2xs text-danger-600">{errors.destination}</p>}
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3 xl:col-span-2">
           <DateField
             label="تاریخ ورود"
             value={checkIn}
@@ -85,7 +85,7 @@ export function HotelSearchForm({ className }: { className?: string }) {
           {errors.checkIn && <p className="mt-1 text-2xs text-danger-600">{errors.checkIn}</p>}
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3 xl:col-span-2">
           <DateField
             label="تاریخ خروج"
             value={checkOut}
