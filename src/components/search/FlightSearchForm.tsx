@@ -43,8 +43,8 @@ export function FlightSearchForm({ className }: FlightSearchFormProps) {
   const [tripType, setTripType] = useState<TripType>('round');
   const [origin, setOrigin] = useState<City | null>(null);
   const [destination, setDestination] = useState<City | null>(null);
-  const [departDate, setDepartDate] = useState<Date | null>(addDays(today, 7));
-  const [returnDate, setReturnDate] = useState<Date | null>(addDays(today, 12));
+  const [departDate, setDepartDate] = useState<Date | null>(null);
+  const [returnDate, setReturnDate] = useState<Date | null>(null);
   const [passengers, setPassengers] = useState<PassengerSelection>({ adults: 1, children: 0, infants: 0 });
   const [cabin, setCabin] = useState<CabinClass>('economy');
   const [legs, setLegs] = useState<MultiLeg[]>([{ origin: null, destination: null, departDate: null }]);
@@ -232,6 +232,7 @@ export function FlightSearchForm({ className }: FlightSearchFormProps) {
           <div className={narrowField}>
             <DateField
               label="تاریخ رفت"
+              placeholder="انتخاب تاریخ رفت"
               value={departDate}
               min={today}
               error={Boolean(errors.departDate)}
@@ -249,7 +250,7 @@ export function FlightSearchForm({ className }: FlightSearchFormProps) {
               min={departDate ? addDays(departDate, 1) : today}
               rangeEnd={null}
               disabled={tripType !== 'round'}
-              placeholder={tripType === 'round' ? 'انتخاب تاریخ' : 'یک‌طرفه'}
+              placeholder={tripType === 'round' ? 'انتخاب تاریخ برگشت' : 'یک‌طرفه'}
               error={Boolean(errors.returnDate)}
               onChange={setReturnDate}
             />

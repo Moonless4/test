@@ -68,14 +68,14 @@
   /* اسکرول‌بار سبک */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #cfd7e3 transparent;
+    scrollbar-color: #D1D1D5 transparent;
   }
   *::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
   *::-webkit-scrollbar-thumb {
-    background-color: #cfd7e3;
+    background-color: #D1D1D5;
     border-radius: 999px;
   }
   *::-webkit-scrollbar-track {
@@ -159,7 +159,7 @@
     width: 5px;
     height: 5px;
     border-radius: 999px;
-    background: #cfd7e3;
+    background: #D1D1D5;
   }
   .route-line::before {
     inset-inline-start: 0;
