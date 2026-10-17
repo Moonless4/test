@@ -35,11 +35,11 @@ const QUICK_ACTIONS: QuickAction[] = [
     icon: 'gift',
   },
   {
-    key: 'transfer',
-    title: 'ترانسفر فرودگاهی',
-    hint: 'سرویس اختصاصی درب فرودگاه',
-    href: '/services/transfer',
-    icon: 'car',
+    key: 'insurance',
+    title: 'بیمه مسافرتی',
+    hint: 'صدور آنی بیمه‌نامه',
+    href: '/services/insurance',
+    icon: 'shield',
     featured: true,
   },
 ];

@@ -85,13 +85,58 @@ export const SERVICES: ServiceItem[] = [
 export const SERVICE_TABS: Array<{ key: string; title: string; icon: string; short?: string }> = [
   { key: 'flight', title: 'پرواز', icon: 'plane' },
   { key: 'hotel', title: 'هتل', icon: 'hotel' },
-  { key: 'train', title: 'قطار', icon: 'train' },
   { key: 'bus', title: 'اتوبوس', icon: 'bus' },
+  { key: 'train', title: 'قطار', icon: 'train' },
   { key: 'tour', title: 'تور', icon: 'compass' },
   { key: 'villa', title: 'ویلا و اقامتگاه', short: 'ویلا', icon: 'villa' },
   { key: 'visa', title: 'ویزا', icon: 'passport' },
   { key: 'insurance', title: 'بیمه مسافرتی', short: 'بیمه', icon: 'shield' },
   { key: 'more', title: 'سایر خدمات', short: 'بیشتر', icon: 'grid' },
+];
+
+/** خدمات ثانویه — در منوی «سایر خدمات» هدر و منوی موبایل فهرست می‌شوند */
+export const OTHER_SERVICES: ServiceItem[] = [
+  {
+    key: 'bus',
+    title: 'اتوبوس',
+    description: 'بلیط اتوبوس‌های VIP سراسر کشور',
+    href: '/buses',
+    icon: 'bus',
+  },
+  {
+    key: 'stays',
+    title: 'ویلا و اقامتگاه',
+    description: 'اقامتگاه‌های بومی، ویلا و آپارتمان',
+    href: '/stays',
+    icon: 'villa',
+  },
+  {
+    key: 'visa',
+    title: 'ویزا',
+    description: 'دریافت ویزای توریستی و تحصیلی',
+    href: '/services/visa',
+    icon: 'passport',
+  },
+  {
+    key: 'insurance',
+    title: 'بیمه مسافرتی',
+    description: 'صدور آنی بیمه‌نامه در چند دقیقه',
+    href: '/services/insurance',
+    icon: 'shield',
+  },
+];
+
+/** خدمات نمایش‌داده‌شده در بخش «خدمات سفر سفربان» صفحه‌ی خانه */
+export const HOME_SERVICES: ServiceItem[] = [
+  { key: 'flight', title: 'بلیط هواپیما', description: 'مقایسه قیمت تمام ایرلاین‌های داخلی و خارجی', href: '/flights', icon: 'plane' },
+  { key: 'hotel', title: 'هتل', description: 'رزرو هتل‌های ایران و جهان با تخفیف ویژه', href: '/hotels', icon: 'hotel' },
+  { key: 'bus', title: 'اتوبوس', description: 'بلیط اتوبوس‌های VIP سراسر کشور', href: '/buses', icon: 'bus' },
+  { key: 'train', title: 'قطار', description: 'بلیط قطارهای سریع‌السیر و لوکس', href: '/trains', icon: 'train' },
+  { key: 'tour', title: 'تور', description: 'تورهای داخلی و خارجی با راهنمای فارسی', href: '/tours', icon: 'compass' },
+  { key: 'villa', title: 'ویلا و اقامتگاه', description: 'اقامتگاه‌های بومی، ویلا و آپارتمان', href: '/stays', icon: 'villa' },
+  { key: 'visa', title: 'ویزا', description: 'دریافت ویزای توریستی و تحصیلی', href: '/services/visa', icon: 'passport' },
+  { key: 'insurance', title: 'بیمه مسافرتی', description: 'صدور آنی بیمه‌نامه در چند دقیقه', href: '/services/insurance', icon: 'shield' },
+  { key: 'more', title: 'سایر خدمات', description: 'eSIM، CIP، گشت شهری و ترانسفر', href: '/services', icon: 'grid' },
 ];
 
 export const MORE_SERVICES: ServiceItem[] = [

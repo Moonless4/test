@@ -130,9 +130,6 @@ export const SUPPORT_CONTACT = {
 
 export const TRUST_BADGES = [
   { id: 'enamad', title: 'نماد اعتماد الکترونیکی', subtitle: 'دارای نماد دو ستاره' },
-  { id: 'bmi', title: 'بانک مرکزی', subtitle: 'مجوز پرداخت رسمی' },
-  { id: 'iata', title: 'عضو IATA', subtitle: 'نماینده رسمی فروش بلیط' },
-  { id: 'isico', title: 'بیمه سامان', subtitle: 'همکار رسمی بیمه مسافرتی' },
 ];
 
 export const SOCIALS = [

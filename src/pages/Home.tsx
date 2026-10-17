@@ -21,11 +21,11 @@ export default function Home() {
       {/* ۲. دسترسی سریع (پیگیری خرید، ویزا، کارت هدیه، ترانسفر) */}
       <QuickActions />
 
-      {/* ۳. مقصدهای محبوب */}
-      <PopularDestinations />
-
-      {/* ۴. پروازهای پرطرفدار داخلی و خارجی */}
+      {/* ۳. پروازهای پرطرفدار داخلی و خارجی */}
       <PopularFlights scope="combined" />
+
+      {/* ۴. مقصدهای محبوب */}
+      <PopularDestinations />
 
       {/* ۵. هتل‌های محبوب داخلی و خارجی */}
       <PopularHotels scope="combined" />

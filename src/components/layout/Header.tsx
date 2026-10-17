@@ -4,37 +4,30 @@ import { Logo } from './Logo';
 import { MobileMenu } from './MobileMenu';
 import { BottomNav } from './BottomNav';
 import { Icon } from '@/components/ui/Icon';
-import { Button } from '@/components/ui/Button';
 import { useApp } from '@/context/AppContext';
-import { DOMESTIC_DESTINATIONS, INTERNATIONAL_DESTINATIONS } from '@/data/destinations';
-import { MORE_SERVICES } from '@/data/services';
-import { POPULAR_DOMESTIC_ROUTES, POPULAR_INTERNATIONAL_ROUTES, cityByCode } from '@/data/cities';
+import { OTHER_SERVICES } from '@/data/services';
 import { SUPPORT_CONTACT } from '@/data/content';
-import { cn, formatNumber } from '@/lib/utils';
-import { faDigits } from '@/lib/jalali';
+import { cn } from '@/lib/utils';
 
 interface NavItem {
   label: string;
   href: string;
-  mega?: 'flight' | 'hotel' | 'more';
+  /** منوی کشویی این آیتم (فعلاً فقط «سایر خدمات») */
+  menu?: 'more';
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'پرواز', href: '/flights', mega: 'flight' },
-  { label: 'هتل', href: '/hotels', mega: 'hotel' },
+  { label: 'پرواز', href: '/flights' },
+  { label: 'هتل', href: '/hotels' },
   { label: 'قطار', href: '/trains' },
-  { label: 'اتوبوس', href: '/buses' },
   { label: 'تور', href: '/tours' },
-  { label: 'ویلا و اقامتگاه', href: '/stays' },
-  { label: 'ویزا', href: '/services/visa' },
-  { label: 'بیمه', href: '/services/insurance' },
-  { label: 'سایر خدمات', href: '/services', mega: 'more' },
+  { label: 'سایر خدمات', href: '/services', menu: 'more' },
 ];
 
 export function Header() {
   const location = useLocation();
   const { user, logout } = useApp();
-  const [openMega, setOpenMega] = useState<string | null>(null);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -49,14 +42,14 @@ export function Header() {
 
   useEffect(() => {
     setMobileOpen(false);
-    setOpenMega(null);
+    setOpenMenu(null);
     setAccountOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setOpenMega(null);
+        setOpenMenu(null);
         setAccountOpen(false);
       }
     };
@@ -66,12 +59,12 @@ export function Header() {
 
   const openWithDelay = (key: string) => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    setOpenMega(key);
+    setOpenMenu(key);
   };
 
   const closeWithDelay = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setOpenMega(null), 160);
+    closeTimer.current = window.setTimeout(() => setOpenMenu(null), 160);
   };
 
   return (
@@ -103,7 +96,7 @@ export function Header() {
                   <li
                     key={item.href}
                     className="relative"
-                    onMouseEnter={() => item.mega && openWithDelay(item.mega)}
+                    onMouseEnter={() => item.menu && openWithDelay(item.menu)}
                     onMouseLeave={closeWithDelay}
                   >
                     <NavLink
@@ -114,13 +107,13 @@ export function Header() {
                           isActive ? 'text-brand-700' : 'text-ink-600 hover:bg-ink-50 hover:text-ink-900',
                         )
                       }
-                      onFocus={() => item.mega && openWithDelay(item.mega)}
+                      onFocus={() => item.menu && openWithDelay(item.menu)}
                     >
                       {item.label}
-                      {item.mega && <Icon name="chevron-down" className="h-3.5 w-3.5 opacity-60" />}
+                      {item.menu && <Icon name="chevron-down" className="h-3.5 w-3.5 opacity-60" />}
                     </NavLink>
-                    {item.mega && openMega === item.mega && (
-                      <MegaPanel kind={item.mega} onClose={() => setOpenMega(null)} />
+                    {item.menu === 'more' && openMenu === 'more' && (
+                      <ServicesMenu onClose={() => setOpenMenu(null)} />
                     )}
                   </li>
                 ))}
@@ -137,12 +130,16 @@ export function Header() {
                 <span className="num">{SUPPORT_CONTACT.phone}</span>
               </a>
 
+              {/* فقط آیکون کیف — متن با هاور باز می‌شود */}
               <Link
                 to="/account"
-                className="hidden h-10 items-center gap-2 rounded-lg px-3 text-xs font-medium text-ink-600 transition hover:bg-ink-50 lg:flex"
+                aria-label="سفرهای من"
+                className="group hidden h-10 items-center rounded-lg px-2.5 text-xs font-medium text-ink-600 transition hover:text-brand-700 lg:flex"
               >
-                <Icon name="briefcase" className="h-4 w-4" />
-                سفرهای من
+                <Icon name="briefcase" className="h-5 w-5" />
+                <span className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-200 group-hover:ms-1.5 group-hover:max-w-[80px] group-hover:opacity-100">
+                  سفرهای من
+                </span>
               </Link>
 
               {user ? (
@@ -150,15 +147,10 @@ export function Header() {
                   <button
                     type="button"
                     onClick={() => setAccountOpen((current) => !current)}
-                    className="flex h-10 items-center gap-2 rounded-lg border border-ink-200 px-2.5 transition hover:border-ink-300"
+                    className="flex h-10 items-center gap-2 rounded-lg px-2.5 transition hover:text-brand-700"
                     aria-expanded={accountOpen}
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-2xs font-bold text-white">
-                      {user.name.slice(0, 1)}
-                    </span>
-                    <span className="hidden max-w-[90px] truncate text-xs font-medium text-ink-800 sm:block">
-                      {user.name}
-                    </span>
+                    <Icon name="user" className="h-5 w-5" />
                     <Icon name="chevron-down" className="h-3.5 w-3.5 text-ink-400" />
                   </button>
                   {accountOpen && (
@@ -190,17 +182,23 @@ export function Header() {
                   )}
                 </div>
               ) : (
-                <Link to="/login" className="hidden lg:block">
-                  <Button size="sm" variant="primary" className="h-10 px-4 text-xs">
+                /* فقط آیکون — متن با هاور باز می‌شود */
+                <Link
+                  to="/login"
+                  aria-label="ورود / ثبت‌نام"
+                  className="group hidden h-10 items-center rounded-lg px-2.5 text-xs font-medium text-ink-600 transition hover:text-brand-700 lg:flex"
+                >
+                  <Icon name="user" className="h-5 w-5" />
+                  <span className="max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-200 group-hover:ms-1.5 group-hover:max-w-[90px] group-hover:opacity-100">
                     ورود / ثبت‌نام
-                  </Button>
+                  </span>
                 </Link>
               )}
 
               <Link
                 to="/login"
                 aria-label="حساب کاربری"
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-ink-200 text-ink-600 transition hover:border-ink-300 lg:hidden"
+                className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-600 transition hover:text-brand-700 lg:hidden"
               >
                 <Icon name="user" className="h-5 w-5" />
               </Link>
@@ -215,146 +213,32 @@ export function Header() {
   );
 }
 
-/* ------------------------------------------------------------------ مگامنو ---- */
+/* --------------------------------------------- منوی کشویی «سایر خدمات» ---- */
 
-function MegaPanel({ kind, onClose }: { kind: 'flight' | 'hotel' | 'more'; onClose: () => void }) {
+function ServicesMenu({ onClose }: { onClose: () => void }) {
   return (
-    <div
-      className={cn(
-        'absolute top-[calc(100%+8px)] z-50 animate-pop-in rounded-xl border border-ink-200 bg-white p-4 shadow-pop',
-        kind === 'more' ? 'end-0 w-[520px]' : 'start-0 w-[640px]',
-      )}
-    >
-      {kind === 'flight' && (
-        <div className="grid grid-cols-[1.1fr_1.1fr_0.9fr] gap-4">
-          <MegaColumn
-            title="پرترددترین پروازهای داخلی"
-            items={POPULAR_DOMESTIC_ROUTES.map(([from, to]) => ({
-              label: `${cityByCode(from)?.name} — ${cityByCode(to)?.name}`,
-              href: `/flights?from=${from}&to=${to}&trip=oneway`,
-            }))}
-            onClose={onClose}
-          />
-          <MegaColumn
-            title="پرترددترین پروازهای خارجی"
-            items={POPULAR_INTERNATIONAL_ROUTES.map(([from, to]) => ({
-              label: `${cityByCode(from)?.name ?? 'تهران'} — ${cityByCode(to)?.name}`,
-              href: `/flights?from=${from}&to=${to}&trip=oneway`,
-            })).filter((item) => !item.label.includes('undefined'))}
-            onClose={onClose}
-          />
-          <div className="rounded-xl bg-brand-50 p-3">
-            <p className="text-xs font-bold text-brand-800">پروازهای ارزان امروز</p>
-            <p className="mt-1.5 text-2xs leading-5 text-brand-700/80">
-              با فعال‌کردن «تقویم قیمت»، ارزان‌ترین روزهای ماه را ببینید.
-            </p>
-            <Link
-              to="/flights"
-              onClick={onClose}
-              className="mt-3 flex items-center gap-1 text-2xs font-medium text-brand-700"
-            >
-              جستجوی پرواز
-              <Icon name="chevron-left" className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {kind === 'hotel' && (
-        <div className="grid grid-cols-3 gap-4">
-          <MegaColumn
-            title="اقامت در ایران"
-            items={DOMESTIC_DESTINATIONS.slice(0, 6).map((d) => ({
-              label: d.name,
-              href: `/hotels?city=${d.code}&name=${encodeURIComponent(d.name)}`,
-              hint: `از ${formatNumber(d.startingPrice)} تومان`,
-            }))}
-            onClose={onClose}
-          />
-          <MegaColumn
-            title="اقامت در جهان"
-            items={INTERNATIONAL_DESTINATIONS.slice(0, 6).map((d) => ({
-              label: d.name,
-              href: `/hotels?city=${d.code}&name=${encodeURIComponent(d.name)}`,
-              hint: `از ${formatNumber(d.startingPrice)} تومان`,
-            }))}
-            onClose={onClose}
-          />
-          <MegaColumn
-            title="ویلا و اقامتگاه"
-            items={[
-              { label: 'ویلای ساحلی کیش', href: '/stays?city=KIH&name=%DA%A9%DB%8C%D8%B4' },
-              { label: 'اقامتگاه جنگلی رامسر', href: '/stays?name=%D8%B1%D8%A7%D9%85%D8%B3%D8%B1' },
-              { label: 'خانه‌های سنتی اصفهان', href: '/stays?city=IFN&name=%D8%A7%D8%B5%D9%81%D9%87%D8%A7%D9%86' },
-              { label: 'آپارتمان مبله مشهد', href: '/stays?city=MHD&name=%D9%85%D8%B4%D9%87%D8%AF' },
-              { label: 'همه اقامتگاه‌ها', href: '/stays' },
-            ]}
-            onClose={onClose}
-          />
-        </div>
-      )}
-
-      {kind === 'more' && (
-        <div className="grid grid-cols-2 gap-1.5">
-          {MORE_SERVICES.map((service) => (
-            <Link
-              key={service.key}
-              to={service.href}
-              onClick={onClose}
-              className="flex items-start gap-3 rounded-lg p-2.5 transition hover:bg-ink-50"
-            >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
-                <Icon name={service.icon} className="h-5 w-5" />
-              </span>
-              <span>
-                <span className="block text-xs font-medium text-ink-800">{service.title}</span>
-                <span className="mt-0.5 block text-2xs text-ink-500">{service.description}</span>
-              </span>
-            </Link>
-          ))}
-          <Link
-            to="/services"
-            onClick={onClose}
-            className="col-span-2 mt-1 flex items-center justify-center gap-1 rounded-lg bg-ink-50 py-2.5 text-2xs font-medium text-ink-700 transition hover:bg-ink-100"
-          >
-            مشاهده‌ی همه‌ی خدمات سفربان
-            <Icon name="chevron-left" className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function MegaColumn({
-  title,
-  items,
-  onClose,
-}: {
-  title: string;
-  items: Array<{ label: string; href: string; hint?: string }>;
-  onClose: () => void;
-}) {
-  return (
-    <div>
-      <p className="mb-2 text-2xs font-bold text-ink-400">{title}</p>
-      <ul className="space-y-0.5">
-        {items.map((item) => (
-          <li key={item.href + item.label}>
-            <Link
-              to={item.href}
-              onClick={onClose}
-              className="flex items-center justify-between gap-2 rounded-lg px-2 py-2 text-xs text-ink-600 transition hover:bg-ink-50 hover:text-ink-900"
-            >
-              <span>{item.label}</span>
-              {item.hint && <span className="num text-2xs text-ink-400">{item.hint}</span>}
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <div className="absolute end-0 top-[calc(100%+8px)] z-50 w-60 animate-pop-in rounded-xl border border-ink-200 bg-white p-1.5 shadow-pop">
+      {OTHER_SERVICES.map((service) => (
+        <Link
+          key={service.key}
+          to={service.href}
+          onClick={onClose}
+          className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-ink-700 transition hover:bg-ink-50"
+        >
+          <Icon name={service.icon} className="h-4 w-4 text-brand-600" />
+          {service.title}
+        </Link>
+      ))}
+      <Link
+        to="/services"
+        onClick={onClose}
+        className="mt-1 flex items-center justify-center gap-1 rounded-lg bg-ink-50 py-2 text-2xs font-medium text-ink-700 transition hover:bg-ink-100"
+      >
+        همه‌ی خدمات سفربان
+        <Icon name="chevron-left" className="h-3.5 w-3.5" />
+      </Link>
     </div>
   );
 }
 
 export { NAV_ITEMS };
-export const NAV_BADGE = faDigits(0);

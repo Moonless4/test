@@ -17,7 +17,7 @@ export function FlightDealCard({ deal, className }: FlightDealCardProps) {
   return (
     <Link
       to={href}
-      className={`group flex w-[260px] shrink-0 flex-col gap-3 rounded-xl border border-ink-200 bg-white p-4 transition hover:border-brand-300 hover:shadow-card ${className ?? ''}`}
+      className={`group flex w-full flex-col gap-3 rounded-xl border border-ink-200 bg-white p-4 transition hover:border-brand-300 ${className ?? ''}`}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">

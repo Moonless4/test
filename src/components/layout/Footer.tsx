@@ -128,7 +128,7 @@ export function Footer() {
       {/* نمادها و اپلیکیشن */}
       <div className="border-t border-ink-200">
         <div className="container-page flex flex-col gap-6 py-7 lg:flex-row lg:items-center lg:justify-between">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="flex flex-wrap gap-3">
             {TRUST_BADGES.map((badge) => (
               <div
                 key={badge.id}

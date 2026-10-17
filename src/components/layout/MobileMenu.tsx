@@ -3,7 +3,7 @@ import { Drawer } from '@/components/ui/Drawer';
 import { Icon } from '@/components/ui/Icon';
 import { Logo } from './Logo';
 import { NAV_ITEMS } from './Header';
-import { MORE_SERVICES } from '@/data/services';
+import { MORE_SERVICES, OTHER_SERVICES } from '@/data/services';
 import { DOMESTIC_DESTINATIONS, INTERNATIONAL_DESTINATIONS } from '@/data/destinations';
 import { SUPPORT_CONTACT } from '@/data/content';
 import { useApp } from '@/context/AppContext';
@@ -98,7 +98,7 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
         <div>
           <p className="mb-2 text-2xs font-bold text-ink-400">سایر خدمات</p>
           <div className="grid grid-cols-2 gap-1.5">
-            {MORE_SERVICES.map((service) => (
+            {[...OTHER_SERVICES, ...MORE_SERVICES].map((service) => (
               <Link
                 key={service.key}
                 to={service.href}

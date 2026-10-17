@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { HScroller } from '@/components/ui/HScroller';
 import { FlightDealCard } from '@/components/cards/FlightDealCard';
 import { DOMESTIC_FLIGHT_DEALS, INTERNATIONAL_FLIGHT_DEALS } from '@/data/popularFlights';
 import { cn } from '@/lib/utils';
@@ -44,11 +43,13 @@ export function PopularFlights({ scope }: PopularFlightsProps) {
             </div>
           }
         />
-        <HScroller>
-          {(tab === 'domestic' ? DOMESTIC_FLIGHT_DEALS : INTERNATIONAL_FLIGHT_DEALS).map((deal) => (
-            <FlightDealCard key={deal.id} deal={deal} className="snap-start" />
-          ))}
-        </HScroller>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {(tab === 'domestic' ? DOMESTIC_FLIGHT_DEALS : INTERNATIONAL_FLIGHT_DEALS)
+            .slice(0, 4)
+            .map((deal) => (
+              <FlightDealCard key={deal.id} deal={deal} />
+            ))}
+        </div>
       </section>
     );
   }
@@ -68,11 +69,11 @@ export function PopularFlights({ scope }: PopularFlightsProps) {
         actionLabel={isDomestic ? 'همه پروازهای داخلی' : 'همه پروازهای خارجی'}
         actionHref="/flights"
       />
-      <HScroller>
-        {deals.map((deal) => (
-          <FlightDealCard key={deal.id} deal={deal} className="snap-start" />
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {deals.slice(0, 4).map((deal) => (
+          <FlightDealCard key={deal.id} deal={deal} />
         ))}
-      </HScroller>
+      </div>
     </section>
   );
 }

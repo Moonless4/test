@@ -4,7 +4,6 @@ import { FlightSearchForm } from './FlightSearchForm';
 import { HotelSearchForm } from './HotelSearchForm';
 import { TripSearchForm } from './TripSearchForm';
 import { SimpleSearchForm } from './SimpleSearchForm';
-import { Icon } from '@/components/ui/Icon';
 import { cn } from '@/lib/utils';
 
 interface SearchBoxProps {
@@ -106,31 +105,13 @@ export function SearchBox({ defaultService = 'flight', className, showHeading = 
       )}
 
       {/* بدون overflow-hidden تا پنل‌های شناور فیلدها (تقویم، مسافر، شهر) بریده نشوند */}
-      <div className="rounded-2xl border border-ink-200 bg-white shadow-panel">
+      <div className="rounded-2xl border border-ink-200 bg-white">
         <ServiceTabs active={service} onChange={setService} badges={{ flight: 20, hotel: 15 }} />
         <div key={service} className="animate-fade-in p-4 sm:p-5 lg:p-6">
           {renderForm()}
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-2xs text-ink-500 sm:text-xs">
-        <span className="flex items-center gap-1.5">
-          <Icon name="support" className="h-4 w-4 text-brand-600" />
-          پشتیبانی ۲۴ ساعته
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Icon name="shield-check" className="h-4 w-4 text-brand-600" />
-          پرداخت امن بانکی
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Icon name="refund" className="h-4 w-4 text-brand-600" />
-          استرداد آنلاین بلیط
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Icon name="percent" className="h-4 w-4 text-brand-600" />
-          تضمین بهترین قیمت
-        </span>
-      </div>
     </section>
   );
 }

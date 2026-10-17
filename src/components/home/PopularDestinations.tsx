@@ -37,13 +37,8 @@ export function PopularDestinations() {
       />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {list.slice(0, 4).map((destination) => (
+        {list.map((destination) => (
           <DestinationCard key={destination.id} destination={destination} />
-        ))}
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {list.slice(4, 8).map((destination) => (
-          <DestinationCard key={destination.id} destination={destination} size="sm" />
         ))}
       </div>
     </section>

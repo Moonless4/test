@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { HScroller } from '@/components/ui/HScroller';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { HotelCard } from '@/components/cards/HotelCard';
+import { HotelMiniCard } from '@/components/cards/HotelMiniCard';
 import { HOTELS } from '@/data/hotels';
 import { cn } from '@/lib/utils';
 
@@ -9,6 +8,7 @@ interface PopularHotelsProps {
   scope: 'domestic' | 'international' | 'combined';
 }
 
+/** هتل‌های محبوب — کارت‌های ساده و یکدست */
 export function PopularHotels({ scope }: PopularHotelsProps) {
   const [tab, setTab] = useState<'domestic' | 'international'>(
     scope === 'international' ? 'international' : 'domestic',
@@ -55,17 +55,11 @@ export function PopularHotels({ scope }: PopularHotelsProps) {
         }
       />
 
-      <HScroller>
-        {list.map((hotel) => (
-          <HotelCard
-            key={hotel.id}
-            hotel={hotel}
-            layout="grid"
-            nights={3}
-            className="w-[300px] shrink-0 snap-start"
-          />
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {list.slice(0, 4).map((hotel) => (
+          <HotelMiniCard key={hotel.id} hotel={hotel} />
         ))}
-      </HScroller>
+      </div>
     </section>
   );
 }
