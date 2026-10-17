@@ -4,6 +4,7 @@ dist-ssr
 *.local
 .DS_Store
 .vite
+*.tsbuildinfo
 npm-debug.log*
 yarn-error.log*
 .env

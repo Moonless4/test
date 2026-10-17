@@ -88,10 +88,10 @@ export const SERVICE_TABS: Array<{ key: string; title: string; icon: string; sho
   { key: 'train', title: 'قطار', icon: 'train' },
   { key: 'bus', title: 'اتوبوس', icon: 'bus' },
   { key: 'tour', title: 'تور', icon: 'compass' },
-  { key: 'villa', title: 'ویلا و اقامتگاه', icon: 'villa' },
+  { key: 'villa', title: 'ویلا و اقامتگاه', short: 'ویلا', icon: 'villa' },
   { key: 'visa', title: 'ویزا', icon: 'passport' },
-  { key: 'insurance', title: 'بیمه مسافرتی', icon: 'shield' },
-  { key: 'more', title: 'سایر خدمات', icon: 'grid' },
+  { key: 'insurance', title: 'بیمه مسافرتی', short: 'بیمه', icon: 'shield' },
+  { key: 'more', title: 'سایر خدمات', short: 'بیشتر', icon: 'grid' },
 ];
 
 export const MORE_SERVICES: ServiceItem[] = [
