@@ -255,6 +255,7 @@ export function FlightSearchForm({ variant = 'hero', className }: FlightSearchFo
               onChange={setPassengers}
               cabin={cabin}
               onCabinChange={setCabin}
+              align="end"
             />
           </div>
         </div>

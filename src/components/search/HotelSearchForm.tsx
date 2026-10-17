@@ -103,25 +103,27 @@ export function HotelSearchForm({ className }: { className?: string }) {
             onClose={() => setGuestsOpen(false)}
             className="w-full"
             panelClassName="w-[320px] p-4"
-          >
-            <button
-              type="button"
-              onClick={() => setGuestsOpen((current) => !current)}
-              className={cn('field-shell text-start', guestsOpen && 'border-brand-500 ring-2 ring-brand-500/15')}
-            >
-              <Icon name="bed" className="h-5 w-5 shrink-0 text-ink-400" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-2xs text-ink-500">اتاق و مسافر</span>
-                <span className="block truncate text-sm font-medium text-ink-900">
-                  {faDigits(rooms)} اتاق · {faDigits(guests)} مسافر
+            align="end"
+            trigger={
+              <button
+                type="button"
+                onClick={() => setGuestsOpen((current) => !current)}
+                className={cn('field-shell text-start', guestsOpen && 'border-brand-500 ring-2 ring-brand-500/15')}
+              >
+                <Icon name="bed" className="h-5 w-5 shrink-0 text-ink-400" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-2xs text-ink-500">اتاق و مسافر</span>
+                  <span className="block truncate text-sm font-medium text-ink-900">
+                    {faDigits(rooms)} اتاق · {faDigits(guests)} مسافر
+                  </span>
                 </span>
-              </span>
-              <Icon
-                name="chevron-down"
-                className={cn('h-4 w-4 shrink-0 text-ink-400 transition', guestsOpen && 'rotate-180')}
-              />
-            </button>
-
+                <Icon
+                  name="chevron-down"
+                  className={cn('h-4 w-4 shrink-0 text-ink-400 transition', guestsOpen && 'rotate-180')}
+                />
+              </button>
+            }
+          >
             <div>
               <div className="divide-y divide-ink-100">
                 <Counter

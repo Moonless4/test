@@ -19,6 +19,8 @@ interface DateFieldProps {
   compact?: boolean;
   /** برای فیلدهایی مثل تاریخ تولد که میان‌بر «امروز» در آن‌ها معنا ندارد */
   hideQuickAction?: boolean;
+  /** لبه‌ی چسبیدن پنل تقویم: ابتدای فیلد (راست در RTL) یا انتهای آن */
+  align?: 'start' | 'end';
 }
 
 /** فیلد تاریخ شمسی با تقویم بازشو */
@@ -35,6 +37,7 @@ export function DateField({
   size = 'lg',
   compact,
   hideQuickAction,
+  align = 'start',
 }: DateFieldProps) {
   const [open, setOpen] = useState(false);
 
@@ -44,38 +47,40 @@ export function DateField({
       onClose={() => setOpen(false)}
       className={cn('w-full', className)}
       panelClassName="w-[340px] p-4"
+      align={align}
+      trigger={
+        <button
+          type="button"
+          disabled={disabled}
+          onClick={() => setOpen((current) => !current)}
+          className={cn(
+            'flex w-full items-center gap-2 text-start transition',
+            size === 'lg' ? 'field-shell' : 'h-11 rounded-lg border border-ink-200 bg-white px-3',
+            error && 'field-shell-error',
+            open && 'border-brand-500 ring-2 ring-brand-500/15',
+            disabled && 'cursor-not-allowed bg-ink-50 opacity-80',
+          )}
+        >
+          <Icon name="calendar" className="h-5 w-5 shrink-0 text-ink-400" />
+          <span className="min-w-0 flex-1">
+            {!compact && <span className="block text-2xs text-ink-500">{label}</span>}
+            <span
+              className={cn(
+                'block truncate text-sm',
+                value ? 'font-medium text-ink-900' : 'text-ink-400',
+              )}
+            >
+              {value ? formatJalaliWithWeekday(value) : placeholder}
+            </span>
+          </span>
+          {value && (
+            <span className="num hidden shrink-0 text-2xs text-ink-400 xs:block">
+              {formatJalaliNumeric(value)}
+            </span>
+          )}
+        </button>
+      }
     >
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={() => setOpen((current) => !current)}
-        className={cn(
-          'flex w-full items-center gap-2 text-start transition',
-          size === 'lg' ? 'field-shell' : 'h-11 rounded-lg border border-ink-200 bg-white px-3',
-          error && 'field-shell-error',
-          open && 'border-brand-500 ring-2 ring-brand-500/15',
-          disabled && 'cursor-not-allowed bg-ink-50 opacity-80',
-        )}
-      >
-        <Icon name="calendar" className="h-5 w-5 shrink-0 text-ink-400" />
-        <span className="min-w-0 flex-1">
-          {!compact && <span className="block text-2xs text-ink-500">{label}</span>}
-          <span
-            className={cn(
-              'block truncate text-sm',
-              value ? 'font-medium text-ink-900' : 'text-ink-400',
-            )}
-          >
-            {value ? formatJalaliWithWeekday(value) : placeholder}
-          </span>
-        </span>
-        {value && (
-          <span className="num hidden shrink-0 text-2xs text-ink-400 xs:block">
-            {formatJalaliNumeric(value)}
-          </span>
-        )}
-      </button>
-
       <div>
         <div className="mb-2 flex items-center justify-between">
           <p className="text-xs font-medium text-ink-500">{label}</p>

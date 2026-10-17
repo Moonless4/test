@@ -80,19 +80,27 @@ export function SimpleSearchForm({ service, className }: { service: SimpleServic
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const guestsField = (
-    <Popover open={guestsOpen} onClose={() => setGuestsOpen(false)} className="w-full" panelClassName="w-[300px] p-4">
-      <button
-        type="button"
-        onClick={() => setGuestsOpen((current) => !current)}
-        className={cn('field-shell text-start', guestsOpen && 'border-brand-500 ring-2 ring-brand-500/15')}
-      >
-        <Icon name="users" className="h-5 w-5 shrink-0 text-ink-400" />
-        <span className="min-w-0 flex-1">
-          <span className="block text-2xs text-ink-500">تعداد نفرات</span>
-          <span className="block truncate text-sm font-medium text-ink-900">{faDigits(guests)} نفر</span>
-        </span>
-        <Icon name="chevron-down" className={cn('h-4 w-4 shrink-0 text-ink-400 transition', guestsOpen && 'rotate-180')} />
-      </button>
+    <Popover
+      open={guestsOpen}
+      onClose={() => setGuestsOpen(false)}
+      className="w-full"
+      panelClassName="w-[300px] p-4"
+      align="end"
+      trigger={
+        <button
+          type="button"
+          onClick={() => setGuestsOpen((current) => !current)}
+          className={cn('field-shell text-start', guestsOpen && 'border-brand-500 ring-2 ring-brand-500/15')}
+        >
+          <Icon name="users" className="h-5 w-5 shrink-0 text-ink-400" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-2xs text-ink-500">تعداد نفرات</span>
+            <span className="block truncate text-sm font-medium text-ink-900">{faDigits(guests)} نفر</span>
+          </span>
+          <Icon name="chevron-down" className={cn('h-4 w-4 shrink-0 text-ink-400 transition', guestsOpen && 'rotate-180')} />
+        </button>
+      }
+    >
       <div>
         <Counter title="تعداد نفرات" value={guests} min={1} max={10} onChange={setGuests} />
         <button

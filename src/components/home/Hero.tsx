@@ -3,8 +3,9 @@ import { Icon } from '@/components/ui/Icon';
 
 /** بخش اصلی صفحه‌ی خانه: پنل جستجو روی پس‌زمینه‌ی روشن برند */
 export function Hero() {
+  // بدون overflow-hidden تا پنل‌های شناور جستجو (تقویم، مسافر، شهر) بریده نشوند
   return (
-    <section className="relative overflow-hidden border-b border-ink-200 bg-gradient-to-b from-brand-50 via-brand-50/40 to-white">
+    <section className="relative border-b border-ink-200 bg-gradient-to-b from-brand-50 via-brand-50/40 to-white">
       <div className="container-page relative py-7 sm:py-9 lg:py-11">
         <SearchBox />
       </div>

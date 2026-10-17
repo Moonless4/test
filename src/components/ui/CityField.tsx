@@ -135,24 +135,25 @@ export function CityField({
       onClose={() => setOpen(false)}
       className={cn('w-full', className)}
       panelClassName="w-[360px] p-2"
-    >
-      <button
-        type="button"
-        onClick={() => setOpen((current) => !current)}
-        className={cn('field-shell text-start', error && 'field-shell-error', open && 'border-brand-500 ring-2 ring-brand-500/15')}
-      >
-        <Icon name="map-pin" className="h-5 w-5 shrink-0 text-ink-400" />
-        <span className="min-w-0 flex-1">
-          <span className="block text-2xs text-ink-500">{label}</span>
-          <span
-            className={cn('block truncate text-sm font-medium', value ? 'text-ink-900' : 'text-ink-400')}
-          >
-            {value ? `${value.name} (${value.code})` : placeholder}
+      trigger={
+        <button
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          className={cn('field-shell text-start', error && 'field-shell-error', open && 'border-brand-500 ring-2 ring-brand-500/15')}
+        >
+          <Icon name="map-pin" className="h-5 w-5 shrink-0 text-ink-400" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-2xs text-ink-500">{label}</span>
+            <span
+              className={cn('block truncate text-sm font-medium', value ? 'text-ink-900' : 'text-ink-400')}
+            >
+              {value ? `${value.name} (${value.code})` : placeholder}
+            </span>
           </span>
-        </span>
-        <Icon name="chevron-down" className={cn('h-4 w-4 shrink-0 text-ink-400 transition', open && 'rotate-180')} />
-      </button>
-
+          <Icon name="chevron-down" className={cn('h-4 w-4 shrink-0 text-ink-400 transition', open && 'rotate-180')} />
+        </button>
+      }
+    >
       <div>
         <div className="flex items-center gap-2 border-b border-ink-100 px-2 pb-2">
           <Icon name="search" className="h-4 w-4 text-ink-400" />

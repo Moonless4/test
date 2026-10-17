@@ -1,9 +1,12 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 interface PopoverProps {
   open: boolean;
   onClose: () => void;
+  /** فیلد (دکمه) همیشه‌درجریان‌صفحه که پنل را باز و بسته می‌کند */
+  trigger: ReactNode;
+  /** محتوای پنل شناور؛ فقط در حالت باز رندر می‌شود */
   children: ReactNode;
   className?: string;
   /** لبه‌ی چسبیدن پنل: ابتدای فیلد (راست در RTL) یا انتهای آن */
@@ -20,6 +23,7 @@ interface PopoverProps {
 export function Popover({
   open,
   onClose,
+  trigger,
   children,
   className,
   align = 'start',
@@ -27,6 +31,19 @@ export function Popover({
   sheetOnMobile = true,
 }: PopoverProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // پنل بلندتر از فضای خالی زیر فیلد (مثل «مسافران») تا پایین پنجره کوتاه می‌شود و خودش اسکرول می‌خورد
+  useLayoutEffect(() => {
+    if (!open) return;
+    const panel = panelRef.current;
+    if (!panel || window.innerWidth < 640) return; // روی موبایل پنل شیت پایین‌کش با ارتفاع محدود است
+    const available = window.innerHeight - panel.getBoundingClientRect().top - 12;
+    if (panel.scrollHeight > available) {
+      panel.style.maxHeight = `${Math.max(180, available)}px`;
+      panel.style.overflowY = 'auto';
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -48,9 +65,10 @@ export function Popover({
 
   return (
     <div ref={ref} className={cn('relative', className)}>
-      {children}
+      {trigger}
       {open && (
         <div
+          ref={panelRef}
           role="dialog"
           className={cn(
             'absolute top-[calc(100%+6px)] z-50 animate-pop-in rounded-xl border border-ink-200 bg-white shadow-pop',

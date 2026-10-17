@@ -105,7 +105,8 @@ export function SearchBox({ defaultService = 'flight', className, showHeading = 
         </div>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-ink-200 bg-white shadow-panel">
+      {/* بدون overflow-hidden تا پنل‌های شناور فیلدها (تقویم، مسافر، شهر) بریده نشوند */}
+      <div className="rounded-2xl border border-ink-200 bg-white shadow-panel">
         <ServiceTabs active={service} onChange={setService} badges={{ flight: 20, hotel: 15 }} />
         <div key={service} className="animate-fade-in p-4 sm:p-5 lg:p-6">
           {renderForm()}

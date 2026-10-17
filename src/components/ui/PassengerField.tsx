@@ -20,6 +20,8 @@ interface PassengerFieldProps {
   onCabinChange: (cabin: CabinClass) => void;
   className?: string;
   error?: boolean;
+  /** لبه‌ی چسبیدن پنل: ابتدای فیلد (راست در RTL) یا انتهای آن */
+  align?: 'start' | 'end';
 }
 
 export function PassengerField({
@@ -29,33 +31,41 @@ export function PassengerField({
   onCabinChange,
   className,
   error,
+  align = 'start',
 }: PassengerFieldProps) {
   const [open, setOpen] = useState(false);
   const total = passengers.adults + passengers.children + passengers.infants;
 
   return (
-    <Popover open={open} onClose={() => setOpen(false)} className={cn('w-full', className)} panelClassName="w-[340px] p-4">
-      <button
-        type="button"
-        onClick={() => setOpen((current) => !current)}
-        className={cn(
-          'field-shell text-start',
-          error && 'field-shell-error',
-          open && 'border-brand-500 ring-2 ring-brand-500/15',
-        )}
-      >
-        <Icon name="users" className="h-5 w-5 shrink-0 text-ink-400" />
-        <span className="min-w-0 flex-1">
-          <span className="block text-2xs text-ink-500">مسافران و کلاس پروازی</span>
-          <span className="block truncate text-sm font-medium text-ink-900">
-            {faDigits(total)} مسافر
-            <span className="mx-1 text-ink-300">·</span>
-            {CABIN_LABELS.find((c) => c.key === cabin)?.title}
+    <Popover
+      open={open}
+      onClose={() => setOpen(false)}
+      className={cn('w-full', className)}
+      panelClassName="w-[340px] p-4"
+      align={align}
+      trigger={
+        <button
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          className={cn(
+            'field-shell text-start',
+            error && 'field-shell-error',
+            open && 'border-brand-500 ring-2 ring-brand-500/15',
+          )}
+        >
+          <Icon name="users" className="h-5 w-5 shrink-0 text-ink-400" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-2xs text-ink-500">مسافران و کلاس پروازی</span>
+            <span className="block truncate text-sm font-medium text-ink-900">
+              {faDigits(total)} مسافر
+              <span className="mx-1 text-ink-300">·</span>
+              {CABIN_LABELS.find((c) => c.key === cabin)?.title}
+            </span>
           </span>
-        </span>
-        <Icon name="chevron-down" className={cn('h-4 w-4 shrink-0 text-ink-400 transition', open && 'rotate-180')} />
-      </button>
-
+          <Icon name="chevron-down" className={cn('h-4 w-4 shrink-0 text-ink-400 transition', open && 'rotate-180')} />
+        </button>
+      }
+    >
       <div>
         <p className="mb-1 text-xs font-medium text-ink-500">تعداد مسافران</p>
         <div className="divide-y divide-ink-100">
