@@ -24,53 +24,8 @@ export function Footer() {
 
   return (
     <footer className="mt-12 border-t border-ink-200 bg-white pb-20 lg:pb-0">
-      {/* خبرنامه */}
-      <div className="border-b border-ink-200 bg-ink-50/70">
-        <div className="container-page flex flex-col gap-4 py-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <Icon name="mail" className="h-5 w-5" />
-            </span>
-            <div>
-              <p className="text-sm font-bold text-ink-900">خبرنامه‌ی پیشنهادهای سفر</p>
-              <p className="mt-1 text-2xs leading-5 text-ink-500">
-                تخفیف‌های هفتگی پرواز و هتل را مستقیم در ایمیل خود دریافت کنید.
-              </p>
-            </div>
-          </div>
-
-          {subscribed ? (
-            <div className="flex items-center gap-2 rounded-lg border border-success-500/30 bg-success-50 px-4 py-3 text-xs text-success-700">
-              <Icon name="check" className="h-4 w-4" />
-              عضویت شما ثبت شد. اولین پیشنهاد را همین هفته دریافت می‌کنید.
-            </div>
-          ) : (
-            <form onSubmit={subscribe} className="flex w-full max-w-md flex-col gap-2 sm:flex-row" noValidate>
-              <div className={cn('field-shell flex-1 bg-white', error && 'field-shell-error')}>
-                <Icon name="mail" className="h-4 w-4 text-ink-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(event) => {
-                    setEmail(event.target.value);
-                    if (error) setError('');
-                  }}
-                  placeholder="ایمیل شما"
-                  className="input-base dir-ltr"
-                  aria-label="ایمیل"
-                />
-              </div>
-              <Button type="submit" size="lg" className="sm:w-auto">
-                عضویت
-              </Button>
-              {error && <p className="text-2xs text-danger-600 sm:hidden">{error}</p>}
-            </form>
-          )}
-        </div>
-      </div>
-
       {/* لینک‌ها */}
-      <div className="container-page grid gap-8 py-10 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="container-page grid gap-8 py-10 sm:grid-cols-2 lg:grid-cols-6">
         <div className="lg:col-span-2">
           <Logo />
           <p className="mt-4 max-w-sm text-xs leading-6 text-ink-500">
@@ -123,11 +78,46 @@ export function Footer() {
             </ul>
           </div>
         ))}
+
+        {/* خبرنامه — کوچک، کنار ستون سفربان */}
+        <div>
+          <p className="text-xs font-bold text-ink-900">خبرنامه‌ی پیشنهادهای سفر</p>
+          <p className="mt-2 text-2xs leading-5 text-ink-500">
+            تخفیف‌های هفتگی پرواز و هتل را در ایمیل خود دریافت کنید.
+          </p>
+          {subscribed ? (
+            <p className="mt-3 flex items-start gap-1.5 rounded-lg border border-success-500/30 bg-success-50 px-2.5 py-2 text-[0.65rem] leading-5 text-success-700">
+              <Icon name="check" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              عضویت شما ثبت شد.
+            </p>
+          ) : (
+            <form onSubmit={subscribe} className="mt-3 space-y-2" noValidate>
+              <div className={cn('field-shell bg-white', error && 'field-shell-error')}>
+                <Icon name="mail" className="h-4 w-4 shrink-0 text-ink-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    if (error) setError('');
+                  }}
+                  placeholder="ایمیل شما"
+                  className="input-base dir-ltr"
+                  aria-label="ایمیل"
+                />
+              </div>
+              {error && <p className="text-2xs text-danger-600">{error}</p>}
+              <Button type="submit" size="sm" className="w-full">
+                عضویت
+              </Button>
+            </form>
+          )}
+        </div>
       </div>
 
       {/* نمادها و اپلیکیشن */}
       <div className="border-t border-ink-200">
-        <div className="container-page flex flex-col gap-6 py-7 lg:flex-row lg:items-center lg:justify-between">
+        <div className="container-page flex flex-col gap-5 py-7">
           <div className="flex flex-wrap gap-3">
             {TRUST_BADGES.map((badge) => (
               <div
