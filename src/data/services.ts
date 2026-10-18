@@ -179,3 +179,6 @@ export const MORE_SERVICES: ServiceItem[] = [
     icon: 'wallet',
   },
 ];
+
+/** فهرست بازشوی «سایر خدمات» در بخش «خدمات سفر سفربان» صفحه‌ی خانه */
+export const HOME_MORE_SERVICES: ServiceItem[] = [...OTHER_SERVICES, ...MORE_SERVICES];
