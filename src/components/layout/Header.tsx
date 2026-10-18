@@ -17,10 +17,22 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hiddenOnScroll, setHiddenOnScroll] = useState(false);
   const closeTimer = useRef<number | null>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 8);
+
+      // پایین رفتن صفحه: هدر مخفی می‌شود — بالا آمدن: دوباره نمایان
+      if (y <= 8) setHiddenOnScroll(false);
+      else if (y > lastY + 6) setHiddenOnScroll(true);
+      else if (y < lastY - 6) setHiddenOnScroll(false);
+
+      lastY = y;
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -57,8 +69,9 @@ export function Header() {
     <>
       <header
         className={cn(
-          'sticky top-0 z-50 border-b bg-white/95 backdrop-blur transition',
+          'sticky top-0 z-50 border-b bg-white/95 backdrop-blur transition duration-300',
           scrolled ? 'border-ink-200 shadow-card' : 'border-transparent',
+          hiddenOnScroll && !openMenu && !mobileOpen && !accountOpen ? '-translate-y-full' : 'translate-y-0',
         )}
       >
         <div className="container-page">
