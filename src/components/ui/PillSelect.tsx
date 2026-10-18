@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { Popover } from './Popover';
 import { Icon } from './Icon';
 import { cn } from '@/lib/utils';
 
@@ -11,35 +13,66 @@ interface PillSelectProps {
 
 /**
  * دکمه‌ی قرصی با فلش پایین برای انتخاب‌های کوتاه (نوع سفر، کلاس پروازی).
- * انتخاب با یک select نامرئی روی قرص انجام می‌شود تا روی موبایل هم تجربه‌ی بومی داشته باشد.
+ * فهرست گزینه‌ها با پنل شناور خودِ اپ نمایش داده می‌شود تا هم‌رنگ و هم‌زبان بقیه‌ی رابط باشد
+ * (به‌جای فهرست پیش‌فرض مرورگر که با تم مینیمال هم‌خوان نیست).
  */
 export function PillSelect({ value, options, onChange, ariaLabel, className }: PillSelectProps) {
+  const [open, setOpen] = useState(false);
   const current = options.find((option) => option.key === value)?.title ?? '—';
 
   return (
-    <div className={cn('relative inline-flex', className)}>
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        aria-label={ariaLabel}
-        className="peer absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0"
-      >
-        {options.map((option) => (
-          <option key={option.key} value={option.key}>
-            {option.title}
-          </option>
-        ))}
-      </select>
-      <span
-        aria-hidden="true"
-        className={cn(
-          'pointer-events-none flex h-9 items-center gap-1.5 rounded-full border border-ink-800 bg-white px-3.5 text-xs font-medium text-ink-900 transition',
-          'peer-hover:border-ink-900 peer-hover:bg-ink-50 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500/20 sm:text-sm',
-        )}
-      >
-        {current}
-        <Icon name="chevron-down" className="h-4 w-4" />
-      </span>
-    </div>
+    <Popover
+      open={open}
+      onClose={() => setOpen(false)}
+      className={cn('inline-flex', className)}
+      panelClassName="w-auto min-w-[11rem] p-1.5"
+      sheetOnMobile={false}
+      trigger={
+        <button
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          aria-label={ariaLabel}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          className={cn(
+            'flex h-9 items-center gap-1.5 rounded-full border bg-white px-3.5 text-xs font-medium text-ink-900 transition',
+            'focus-visible:ring-2 focus-visible:ring-brand-500/20 sm:text-sm',
+            open ? 'border-brand-600' : 'border-ink-800 hover:border-ink-900 hover:bg-ink-50',
+          )}
+        >
+          {current}
+          <Icon
+            name="chevron-down"
+            className={cn('h-4 w-4 text-ink-400 transition', open && 'rotate-180 text-brand-600')}
+          />
+        </button>
+      }
+    >
+      <ul role="listbox" aria-label={ariaLabel} className="space-y-0.5">
+        {options.map((option) => {
+          const active = option.key === value;
+          return (
+            <li key={option.key}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={active}
+                onClick={() => {
+                  onChange(option.key);
+                  setOpen(false);
+                }}
+                className={cn(
+                  'flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-xs transition',
+                  active ? 'bg-brand-50 font-medium text-brand-700' : 'text-ink-700 hover:bg-ink-50',
+                )}
+              >
+                {option.title}
+                {active && <Icon name="check" className="h-4 w-4 text-brand-600" />}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </Popover>
   );
 }

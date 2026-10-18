@@ -211,8 +211,7 @@ export function FlightSearchForm({ className }: FlightSearchFormProps) {
               type="button"
               onClick={swap}
               aria-label="جابجایی مبدا و مقصد"
-              className="absolute -start-4 top-1/2 z-30 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-500 shadow-card transition hover:border-brand-300 hover:text-brand-700 lg:flex"
-              style={{ insetInlineStart: '-1rem' }}
+              className="absolute -end-4 top-1/2 z-30 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-500 shadow-card transition hover:border-brand-300 hover:text-brand-700 lg:flex"
             >
               <Icon name="swap" className="h-4 w-4" />
             </button>

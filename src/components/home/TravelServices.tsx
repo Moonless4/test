@@ -11,7 +11,7 @@ export function TravelServices() {
           title="خدمات سفر سفربان"
           subtitle="از بلیط و اقامت تا ویزا، بیمه و خدمات فرودگاهی"
         />
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {HOME_SERVICES.map((service) => (
             <ServiceCard key={service.key} service={service} />
           ))}

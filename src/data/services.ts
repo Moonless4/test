@@ -126,17 +126,13 @@ export const OTHER_SERVICES: ServiceItem[] = [
   },
 ];
 
-/** خدمات نمایش‌داده‌شده در بخش «خدمات سفر سفربان» صفحه‌ی خانه */
+/** خدمات نمایش‌داده‌شده در بخش «خدمات سفر سفربان» صفحه‌ی خانه — یک سطر؛ بقیه‌ی خدمات زیر «سایر خدمات» است */
 export const HOME_SERVICES: ServiceItem[] = [
   { key: 'flight', title: 'بلیط هواپیما', description: 'مقایسه قیمت تمام ایرلاین‌های داخلی و خارجی', href: '/flights', icon: 'plane' },
   { key: 'hotel', title: 'هتل', description: 'رزرو هتل‌های ایران و جهان با تخفیف ویژه', href: '/hotels', icon: 'hotel' },
-  { key: 'bus', title: 'اتوبوس', description: 'بلیط اتوبوس‌های VIP سراسر کشور', href: '/buses', icon: 'bus' },
   { key: 'train', title: 'قطار', description: 'بلیط قطارهای سریع‌السیر و لوکس', href: '/trains', icon: 'train' },
   { key: 'tour', title: 'تور', description: 'تورهای داخلی و خارجی با راهنمای فارسی', href: '/tours', icon: 'compass' },
-  { key: 'villa', title: 'ویلا و اقامتگاه', description: 'اقامتگاه‌های بومی، ویلا و آپارتمان', href: '/stays', icon: 'villa' },
-  { key: 'visa', title: 'ویزا', description: 'دریافت ویزای توریستی و تحصیلی', href: '/services/visa', icon: 'passport' },
-  { key: 'insurance', title: 'بیمه مسافرتی', description: 'صدور آنی بیمه‌نامه در چند دقیقه', href: '/services/insurance', icon: 'shield' },
-  { key: 'more', title: 'سایر خدمات', description: 'eSIM، CIP، گشت شهری و ترانسفر', href: '/services', icon: 'grid' },
+  { key: 'more', title: 'سایر خدمات', description: 'اتوبوس، ویلا، ویزا، بیمه و خدمات فرودگاهی', href: '/services', icon: 'grid' },
 ];
 
 export const MORE_SERVICES: ServiceItem[] = [
