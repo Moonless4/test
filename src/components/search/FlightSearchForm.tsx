@@ -95,9 +95,12 @@ export function FlightSearchForm({ className }: FlightSearchFormProps) {
     );
   };
 
-  // در دسکتاپ باریک (lg) فیلدها دو ردیفه می‌شوند تا متنشان بریده نشود؛ از xl به بعد چیدمان یک‌ردیفه‌ی فعلی حفظ می‌شود
+  // در دسکتاپ باریک (lg) فیلدها دو ردیفه می‌شوند تا متنشان بریده نشود؛ از xl به بعد چیدمان یک‌ردیفه‌ی فعلی حفظ می‌شود.
+  // در سفر یک‌طرفه فیلد تاریخ برگشت وجود ندارد، پس فیلدها پهن‌تر می‌شوند تا ردیف کامل بماند.
   const wideField = 'lg:col-span-6 xl:col-span-3';
-  const narrowField = 'lg:col-span-4 xl:col-span-2';
+  const narrowField = tripType === 'round' ? 'lg:col-span-4 xl:col-span-2' : 'lg:col-span-6 xl:col-span-3';
+  const summaryError =
+    errors.origin || errors.destination || errors.departDate || (tripType === 'round' ? errors.returnDate : '');
 
   return (
     <form onSubmit={handleSubmit} className={cn('space-y-3.5', className)} noValidate>
@@ -242,18 +245,19 @@ export function FlightSearchForm({ className }: FlightSearchFormProps) {
             />
           </div>
 
-          <div className={narrowField}>
-            <DateField
-              label="تاریخ برگشت"
-              value={tripType === 'round' ? returnDate : null}
-              min={departDate ? addDays(departDate, 1) : today}
-              rangeEnd={null}
-              disabled={tripType !== 'round'}
-              placeholder={tripType === 'round' ? 'انتخاب تاریخ برگشت' : 'یک‌طرفه'}
-              error={Boolean(errors.returnDate)}
-              onChange={setReturnDate}
-            />
-          </div>
+          {tripType === 'round' && (
+            <div className={narrowField}>
+              <DateField
+                label="تاریخ برگشت"
+                placeholder="انتخاب تاریخ برگشت"
+                value={returnDate}
+                min={departDate ? addDays(departDate, 1) : today}
+                rangeEnd={null}
+                error={Boolean(errors.returnDate)}
+                onChange={setReturnDate}
+              />
+            </div>
+          )}
 
           <div className={narrowField}>
             <PassengerField passengers={passengers} onChange={setPassengers} align="end" />
@@ -261,12 +265,10 @@ export function FlightSearchForm({ className }: FlightSearchFormProps) {
         </div>
       )}
 
-      {(errors.origin || errors.destination || errors.departDate || errors.returnDate) && (
+      {summaryError && (
         <div className="flex items-start gap-2 rounded-lg border border-danger-500/30 bg-danger-50 px-3 py-2.5 text-xs text-danger-700">
           <Icon name="alert" className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>
-            {errors.origin || errors.destination || errors.departDate || errors.returnDate}
-          </span>
+          <span>{summaryError}</span>
         </div>
       )}
 
