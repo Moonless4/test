@@ -11,19 +11,19 @@ interface OfferCardProps {
 }
 
 const TONE_STRIP: Record<Offer['tone'], string> = {
-  brand: 'bg-brand-800/70',
-  accent: 'bg-accent-700/70',
-  dark: 'bg-ink-900/65',
+  brand: 'from-brand-800/60 via-brand-800/32 to-brand-800/12',
+  accent: 'from-accent-700/60 via-accent-700/32 to-accent-700/12',
+  dark: 'from-ink-900/60 via-ink-900/32 to-ink-900/12',
 };
 
-/** کارت پیشنهاد ویژه — تصویر تمام‌قد و متن روی نوار بلورشده‌ی پایین */
+/** کارت پیشنهاد ویژه — تصویر تمام‌قد و نوار بلورشده‌ی سبک در پایین */
 export function OfferCard({ offer, variant = 'banner', className }: OfferCardProps) {
   return (
     <Link
       to={offer.href}
       className={cn(
         'group relative block overflow-hidden rounded-xl bg-ink-900',
-        variant === 'banner' ? 'h-56 sm:h-64' : 'h-56',
+        variant === 'banner' ? 'h-56 sm:h-64' : 'h-64',
         className,
       )}
     >
@@ -46,15 +46,15 @@ export function OfferCard({ offer, variant = 'banner', className }: OfferCardPro
 
       <div
         className={cn(
-          'absolute inset-x-0 bottom-0 border-t border-white/15 p-4 text-white backdrop-blur-md sm:p-5',
+          'absolute inset-x-0 bottom-0 bg-gradient-to-t p-3.5 text-white backdrop-blur-sm [text-shadow:0_1px_3px_rgba(0,0,0,0.45)] sm:p-4',
           TONE_STRIP[offer.tone],
         )}
       >
-        <h3 className={cn('font-bold leading-7', variant === 'banner' ? 'text-lg sm:text-xl' : 'text-base')}>
+        <h3 className={cn('font-bold leading-7 text-white', variant === 'banner' ? 'text-lg sm:text-xl' : 'text-base')}>
           {offer.title}
         </h3>
-        <p className="mt-1.5 text-2xs leading-6 text-white/85 sm:text-xs">{offer.subtitle}</p>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
+        <p className="mt-1 text-2xs leading-6 text-white/90 sm:text-xs">{offer.subtitle}</p>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           {offer.code && (
             <span className="num rounded-md border border-dashed border-white/50 px-2 py-1 text-2xs">
               کد تخفیف: {offer.code}

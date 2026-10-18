@@ -8,7 +8,7 @@ interface DestinationCardProps {
   className?: string;
 }
 
-/** کارت مقصد — تصویر تمام‌قد و متن روی نوار بلورشده‌ی پایین */
+/** کارت مقصد — تصویر تمام‌قد و نوار بلورشده‌ی سبک در پایین */
 export function DestinationCard({ destination, className }: DestinationCardProps) {
   return (
     <Link
@@ -25,19 +25,16 @@ export function DestinationCard({ destination, className }: DestinationCardProps
         className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
       />
 
-      <div className="absolute inset-x-0 bottom-0 border-t border-white/15 bg-ink-900/45 p-3 text-white backdrop-blur-md">
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-900/55 via-ink-900/30 to-ink-900/10 p-3 text-white backdrop-blur-sm [text-shadow:0_1px_3px_rgba(0,0,0,0.45)]">
         <p className="truncate text-sm font-bold">{destination.name}</p>
-        <p className="mt-1 truncate text-2xs text-white/80">
+        <p className="mt-0.5 truncate text-2xs text-white/85">
           {destination.country} · <span className="num">{faDigits(destination.hotelCount)}</span> اقامتگاه
         </p>
-
-        <div className="mt-2.5 flex items-end justify-between gap-2">
-          <span className="text-2xs text-white/75">شروع قیمت از</span>
-          <span className="num text-sm font-bold">
-            {formatNumber(destination.startingPrice)}
-            <span className="ms-1 text-2xs font-normal text-white/75">تومان</span>
-          </span>
-        </div>
+        <p className="mt-1 truncate text-2xs">
+          شروع قیمت از{' '}
+          <span className="num text-sm font-bold">{formatNumber(destination.startingPrice)}</span>
+          <span className="ms-1 font-normal text-white/85">تومان</span>
+        </p>
       </div>
     </Link>
   );
