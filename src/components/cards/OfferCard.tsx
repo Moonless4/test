@@ -38,6 +38,14 @@ export function OfferCard({ offer, variant = 'banner', className }: OfferCardPro
         </span>
       </div>
 
+      {/* بلور خیلی کم که با تصویر ترکیب می‌شود */}
+      <div
+        className={cn(
+          'pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent backdrop-blur-[2px] [mask-image:linear-gradient(to_top,black_45%,transparent)]',
+          variant === 'banner' ? 'h-32' : 'h-40',
+        )}
+      />
+
       <div className="absolute inset-x-0 bottom-0 p-3.5 text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.65),0_0_12px_rgba(0,0,0,0.4)] sm:p-4">
         <h3 className={cn('font-bold leading-7 text-white', variant === 'banner' ? 'text-lg sm:text-xl' : 'text-base')}>
           {offer.title}

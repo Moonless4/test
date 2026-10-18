@@ -30,7 +30,10 @@ export function HotelMiniCard({ hotel, queryString = '', className }: HotelMiniC
         className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
       />
 
-      {/* متن مستقیم روی تصویر: بدون پرده و بلور، فقط سایه برای خوانایی */}
+      {/* بلور خیلی کم که با تصویر ترکیب می‌شود */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/55 via-black/20 to-transparent backdrop-blur-[2px] [mask-image:linear-gradient(to_top,black_45%,transparent)]" />
+
+      {/* متن روی تصویر با سایه‌ی سبک برای خوانایی */}
       <div className="absolute inset-x-0 bottom-0 p-3 text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.65),0_0_12px_rgba(0,0,0,0.4)]">
         <Link to={href} className="block truncate text-xs font-bold sm:text-sm">
           {hotel.name}
