@@ -12,7 +12,8 @@ interface FlightDealCardProps {
 
 /** کارت مسیر پرطرفدار — از/به، ایرلاین و ارزان‌ترین قیمت */
 export function FlightDealCard({ deal, className }: FlightDealCardProps) {
-  const href = `/flights?from=${deal.from.code}&to=${deal.to.code}&trip=oneway`;
+  // تاریخ همراه لینک می‌رود تا صفحه‌ی نتایج همان پروازها را نشان دهد
+  const href = `/flights?from=${deal.from.code}&to=${deal.to.code}&depart=${deal.departDate}&trip=oneway&cabin=economy`;
 
   return (
     <Link

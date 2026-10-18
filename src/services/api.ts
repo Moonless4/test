@@ -53,12 +53,16 @@ export interface FlightSearchRequest {
   passengers: number;
 }
 
+/** کلید تاریخ پرواز (بدون جداکننده) — مبنای تولید نتایج؛ جای دیگر مثل پیشنهادهای صفحه‌ی خانه هم از همین استفاده می‌کند تا قیمت‌ها یکی باشد */
+export function flightDateKey(date: Date) {
+  return `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`;
+}
+
 export async function searchFlights(req: FlightSearchRequest, options?: RequestOptions): Promise<Flight[]> {
-  const dateKey = `${req.date.getFullYear()}${req.date.getMonth() + 1}${req.date.getDate()}`;
   const flights = generateFlights({
     origin: req.origin,
     destination: req.destination,
-    date: dateKey,
+    date: flightDateKey(req.date),
     tripType: req.tripType,
     cabin: req.cabin,
     passengers: req.passengers,

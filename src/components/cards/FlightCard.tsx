@@ -32,7 +32,14 @@ export function FlightCard({ flight, queryString, passengers, tripType }: Flight
   const returnSegment = tripType === 'round' ? flight.segments[1] : undefined;
 
   return (
-    <article className="card overflow-hidden transition hover:border-ink-300 hover:shadow-card-hover">
+    <article className="card relative overflow-hidden transition hover:border-ink-300 hover:shadow-card-hover">
+      {/* کل کارت قابل کلیک است و به جزئیات پرواز می‌رود؛ دکمه‌ی «انتخاب پرواز» روی همین لایه می‌ماند */}
+      <Link
+        to={detailHref}
+        aria-label={`جزئیات پرواز ${flight.airline.name} از ${flight.from.name} به ${flight.to.name}`}
+        className="absolute inset-0 z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500/40"
+      />
+
       <div className="flex flex-col gap-4 p-4 lg:grid lg:grid-cols-[minmax(140px,0.9fr)_minmax(0,2fr)_minmax(140px,1fr)_minmax(150px,auto)] lg:items-center lg:gap-5">
         {/* ایرلاین */}
         <div className="flex items-center gap-3">
@@ -121,7 +128,7 @@ export function FlightCard({ flight, queryString, passengers, tripType }: Flight
                 {faDigits(flight.seatsLeft)} صندلی باقی مانده
               </span>
             )}
-            <Link to={detailHref} className="lg:w-full">
+            <Link to={detailHref} className="relative z-20 lg:w-full">
               <Button size="md" className="w-full lg:min-w-[140px]">
                 انتخاب پرواز
               </Button>

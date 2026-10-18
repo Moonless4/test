@@ -10,13 +10,7 @@ interface OfferCardProps {
   className?: string;
 }
 
-const TONE_STRIP: Record<Offer['tone'], string> = {
-  brand: 'from-brand-800/60 via-brand-800/32 to-brand-800/12',
-  accent: 'from-accent-700/60 via-accent-700/32 to-accent-700/12',
-  dark: 'from-ink-900/60 via-ink-900/32 to-ink-900/12',
-};
-
-/** کارت پیشنهاد ویژه — تصویر تمام‌قد و نوار بلورشده‌ی سبک در پایین */
+/** کارت پیشنهاد ویژه — تصویر تمام‌قد و متن مستقیم روی تصویر با سایه */
 export function OfferCard({ offer, variant = 'banner', className }: OfferCardProps) {
   return (
     <Link
@@ -44,19 +38,14 @@ export function OfferCard({ offer, variant = 'banner', className }: OfferCardPro
         </span>
       </div>
 
-      <div
-        className={cn(
-          'absolute inset-x-0 bottom-0 bg-gradient-to-t p-3.5 text-white backdrop-blur-sm [text-shadow:0_1px_3px_rgba(0,0,0,0.45)] sm:p-4',
-          TONE_STRIP[offer.tone],
-        )}
-      >
+      <div className="absolute inset-x-0 bottom-0 p-3.5 text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.65),0_0_12px_rgba(0,0,0,0.4)] sm:p-4">
         <h3 className={cn('font-bold leading-7 text-white', variant === 'banner' ? 'text-lg sm:text-xl' : 'text-base')}>
           {offer.title}
         </h3>
         <p className="mt-1 text-2xs leading-6 text-white/90 sm:text-xs">{offer.subtitle}</p>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           {offer.code && (
-            <span className="num rounded-md border border-dashed border-white/50 px-2 py-1 text-2xs">
+            <span className="num rounded-md border border-dashed border-white/50 bg-ink-900/25 px-2 py-1 text-2xs">
               کد تخفیف: {offer.code}
             </span>
           )}
