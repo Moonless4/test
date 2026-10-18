@@ -34,7 +34,7 @@ export function FlightDealCard({ deal, className }: FlightDealCardProps) {
         <span className="text-sm font-bold text-ink-900">{deal.from.name}</span>
         <span className="flex flex-1 items-center gap-1 text-ink-300">
           <span className="h-px flex-1 bg-ink-200" />
-          <Icon name="plane" className="h-3.5 w-3.5 text-brand-500" />
+          <Icon name="plane-side" className="h-3.5 w-3.5 text-brand-500" />
           <span className="h-px flex-1 bg-ink-200" />
         </span>
         <span className="text-sm font-bold text-ink-900">{deal.to.name}</span>
