@@ -13,7 +13,7 @@ export function MobileMenu({ open, onClose }: { open: boolean; onClose: () => vo
   const { user, logout } = useApp();
 
   return (
-    <Drawer open={open} onClose={onClose} side="end" title="منوی سفربان" className="w-[92%] max-w-[380px]">
+    <Drawer open={open} onClose={onClose} side="start" title="منوی سفربان" className="w-[92%] max-w-[380px]">
       <div className="space-y-5">
         <div className="flex items-center justify-between rounded-xl border border-ink-200 p-3">
           {user ? (
