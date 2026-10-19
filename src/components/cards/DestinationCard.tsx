@@ -6,15 +6,25 @@ import type { Destination } from '@/types';
 interface DestinationCardProps {
   destination: Destination;
   className?: string;
+  /** کارت میانی کاروسل — اندازه‌ی کامل، بقیه کوچک و محو می‌شوند */
+  active?: boolean;
+  /** روی کارت‌های کناری، کلیک اول کارت را وسط می‌آورد */
+  onFocus?: () => void;
 }
 
-/** کارت مقصد — تصویر تمام‌قد و نوار بلورشده‌ی سبک در پایین */
-export function DestinationCard({ destination, className }: DestinationCardProps) {
+/** کارت مقصد — تصویر تمام‌قد، پرده‌ی شیشه‌ای پایین و برچسب قیمت */
+export function DestinationCard({ destination, className, active = true, onFocus }: DestinationCardProps) {
   return (
     <Link
       to={`/hotels?city=${destination.code}&name=${encodeURIComponent(destination.name)}`}
+      onClick={(event) => {
+        if (active) return;
+        event.preventDefault();
+        onFocus?.();
+      }}
       className={cn(
-        'group relative block h-48 overflow-hidden rounded-xl border border-ink-200 bg-ink-900 transition hover:border-ink-300 sm:h-52',
+        'group relative block h-64 overflow-hidden rounded-2xl border border-ink-200 bg-ink-900 transition sm:h-72',
+        active ? 'shadow-card' : 'shadow-none',
         className,
       )}
     >
@@ -25,20 +35,22 @@ export function DestinationCard({ destination, className }: DestinationCardProps
         className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
       />
 
-      {/* بلور خیلی کم که با تصویر ترکیب می‌شود */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/55 via-black/20 to-transparent backdrop-blur-[2px] [mask-image:linear-gradient(to_top,black_45%,transparent)]" />
+      {/* برچسب قیمت */}
+      <span className="num absolute start-3 top-3 rounded-full bg-ink-900/55 px-2.5 py-1 text-2xs font-bold text-white backdrop-blur-sm">
+        از {formatNumber(destination.startingPrice)} تومان
+      </span>
 
-      {/* متن روی تصویر با سایه‌ی سبک برای خوانایی */}
-      <div className="absolute inset-x-0 bottom-0 p-3 text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.65),0_0_12px_rgba(0,0,0,0.4)]">
-        <p className="truncate text-sm font-bold">{destination.name}</p>
-        <p className="mt-0.5 truncate text-2xs text-white/85">
+      {/* پرده‌ی شیشه‌ای پایین کارت — لبه‌اش در تصویر محو می‌شود */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink-900/85 via-ink-900/35 to-transparent backdrop-blur-[3px] [mask-image:linear-gradient(to_top,black_45%,transparent)]" />
+
+      <div className="absolute inset-x-0 bottom-0 p-4 text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.6)]">
+        <p className="truncate text-base font-bold">{destination.name}</p>
+        <p className="mt-1 truncate text-2xs text-white/85">
           {destination.country} · <span className="num">{faDigits(destination.hotelCount)}</span> اقامتگاه
         </p>
-        <p className="mt-1 truncate text-2xs">
-          شروع قیمت از{' '}
-          <span className="num text-sm font-bold">{formatNumber(destination.startingPrice)}</span>
-          <span className="ms-1 font-normal text-white/85">تومان</span>
-        </p>
+        <span className="mt-3 flex h-9 items-center justify-center rounded-full bg-white text-2xs font-bold text-ink-900 transition group-hover:bg-brand-600 group-hover:text-white">
+          مشاهده اقامتگاه‌ها
+        </span>
       </div>
     </Link>
   );

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { DestinationCard } from '@/components/cards/DestinationCard';
+import { DestinationCarousel } from './DestinationCarousel';
 import { DOMESTIC_DESTINATIONS, INTERNATIONAL_DESTINATIONS } from '@/data/destinations';
 import { cn } from '@/lib/utils';
 
@@ -40,11 +40,7 @@ export function PopularDestinations() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {list.map((destination) => (
-          <DestinationCard key={destination.id} destination={destination} />
-        ))}
-      </div>
+      <DestinationCarousel key={tab} items={list} />
     </section>
   );
 }
