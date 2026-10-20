@@ -21,7 +21,7 @@ export const heading = (title, subtitle, icon = 'luxina-icon-home-5-line') => `
 </div>`;
 
 export const section = (inner, className = '') => `
-<div class="elementor-element e-flex e-con-boxed e-con e-parent ${className}">
+<div class="elementor-element e-flex e-con-boxed e-con e-parent rb-con ${className}">
   <div class="e-con-inner">${inner}</div>
 </div>`;
 

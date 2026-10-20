@@ -844,3 +844,35 @@
   opacity: 1;
   margin-inline-end: 8px;
 }
+
+/* Routes rebuilt from scratch print their own Elementor containers, which carry
+   none of the per-element padding the captured sections declare. Give them the
+   same 1440px container and 56px gutters so content lines up with the header. */
+.elementor .e-con-boxed.rb-con {
+  --display: flex;
+  --content-width: 1440px;
+  --padding-top: 40px;
+  --padding-bottom: 40px;
+  --padding-left: 56px;
+  --padding-right: 56px;
+}
+
+.elementor .e-con-boxed.rb-con:first-child {
+  --padding-top: 0px;
+}
+
+@media (max-width: 1200px) {
+  .elementor .e-con-boxed.rb-con {
+    --padding-left: 40px;
+    --padding-right: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .elementor .e-con-boxed.rb-con {
+    --padding-top: 24px;
+    --padding-bottom: 24px;
+    --padding-left: 20px;
+    --padding-right: 20px;
+  }
+}
