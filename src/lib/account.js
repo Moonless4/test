@@ -45,6 +45,7 @@ export function applyAccount(root = document) {
     }
   }
 
+  // Guests get no popover: the header icon itself reads "ورود | عضویت" on hover.
   const items = root.querySelector('.header-actions-wrap .account-items');
   if (items) {
     items.innerHTML = account
@@ -54,18 +55,7 @@ export function applyAccount(root = document) {
              <i class="account-item-arrow-icon luxina-icon-arrow-left-line sub-menu-item-arrow"></i>
            </a>
          </li>`
-      : `<li class="luxina-account-item account-item menu-item account-login">
-           <a href="/login" class="account-item-link">
-             <span class="account-item-label menu-item-title">ورود</span>
-             <i class="account-item-arrow-icon luxina-icon-arrow-left-line sub-menu-item-arrow"></i>
-           </a>
-         </li>
-         <li class="luxina-account-item account-item menu-item account-signup">
-           <a href="/login?section=signup" class="account-item-link">
-             <span class="account-item-label menu-item-title">عضویت</span>
-             <i class="account-item-arrow-icon luxina-icon-arrow-left-line sub-menu-item-arrow"></i>
-           </a>
-         </li>`;
+      : '';
   }
 
   const mobile = root.querySelector('.header-mobile-actions-wrap .luxina-account-wrap');

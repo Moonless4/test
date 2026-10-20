@@ -792,3 +792,55 @@
     padding: 16px;
   }
 }
+
+/* Header actions: the account and consultation actions are icon-only and
+   reveal their label on hover instead of opening a list. */
+.header-actions-wrap .luxina-account {
+  gap: 0;
+  padding: 10px 12px;
+}
+
+.header-actions-wrap .luxina-account-display_name {
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: max-width 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
+}
+
+.header-actions-wrap .luxina-account-wrap:hover .luxina-account-display_name,
+.header-actions-wrap .luxina-account-wrap:focus-within .luxina-account-display_name,
+.header-actions-wrap .luxina-account-wrap.logged-in-wrap .luxina-account-display_name {
+  max-width: 140px;
+  opacity: 1;
+  margin-inline-end: 8px;
+}
+
+/* Guests have no popover: the list only duplicated the icon's own label. */
+.header-actions-wrap .luxina-account-items:empty {
+  display: none;
+}
+
+.header-actions-wrap .header-action-btn-wrap {
+  gap: 0;
+  white-space: nowrap;
+}
+
+.header-actions-wrap .header-action-btn-wrap > .header-action-btn-text-wrap {
+  gap: 0;
+}
+
+.header-actions-wrap .header-action-btn-wrap .header-action-btn-text {
+  display: inline-block;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-width 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
+}
+
+.header-actions-wrap .header-action-btn-wrap:hover .header-action-btn-text,
+.header-actions-wrap .header-action-btn-wrap:focus-within .header-action-btn-text {
+  max-width: 180px;
+  opacity: 1;
+  margin-inline-end: 8px;
+}
