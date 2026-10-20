@@ -225,6 +225,66 @@
   line-height: 1.6;
 }
 
+.rb-form .rb-invalid {
+  border-color: #d9534f !important;
+}
+
+.rb-field-error {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: #d9534f;
+}
+
+.rb-form-switch {
+  margin-top: 14px;
+  color: var(--text-main-70);
+  font-size: 0.9rem;
+}
+
+.rb-form-switch a {
+  color: var(--secondary-100);
+  font-weight: 700;
+}
+
+.rb-about {
+  max-width: 860px;
+  margin-inline: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.rb-about-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.rb-about-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-light, #f4f4f4);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.rb-about-stat-value {
+  font-family: var(--heading-font);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--primary-100);
+}
+
+.rb-about-stat-label {
+  font-size: 0.8rem;
+  color: var(--text-main-70);
+}
+
 .rb-contact-info {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -259,7 +319,8 @@
 
 @media (max-width: 767px) {
   .rb-article,
-  .rb-service {
+  .rb-service,
+  .rb-about {
     padding: 20px;
   }
 

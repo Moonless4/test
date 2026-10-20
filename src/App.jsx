@@ -14,7 +14,7 @@ function isInternalLink(anchor) {
 }
 
 function Site() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const navigate = useNavigate();
 
   // Every rule of elementor-post-837.css is scoped under `.elementor-837`, the
@@ -22,7 +22,7 @@ function Site() {
   const html =
     headerHtml +
     '<div class="elementor elementor-837" data-elementor-id="837" data-elementor-type="wp-page">' +
-    getContent(pathname) +
+    getContent(pathname, search) +
     '</div>' +
     footerHtml;
 

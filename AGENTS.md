@@ -17,7 +17,17 @@ up -d --build`), not a host `npm install`.
   `public/assets/...` (fonts, Swiper, Bootstrap grid, Elementor CSS). Those
   files are self-hosted copies; do not re-link the reference site.
 - `src/content/` holds markup captured from the reference page: `header.html`,
-  `footer.html` and `home.js` (an array of section HTML strings).
+  `footer.html` and `home.js` (an array of section HTML strings). Content for
+  routes that the reference page did not expose as markup lives in
+  `articles.js` (blog posts), `services.js` (footer service pages) and
+  `projects.js` (the homepage-hero project, which is not in the projects grid).
+- `src/pages/pages.js` maps every route to markup. Listing pages reuse the
+  captured homepage sections, so section lookups go by widget name / data-id
+  (`sectionWith`, `sectionById`) — never by array index, which shifts whenever
+  a section is removed.
+- There is no backend: form validation and the login/signup session live in
+  `src/lib/initInteractions.js` and `src/lib/account.js` (localStorage only), so
+  submissions and accounts exist per browser and are not persisted server-side.
 - `src/App.jsx` concatenates header + sections + footer into one
   `dangerouslySetInnerHTML` fragment on purpose. The header tag opens
   `#container` and `#page-body`, and the section/footer markup closes them, so

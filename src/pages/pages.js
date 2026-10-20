@@ -1,6 +1,7 @@
 import { homeSections } from '../content/home.js';
 import { articles, articleUrl, findArticle } from '../content/articles.js';
 import { services, findService } from '../content/services.js';
+import { findFeaturedProject } from '../content/projects.js';
 
 const sectionWith = (widget) =>
   homeSections.find((section) => section.html.includes(`elementor-widget-luxina_${widget}`))?.html ?? '';
@@ -32,14 +33,14 @@ const section = (inner, className = '') => `
   <div class="e-con-inner">${inner}</div>
 </div>`;
 
-const form = (fields, submit = 'ارسال') => `
+const form = (fields, submit = 'ارسال', { name = 'request', note = 'درخواست شما ثبت شد؛ به‌زودی با شما تماس می‌گیریم.' } = {}) => `
 <div class="luxina_contact_form-wrap">
-  <form class="wpcf7-form rb-form">
+  <form class="wpcf7-form rb-form" data-rb-form="${name}" novalidate>
     ${fields}
     <button type="submit" class="button button-start rounded button-primary rb-form-submit">
       <span class="button-text">${submit}</span>
     </button>
-    <p class="rb-form-note" hidden>درخواست شما ثبت شد؛ به‌زودی با شما تماس می‌گیریم.</p>
+    <p class="rb-form-note" hidden>${note}</p>
   </form>
 </div>`;
 
@@ -77,7 +78,10 @@ const contactPage = () =>
   section(
     heading('تماس با ما', 'Contact us', 'luxina-icon-question-answer-fill') +
       contactInfo +
-      form(twoFieldRow('نام و نام خانوادگی', 'شماره تماس') + messageRow('متن پیام شما')),
+      form(twoFieldRow('نام و نام خانوادگی', 'شماره تماس') + messageRow('متن پیام شما'), 'ارسال پیام', {
+        name: 'contact',
+        note: 'پیام شما ثبت شد؛ کارشناسان ما در اولین فرصت پاسخ می‌دهند.',
+      }),
   );
 
 const consultationPage = () =>
@@ -86,41 +90,83 @@ const consultationPage = () =>
       form(
         twoFieldRow('نام و نام خانوادگی', 'شماره تماس') + messageRow('درباره پروژه‌تان بنویسید'),
         'ثبت درخواست',
+        { name: 'consultation', note: 'درخواست مشاورهٔ شما ثبت شد؛ برای هماهنگی جلسه تماس می‌گیریم.' },
       ),
   );
 
 const cooperationPage = () =>
   section(
     heading('فرصت همکاری', 'Cooperation', 'luxina-icon-team-fill') +
-      form(twoFieldRow('نام و نام خانوادگی', 'شماره تماس') + messageRow('زمینه همکاری'), 'ارسال'),
+      form(twoFieldRow('نام و نام خانوادگی', 'شماره تماس') + messageRow('زمینه همکاری'), 'ارسال درخواست', {
+        name: 'cooperation',
+        note: 'درخواست همکاری شما ثبت شد؛ در صورت تطابق با فرصت‌های موجود تماس می‌گیریم.',
+      }),
   ) + teamSection;
 
-const loginPage = () => `
+const loginPage = (mode = 'login') => {
+  const signup = mode === 'signup';
+  return `
 <div class="elementor-element e-flex e-con-boxed e-con e-parent">
   <div class="e-con-inner rb-narrow">
-    <div class="luxina_contact_form_title">ورود به حساب</div>
-    <div class="luxina_contact_form_subtitle">Login</div>
+    <div class="luxina_contact_form_title">${signup ? 'عضویت در سایت' : 'ورود به حساب'}</div>
+    <div class="luxina_contact_form_subtitle">${signup ? 'Create account' : 'Login'}</div>
     <div class="luxina_contact_form-wrap">
-      <form class="wpcf7-form rb-form">
+      <form class="wpcf7-form rb-form" data-rb-form="${signup ? 'signup' : 'login'}" novalidate>
         <div class="luxina-cf7-first-row"><p>
+          ${
+            signup
+              ? '<input class="form-control" type="text" name="name" placeholder="نام و نام خانوادگی" required>'
+              : ''
+          }
           <input class="form-control" type="text" name="email" placeholder="ایمیل یا شماره موبایل" required>
           <input class="form-control" type="password" name="password" placeholder="رمز عبور" required>
         </p></div>
         <button type="submit" class="button button-start rounded button-primary rb-form-submit">
-          <span class="button-text">ورود</span>
+          <span class="button-text">${signup ? 'ساخت حساب' : 'ورود'}</span>
         </button>
-        <p class="rb-form-note" hidden>فرم ورود آماده اتصال به سرویس احراز هویت است.</p>
+        <p class="rb-form-note" hidden>${signup ? 'حساب شما ساخته شد؛ خوش آمدید.' : 'خوش آمدید! وارد حساب خود شدید.'}</p>
+        <p class="rb-form-switch">
+          ${
+            signup
+              ? 'حساب کاربری دارید؟ <a href="/login">وارد شوید</a>'
+              : 'حساب کاربری ندارید؟ <a href="/login?section=signup">ثبت‌نام کنید</a>'
+          }
+        </p>
       </form>
     </div>
   </div>
 </div>`;
+};
 
 const notFoundPage = () =>
   section(
     heading('صفحه پیدا نشد', 'Page not found', 'luxina-icon-error-warning-fill') +
-      `<p class="rb-empty">صفحه‌ای که به دنبال آن هستید وجود ندارد.</p>
-       <a href="/" class="button button-start rounded button-primary"><span class="button-text">بازگشت به خانه</span></a>`,
+      `<p class="rb-empty">صفحه‌ای که به دنبال آن هستید وجود ندارد یا جابه‌جا شده است.</p>
+       <div class="rb-detail-actions">
+         <a href="/" class="button button-start rounded button-primary"><span class="button-text">بازگشت به خانه</span></a>
+         <a href="/projects" class="button button-start rounded button-gray"><span class="button-text">پروژه‌ها</span></a>
+         <a href="/blog" class="button button-start rounded button-gray"><span class="button-text">مقالات</span></a>
+         <a href="/contact" class="button button-start rounded button-gray"><span class="button-text">تماس با ما</span></a>
+       </div>`,
   );
+
+const aboutPage = () =>
+  section(
+    heading('درباره ما', 'About us', 'luxina-icon-building-line') +
+      `<div class="rb-about">
+        <p class="rb-service-intro">ما در لوکسینا با افتخار هنر و تخصص خود را در خدمت ساخت و ساز، انبوه‌سازی، بازسازی خانه‌های قدیمی و طراحی خانه‌های لوکس قرار داده‌ایم. هدف ما خلق فضاهایی است که نه تنها نیازهای عملکردی را برآورده کنند، بلکه الهام‌بخش زندگی مدرن و سبک زندگی منحصر به فرد شما باشند.</p>
+        <p class="rb-detail-text">تیم ما از معماران، مهندسان سازه و مدیران اجرایی تشکیل شده است که از مرحلهٔ ایده تا تحویل کلید در کنار شما هستند. هر پروژه با شناخت دقیق نیاز کارفرما آغاز می‌شود و با برنامه‌ریزی شفاف، انتخاب متریال مناسب و نظارت مستمر به پایان می‌رسد.</p>
+        <div class="rb-about-stats">
+          <div class="rb-about-stat"><span class="rb-about-stat-value">۱۵+</span><span class="rb-about-stat-label">سال تجربهٔ اجرایی</span></div>
+          <div class="rb-about-stat"><span class="rb-about-stat-value">۱۲۰+</span><span class="rb-about-stat-label">پروژهٔ تحویل‌شده</span></div>
+          <div class="rb-about-stat"><span class="rb-about-stat-value">۹۵٪</span><span class="rb-about-stat-label">رضایت کارفرمایان</span></div>
+        </div>
+        <div class="rb-detail-actions">
+          <a href="/consultation" class="button button-start rounded button-primary"><span class="button-text">درخواست مشاوره</span></a>
+          <a href="/projects" class="button button-start rounded button-gray"><span class="button-text">مشاهده پروژه‌ها</span></a>
+        </div>
+      </div>`,
+  ) + teamSection + faqSection;
 
 const parse = (html) => new DOMParser().parseFromString(html, 'text/html');
 
@@ -172,12 +218,44 @@ const detailShell = ({ image, title, badge, badgeColor, specs, description }) =>
   </div>
 </div>`;
 
+const moreProjects = (slug) => {
+  const related = relatedProjects(slug);
+  return related
+    ? section(
+        heading('پروژه‌های دیگر', 'More projects', 'luxina-icon-building-line') +
+          `<div class="rb-related">${related}</div>`,
+      )
+    : '';
+};
+
 function projectPage(slug) {
   const doc = parse(projectsSection);
   const link = Array.from(doc.querySelectorAll('a.luxina_project_inner')).find((anchor) =>
     decodeURIComponent(anchor.getAttribute('href') || '').includes(slug),
   );
-  if (!link) return notFoundPage();
+
+  if (!link) {
+    const featured = findFeaturedProject(slug);
+    if (!featured) return notFoundPage();
+    const featuredSpecs = featured.specs
+      .map(
+        ([title, value]) => `<div class="rb-detail-spec">
+          <span class="rb-detail-spec-title">${title}</span>
+          <span class="rb-detail-spec-value">${value}</span>
+        </div>`,
+      )
+      .join('');
+    return (
+      detailShell({
+        image: featured.image,
+        title: featured.title,
+        badge: featured.status,
+        badgeColor: featured.statusColor,
+        specs: featuredSpecs,
+        description: featured.description,
+      }) + moreProjects(slug)
+    );
+  }
 
   const image = link.querySelector('img')?.getAttribute('src') || '';
   const title = link.querySelector('.luxina_project_name')?.textContent.trim() || '';
@@ -191,8 +269,6 @@ function projectPage(slug) {
     )
     .join('');
 
-  const related = relatedProjects(slug);
-
   return (
     detailShell({
       image,
@@ -200,13 +276,7 @@ function projectPage(slug) {
       badge: badge?.textContent.trim(),
       badgeColor: badge?.getAttribute('style')?.replace('background:', ''),
       specs,
-    }) +
-    (related
-      ? section(
-          heading('پروژه‌های دیگر', 'More projects', 'luxina-icon-building-line') +
-            `<div class="rb-related">${related}</div>`,
-        )
-      : '')
+    }) + moreProjects(slug)
   );
 }
 
@@ -249,16 +319,19 @@ function servicePage(slug) {
   );
 }
 
-export function getContent(pathname) {
+export function getContent(pathname, search = '') {
   const route = decodeURIComponent(pathname);
   if (route === '/' || route === '') return homeContent;
   if (route === '/projects') return projectsSection;
   if (route === '/blog') return blogSection;
-  if (route === '/about') return teamSection + faqSection;
+  if (route === '/about') return aboutPage();
   if (route === '/contact') return contactPage();
   if (route === '/consultation') return consultationPage();
   if (route === '/cooperation') return cooperationPage();
-  if (route === '/login') return loginPage();
+  if (route === '/login') {
+    const section = new URLSearchParams(search).get('section');
+    return loginPage(section === 'signup' ? 'signup' : 'login');
+  }
   if (route === '/404') return notFoundPage();
   if (route.startsWith('/blog/')) return articlePage(route.replace('/blog/', '').replace(/\/$/, ''));
   if (route.startsWith('/services/')) return servicePage(route.replace('/services/', '').replace(/\/$/, ''));
