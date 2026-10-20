@@ -1,0 +1,17 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [
+    {
+      "name": "ADMIN_EMAIL",
+      "description": "متغیر محیطی از پیش تعریف‌شده‌ی اپ؛ نسخه‌ی فعلی (فقط هدر و هیروی صفحه‌ی اصلی) از آن استفاده نمی‌کند و برای پنل مدیریت آینده نگه داشته شده است.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "ADMIN_PASSWORD",
+      "description": "متغیر محیطی از پیش تعریف‌شده‌ی اپ؛ نسخه‌ی فعلی از آن استفاده نمی‌کند و برای پنل مدیریت آینده نگه داشته شده است.",
+      "requiredAtBoot": false
+    }
+  ]
+}

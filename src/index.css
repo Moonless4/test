@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* فونت وزیرمتن به‌صورت محلی میزبانی می‌شود (بدون CDN) */
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-night font-sans text-white antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgba(253, 184, 19, 0.3);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgba(253, 184, 19, 0.75);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* شبکه‌ی محو معماری در پس‌زمینه‌ی هیرو */
+  .arch-grid {
+    background-image:
+      linear-gradient(to left, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 68px 68px;
+    mask-image: radial-gradient(120% 85% at 50% 30%, #000 20%, transparent 78%);
+    -webkit-mask-image: radial-gradient(120% 85% at 50% 30%, #000 20%, transparent 78%);
+  }
+
+  /* لبه‌ی روشن و قوسی‌شکلِ پایین هیرو */
+  .hero-curve {
+    border-top-left-radius: 50% 100%;
+    border-top-right-radius: 50% 100%;
+  }
+
+  /* محو شدن لبه‌های تصویر تا روی پس‌زمینه‌ی تیره بنشیند */
+  .photo-fade {
+    mask-image: radial-gradient(120% 96% at 50% 40%, #000 42%, transparent 92%);
+    -webkit-mask-image: radial-gradient(120% 96% at 50% 40%, #000 42%, transparent 92%);
+  }
+
+  /* هم‌رنگ شدن تصویر با تم تیره‌ی هیرو */
+  .photo-tone {
+    filter: saturate(1.06) contrast(1.04) brightness(0.96);
+  }
+}
