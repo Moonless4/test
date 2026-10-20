@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="16" fill="#CB0236"/>
+  <rect x="4" y="4" width="56" height="56" rx="13" fill="none" stroke="#FDCA01" stroke-width="1.5" opacity=".7"/>
+  <text x="32" y="42" font-family="Tahoma, sans-serif" font-size="26" font-weight="bold" fill="#fff" text-anchor="middle">ن</text>
+  <circle cx="32" cy="52" r="2" fill="#FDCA01"/>
+</svg>

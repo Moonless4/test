@@ -1,0 +1,73 @@
+@font-face {
+  font-family: 'YekanBakh';
+  src: url('/fonts/YekanBakhFaNum-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YekanBakh';
+  src: url('/fonts/YekanBakhFaNum-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YekanBakh';
+  src: url('/fonts/YekanBakhFaNum-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YekanBakh';
+  src: url('/fonts/YekanBakhFaNum-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'YekanBakh';
+  src: url('/fonts/YekanBakhFaNum-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Caveat Brush';
+  src: url('/fonts/caveat-brush-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --wine: #24000a;
+  --wine-deep: #190006;
+  --wine-soft: #3a0512;
+  --primary: #cb0236;
+  --primary-bright: #e1003c;
+  --primary-dark: #a5002b;
+  --gold: #fdca01;
+  --gold-deep: #d9a400;
+  --cream: #f2e2c1;
+  --cream-soft: #fbf3e3;
+  --paper: #fdfdfd;
+  --ink: #1a1a1a;
+  --muted: #7c6c6c;
+  --line: rgba(36, 0, 10, 0.1);
+  --line-strong: rgba(36, 0, 10, 0.18);
+  --container: 1392px;
+  --radius-xl: 40px;
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-sm: 14px;
+  --shadow-soft: 0 24px 60px -42px rgba(36, 0, 10, 0.55);
+  --shadow-card: 0 18px 40px -32px rgba(36, 0, 10, 0.45);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
