@@ -4,6 +4,14 @@ import { applyAccount, clearAccount, setAccount } from './account.js';
 
 let listening = false;
 let authListening = false;
+let lightboxListening = false;
+
+function closeLightbox(lightbox) {
+  lightbox.hidden = true;
+  if (!document.querySelector('#mobile-menu-container.open')) {
+    document.body.classList.remove('disable-scrolling');
+  }
+}
 
 const toEnglishDigits = (value) =>
   value
@@ -138,6 +146,32 @@ export function initInteractions(root = document) {
   root.querySelectorAll('.menu-item-has-children > a[href="#"]').forEach((link) => {
     link.addEventListener('click', (event) => event.preventDefault());
   });
+
+  root.querySelectorAll('.rb-gallery-item').forEach((item) => {
+    item.addEventListener('click', () => {
+      const lightbox = root.querySelector('.rb-lightbox');
+      const image = lightbox?.querySelector('img');
+      if (!lightbox || !image) return;
+      image.src = item.dataset.full;
+      lightbox.hidden = false;
+      document.body.classList.add('disable-scrolling');
+    });
+  });
+
+  root.querySelectorAll('.rb-lightbox').forEach((lightbox) => {
+    lightbox.addEventListener('click', (event) => {
+      if (event.target !== lightbox && !event.target.closest('.rb-lightbox-close')) return;
+      closeLightbox(lightbox);
+    });
+  });
+
+  if (!lightboxListening) {
+    lightboxListening = true;
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      document.querySelectorAll('.rb-lightbox:not([hidden])').forEach(closeLightbox);
+    });
+  }
 
   if (!authListening) {
     authListening = true;

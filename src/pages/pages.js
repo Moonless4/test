@@ -1,12 +1,8 @@
 import { homeSections } from '../content/home.js';
 import { articles, articleUrl, findArticle } from '../content/articles.js';
-import { services, findService } from '../content/services.js';
-import { findFeaturedProject } from '../content/projects.js';
-
-const sectionWith = (widget) =>
-  homeSections.find((section) => section.html.includes(`elementor-widget-luxina_${widget}`))?.html ?? '';
-
-const sectionById = (id) => homeSections.find((section) => section.id === id)?.html ?? '';
+import { findService } from '../content/services.js';
+import { heading, section, sectionById, sectionWith } from './blocks.js';
+import { projectPage } from './projectPage.js';
 
 const projectsSection = sectionWith('projects');
 const blogSection = sectionWith('blog');
@@ -14,24 +10,6 @@ const faqSection = sectionWith('faq');
 const teamSection = sectionById('b6d9756');
 
 const homeContent = homeSections.map((section) => section.html).join('');
-
-const heading = (title, subtitle, icon = 'luxina-icon-home-5-line') => `
-<div class="elementor-widget elementor-widget-luxina_heading">
-  <div class="elementor-widget-container">
-    <div class="luxina_heading_wrap">
-      <i class="luxinaicon ${icon} luxina_heading_icon" aria-hidden="true"></i>
-      <div class="luxina_heading_title_inner">
-        <div class="luxina_heading_title">${title}</div>
-        <span class="luxina_heading_subtitle">${subtitle}</span>
-      </div>
-    </div>
-  </div>
-</div>`;
-
-const section = (inner, className = '') => `
-<div class="elementor-element e-flex e-con-boxed e-con e-parent ${className}">
-  <div class="e-con-inner">${inner}</div>
-</div>`;
 
 const form = (fields, submit = 'ارسال', { name = 'request', note = 'درخواست شما ثبت شد؛ به‌زودی با شما تماس می‌گیریم.' } = {}) => `
 <div class="luxina_contact_form-wrap">
@@ -168,118 +146,6 @@ const aboutPage = () =>
       </div>`,
   ) + teamSection + faqSection;
 
-const parse = (html) => new DOMParser().parseFromString(html, 'text/html');
-
-const relatedProjects = (slug) => {
-  const doc = parse(projectsSection);
-  return Array.from(doc.querySelectorAll('a.luxina_project_inner'))
-    .filter((anchor) => !decodeURIComponent(anchor.getAttribute('href') || '').includes(slug))
-    .map((anchor) => {
-      const title = anchor.querySelector('.luxina_project_name')?.textContent.trim() || '';
-      const image = anchor.querySelector('img')?.getAttribute('src') || '';
-      return `<a class="rb-related-card" href="${anchor.getAttribute('href')}">
-        <img src="${image}" alt="${title}">
-        <span class="rb-related-card-body"><span class="rb-related-card-title">${title}</span></span>
-      </a>`;
-    })
-    .join('');
-};
-
-const relatedArticles = (slug) =>
-  articles
-    .filter((article) => article.slug !== slug)
-    .map(
-      (article) => `<a class="rb-related-card" href="${articleUrl(article)}">
-        <img src="${article.image}" alt="${article.title}">
-        <span class="rb-related-card-body">
-          <span class="rb-related-card-cat">${article.category}</span>
-          <span class="rb-related-card-title">${article.title}</span>
-        </span>
-      </a>`,
-    )
-    .join('');
-
-const detailShell = ({ image, title, badge, badgeColor, specs, description }) => `
-<div class="elementor-element e-flex e-con-boxed e-con e-parent">
-  <div class="e-con-inner">
-    <div class="rb-detail">
-      <figure class="rb-detail-media"><img src="${image}" alt="${title}"></figure>
-      <div class="rb-detail-body">
-        ${badge ? `<span class="rb-detail-badge" style="background:${badgeColor || 'var(--primary-100)'}">${badge}</span>` : ''}
-        <h1 class="rb-detail-title">${title}</h1>
-        ${specs ? `<div class="rb-detail-specs">${specs}</div>` : ''}
-        ${description ? `<p class="rb-detail-text">${description}</p>` : ''}
-        <div class="rb-detail-actions">
-          <a href="/consultation" class="button button-start rounded button-primary"><span class="button-text">درخواست مشاوره</span></a>
-          <a href="/contact" class="button button-start rounded button-gray"><span class="button-text">تماس با ما</span></a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>`;
-
-const moreProjects = (slug) => {
-  const related = relatedProjects(slug);
-  return related
-    ? section(
-        heading('پروژه‌های دیگر', 'More projects', 'luxina-icon-building-line') +
-          `<div class="rb-related">${related}</div>`,
-      )
-    : '';
-};
-
-function projectPage(slug) {
-  const doc = parse(projectsSection);
-  const link = Array.from(doc.querySelectorAll('a.luxina_project_inner')).find((anchor) =>
-    decodeURIComponent(anchor.getAttribute('href') || '').includes(slug),
-  );
-
-  if (!link) {
-    const featured = findFeaturedProject(slug);
-    if (!featured) return notFoundPage();
-    const featuredSpecs = featured.specs
-      .map(
-        ([title, value]) => `<div class="rb-detail-spec">
-          <span class="rb-detail-spec-title">${title}</span>
-          <span class="rb-detail-spec-value">${value}</span>
-        </div>`,
-      )
-      .join('');
-    return (
-      detailShell({
-        image: featured.image,
-        title: featured.title,
-        badge: featured.status,
-        badgeColor: featured.statusColor,
-        specs: featuredSpecs,
-        description: featured.description,
-      }) + moreProjects(slug)
-    );
-  }
-
-  const image = link.querySelector('img')?.getAttribute('src') || '';
-  const title = link.querySelector('.luxina_project_name')?.textContent.trim() || '';
-  const badge = link.querySelector('.luxina_project_status');
-  const specs = Array.from(link.querySelectorAll('.luxina_project_detail-wrap'))
-    .map(
-      (wrap) => `<div class="rb-detail-spec">
-        <span class="rb-detail-spec-title">${wrap.querySelector('.luxina_project_detail-title')?.textContent.trim() ?? ''}</span>
-        <span class="rb-detail-spec-value">${wrap.querySelector('.luxina_project_detail-description')?.textContent.trim() ?? ''}</span>
-      </div>`,
-    )
-    .join('');
-
-  return (
-    detailShell({
-      image,
-      title,
-      badge: badge?.textContent.trim(),
-      badgeColor: badge?.getAttribute('style')?.replace('background:', ''),
-      specs,
-    }) + moreProjects(slug)
-  );
-}
-
 function articlePage(slug) {
   const article = findArticle(slug);
   if (!article) return notFoundPage();
@@ -335,6 +201,8 @@ export function getContent(pathname, search = '') {
   if (route === '/404') return notFoundPage();
   if (route.startsWith('/blog/')) return articlePage(route.replace('/blog/', '').replace(/\/$/, ''));
   if (route.startsWith('/services/')) return servicePage(route.replace('/services/', '').replace(/\/$/, ''));
-  if (route.startsWith('/project/')) return projectPage(route.replace('/project/', '').replace(/\/$/, ''));
+  if (route.startsWith('/project/')) {
+    return projectPage(route.replace('/project/', '').replace(/\/$/, '')) || notFoundPage();
+  }
   return notFoundPage();
 }

@@ -23,8 +23,14 @@ up -d --build`), not a host `npm install`.
   `projects.js` (the homepage-hero project, which is not in the projects grid).
 - `src/pages/pages.js` maps every route to markup. Listing pages reuse the
   captured homepage sections, so section lookups go by widget name / data-id
-  (`sectionWith`, `sectionById`) — never by array index, which shifts whenever
-  a section is removed.
+  (`sectionWith`, `sectionById`, both in `src/pages/blocks.js`) — never by array
+  index, which shifts whenever a section is removed. `blocks.js` holds the
+  shared widget builders (`heading`, `section`).
+- Project detail pages live in `src/pages/projectPage.js`: title/image/status
+  come from the captured projects grid, while overview, facts, gallery and
+  related services come from `src/content/project-details.js`, keyed by the
+  project slug used in the card link. The gallery lightbox is wired in
+  `src/lib/initInteractions.js`.
 - There is no backend: form validation and the login/signup session live in
   `src/lib/initInteractions.js` and `src/lib/account.js` (localStorage only), so
   submissions and accounts exist per browser and are not persisted server-side.
