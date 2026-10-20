@@ -1,13 +1,16 @@
 import { homeSections } from '../content/home.js';
+import { articles, articleUrl, findArticle } from '../content/articles.js';
+import { services, findService } from '../content/services.js';
 
 const sectionWith = (widget) =>
   homeSections.find((section) => section.html.includes(`elementor-widget-luxina_${widget}`))?.html ?? '';
 
+const sectionById = (id) => homeSections.find((section) => section.id === id)?.html ?? '';
+
 const projectsSection = sectionWith('projects');
-const productsSection = sectionWith('products');
 const blogSection = sectionWith('blog');
 const faqSection = sectionWith('faq');
-const teamSection = homeSections[7]?.html ?? '';
+const teamSection = sectionById('b6d9756');
 
 const homeContent = homeSections.map((section) => section.html).join('');
 
@@ -51,21 +54,37 @@ const messageRow = (placeholder) => `
   <textarea class="form-control" name="message" placeholder="${placeholder}"></textarea>
 </p></div>`;
 
+const contactInfo = `
+<div class="rb-contact-info">
+  <div class="rb-contact-card">
+    <i class="luxinaicon luxina-icon-map-pin-2-fill" aria-hidden="true"></i>
+    <span class="rb-contact-label">آدرس</span>
+    <span class="rb-contact-value">تهران، خیابان اسکندری، کوچه ۱۶ مهربان</span>
+  </div>
+  <div class="rb-contact-card">
+    <i class="luxinaicon luxina-icon-customer-service-2-line" aria-hidden="true"></i>
+    <span class="rb-contact-label">تلفن</span>
+    <span class="rb-contact-value" dir="ltr">021-123 4567</span>
+  </div>
+  <div class="rb-contact-card">
+    <i class="luxinaicon luxina-icon-mail-fill" aria-hidden="true"></i>
+    <span class="rb-contact-label">ایمیل</span>
+    <span class="rb-contact-value" dir="ltr">info@archilux.ir</span>
+  </div>
+</div>`;
+
 const contactPage = () =>
   section(
     heading('تماس با ما', 'Contact us', 'luxina-icon-question-answer-fill') +
-      form(
-        twoFieldRow('نام و نام خانوادگی', 'شماره تماس') +
-          messageRow('متن پیام شما'),
-      ),
+      contactInfo +
+      form(twoFieldRow('نام و نام خانوادگی', 'شماره تماس') + messageRow('متن پیام شما')),
   );
 
 const consultationPage = () =>
   section(
     heading('درخواست مشاوره', 'Consultation request', 'luxina-icon-customer-service-2-line') +
       form(
-        twoFieldRow('نام و نام خانوادگی', 'شماره تماس') +
-          messageRow('درباره پروژه‌تان بنویسید'),
+        twoFieldRow('نام و نام خانوادگی', 'شماره تماس') + messageRow('درباره پروژه‌تان بنویسید'),
         'ثبت درخواست',
       ),
   );
@@ -96,13 +115,6 @@ const loginPage = () => `
   </div>
 </div>`;
 
-const cartPage = () =>
-  section(
-    heading('سبد خرید', 'Cart', 'luxina-icon-shopping-bag-3-line') +
-      `<p class="rb-empty">سبد خرید شما در حال حاضر خالی است.</p>
-       <a href="/shop" class="button button-start rounded button-primary"><span class="button-text">مشاهده محصولات</span></a>`,
-  );
-
 const notFoundPage = () =>
   section(
     heading('صفحه پیدا نشد', 'Page not found', 'luxina-icon-error-warning-fill') +
@@ -110,7 +122,38 @@ const notFoundPage = () =>
        <a href="/" class="button button-start rounded button-primary"><span class="button-text">بازگشت به خانه</span></a>`,
   );
 
-const detailShell = ({ image, title, badge, badgeColor, specs, description, cart }) => `
+const parse = (html) => new DOMParser().parseFromString(html, 'text/html');
+
+const relatedProjects = (slug) => {
+  const doc = parse(projectsSection);
+  return Array.from(doc.querySelectorAll('a.luxina_project_inner'))
+    .filter((anchor) => !decodeURIComponent(anchor.getAttribute('href') || '').includes(slug))
+    .map((anchor) => {
+      const title = anchor.querySelector('.luxina_project_name')?.textContent.trim() || '';
+      const image = anchor.querySelector('img')?.getAttribute('src') || '';
+      return `<a class="rb-related-card" href="${anchor.getAttribute('href')}">
+        <img src="${image}" alt="${title}">
+        <span class="rb-related-card-body"><span class="rb-related-card-title">${title}</span></span>
+      </a>`;
+    })
+    .join('');
+};
+
+const relatedArticles = (slug) =>
+  articles
+    .filter((article) => article.slug !== slug)
+    .map(
+      (article) => `<a class="rb-related-card" href="${articleUrl(article)}">
+        <img src="${article.image}" alt="${article.title}">
+        <span class="rb-related-card-body">
+          <span class="rb-related-card-cat">${article.category}</span>
+          <span class="rb-related-card-title">${article.title}</span>
+        </span>
+      </a>`,
+    )
+    .join('');
+
+const detailShell = ({ image, title, badge, badgeColor, specs, description }) => `
 <div class="elementor-element e-flex e-con-boxed e-con e-parent">
   <div class="e-con-inner">
     <div class="rb-detail">
@@ -122,14 +165,12 @@ const detailShell = ({ image, title, badge, badgeColor, specs, description, cart
         ${description ? `<p class="rb-detail-text">${description}</p>` : ''}
         <div class="rb-detail-actions">
           <a href="/consultation" class="button button-start rounded button-primary"><span class="button-text">درخواست مشاوره</span></a>
-          ${cart ? `<button type="button" class="button button-start rounded button-gray rb-add-to-cart"><span class="button-text">افزودن به سبد خرید</span></button>` : ''}
+          <a href="/contact" class="button button-start rounded button-gray"><span class="button-text">تماس با ما</span></a>
         </div>
       </div>
     </div>
   </div>
 </div>`;
-
-const parse = (html) => new DOMParser().parseFromString(html, 'text/html');
 
 function projectPage(slug) {
   const doc = parse(projectsSection);
@@ -150,53 +191,77 @@ function projectPage(slug) {
     )
     .join('');
 
-  return detailShell({
-    image,
-    title,
-    badge: badge?.textContent.trim(),
-    badgeColor: badge?.getAttribute('style')?.replace('background:', ''),
-    specs,
-    description: '',
-  });
+  const related = relatedProjects(slug);
+
+  return (
+    detailShell({
+      image,
+      title,
+      badge: badge?.textContent.trim(),
+      badgeColor: badge?.getAttribute('style')?.replace('background:', ''),
+      specs,
+    }) +
+    (related
+      ? section(
+          heading('پروژه‌های دیگر', 'More projects', 'luxina-icon-building-line') +
+            `<div class="rb-related">${related}</div>`,
+        )
+      : '')
+  );
 }
 
-function productPage(slug) {
-  const doc = parse(productsSection);
-  const card = Array.from(doc.querySelectorAll('.product')).find((item) =>
-    decodeURIComponent(item.querySelector('a')?.getAttribute('href') || '').includes(slug),
+function articlePage(slug) {
+  const article = findArticle(slug);
+  if (!article) return notFoundPage();
+
+  return section(
+    heading('مقالات', 'Weblog', 'luxina-icon-book-line') +
+      `<article class="rb-article">
+        <figure class="rb-article-media"><img src="${article.image}" alt="${article.title}"></figure>
+        <div class="rb-article-meta"><span class="rb-detail-badge">${article.category}</span></div>
+        <h1 class="rb-detail-title">${article.title}</h1>
+        <div class="rb-article-text">${article.body.map((paragraph) => `<p>${paragraph}</p>`).join('')}</div>
+        <ul class="rb-article-list">${article.points.map((point) => `<li>${point}</li>`).join('')}</ul>
+        <div class="rb-detail-actions">
+          <a href="/consultation" class="button button-start rounded button-primary"><span class="button-text">درخواست مشاوره</span></a>
+          <a href="/blog" class="button button-start rounded button-gray"><span class="button-text">همه مقالات</span></a>
+        </div>
+      </article>
+      <div class="rb-related">${relatedArticles(article.slug)}</div>`,
   );
-  if (!card) return notFoundPage();
+}
 
-  const image = card.querySelector('img')?.getAttribute('src') || '';
-  const title = card.querySelector('.woocommerce-loop-product__title')?.textContent.trim() || '';
-  const category = card.querySelector('.product-cart-category')?.textContent.trim() || '';
-  const price = card.querySelector('.price')?.textContent.replace(/\s+/g, ' ').trim() || '';
+function servicePage(slug) {
+  const service = findService(slug);
+  if (!service) return notFoundPage();
 
-  return detailShell({
-    image,
-    title,
-    badge: category,
-    specs: price
-      ? `<div class="rb-detail-spec"><span class="rb-detail-spec-title">قیمت</span><span class="rb-detail-spec-value">${price}</span></div>`
-      : '',
-    cart: true,
-  });
+  return section(
+    heading(service.title, service.subtitle, service.icon) +
+      `<div class="rb-service">
+        <p class="rb-service-intro">${service.intro}</p>
+        <ul class="rb-service-list">${service.points.map((point) => `<li>${point}</li>`).join('')}</ul>
+        ${service.body.map((paragraph) => `<p class="rb-detail-text">${paragraph}</p>`).join('')}
+        <div class="rb-detail-actions">
+          <a href="/consultation" class="button button-start rounded button-primary"><span class="button-text">درخواست مشاوره</span></a>
+          <a href="/contact" class="button button-start rounded button-gray"><span class="button-text">تماس با ما</span></a>
+        </div>
+      </div>`,
+  );
 }
 
 export function getContent(pathname) {
   const route = decodeURIComponent(pathname);
   if (route === '/' || route === '') return homeContent;
   if (route === '/projects') return projectsSection;
-  if (route === '/shop') return productsSection;
   if (route === '/blog') return blogSection;
   if (route === '/about') return teamSection + faqSection;
   if (route === '/contact') return contactPage();
   if (route === '/consultation') return consultationPage();
   if (route === '/cooperation') return cooperationPage();
-  if (route === '/cart') return cartPage();
   if (route === '/login') return loginPage();
   if (route === '/404') return notFoundPage();
+  if (route.startsWith('/blog/')) return articlePage(route.replace('/blog/', '').replace(/\/$/, ''));
+  if (route.startsWith('/services/')) return servicePage(route.replace('/services/', '').replace(/\/$/, ''));
   if (route.startsWith('/project/')) return projectPage(route.replace('/project/', '').replace(/\/$/, ''));
-  if (route.startsWith('/product/')) return productPage(route.replace('/product/', '').replace(/\/$/, ''));
   return notFoundPage();
 }
