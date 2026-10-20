@@ -28,6 +28,7 @@ import QuantitySelector from '../components/ui/QuantitySelector';
 import Rating from '../components/ui/Rating';
 import EmptyState from '../components/ui/EmptyState';
 import Button from '../components/ui/Button';
+import { scrollToTarget } from '../lib/smoothScroll';
 
 const TABS = [
   { id: 'desc', label: 'توضیحات' },
@@ -372,11 +373,7 @@ export default function ProductPage() {
               </p>
               <button
                 type="button"
-                onClick={() =>
-                  document
-                    .getElementById('product-reviews')
-                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                }
+                onClick={() => scrollToTarget('#product-reviews')}
                 className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-teal-800 px-5 text-sm font-bold text-white transition-colors hover:bg-teal-700"
               >
                 خواندن و ثبت نظرات

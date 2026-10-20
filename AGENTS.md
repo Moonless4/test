@@ -132,6 +132,24 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
 
 ## Things that are easy to get wrong
 
+- **Smooth scrolling is Lenis** (`src/components/layout/SmoothScroll.tsx`, mounted once in
+  `main.tsx` next to `<App />`, so the panel scrolls the same way). It animates the *window's own*
+  scroll instead of transforming a content layer, which is why the sticky header, the fixed bottom
+  bar and the `IntersectionObserver` reveals in `components/ui/Reveal.tsx` keep working untouched —
+  never "upgrade" it to a wrapper/transform approach, that is what breaks `position: sticky`.
+  Tuning that must stay: `duration` ~1.1 s with expo-out (fast first frames, gentle settle),
+  `wheelMultiplier: 1`, `syncTouch: false` (a phone keeps its native momentum),
+  `allowNestedScroll: true` (the cart list, the category sheet and the panel's tables scroll
+  themselves). A whole instance is *not created* under `prefers-reduced-motion` — no rAF loop, no
+  listeners — so reduced motion is native scrolling, not "smoothing with zero duration".
+- **Programmatic scrolls go through `src/lib/smoothScroll.ts`**, never `window.scrollTo` /
+  `scrollIntoView` directly: an animation frame would overwrite the jump. `scrollToTarget(0,
+  { immediate: true })` for a route change (`ScrollToTop`), `scrollToTarget('#id')` for a section —
+  it honours the element's `scroll-mt-*`, which is what keeps the sticky header off the target.
+  `pauseSmoothScroll(true)` next to the body's overflow lock (cart drawer, category sheet) stops a
+  gesture that is already in flight.
+- `html.lenis { scroll-behavior: auto }` exists because the base `html` rule sets `smooth`: the
+  browser would animate every frame Lenis sets. It only applies while the scroller runs.
 - **RTL**: `<html dir="rtl">`. Use logical Tailwind utilities (`start-*`, `end-*`, `ms-*`, `me-*`,
   `ps-*`, `pe-*`) instead of `left-*`/`right-*`, otherwise the layout flips incorrectly.
 - **Persian digits**: never print raw JS numbers into the UI. Use `toFa` / `formatNumber` from

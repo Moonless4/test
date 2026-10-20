@@ -7,6 +7,7 @@ import CategoryDrawer from './components/layout/CategoryDrawer';
 import MobileTabBar from './components/layout/MobileTabBar';
 import HomePage from './pages/HomePage';
 import { adminHref, isAdminPath } from './admin/lib/basePath';
+import { scrollToTarget } from './lib/smoothScroll';
 
 /**
  * Every page except the landing page ships as its own chunk: a phone opening the store pays for
@@ -34,7 +35,8 @@ const AdminApp = lazy(() => import('./admin/AdminApp'));
 function ScrollToTop() {
   const { pathname, search } = useLocation();
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    // The smooth scroller owns the scroll position, so a route change asks it to jump.
+    scrollToTarget(0, { immediate: true });
   }, [pathname, search]);
   return null;
 }

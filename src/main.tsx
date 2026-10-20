@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import SmoothScroll from './components/layout/SmoothScroll';
 import { initAdminBase } from './admin/lib/basePath';
 import { StoreProvider } from './context/StoreContext';
 import { AuthProvider } from './context/AuthContext';
@@ -19,6 +20,8 @@ initAdminBase().finally(() => {
       <BrowserRouter>
         <AuthProvider>
           <StoreProvider>
+            {/* Page-wide inertial scrolling — mounted once, outside the router's own tree. */}
+            <SmoothScroll />
             <App />
           </StoreProvider>
         </AuthProvider>

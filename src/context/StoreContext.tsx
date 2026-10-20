@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { COIN_MIN_REDEEM, COIN_VALUE, coinsFor, coupons } from '../lib/data';
+import { pauseSmoothScroll } from '../lib/smoothScroll';
 import type { CartLine, Coupon, Product } from '../lib/types';
 
 const CART_KEY = 'styleon.cart';
@@ -96,8 +97,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // Freeze background scrolling while the drawer is open.
   useEffect(() => {
     document.body.style.overflow = isCartOpen ? 'hidden' : '';
+    // The wheel animation has to stop with the page, or it keeps moving behind the drawer.
+    pauseSmoothScroll(isCartOpen);
     return () => {
       document.body.style.overflow = '';
+      pauseSmoothScroll(false);
     };
   }, [isCartOpen]);
 

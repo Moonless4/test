@@ -25,6 +25,13 @@
     -webkit-text-size-adjust: 100%;
   }
 
+  /* Lenis drives the scroll itself; the native animation would fight every frame it sets. The
+     class only exists while the scroller runs, so touch devices and reduced motion keep smooth
+     native scrolling. */
+  html.lenis {
+    scroll-behavior: auto;
+  }
+
   body {
     @apply bg-white font-sans text-ink antialiased;
     overflow-x: clip;

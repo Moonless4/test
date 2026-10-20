@@ -13,6 +13,7 @@ import {
 import { FREE_SHIPPING_THRESHOLD, useStore } from '../context/StoreContext';
 import { useAuth, type Address } from '../context/AuthContext';
 import { COIN_TITLE } from '../lib/data';
+import { scrollToTarget } from '../lib/smoothScroll';
 import { onlyDigits, toFa } from '../lib/format';
 import {
   STATUS_LABEL,
@@ -273,7 +274,7 @@ export default function CheckoutPage() {
     setEarned(coinsEarned);
     setPlaced(orderNumber);
     clearCart();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTarget(0);
   };
 
   const done = placed

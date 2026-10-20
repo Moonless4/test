@@ -12,6 +12,7 @@
     "theme:build": "node tools/build-theme.mjs"
   },
   "dependencies": {
+    "lenis": "^1.3.27",
     "lucide-react": "^0.451.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

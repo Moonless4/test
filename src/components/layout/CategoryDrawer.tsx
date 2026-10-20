@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronDown, Search, X } from 'lucide-react';
 import { megaMenu } from '../../lib/data';
+import { pauseSmoothScroll } from '../../lib/smoothScroll';
 import type { CategoryId } from '../../lib/types';
 import { MIN_QUERY } from '../../services/search';
 import { NAV_HEAD, NAV_TAIL } from '../../lib/nav';
@@ -40,8 +41,11 @@ export default function CategoryDrawer({ open, onClose }: Props) {
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : '';
+    // Keep the page still behind the sheet — the scroller would otherwise finish its last gesture.
+    pauseSmoothScroll(open);
     return () => {
       document.body.style.overflow = '';
+      pauseSmoothScroll(false);
     };
   }, [open]);
 
