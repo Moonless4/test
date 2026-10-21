@@ -28,7 +28,9 @@ export default function Testimonials() {
               <img src="/assets/title-symbol.webp" alt="" aria-hidden="true" />
               نظرات مشتریان ما
             </span>
-            <h2 id="testimonials-title">داستان‌هایی از سر میزهای نوال</h2>
+            <h2 id="testimonials-title">
+              داستان‌هایی از سر میزهای <span className="title-highlight">نوال</span>
+            </h2>
           </div>
 
           <div className="testimonials__card">

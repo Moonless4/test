@@ -13,10 +13,11 @@ export default function LatestFood({ products, onOpen, onAdd }) {
       <div className="container">
         <div className="latest__panel">
           <img className="latest__bg" src="/assets/on-sale-bg.png" alt="" aria-hidden="true" />
-          <div className="title-accent" id="latest-title">
+          <div id="latest-title">
             <SectionHeading
               eyebrow="تازه از آشپزخانه"
-              title="جدیدترین غذاهای منوی ما"
+              title="جدیدترین غذاهای"
+              highlight="منوی ما"
               script="Fresh & New"
               text="طعم‌های تازه‌ای که همین هفته به منوی نوال اضافه شده‌اند."
             />

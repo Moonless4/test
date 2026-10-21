@@ -13,7 +13,9 @@ export default function BenefitsSection() {
               <img src="/assets/title-symbol.webp" alt="" aria-hidden="true" />
               چرا رستوران نوال؟
             </span>
-            <h2 id="benefits-title">هر وعده، یک تجربه کامل</h2>
+            <h2 id="benefits-title">
+              هر وعده، یک <span className="title-highlight">تجربه کامل</span>
+            </h2>
             <span className="script-note">Taste the difference</span>
           </div>
 

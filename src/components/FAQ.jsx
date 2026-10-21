@@ -13,7 +13,9 @@ export default function FAQ() {
             <img src="/assets/title-symbol.webp" alt="" aria-hidden="true" />
             سوالات متداول
           </span>
-          <h2 id="faq-title">پاسخ سوال‌های شما</h2>
+          <h2 id="faq-title">
+            پاسخ <span className="title-highlight">سوال‌های شما</span>
+          </h2>
           <p>
             اگر پاسخ سوال خود را پیدا نکردید، تیم پشتیبانی نوال هر روز از ۱۲:۰۰ تا ۲۳:۳۰ آماده
             راهنمایی شماست.

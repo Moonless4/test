@@ -48,7 +48,9 @@ export default function ContactSection({ onToast }) {
               <img src="/assets/title-symbol.webp" alt="" aria-hidden="true" />
               با ما در تماس باشید
             </span>
-            <h2 id="contact-title">همیشه خوشحال می‌شویم بشنویم</h2>
+            <h2 id="contact-title">
+              همیشه خوشحال می‌شویم <span className="title-highlight">بشنویم</span>
+            </h2>
             <p className="contact__lead">
               برای رزرو، پیشنهاد، انتقاد یا هر سوالی درباره منو و خدمات نوال، از هر راهی که راحت‌تر
               است با ما در ارتباط باشید.

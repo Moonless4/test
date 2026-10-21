@@ -13,7 +13,8 @@ export default function BlogSection({ onOpenPost }) {
         <div id="blog-title">
           <SectionHeading
             eyebrow="وبلاگ نوال"
-            title="جدیدترین اخبار سایت"
+            title="جدیدترین"
+            highlight="اخبار سایت"
             script="From our kitchen"
             text="دستورهای آشپزی، نکات تغذیه و داستان‌هایی از پشت صحنه رستوران."
           >

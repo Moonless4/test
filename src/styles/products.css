@@ -5,32 +5,6 @@
   padding-bottom: 30px;
 }
 
-.title-accent .section-heading h2 {
-  color: var(--primary);
-}
-
-.title-accent .script-note {
-  transform: rotate(-3deg) translateY(12px);
-}
-
-.title-accent.specials-heading .section-heading h2 {
-  color: var(--ink);
-}
-
-.title-accent.specials-heading .title-highlight {
-  color: var(--primary);
-}
-
-.title-accent.specials-heading .section-heading__title-row {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-}
-
-.title-accent.specials-heading .script-note {
-  transform: rotate(-3deg);
-}
-
 .specials-band {
   position: relative;
   margin: 14px 0 0;

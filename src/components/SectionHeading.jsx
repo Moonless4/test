@@ -1,6 +1,7 @@
 export default function SectionHeading({
   eyebrow,
   title,
+  highlight,
   script,
   text,
   linkHref,
@@ -18,7 +19,15 @@ export default function SectionHeading({
           </span>
         )}
         <div className="section-heading__title-row">
-          <h2>{title}</h2>
+          <h2>
+            {title}
+            {highlight && (
+              <>
+                {' '}
+                <span className="title-highlight">{highlight}</span>
+              </>
+            )}
+          </h2>
           {script && <span className="script-note">{script}</span>}
         </div>
         {text && <p>{text}</p>}
