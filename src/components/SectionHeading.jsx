@@ -1,5 +1,6 @@
 export default function SectionHeading({
   eyebrow,
+  lead,
   title,
   highlight,
   script,
@@ -20,6 +21,7 @@ export default function SectionHeading({
         )}
         <div className="section-heading__title-row">
           <h2>
+            {lead && <span className="title-highlight">{lead} </span>}
             {title}
             {highlight && (
               <>

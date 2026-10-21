@@ -19,9 +19,10 @@ export default function LatestFood({ products, onOpen, onAdd, onViewAll }) {
       <div className="container">
         <div id="latest-title">
           <SectionHeading
+            align="center"
             eyebrow="تازه از آشپزخانه"
-            title="جدیدترین غذاهای"
-            highlight="منوی ما"
+            lead="جدیدترین"
+            title="غذاهای منوی ما"
             script="Fresh & New"
             text="طعم‌های تازه‌ای که همین هفته به منوی نوال اضافه شده‌اند."
           />
