@@ -13,20 +13,17 @@ export default function HeroSection() {
             <p className="hp-hero-badge">انبوه سازی</p>
           </div>
 
-          <h2 className="hp-hero-title">پروژه بـــرج پـــارس جــــــــردن</h2>
+          <h2 className="hp-hero-title">برج پارس جردن</h2>
 
           <div className="hp-hero-author">
             <img src="/img/image.png" width="47" height="48" decoding="async" alt="" />
             <p className="hp-hero-author-name">صمد سلیمان زاده</p>
-            <p className="hp-hero-author-role">طراح و مجری ساخت</p>
+            <p className="hp-hero-author-role">معمار و مجری</p>
           </div>
 
-          <p className="hp-hero-text">
-            برج لوکس اداری تجاری پارس با مساحت ۹۰۵ متر، زیربنای ۱۷۰۰۰ متر، ۲۵ طبقه ، ۲۰ طبقه روی زمین و ۵ طبقه زیر
-            زمین
-          </p>
+          <p className="hp-hero-text">۲۵ طبقه اداری و تجاری در جردن؛ ۱۷٬۰۰۰ متر زیربنا، از فونداسیون تا تحویل کلید.</p>
 
-          <Button href="/project/pars-jordan">درباره این پروژه</Button>
+          <Button href="/project/pars-jordan">مشاهدهٔ پروژه</Button>
         </div>
       </div>
 

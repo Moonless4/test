@@ -12,7 +12,7 @@ export default function HomeProjects() {
         <div className="hp-section-head">
           <PageHeading title="پـروژه هـــــا" subtitle="Projects" icon="luxina-iconpencil-ruler-2-fill" />
           <Button href="/projects" variant="gray">
-            همه پروژه ها
+            مشاهدهٔ همهٔ پروژه‌ها
           </Button>
         </div>
         <ProjectsGrid projects={projects.filter((project) => project.slug !== 'pars-jordan')} arrows />

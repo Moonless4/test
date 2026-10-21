@@ -10,9 +10,9 @@ export default function CooperationPage() {
         <PageHeading title="فرصت همکاری" subtitle="Cooperation" icon="luxina-icon-team-fill" />
         <RequestForm
           type="cooperation"
-          messagePlaceholder="زمینه همکاری"
+          messagePlaceholder="تجربه و زمینهٔ همکاری خود را بنویسید"
           submit="ارسال درخواست"
-          note="درخواست همکاری شما ثبت شد؛ در صورت تطابق با فرصت‌های موجود تماس می‌گیریم."
+          note="درخواست همکاری ثبت شد؛ در صورت تطابق با فرصت‌های موجود تماس می‌گیریم."
         />
       </PageSection>
       <TeamBand />

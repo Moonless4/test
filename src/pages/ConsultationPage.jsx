@@ -8,9 +8,9 @@ export default function ConsultationPage() {
       <PageHeading title="درخواست مشاوره" subtitle="Consultation request" icon="luxina-icon-customer-service-2-line" />
       <RequestForm
         type="consultation"
-        messagePlaceholder="درباره پروژه‌تان بنویسید"
+        messagePlaceholder="دربارهٔ پروژه، متراژ و زمان‌بندی مورد نظرتان بنویسید"
         submit="ثبت درخواست"
-        note="درخواست مشاورهٔ شما ثبت شد؛ برای هماهنگی جلسه تماس می‌گیریم."
+        note="درخواست شما ثبت شد؛ برای هماهنگی جلسه تماس می‌گیریم."
       />
     </PageSection>
   );

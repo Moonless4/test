@@ -199,14 +199,14 @@ export default function ProjectPage() {
         <div className="rb-project-cta">
           <div className="rb-project-cta-text">
             <span className="rb-project-cta-title">پروژهٔ مشابهی در ذهن دارید؟</span>
-            <p>تیم لوکسینا از مرحلهٔ ایده و طراحی تا تحویل کلید همراه شماست.</p>
+            <p>از امکان‌سنجی زمین تا تحویل کلید، در یک مسیر مشخص و یک تیم.</p>
           </div>
           <div className="rb-detail-actions">
             <Button href="/consultation" variant="tertiary">
-              درخواست مشاوره
+              دریافت مشاوره
             </Button>
             <Button href="/projects" variant="gray">
-              همه پروژه‌ها
+              همهٔ پروژه‌ها
             </Button>
           </div>
         </div>

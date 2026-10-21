@@ -46,7 +46,7 @@ export default function InteriorDesignPage() {
           <SectionHead
             kicker="پروژه‌های منتخب"
             title="سه فضا، سه دگرگونی"
-            text="هر پروژه با یک تصویر مقایسه‌ای کوتاه: وضعیت پیش از طراحی در سمت راست و نتیجهٔ اجراشده در سمت چپ."
+            text="وضعیت پیش از طراحی در سمت راست، نتیجهٔ اجراشده در سمت چپ."
           />
           <div className="sp-ba-grid">
             {data.beforeAfterProjects.map((project, index) => (
@@ -70,7 +70,7 @@ export default function InteriorDesignPage() {
           <SectionHead
             kicker="فرایند طراحی"
             title="هفت گام تا خانۀ نهایی"
-            text="هر گام خروجی مشخصی دارد و تا تأیید کارفرما مرحلهٔ بعد آغاز نمی‌شود؛ همان چیزی که طرح را از یک ایدهٔ زیبا به یک برنامهٔ اجرایی تبدیل می‌کند."
+            text="هر گام خروجی مشخصی دارد و تا تأیید کارفرما، مرحلهٔ بعد آغاز نمی‌شود."
           />
           <ProcessRail steps={data.process} />
         </div>
@@ -93,7 +93,7 @@ export default function InteriorDesignPage() {
 
       <section className="sp-band">
         <div className="sp-container">
-          <SectionHead kicker="خدمات مرتبط" title="ادامهٔ مسیر با لوکسینا" />
+          <SectionHead kicker="خدمات مرتبط" title="از فضای داخلی تا نقشه و اجرا" />
           <RelatedServices slug={data.slug} />
         </div>
       </section>
@@ -103,7 +103,7 @@ export default function InteriorDesignPage() {
           <ServiceCta
             image={data.image}
             title="برای فضای خود با ما صحبت کنید"
-            text="اگر برای خانه یا محل کارتان به دنبال طراحی داخلی هستید، در یک جلسهٔ مشاوره نیازها، متراژ و بازهٔ بودجه را بررسی می‌کنیم و مسیر پیشنهادی را توضیح می‌دهیم."
+            text="در یک جلسهٔ مشاوره، نیازها، متراژ و بازهٔ بودجه را مرور می‌کنیم و مسیر پیشنهادی را توضیح می‌دهیم."
           />
         </div>
       </section>

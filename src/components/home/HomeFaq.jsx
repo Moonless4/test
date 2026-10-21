@@ -14,7 +14,7 @@ export default function HomeFaq() {
 
           <div className="hp-faq-body">
             <span className="luxina-faq-bg" aria-hidden="true" />
-            <PageHeading title="سوالات متداول" subtitle="Most asked question" icon="luxina-iconquestionnaire-fill" />
+            <PageHeading title="پرسش‌های متداول" subtitle="Questions & answers" icon="luxina-iconquestionnaire-fill" />
             <FaqList />
           </div>
         </div>

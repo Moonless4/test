@@ -30,7 +30,7 @@ export default function LuxuryConstructionPage() {
           <SectionHead
             kicker="پیشرفت پروژه"
             title="هشت مرحله، از کانسپت تا تحویل کلید"
-            text="هر مرحله را انتخاب کنید تا تصویر، شرح فنی و خروجی‌های همان بخش را ببینید."
+            text="مرحله را انتخاب کنید تا تصویر، شرح فنی و خروجی همان بخش را ببینید."
           />
           <ConstructionStages stages={data.stages} />
         </div>
@@ -80,7 +80,7 @@ export default function LuxuryConstructionPage() {
 
       <section className="sp-band">
         <div className="sp-container">
-          <SectionHead kicker="خدمات مرتبط" title="ادامهٔ مسیر با لوکسینا" />
+          <SectionHead kicker="خدمات مرتبط" title="سه خدمت مکمل ساخت" />
           <RelatedServices slug={data.slug} />
         </div>
       </section>
@@ -90,7 +90,7 @@ export default function LuxuryConstructionPage() {
           <ServiceCta
             image="/img/services/lux-gallery-2.jpg"
             title="پروژهٔ لوکس خود را با ما بسازید"
-            text="برای پروژه‌های بزرگ، پیش از هر قراردادی یک جلسهٔ بررسی امکان‌سنجی برگزار می‌کنیم: زمین، بودجه، برنامهٔ زمانی و سطح کیفیت اجرا."
+            text="پیش از هر قراردادی، یک جلسهٔ امکان‌سنجی برگزار می‌کنیم: زمین، بودجه، برنامهٔ زمانی و سطح کیفیت."
           />
         </div>
       </section>

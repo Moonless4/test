@@ -7,7 +7,7 @@ export default function HomeTeam() {
     <section className="hp-team">
       <div className="hp-team-body">
         <PageHeading title="تیــــــــــم مــــــــــا" subtitle="Our Team" icon="luxina-iconteam-fill" />
-        <p className="hp-team-text">لوکسینا برای تحقق رویاهای معماری شما تلاش می کند!</p>
+        <p className="hp-team-text">معماران، مهندسان و مدیران اجرایی؛ یک تیم با یک زبان مشترک.</p>
         <Button href="/cooperation">فرصت‌های همکاری</Button>
       </div>
       <div className="hp-team-media">

@@ -28,7 +28,7 @@ export default function ServicePage() {
         ))}
         <div className="rb-detail-actions">
           <Button href="/consultation" variant="primary">
-            درخواست مشاوره
+            دریافت مشاوره
           </Button>
           <Button href="/contact" variant="gray">
             تماس با ما

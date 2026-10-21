@@ -10,7 +10,7 @@ export default function HomeBlog() {
       <div className="hp-inner">
         <div className="hp-blog-aside">
           <PageHeading title="وبلاگ" subtitle="Weblog" icon="luxina-iconbook-fill" />
-          <Button href="/blog">همه مقالات</Button>
+          <Button href="/blog">همهٔ مقالات</Button>
         </div>
         <div className="hp-blog-posts">
           <PostsGrid articles={articles.slice(0, 3)} />

@@ -39,9 +39,9 @@ export default function ContactPage() {
       </div>
       <RequestForm
         type="contact"
-        messagePlaceholder="متن پیام شما"
+        messagePlaceholder="دربارهٔ پروژه یا فضای خود بنویسید"
         submit="ارسال پیام"
-        note="پیام شما ثبت شد؛ کارشناسان ما در اولین فرصت پاسخ می‌دهند."
+        note="پیام شما ثبت شد. در اولین فرصت کاری پاسخ می‌دهیم."
       />
     </PageSection>
   );

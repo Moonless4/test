@@ -83,9 +83,9 @@ export default function PromoSection() {
           direction="left"
           image="/img/consult-image.png"
           title="درخواست مشاوره"
-          subtitle="Request for advice"
+          subtitle="Consultation request"
           icon="luxina-iconquestion-answer-fill"
-          primary={{ label: 'درخواست مشاوره', href: '/consultation' }}
+          primary={{ label: 'شروع مشاوره', href: '/consultation' }}
           secondary={{ label: 'تماس با ما', href: '/contact' }}
         />
       </div>

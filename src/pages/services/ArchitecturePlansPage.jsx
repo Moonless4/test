@@ -75,7 +75,7 @@ export default function ArchitecturePlansPage() {
 
       <section className="sp-band">
         <div className="sp-container">
-          <SectionHead kicker="خدمات مرتبط" title="ادامهٔ مسیر با لوکسینا" />
+          <SectionHead kicker="خدمات مرتبط" title="از نقشه تا اجرا" />
           <RelatedServices slug={data.slug} />
         </div>
       </section>
@@ -85,7 +85,7 @@ export default function ArchitecturePlansPage() {
           <ServiceCta
             image="/img/services/plans-technical.jpg"
             title="پلان پروژهٔ خود را با ما شروع کنید"
-            text="اگر زمین یا بنای موجودی دارید و می‌خواهید بدانید چه چیزی می‌توان از آن ساخت، جلسهٔ بررسی سایت و امکان‌سنجی اولین قدم است."
+            text="اگر زمین یا بنای موجودی دارید، جلسهٔ بررسی سایت و امکان‌سنجی اولین قدم است."
           />
         </div>
       </section>

@@ -6,28 +6,28 @@ import { useEffect, useRef } from 'react';
 const SERVICES = [
   {
     title: 'طراحی نقشه و پروتوتایپ',
-    subtitle: 'اجرای صفر تا ۱۰۰ طراحی معماری و سازه',
+    subtitle: 'از تحلیل سایت تا نقشه‌های اجرایی',
     icon: 'luxina-iconbrush-fill',
     image: '/img/service-image1.png',
     slug: 'architecture-plans',
   },
   {
     title: 'ساخت و اجرای پروژه‌های لوکس',
-    subtitle: 'اجرای صفر تا صد پروژه‌های مسکونی لوکس',
+    subtitle: 'یک تیم، از کانسپت تا تحویل کلید',
     icon: 'luxina-iconbuilding-3-fill',
     image: '/img/service-image2.png',
     slug: 'luxury-construction',
   },
   {
     title: 'بازسازی خانه های قدیمی',
-    subtitle: 'اجرای صفر تا صد بازسازی خانه های قدیمی',
+    subtitle: 'هویت بنا می‌ماند، عملکرد به‌روز می‌شود',
     icon: 'luxina-iconbuilding-fill',
     image: '/img/service-image4.png',
     slug: 'old-house-renovation',
   },
   {
     title: 'طراحی داخلی و دکوراسیون',
-    subtitle: 'اجرای صفر تا صد دکوراسیون و نمای داخلی',
+    subtitle: 'چیدمان، متریال و نور در یک روایت',
     icon: 'luxina-iconpencil-ruler-2-fill',
     image: '/img/service-image2.png',
     slug: 'interior-design',

@@ -9,7 +9,7 @@ export default function TeamBand() {
       <div className="rb-team">
         <div className="rb-team-body">
           <PageHeading title="تیــــــــــم مــــــــــا" subtitle="Our Team" icon="luxina-iconteam-fill" />
-          <p className="rb-team-text">لوکسینا برای تحقق رویاهای معماری شما تلاش می کند!</p>
+          <p className="rb-team-text">معماران، مهندسان و مدیران اجرایی؛ یک تیم با یک زبان مشترک.</p>
           <Button href="/cooperation" variant="primary">
             فرصت‌های همکاری
           </Button>

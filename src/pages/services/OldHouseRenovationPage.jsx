@@ -27,7 +27,7 @@ export default function OldHouseRenovationPage() {
           <SectionHead
             kicker="از بررسی تا تحویل"
             title="هشت مرحلهٔ بازسازی یک خانۀ قدیمی"
-            text="بازسازی قدیمی‌ترین بخش‌ها را نمی‌ترسد، اما هیچ‌کدام را بدون بررسی تغییر نمی‌دهد. این هشت مرحله، ترتیب تصمیم‌گیری در پروژه است."
+            text="ترتیب تصمیم‌گیری در یک بازسازی: از بررسی و آسیب‌شناسی تا تحویل نهایی."
           />
           <FeatureList items={data.survey} />
         </div>
@@ -50,7 +50,7 @@ export default function OldHouseRenovationPage() {
 
       <section className="sp-band sp-band-soft">
         <div className="sp-container">
-          <SectionHead kicker="خدمات مرتبط" title="ادامهٔ مسیر با لوکسینا" />
+          <SectionHead kicker="خدمات مرتبط" title="بازسازی، ساخت یا طراحی داخلی؟" />
           <RelatedServices slug={data.slug} />
         </div>
       </section>
@@ -60,7 +60,7 @@ export default function OldHouseRenovationPage() {
           <ServiceCta
             image="/img/services/reno-courtyard.jpg"
             title="خانۀ قدیمی‌تان را از دست ندهید"
-            text="پیش از هر تصمیمی برای تخریب یا تغییر، اجازه دهید وضعیت سازه و ارزش معماری بنا را بررسی کنیم؛ گزارش اولیه مشخص می‌کند چه چیزی قابل نگه‌داشتن است."
+            text="پیش از تصمیم به تخریب یا تغییر، وضعیت سازه و ارزش معماری بنا را بررسی می‌کنیم."
           />
         </div>
       </section>

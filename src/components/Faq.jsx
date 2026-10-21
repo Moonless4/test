@@ -16,7 +16,7 @@ export default function Faq() {
           loading="lazy"
         />
         <div className="rb-faq-body">
-          <PageHeading title="سوالات متداول" subtitle="Most asked question" icon="luxina-iconquestionnaire-fill" />
+          <PageHeading title="پرسش‌های متداول" subtitle="Questions & answers" icon="luxina-iconquestionnaire-fill" />
           <FaqList />
         </div>
       </div>
