@@ -16,7 +16,7 @@ export default function FeaturedProducts({ products, onAdd, onOpen, onViewAll })
   return (
     <section className="featured section" id="specials" aria-labelledby="specials-title">
       <div className="container">
-        <div className="section-heading-wrap heading-banner" id="specials-title">
+        <div className="section-heading-wrap title-accent" id="specials-title">
           <SectionHeading
             eyebrow="پیشنهاد ویژه"
             title="منوی محبوب امروز"
@@ -38,12 +38,14 @@ export default function FeaturedProducts({ products, onAdd, onOpen, onViewAll })
           </SectionHeading>
         </div>
 
-        <div className="product-track" ref={trackRef}>
-          {products.map((product) => (
-            <div className="product-track__item" key={product.id}>
-              <ProductCard product={product} onAdd={onAdd} onOpen={onOpen} />
-            </div>
-          ))}
+        <div className="specials-band">
+          <div className="product-track" ref={trackRef}>
+            {products.map((product) => (
+              <div className="product-track__item" key={product.id}>
+                <ProductCard product={product} onAdd={onAdd} onOpen={onOpen} />
+              </div>
+            ))}
+          </div>
         </div>
 
         <img className="featured__dots" src="/assets/yellow-dots.png" alt="" aria-hidden="true" />
