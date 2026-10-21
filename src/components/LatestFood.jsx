@@ -12,7 +12,6 @@ export default function LatestFood({ products, onOpen, onAdd }) {
     <section className="latest section" aria-labelledby="latest-title">
       <div className="container">
         <div className="latest__panel">
-          <img className="latest__bg" src="/assets/on-sale-bg.png" alt="" aria-hidden="true" />
           <div id="latest-title">
             <SectionHeading
               eyebrow="تازه از آشپزخانه"

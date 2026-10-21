@@ -173,7 +173,17 @@ export const products = [
   },
 ];
 
-export const latestProducts = ['chef-pizza', 'saffron-kebab', 'double-steak', 'royal-pizza'];
+export const latestProducts = [
+  'chef-pizza',
+  'saffron-kebab',
+  'double-steak',
+  'royal-pizza',
+  'naval-burger',
+  'charcoal-chicken',
+  'alfredo-pasta',
+  'season-salad',
+  'diet-chicken',
+];
 
 export const promoBanners = [
   {
