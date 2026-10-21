@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { categories, latestProducts } from '../data/content.js';
-import ProductCard from './ProductCard.jsx';
+import FoodCard from './FoodCard.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import Icon from './Icons.jsx';
 
@@ -52,9 +52,9 @@ export default function LatestFood({ products, onOpen, onAdd, onViewAll }) {
           ))}
         </div>
 
-        <div className="menu-grid">
+        <div className="food-grid">
           {items.map((product) => (
-            <ProductCard key={product.id} product={product} onAdd={onAdd} onOpen={onOpen} />
+            <FoodCard key={product.id} product={product} onAdd={onAdd} onOpen={onOpen} />
           ))}
         </div>
 
