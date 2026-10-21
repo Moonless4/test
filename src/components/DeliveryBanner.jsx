@@ -16,10 +16,6 @@ export default function DeliveryBanner({ onMenu }) {
             <p>در کمتر از ۱ دقیقه غذای دلخواهت رو انتخاب و پرداخت کن!</p>
           </div>
 
-          <div className="delivery-banner__visual">
-            <img src="/assets/promo-waiter.webp" alt="پیک سفارش رستوران نوال" loading="lazy" />
-          </div>
-
           <div className="delivery-banner__actions">
             <button type="button" className="delivery-banner__cta" onClick={onMenu}>
               اکنون سفارش دهید

@@ -6,7 +6,7 @@
 .delivery-banner__panel {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 28px;
   padding: 26px 40px 0;
@@ -94,19 +94,6 @@
   color: rgba(255, 255, 255, 0.82);
 }
 
-.delivery-banner__visual {
-  position: relative;
-  z-index: 2;
-  align-self: end;
-  display: flex;
-  justify-content: center;
-}
-
-.delivery-banner__visual img {
-  width: 180px;
-  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.32));
-}
-
 .delivery-banner__actions {
   position: relative;
   z-index: 2;
@@ -179,10 +166,6 @@
     padding: 24px 26px 0;
   }
 
-  .delivery-banner__visual img {
-    width: 140px;
-  }
-
   .delivery-banner__actions {
     flex-direction: column;
     align-items: flex-start;
@@ -208,10 +191,6 @@
 
   .delivery-banner__copy h2 {
     justify-content: center;
-  }
-
-  .delivery-banner__visual {
-    display: none;
   }
 
   .delivery-banner__actions {
