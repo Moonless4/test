@@ -187,12 +187,13 @@
 }
 
 .dish {
+  --w: 280px;
   position: absolute;
   bottom: 0;
   left: 50%;
-  width: 280px;
-  margin-left: -140px;
-  transform: translateX(calc(var(--diff) * var(--dish-gap, 240px))) translateY(var(--lift, 0px)) scale(var(--scale, 1));
+  width: var(--w);
+  margin-left: calc(var(--w) / -2);
+  transform: translateX(calc(var(--offset-mul, 0) * var(--w))) scale(var(--scale, 1));
   transform-origin: 50% 100%;
   transition:
     transform 0.6s var(--ease),
@@ -231,11 +232,11 @@
 
 .hero__discount {
   position: absolute;
-  top: 1%;
-  right: 1%;
+  top: 3%;
+  right: 3%;
   z-index: 12;
-  width: 78px;
-  height: 78px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
   display: flex;
   flex-direction: column;
@@ -260,12 +261,12 @@
 }
 
 .hero__discount b {
-  font-size: 22px;
+  font-size: 17px;
   font-weight: 900;
 }
 
 .hero__discount small {
-  font-size: 10.5px;
+  font-size: 9px;
   font-weight: 700;
 }
 
@@ -374,9 +375,7 @@
   }
 
   .dish {
-    width: 252px;
-    margin-left: -126px;
-    --dish-gap: 218px;
+    --w: 252px;
   }
 
   .food-carousel__stage {
@@ -410,9 +409,7 @@
   }
 
   .dish {
-    width: 224px;
-    margin-left: -112px;
-    --dish-gap: 196px;
+    --w: 232px;
   }
 
   .food-carousel__stage {
@@ -420,9 +417,8 @@
   }
 
   .hero__discount {
-    right: 0;
-    width: 68px;
-    height: 68px;
+    width: 56px;
+    height: 56px;
   }
 
   .hero__discount b {
@@ -485,9 +481,7 @@
   }
 
   .dish {
-    width: 184px;
-    margin-left: -92px;
-    --dish-gap: 150px;
+    --w: 184px;
   }
 
   .food-carousel__stage {
@@ -501,19 +495,19 @@
   }
 
   .hero__discount {
-    top: 0;
-    right: 0;
-    width: 56px;
-    height: 56px;
+    top: 2%;
+    right: 2%;
+    width: 44px;
+    height: 44px;
     border-width: 3px;
   }
 
   .hero__discount b {
-    font-size: 16px;
+    font-size: 13px;
   }
 
   .hero__discount small {
-    font-size: 8.5px;
+    font-size: 7.5px;
   }
 
   .food-carousel__caption {

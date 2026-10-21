@@ -75,18 +75,16 @@ export default function Hero({ products, onProduct, onReserve }) {
                 if (diff > count / 2) diff -= count;
                 if (diff < -count / 2) diff += count;
                 const abs = Math.abs(diff);
-                const scale = abs === 0 ? 1 : abs === 1 ? 0.7 : 0.5;
-                const lift = abs === 0 ? 0 : abs === 1 ? 34 : 62;
+                const scale = abs === 0 ? 1 : abs === 1 ? 0.82 : 0.68;
+                const offsetMul = diff === 0 ? 0 : Math.sign(diff) * (abs >= 2 ? 1.57 : 0.88);
                 return (
                   <button
                     type="button"
                     key={product.id}
                     className={`dish ${abs === 0 ? 'is-active' : ''}`}
                     style={{
-                      '--diff': diff,
+                      '--offset-mul': offsetMul,
                       '--scale': scale,
-                      '--lift': `${lift}px`,
-                      opacity: abs === 0 ? 1 : abs === 1 ? 0.82 : 0.38,
                       zIndex: 10 - abs,
                     }}
                     onClick={() => (abs === 0 ? onProduct(product) : setActive(index))}
