@@ -180,9 +180,6 @@ export const latestProducts = [
   'royal-pizza',
   'naval-burger',
   'charcoal-chicken',
-  'alfredo-pasta',
-  'season-salad',
-  'diet-chicken',
 ];
 
 export const promoBanners = [

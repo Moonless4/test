@@ -1,64 +1,71 @@
-import { latestProducts } from '../data/content.js';
+import { useState } from 'react';
+import { categories, latestProducts } from '../data/content.js';
+import ProductCard from './ProductCard.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import Icon from './Icons.jsx';
-import { formatPrice } from './ProductCard.jsx';
 
-export default function LatestFood({ products, onOpen, onAdd }) {
-  const items = latestProducts
+export default function LatestFood({ products, onOpen, onAdd, onViewAll }) {
+  const [active, setActive] = useState('all');
+
+  const newest = latestProducts
     .map((id) => products.find((product) => product.id === id))
     .filter(Boolean);
+
+  const pills = categories.filter((cat) => newest.some((product) => product.category === cat.id));
+  const items = active === 'all' ? newest : newest.filter((product) => product.category === active);
 
   return (
     <section className="latest section" aria-labelledby="latest-title">
       <div className="container">
-        <div className="latest__panel">
-          <div id="latest-title">
-            <SectionHeading
-              eyebrow="تازه از آشپزخانه"
-              title="جدیدترین غذاهای"
-              highlight="منوی ما"
-              script="Fresh & New"
-              text="طعم‌های تازه‌ای که همین هفته به منوی نوال اضافه شده‌اند."
-            />
-          </div>
-
-          <div className="latest__track">
-            {items.map((product) => (
-              <article className="latest-card" key={product.id}>
-                <button
-                  type="button"
-                  className="latest-card__media"
-                  onClick={() => onOpen(product)}
-                  aria-label={`مشاهده ${product.name}`}
-                >
-                  <img src={product.image} alt={product.name} loading="lazy" />
-                  {product.discount > 0 && (
-                    <span className="latest-card__discount">
-                      {product.discount.toLocaleString('fa-IR')}٪ تخفیف
-                    </span>
-                  )}
-                </button>
-                <div className="latest-card__body">
-                  <span className="latest-card__cat">{product.categoryLabel}</span>
-                  <h3>
-                    <button type="button" onClick={() => onOpen(product)}>
-                      {product.name}
-                    </button>
-                  </h3>
-                  <div className="latest-card__footer">
-                    <span className="price__now">
-                      {formatPrice(product.price)}
-                      <small>تومان</small>
-                    </span>
-                    <button type="button" className="latest-card__add" onClick={() => onAdd(product)} aria-label={`افزودن ${product.name} به سبد`}>
-                      <Icon name="plus" size={18} />
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+        <div id="latest-title">
+          <SectionHeading
+            eyebrow="تازه از آشپزخانه"
+            title="جدیدترین غذاهای"
+            highlight="منوی ما"
+            script="Fresh & New"
+            text="طعم‌های تازه‌ای که همین هفته به منوی نوال اضافه شده‌اند."
+          />
         </div>
+
+        <div className="menu-filters latest__filters" role="tablist" aria-label="فیلتر دسته‌بندی غذاها">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={active === 'all'}
+            className={`filter-chip ${active === 'all' ? 'is-active' : ''}`}
+            onClick={() => setActive('all')}
+          >
+            همه
+          </button>
+          {pills.map((cat) => (
+            <button
+              type="button"
+              key={cat.id}
+              role="tab"
+              aria-selected={active === cat.id}
+              className={`filter-chip ${active === cat.id ? 'is-active' : ''}`}
+              onClick={() => setActive(cat.id)}
+            >
+              <img className="filter-chip__icon" src={cat.icon} alt="" loading="lazy" />
+              {cat.title}
+            </button>
+          ))}
+        </div>
+
+        <div className="menu-grid">
+          {items.map((product) => (
+            <ProductCard key={product.id} product={product} onAdd={onAdd} onOpen={onOpen} />
+          ))}
+        </div>
+
+        {onViewAll && (
+          <div className="latest__more">
+            <button type="button" className="text-link text-link--button" onClick={onViewAll}>
+              مشاهده همه
+              <Icon name="chevronLeft" size={17} />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

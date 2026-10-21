@@ -289,6 +289,9 @@
 }
 
 .filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   height: 40px;
   padding: 0 18px;
   border-radius: 999px;
@@ -302,6 +305,12 @@
     color 0.25s var(--ease),
     border-color 0.25s var(--ease),
     transform 0.25s var(--ease);
+}
+
+.filter-chip__icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 .filter-chip:hover {
@@ -369,129 +378,21 @@
   padding-top: 20px;
 }
 
-.latest__panel {
-  position: relative;
-  padding: 44px 36px 38px;
-  border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, #fffaf0 0%, var(--cream-soft) 55%, #f7ead5 100%);
-  border: 1px solid rgba(203, 2, 54, 0.07);
-  overflow: hidden;
+.latest__filters {
+  margin-bottom: 24px;
 }
 
-.latest__panel > * {
-  position: relative;
-  z-index: 2;
+.latest__filters .filter-chip.is-active {
+  background: #f7f0d2;
+  border-color: #e8dca9;
+  color: var(--ink);
+  box-shadow: none;
 }
 
-.latest__track {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.latest-card {
-  background: #fff;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid rgba(36, 0, 10, 0.07);
-  box-shadow: var(--shadow-card);
-  transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
-}
-
-.latest-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 26px 50px -38px rgba(36, 0, 10, 0.55);
-}
-
-.latest-card__media {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 165px;
-  overflow: hidden;
-}
-
-.latest-card__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s var(--ease);
-}
-
-.latest-card:hover .latest-card__media img {
-  transform: scale(1.06);
-}
-
-.latest-card__discount {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  padding: 0 9px;
-  border-radius: 999px;
-  background: var(--gold);
-  color: var(--wine);
-  font-size: 10px;
-  font-weight: 800;
-}
-
-.latest-card__body {
-  padding: 14px;
-}
-
-.latest-card__cat {
-  color: var(--primary);
-  font-size: 10px;
-  font-weight: 600;
-}
-
-.latest-card__body h3 {
-  font-size: 14.5px;
-  font-weight: 700;
-  line-height: 1.6;
-  margin-top: 2px;
-  min-height: 46px;
-}
-
-.latest-card__body h3 button {
-  text-align: right;
-  color: inherit;
-  font: inherit;
-}
-
-.latest-card__body h3 button:hover {
-  color: var(--primary);
-}
-
-.latest-card__footer {
+.latest__more {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
-  padding-top: 10px;
-  border-top: 1px solid var(--line);
-}
-
-.latest-card__footer .price__now {
-  font-size: 15px;
-}
-
-.latest-card__add {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--primary);
-  color: #fff;
-  transition: background 0.2s var(--ease), transform 0.2s var(--ease);
-}
-
-.latest-card__add:hover {
-  background: var(--wine);
-  transform: rotate(90deg);
+  justify-content: center;
+  margin-top: 28px;
 }
 
 @media (max-width: 1200px) {
@@ -499,14 +400,6 @@
     flex-basis: calc((100% - 36px) / 3);
   }
 
-  .latest__track {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 14px;
-  }
-
-  .latest-card__media {
-    height: 145px;
-  }
 }
 
 @media (max-width: 1000px) {
@@ -514,27 +407,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .latest__track {
-    display: flex;
-    overflow-x: auto;
-    scrollbar-width: none;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 8px;
-    margin: 0 -4px;
-  }
-
-  .latest__track::-webkit-scrollbar {
-    display: none;
-  }
-
-  .latest-card {
-    flex: 0 0 240px;
-    scroll-snap-align: start;
-  }
-
-  .latest__panel {
-    padding: 36px 24px 30px;
-  }
 }
 
 @media (max-width: 900px) {
@@ -638,20 +510,4 @@
     height: 200px;
   }
 
-  .latest__panel {
-    padding: 28px 16px 22px;
-    border-radius: 28px;
-  }
-
-  .latest-card {
-    flex: 0 0 220px;
-  }
-
-  .latest-card__media {
-    height: 140px;
-  }
-
-  .latest__track {
-    margin: 0 -4px;
-  }
 }

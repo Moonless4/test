@@ -18,7 +18,7 @@ export default function HomePage({ onAdd, onProduct, onPost, onReserve, onCatego
       <FeaturedProducts products={featured} onAdd={onAdd} onOpen={onProduct} onViewAll={onMenu} />
       <PromoBanners onMenu={onMenu} onProduct={onProduct} onReserve={onReserve} />
       <BenefitsSection />
-      <LatestFood products={products} onOpen={onProduct} onAdd={onAdd} />
+      <LatestFood products={products} onOpen={onProduct} onAdd={onAdd} onViewAll={onMenu} />
       <BlogSection onOpenPost={onPost} onViewAll={onBlog} />
       <FinalCta onReserve={onReserve} onMenu={onMenu} />
     </>
