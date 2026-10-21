@@ -1,16 +1,28 @@
-import { homeSections } from '../content/home.js';
+import HeroSection from '../components/home/HeroSection.jsx';
+import ServicesSection from '../components/home/ServicesSection.jsx';
+import HomeProjects from '../components/home/HomeProjects.jsx';
+import TimelineSection from '../components/home/TimelineSection.jsx';
+import PromoSection from '../components/home/PromoSection.jsx';
+import CustomersSection from '../components/home/CustomersSection.jsx';
+import HomeTeam from '../components/home/HomeTeam.jsx';
+import HomeBlog from '../components/home/HomeBlog.jsx';
+import HomeFaq from '../components/home/HomeFaq.jsx';
+import '../styles/home.css';
 
-// The homepage is the reference page itself, so it keeps the captured section
-// markup — every other route is built from React components.
-const html = homeSections.map((section) => section.html).join('');
-
+// The homepage is assembled from React components, one per band of the
+// reference page, in the same order.
 export default function HomePage() {
   return (
-    <div
-      className="elementor elementor-837"
-      data-elementor-id="837"
-      data-elementor-type="wp-page"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <div className="hp-home">
+      <HeroSection />
+      <ServicesSection />
+      <HomeProjects />
+      <TimelineSection />
+      <PromoSection />
+      <CustomersSection />
+      <HomeTeam />
+      <HomeBlog />
+      <HomeFaq />
+    </div>
   );
 }

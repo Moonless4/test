@@ -1,0 +1,591 @@
+/* Homepage — rebuilt from the reference page's Elementor layout.
+   The bands keep the reference geometry (full-bleed sections with a 1440px
+   inner column and 56px gutters), but every wrapper is a plain flex/grid
+   container. The theme's own widget classes (`luxina_*`) still provide the
+   card, slider, timeline and accordion styling, exactly like the other rebuilt
+   pages. */
+
+.hp-section {
+  padding-inline: 56px;
+}
+
+.hp-inner {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+/* ---- Hero ------------------------------------------------------------- */
+
+.hp-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: -234px;
+  margin-bottom: -100px;
+  padding-top: 200px;
+  padding-bottom: 300px;
+  background: url("/img/hero-bg-1.png") bottom left / cover no-repeat;
+}
+
+.hp-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: 56px;
+  display: grid;
+  grid-template-columns: 3fr 4fr;
+  box-sizing: border-box;
+}
+
+.hp-hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  padding-right: 100px;
+  box-sizing: border-box;
+}
+
+.hp-hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hp-hero-badge {
+  /* The reference widgets keep a 20px bottom margin, which is what gives the
+     badge row its extra height. */
+  margin: 0 0 20px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background-color: #5295531a;
+  color: #75b376;
+}
+
+.hp-hero-title {
+  margin: 0;
+  font-family: var(--heading-font);
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1.5;
+  color: #fff;
+}
+
+.hp-hero-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  border-radius: 8px;
+  padding-left: 16px;
+  background-image: linear-gradient(90deg, #5295531a 0%, #52955300 100%);
+}
+
+.hp-hero-author img {
+  display: block;
+  width: 48px;
+  height: auto;
+}
+
+.hp-hero-author p {
+  margin: 0;
+  padding: 8px 12px;
+}
+
+.hp-hero-author-name {
+  font-weight: 800;
+  color: #fff;
+}
+
+.hp-hero-author-role {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #ffffffb3;
+}
+
+.hp-hero-text {
+  margin: 0;
+  color: #ffffffb3;
+}
+
+.hp-hero-visual {
+  position: absolute;
+  top: 0;
+  bottom: 130px;
+  left: 50%;
+  width: 50%;
+  transform: translateX(-80%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.hp-hero-visual img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.hp-hero-visual--mobile {
+  display: none;
+}
+
+/* ---- Services --------------------------------------------------------- */
+
+.hp-services .hp-inner,
+.hp-customers .hp-inner {
+  /* A flex column keeps the widgets' own top margin (84px / 120px) inside the
+     band instead of collapsing through the section. */
+  display: flex;
+  flex-direction: column;
+}
+
+.hp-services .luxina_services_container {
+  isolation: isolate;
+}
+
+/* The service subtitle is collapsed until the card is hovered; its target
+   height is measured by `ServicesSection`. */
+.hp-services .luxina_services_item-subtitle-wrap {
+  height: 0;
+}
+
+/* ---- Section head (projects / blog) ----------------------------------- */
+
+.hp-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ---- Projects --------------------------------------------------------- */
+
+.hp-projects {
+  position: relative;
+  z-index: 2;
+  margin-top: 60px;
+}
+
+.hp-projects .hp-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.hp-projects .luxina-slider-wrap {
+  padding-bottom: 24px;
+}
+
+/* ---- Timeline --------------------------------------------------------- */
+
+.hp-timeline {
+  margin-top: 60px;
+}
+
+.hp-timeline .hp-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ---- Promo cards ------------------------------------------------------ */
+
+.hp-promos {
+  margin-top: 90px;
+}
+
+.hp-promos .hp-inner {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: center;
+}
+
+.hp-promo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.hp-promo .luxina_masked_cart_container {
+  --cta-content-overlap: 4vw;
+}
+
+.hp-promo--catalog .luxina_masked_cart_content_wrap {
+  padding: 0;
+}
+
+.hp-promo--catalog .luxina_cta_cart_button1 {
+  background-color: #1a3b410d;
+  border-style: none;
+}
+
+.hp-promo--catalog .luxina_cta_cart_button2 {
+  background-color: #529553;
+  border-style: none;
+}
+
+.hp-promo--catalog .luxina_cta_cart_button2 .button-text,
+.hp-promo--catalog .luxina_cta_cart_button2 .button-icon {
+  color: #fff;
+}
+
+.hp-promo--catalog .luxina_pro_icon_container .luxina_pro_icon_bg-wrap {
+  background-color: #529553;
+}
+
+.hp-promo--catalog .luxina_pro_icon_container .luxina_pro_icon {
+  font-size: 1.125rem;
+  color: #fff;
+}
+
+.hp-promo--consult .luxina_cta_cart_button1 {
+  border-style: none;
+}
+
+.hp-promo--consult .luxina_cta_cart_button2 {
+  background-color: #1a3b410d;
+  border-style: none;
+}
+
+.hp-promo--consult .luxina_pro_icon_container .luxina_pro_icon {
+  font-size: 1.125rem;
+}
+
+/* ---- Customers -------------------------------------------------------- */
+
+.hp-customers .luxina_customers_title-text,
+.hp-customers .luxina_customers_title-subtitle {
+  text-align: center;
+}
+
+.hp-customers .luxina_customers_item-img {
+  filter: brightness(76%) contrast(150%) saturate(0%);
+}
+
+.hp-customers .luxina_customers_item-img:hover {
+  filter: none;
+}
+
+/* ---- Team ------------------------------------------------------------- */
+
+.hp-team {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 60px;
+  padding: 150px 56px;
+  background: url("/img/team-bg.png") center / cover no-repeat;
+  box-sizing: border-box;
+}
+
+.hp-team-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  padding-inline-end: 100px;
+  align-self: center;
+  box-sizing: border-box;
+}
+
+.hp-team-body .luxina_heading_title {
+  color: #fff;
+}
+
+.hp-team-body .luxina_heading_subtitle {
+  color: #ffffff4d;
+}
+
+.hp-team-text {
+  margin: 0;
+  color: #ffffffb3;
+}
+
+.hp-team-media img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---- Blog ------------------------------------------------------------- */
+
+.hp-blog {
+  margin-top: -60px;
+  background: url("/img/Vector-1.png") center right no-repeat;
+}
+
+.hp-blog .hp-inner {
+  display: flex;
+  align-items: center;
+}
+
+.hp-blog-aside {
+  flex: 0 0 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+}
+
+.hp-blog-posts {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ---- FAQ -------------------------------------------------------------- */
+
+.hp-faq {
+  position: relative;
+  background: url("/img/Vector-2-1.png") top center no-repeat;
+  overflow: hidden;
+}
+
+.hp-faq .hp-inner {
+  padding-block: 190px 160px;
+}
+
+.hp-faq-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding-inline: 160px;
+  box-sizing: border-box;
+}
+
+.hp-faq-grid::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 32px;
+  height: 320px;
+  border-radius: 8px;
+  background: #1a3b41;
+  opacity: 0.05;
+}
+
+.hp-faq-media {
+  position: relative;
+  z-index: 1;
+}
+
+.hp-faq-media img {
+  display: block;
+  width: 295px;
+  height: auto;
+}
+
+.hp-faq-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: 40px;
+}
+
+.hp-faq-body > .luxina_heading_wrap {
+  margin-bottom: 24px;
+}
+
+/* The glass panel behind the FAQ column. */
+.hp-faq .luxina-faq-bg {
+  position: absolute;
+  top: -62px;
+  inset-inline-start: -100px;
+  width: 352px;
+  aspect-ratio: 1.171;
+  clip-path: polygon(0% 5.35%, 0.04% 4.63%, 0.16% 3.93%, 0.36% 3.27%, 0.62% 2.65%, 0.95% 2.08%, 1.34% 1.57%, 1.78% 1.12%, 2.27% 0.73%, 2.79% 0.42%, 3.36% 0.19%, 3.95% 0.05%, 4.57% 0%, 96.1% 0.06%, 96.74% 0.22%, 97.33% 0.49%, 97.89% 0.84%, 98.39% 1.28%, 98.84% 1.79%, 99.22% 2.37%, 99.54% 3.01%, 99.78% 3.69%, 99.93% 4.42%, 100% 5.18%, 99.97% 5.96%, 91.17% 95.26%, 91.07% 95.92%, 90.9% 96.55%, 90.67% 97.14%, 90.39% 97.69%, 90.05% 98.19%, 89.67% 98.64%, 89.24% 99.04%, 88.78% 99.37%, 88.28% 99.64%, 87.75% 99.84%, 87.2% 99.96%, 86.63% 100%, 3.95% 99.95%, 3.36% 99.81%, 2.79% 99.58%, 2.27% 99.27%, 1.78% 98.88%, 1.34% 98.43%, 0.95% 97.92%, 0.62% 97.35%, 0.36% 96.73%, 0.16% 96.07%, 0.04% 95.37%, 0% 94.65%);
+  background: linear-gradient(46.92deg, rgba(255, 255, 255, 0.4) 59.26%, rgba(255, 255, 255, 0.3) 98.39%);
+  box-shadow: 0 40px 64px 0 #0000000d;
+  backdrop-filter: blur(56px);
+}
+
+/* ---- Responsive ------------------------------------------------------- */
+
+@media (min-width: 1441px) {
+  .hp-hero-visual {
+    bottom: 8vw;
+  }
+}
+
+@media (max-width: 1200px) {
+  .hp-section {
+    padding-inline: 40px;
+  }
+
+  .hp-hero-inner {
+    grid-template-columns: 2fr 1fr;
+    padding-inline: 40px;
+  }
+
+  .hp-hero-copy {
+    padding-right: 0;
+  }
+
+  .hp-hero-visual {
+    left: 40%;
+  }
+
+  .hp-promos .hp-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hp-promo {
+    width: 70%;
+    justify-self: center;
+  }
+
+  .hp-team {
+    padding: 120px 40px;
+  }
+
+  .hp-team-body {
+    padding-inline-end: 0;
+  }
+
+  .hp-blog {
+    margin-top: -30px;
+  }
+
+  .hp-faq .hp-inner {
+    padding-block: 80px;
+  }
+
+  .hp-faq-grid {
+    padding-inline: 40px;
+  }
+
+  .hp-faq-media img {
+    width: 200px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .hp-faq .luxina-faq-bg {
+    width: 300px;
+    inset-inline-start: -74px;
+    top: -20px;
+    aspect-ratio: 2.117;
+    clip-path: polygon(0% 9.73%, 0.04% 8.41%, 0.16% 7.14%, 0.36% 5.94%, 0.63% 4.82%, 0.96% 3.78%, 1.35% 2.85%, 1.79% 2.03%, 2.28% 1.33%, 2.81% 0.76%, 3.37% 0.35%, 3.97% 0.09%, 4.59% 0%, 96.11% 0.12%, 96.79% 0.45%, 97.42% 0.98%, 98% 1.7%, 98.52% 2.57%, 98.97% 3.6%, 99.35% 4.74%, 99.65% 6%, 99.86% 7.34%, 99.98% 8.75%, 99.99% 10.22%, 99.9% 11.72%, 91.92% 92.27%, 91.78% 93.37%, 91.59% 94.41%, 91.34% 95.38%, 91.04% 96.27%, 90.7% 97.09%, 90.32% 97.82%, 89.91% 98.46%, 89.46% 99%, 88.99% 99.43%, 88.49% 99.74%, 87.97% 99.93%, 87.43% 100%, 3.97% 99.91%, 3.37% 99.65%, 2.81% 99.24%, 2.28% 98.67%, 1.79% 97.97%, 1.35% 97.15%, 0.96% 96.22%, 0.63% 95.18%, 0.36% 94.06%, 0.16% 92.86%, 0.04% 91.59%, 0% 90.27%);
+  }
+
+  .hp-faq-grid::before {
+    top: 24px;
+    height: 210px;
+  }
+}
+
+@media (max-width: 767px) {
+  .hp-hero {
+    margin-top: -120px;
+    margin-bottom: 0;
+    padding-top: 120px;
+    padding-bottom: 0;
+    padding-inline: 0;
+  }
+
+  .hp-hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hp-hero-title {
+    font-size: 1.5rem;
+  }
+
+  .hp-hero-author {
+    padding: 8px;
+  }
+
+  .hp-hero-author img {
+    width: 32px;
+  }
+
+  .hp-hero-author p {
+    padding: 0;
+  }
+
+  .hp-hero-author-role {
+    font-size: 0.875rem;
+  }
+
+  .hp-hero-visual--desktop {
+    display: none;
+  }
+
+  .hp-hero-visual--mobile {
+    position: static;
+    display: flex;
+    width: 80%;
+    max-width: 80%;
+    margin-top: 24px;
+    align-self: flex-end;
+    transform: none;
+    z-index: 1;
+  }
+
+  .hp-section-head {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .hp-promo {
+    width: 100%;
+  }
+
+  .hp-team {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hp-blog {
+    margin-top: 60px;
+  }
+
+  .hp-blog .hp-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hp-blog-aside {
+    flex: 0 0 auto;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    padding-bottom: 24px;
+  }
+
+  .hp-faq {
+    padding-inline: 0;
+    margin-bottom: -60px;
+  }
+
+  .hp-faq-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hp-faq-grid::before {
+    top: 24px;
+    bottom: 40px;
+    height: auto;
+  }
+
+  .hp-faq-media {
+    position: absolute;
+    inset-inline-end: -40px;
+    top: 0;
+  }
+
+  .hp-faq-body {
+    padding-top: 0;
+  }
+}
