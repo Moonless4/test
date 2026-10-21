@@ -70,17 +70,38 @@ export default function ProjectPage() {
           ]}
         />
         <div className="rb-project-hero">
-          <figure className="rb-project-hero-media">
-            <img src={project.image} alt={project.title} width="900" height="640" />
-            {project.status ? (
-              <span
-                className="rb-detail-badge rb-project-status"
-                style={{ background: project.statusColor || 'var(--primary-100)' }}
-              >
-                {project.status}
-              </span>
+          <div className="rb-project-media-col">
+            <figure className="rb-project-hero-media">
+              <img src={project.image} alt={project.title} width="900" height="640" />
+              {project.status ? (
+                <span
+                  className="rb-detail-badge rb-project-status"
+                  style={{ background: project.statusColor || 'var(--primary-100)' }}
+                >
+                  {project.status}
+                </span>
+              ) : null}
+            </figure>
+            {details?.gallery?.length ? (
+              <div className="rb-project-thumbs">
+                {details.gallery.map((image, index) => (
+                  <button
+                    type="button"
+                    className="rb-project-thumb"
+                    key={image}
+                    onClick={() => setLightbox(image)}
+                    aria-label={`بزرگ‌نمایش تصویر ${index + 1}`}
+                  >
+                    <img
+                      src={image}
+                      alt={`${project.title} — تصویر ${index + 1}`}
+                      loading="lazy"
+                    />
+                  </button>
+                ))}
+              </div>
             ) : null}
-          </figure>
+          </div>
           <div className="rb-project-hero-body">
             <span className="rb-project-eyebrow">
               <i className="luxinaicon luxina-icon-map-pin-2-fill" aria-hidden="true" />
@@ -135,25 +156,6 @@ export default function ProjectPage() {
                 درخواست بازدید
               </Button>
             </aside>
-          </div>
-        </PageSection>
-      ) : null}
-
-      {details?.gallery?.length ? (
-        <PageSection>
-          <PageHeading title="گالری تصاویر" subtitle="Gallery" icon="luxina-icon-grid-fill" />
-          <div className="rb-gallery">
-            {details.gallery.map((image, index) => (
-              <button
-                type="button"
-                className="rb-gallery-item"
-                key={image}
-                onClick={() => setLightbox(image)}
-                aria-label={`بزرگ‌نمایش تصویر ${index + 1}`}
-              >
-                <img src={image} alt={`${project.title} — تصویر ${index + 1}`} loading="lazy" />
-              </button>
-            ))}
           </div>
         </PageSection>
       ) : null}
