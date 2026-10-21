@@ -29,6 +29,13 @@ body:not(.home).sticky-header:not(.sticky-header-active) #header_inner .header-l
   visibility: visible;
 }
 
+/* The theme hangs a 1px white rule 33px below the logo while the homepage
+   header is still transparent; over the dark hero it reads as a stray line
+   crossing the hero badges, so it stays off. */
+body.home.sticky-header:not(.sticky-header-active) #header_inner .header-logo::before {
+  display: none;
+}
+
 /* The fixed, opaque header sits above the page, so the first band of a rebuilt
    page needs its own top padding instead of touching the header edge. */
 body:not(.home) .rb-section:first-of-type {
