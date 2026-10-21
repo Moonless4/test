@@ -9,6 +9,10 @@ const ProjectPage = lazy(() => import('./pages/ProjectPage.jsx'));
 const BlogPage = lazy(() => import('./pages/BlogPage.jsx'));
 const ArticlePage = lazy(() => import('./pages/ArticlePage.jsx'));
 const ServicePage = lazy(() => import('./pages/ServicePage.jsx'));
+const InteriorDesignPage = lazy(() => import('./pages/services/InteriorDesignPage.jsx'));
+const OldHouseRenovationPage = lazy(() => import('./pages/services/OldHouseRenovationPage.jsx'));
+const LuxuryConstructionPage = lazy(() => import('./pages/services/LuxuryConstructionPage.jsx'));
+const ArchitecturePlansPage = lazy(() => import('./pages/services/ArchitecturePlansPage.jsx'));
 const AboutPage = lazy(() => import('./pages/AboutPage.jsx'));
 const ContactPage = lazy(() => import('./pages/ContactPage.jsx'));
 const ConsultationPage = lazy(() => import('./pages/ConsultationPage.jsx'));
@@ -24,6 +28,10 @@ export default function AppRoutes() {
       <Route path="/project/:slug" element={<ProjectPage />} />
       <Route path="/blog" element={<BlogPage />} />
       <Route path="/blog/:slug" element={<ArticlePage />} />
+      <Route path="/services/interior-design" element={<InteriorDesignPage />} />
+      <Route path="/services/old-house-renovation" element={<OldHouseRenovationPage />} />
+      <Route path="/services/luxury-construction" element={<LuxuryConstructionPage />} />
+      <Route path="/services/architecture-plans" element={<ArchitecturePlansPage />} />
       <Route path="/services/:slug" element={<ServicePage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/contact" element={<ContactPage />} />

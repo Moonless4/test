@@ -9,24 +9,28 @@ const SERVICES = [
     subtitle: 'اجرای صفر تا ۱۰۰ طراحی معماری و سازه',
     icon: 'luxina-iconbrush-fill',
     image: '/img/service-image1.png',
+    slug: 'architecture-plans',
   },
   {
     title: 'ساخت و اجرای پروژه‌های لوکس',
     subtitle: 'اجرای صفر تا صد پروژه‌های مسکونی لوکس',
     icon: 'luxina-iconbuilding-3-fill',
     image: '/img/service-image2.png',
+    slug: 'luxury-construction',
   },
   {
     title: 'بازسازی خانه های قدیمی',
     subtitle: 'اجرای صفر تا صد بازسازی خانه های قدیمی',
     icon: 'luxina-iconbuilding-fill',
     image: '/img/service-image4.png',
+    slug: 'old-house-renovation',
   },
   {
     title: 'طراحی داخلی و دکوراسیون',
     subtitle: 'اجرای صفر تا صد دکوراسیون و نمای داخلی',
     icon: 'luxina-iconpencil-ruler-2-fill',
     image: '/img/service-image2.png',
+    slug: 'interior-design',
   },
 ];
 
@@ -99,7 +103,12 @@ export default function ServicesSection() {
 
             <div className="wrapper luxina_services_wrap desktop-columns desktop-columns-4 desktop-display-grid tablet-columns tablet-columns-2 tablet-display-grid mobile-columns mobile-columns-1 mobile-display-grid">
               {SERVICES.map((service) => (
-                <div className="luxina_services_item-wrapper slider-slide" key={service.title}>
+                <a
+                  className="luxina_services_item-wrapper slider-slide"
+                  href={`/services/${service.slug}`}
+                  key={service.title}
+                  aria-label={`${service.title} — مشاهدهٔ صفحهٔ خدمت`}
+                >
                   <div
                     className="luxina_services_item"
                     style={{ '--item-height': '520px', backgroundImage: `url(${service.image})` }}
@@ -122,7 +131,7 @@ export default function ServicesSection() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           </div>
