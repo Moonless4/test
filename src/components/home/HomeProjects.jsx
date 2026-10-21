@@ -17,7 +17,7 @@ export default function HomeProjects() {
         </div>
         <ProjectsGrid
           projects={projects.filter((project) => project.slug !== featuredProject.slug)}
-          arrows
+          carousel
         />
       </div>
     </section>

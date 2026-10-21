@@ -44,16 +44,20 @@ function syncSlider(wrap) {
   const direction = getComputedStyle(track).direction === 'rtl' ? -1 : 1;
   const step = () => Math.round(track.clientWidth * 0.9);
 
+  // In RTL the track scrolls towards negative `scrollLeft`, so advancing is
+  // always `direction * step` and going back is its negation.
+  const advance = () => direction * step();
+
   if (prev) {
     prev.style.display = 'flex';
     prev.addEventListener('click', () =>
-      track.scrollBy({ left: direction * step(), behavior: 'smooth' }),
+      track.scrollBy({ left: -advance(), behavior: 'smooth' }),
     );
   }
   if (next) {
     next.style.display = 'flex';
     next.addEventListener('click', () =>
-      track.scrollBy({ left: -direction * step(), behavior: 'smooth' }),
+      track.scrollBy({ left: advance(), behavior: 'smooth' }),
     );
   }
 }

@@ -200,6 +200,51 @@
 
 .hp-projects .luxina-slider-wrap {
   padding-bottom: 24px;
+  position: relative;
+}
+
+/* ---- Projects carousel ------------------------------------------------ */
+
+/* The shared slider helper turns the row into `.rb-track`; here the cards stay
+   on one line and page horizontally three at a time (two on tablet, one on
+   mobile) while the arrows step through them. */
+.hp-projects .projects-carousel .rb-track {
+  display: flex !important;
+  gap: 16px;
+  padding-bottom: 4px;
+}
+
+.hp-projects .projects-carousel .rb-track > * {
+  flex: 0 0 calc((100% - 32px) / 3);
+  min-width: 0;
+}
+
+.hp-projects .projects-carousel .luxina-slider-nav-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--text-main-100);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+  z-index: 3;
+}
+
+.hp-projects .projects-carousel .luxina-slider-nav-btn:hover {
+  background: var(--primary-100);
+  color: #fff;
+}
+
+@media (max-width: 1200px) {
+  .hp-projects .projects-carousel .rb-track > * {
+    flex: 0 0 calc((100% - 16px) / 2);
+  }
+}
+
+@media (max-width: 767px) {
+  .hp-projects .projects-carousel .rb-track > * {
+    flex: 0 0 100%;
+  }
 }
 
 /* ---- Timeline --------------------------------------------------------- */
