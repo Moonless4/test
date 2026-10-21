@@ -99,6 +99,7 @@ export default function App() {
   );
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
+  const cartIds = useMemo(() => cart.map((item) => item.id), [cart]);
 
   const addToCart = useCallback(
     (item, qty = 1) => {
@@ -163,7 +164,15 @@ export default function App() {
       case 'post':
         return <BlogPostPage id={route.id} onMenu={goMenu} onBlog={goBlog} />;
       case 'product':
-        return <ProductPage id={route.id} onAdd={addToCart} onOpen={openProduct} onMenu={goMenu} />;
+        return (
+          <ProductPage
+            id={route.id}
+            onAdd={addToCart}
+            onOpen={openProduct}
+            onMenu={goMenu}
+            cartIds={cartIds}
+          />
+        );
       case 'about':
         return <AboutPage onMenu={goMenu} onReserve={openReserve} />;
       case 'contact':
@@ -224,6 +233,7 @@ export default function App() {
         items={cartItems}
         onQty={updateQty}
         onRemove={removeItem}
+        onAdd={addToCart}
         onCheckout={() => {
           setCartOpen(false);
           setCheckoutOpen(true);

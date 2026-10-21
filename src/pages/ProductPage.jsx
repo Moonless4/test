@@ -3,13 +3,16 @@ import { products } from '../data/content.js';
 import Breadcrumbs from '../components/Breadcrumbs.jsx';
 import Icon from '../components/Icons.jsx';
 import ProductCard, { formatPrice } from '../components/ProductCard.jsx';
+import OrderSuggestions from '../components/OrderSuggestions.jsx';
 
-export default function ProductPage({ id, onAdd, onOpen, onMenu }) {
+export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [] }) {
   const product = products.find((item) => item.id === id);
   const [qty, setQty] = useState(1);
+  const [added, setAdded] = useState(false);
 
   useEffect(() => {
     setQty(1);
+    setAdded(false);
   }, [id]);
 
   if (!product) return null;
@@ -86,7 +89,10 @@ export default function ProductPage({ id, onAdd, onOpen, onMenu }) {
               <button
                 type="button"
                 className="btn btn--primary btn--block product-modal__add"
-                onClick={() => onAdd(product, qty)}
+                onClick={() => {
+                  onAdd(product, qty);
+                  setAdded(true);
+                }}
               >
                 <Icon name="cart" size={19} />
                 افزودن به سبد خرید
@@ -96,6 +102,14 @@ export default function ProductPage({ id, onAdd, onOpen, onMenu }) {
                 <Icon name="truck" size={16} />
                 ارسال داغ و تازه در ۳۰ تا ۴۵ دقیقه
               </p>
+
+              {added && (
+                <OrderSuggestions
+                  exclude={[product.id, ...cartIds]}
+                  title="نوشیدنی یا پیش‌غذا کنار این غذا"
+                  onAdd={onAdd}
+                />
+              )}
             </div>
           </div>
         </div>

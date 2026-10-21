@@ -734,3 +734,102 @@
   }
 
 }
+
+/* پیشنهاد نوشیدنی و پیش‌غذا کنار غذا (سبد خرید و صفحه محصول) */
+.order-suggest {
+  margin: 18px 0 6px;
+  padding: 14px 14px 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--cream-soft);
+}
+
+.order-suggest__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.order-suggest__head h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.order-suggest__head span {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.order-suggest__list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-suggest__item {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.order-suggest__item img {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
+}
+
+.order-suggest__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.order-suggest__copy b {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.order-suggest__copy small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.order-suggest__add {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.order-suggest__add:hover {
+  background: var(--primary-dark);
+  transform: scale(1.06);
+}
+
+.product-modal__body .order-suggest {
+  margin-top: 14px;
+  text-align: right;
+}

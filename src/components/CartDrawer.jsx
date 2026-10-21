@@ -1,11 +1,12 @@
 import { formatPrice } from './ProductCard.jsx';
 import Icon from './Icons.jsx';
 import { useOverlay } from './Modal.jsx';
+import OrderSuggestions from './OrderSuggestions.jsx';
 
 const deliveryFee = 35000;
 const freeDeliveryFrom = 500000;
 
-export default function CartDrawer({ open, onClose, items, onQty, onRemove, onCheckout, onBrowse }) {
+export default function CartDrawer({ open, onClose, items, onQty, onRemove, onAdd, onCheckout, onBrowse }) {
   useOverlay(open, onClose);
 
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.qty, 0);
@@ -77,6 +78,7 @@ export default function CartDrawer({ open, onClose, items, onQty, onRemove, onCh
                   </button>
                 </article>
               ))}
+              <OrderSuggestions exclude={items.map((item) => item.product.id)} onAdd={onAdd} />
             </div>
 
             <div className="cart-summary">
