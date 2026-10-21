@@ -386,6 +386,23 @@
   color: #8b1d28;
 }
 
+.latest__filters {
+  margin-bottom: 24px;
+}
+
+.latest__filters .filter-chip.is-active {
+  background: #f7f0d2;
+  border-color: #e8dca9;
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.latest__filters .filter-chip {
+  height: 42px;
+  padding: 0 16px;
+  gap: 9px;
+}
+
 .latest__nav {
   display: inline-flex;
   align-items: center;
