@@ -15,6 +15,26 @@ body.sticky-header .site-header-slot + #page-body {
   margin-top: var(--header-height);
 }
 
+/* The theme keeps the white logo (`logo.png`) on screen until the header enters
+   its scrolled state. Only the homepage has a light-on-dark header at rest; a
+   rebuilt page shows the header on the light body, so the colored logo
+   (`logo-2.png`) has to be the visible one there. */
+body:not(.home).sticky-header:not(.sticky-header-active) #header_inner .header-logo img:nth-of-type(1) {
+  opacity: 0;
+  visibility: hidden;
+}
+
+body:not(.home).sticky-header:not(.sticky-header-active) #header_inner .header-logo img:nth-of-type(2) {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* The fixed, opaque header sits above the page, so the first band of a rebuilt
+   page needs its own top padding instead of touching the header edge. */
+body:not(.home) .rb-section:first-of-type {
+  padding-block-start: 40px;
+}
+
 /* ---- Page shell ------------------------------------------------------- */
 
 /* The theme does not set a global border-box, so every box that combines a

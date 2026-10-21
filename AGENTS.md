@@ -58,6 +58,11 @@ up -d --build`), not a host `npm install`.
   already ran and their grids/forms stay dead.
 - Header markup is captured HTML: edit account/menu behaviour in
   `src/lib/header.js` and `src/lib/account.js`, not in JSX.
+- The theme header shows `logo.png` (white) at rest and swaps to `logo-2.png`
+  (colored) once `sticky-header-active` is set. Only the homepage has a dark
+  header at rest, so `styles/site.css` forces the colored logo on every other
+  page and gives the first `.rb-section` a top padding (the fixed header would
+  otherwise sit right on it).
 - `public/img/` holds the downloaded media. The reference markup points some
   assets at theme-relative paths (`/luxina/wp-content/...`); rewrite those to
   the `/img/...` equivalent.
