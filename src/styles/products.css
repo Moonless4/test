@@ -5,6 +5,26 @@
   padding-bottom: 30px;
 }
 
+.featured .section-heading-wrap {
+  position: relative;
+  padding: 28px 32px 46px;
+  background-image: url('/assets/featured-bg.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.featured .section-heading {
+  margin-bottom: 0;
+}
+
+.featured .section-heading h2 {
+  color: var(--primary);
+}
+
+.featured .script-note {
+  transform: rotate(-3deg) translateY(12px);
+}
+
 .featured__dots {
   position: absolute;
   top: 30px;
@@ -534,6 +554,10 @@
 
   .featured {
     padding-top: 46px;
+  }
+
+  .featured .section-heading-wrap {
+    padding: 24px 22px 38px;
   }
 }
 
