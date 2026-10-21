@@ -18,8 +18,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  border-radius: 26px;
-  background: #b31b2a url('/assets/featured-bg.png') center / 100% 100% no-repeat;
+  background: url('/assets/specials-band.png') center bottom / 100% 100% no-repeat;
 }
 
 .specials-band .product-track {
