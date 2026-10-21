@@ -1,3 +1,5 @@
+import { menuProducts } from './menuProducts.js';
+
 export const navLinks = [
   { id: 'home', label: 'خانه', href: '/' },
   { id: 'menu', label: 'منو', href: '/menu', hasMega: true },
@@ -171,6 +173,7 @@ export const products = [
     featured: true,
     badge: 'پیشنهاد شگفت‌انگیز',
   },
+  ...menuProducts,
 ];
 
 // Hero slider pairs each slide with the artwork that actually depicts that dish,
