@@ -1,58 +1,51 @@
-// Premium inertial scrolling for precise-pointer devices. Wheel input is
-// accumulated into a target position and the page eases towards it once per
-// frame, so the content glides with a little weight and settles softly instead
-// of jumping. Only the scroll position changes — no layout wrapper, no
-// transform, so sticky headers, reveal animations and carousels keep working.
+// Premium inertial scrolling, powered by Lenis.
 //
-// Everything else stays native:
-// - touch devices (no `hover` / fine pointer) scroll with the browser,
-// - horizontal gestures and carousels are never intercepted,
-// - nested scrollers (drawers, panels) keep their own scroll,
-// - `prefers-reduced-motion` users get instant scrolling,
-// - keyboard, scrollbar drags and browser scroll restoration resync the target.
+// Lenis owns the scroll position: wheel input is accumulated into a target and
+// the page eases towards it once per frame, so content glides with weight and
+// settles softly instead of stepping. Only the real scroll position changes —
+// no transform wrapper — so the sticky header, the mega menu, the carousels and
+// the theme's own scroll state keep working unchanged.
+//
+// What gets what:
+// - desktop mouse wheel / trackpad: smoothed by Lenis on a single raf loop,
+// - touch-first devices (phones, tablets): Lenis is never created, the browser
+//   keeps its own momentum,
+// - `prefers-reduced-motion`: native scrolling,
+// - nested scrollers, horizontal gestures and the locked page (drawer,
+//   lightbox) pass through untouched.
 
-const DAMPING = 0.13; // share of the remaining distance covered per 60fps frame
-const MAX_STEP = 240; // clamp one wheel event so a hard flick stays controlled
-const SETTLE = 0.5; // px below which the motion counts as finished
-const LINE_HEIGHT = 16; // px for `deltaMode: DOM_DELTA_LINE`
-const ANCHOR_GAP = 16; // breathing room under a sticky header
+import Lenis from 'lenis';
 
-let target = 0;
-let current = 0;
-let frameId = 0;
-let previousTime = 0;
+// Physics. `lerp` is the share of the remaining distance the page covers per
+// frame: lower = heavier. Lenis defaults to 0.1; 0.08 gives the wheel input a
+// weighted, slightly delayed catch-up that still settles in well under a
+// second, which is the "expensive studio site" feel without lag.
+const LERP = 0.08;
+const WHEEL_MULTIPLIER = 1;
+
+// Programmatic moves (anchors, keyboard) get a fixed-length glide so they read
+// as one deliberate motion rather than a decaying flick.
+const MOVE_DURATION = 1.15;
+const KEY_DURATION = 0.9;
+const KEY_PAGE = 0.9;
+const ANCHOR_GAP = 16;
+
+const easeOutExpo = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+
+let lenis = null;
+let frame = 0;
 let bound = false;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-const maxScroll = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Touch-first devices keep the browser's own momentum, which is smoother and
-// lighter than anything scripted; a mouse/trackpad device (or one without a
-// coarse pointer at all) gets the custom easing.
+// lighter than anything scripted.
 const touchFirstDevice = () =>
   window.matchMedia('(pointer: coarse)').matches && navigator.maxTouchPoints > 0;
 
 export const smoothScrollEnabled = () => !touchFirstDevice() && !prefersReducedMotion();
-
-function hasOverflow(element, axis) {
-  const style = getComputedStyle(element);
-  const overflow = axis === 'x' ? style.overflowX : style.overflowY;
-  if (!/(auto|scroll|overlay)/.test(overflow)) return false;
-  return axis === 'x'
-    ? element.scrollWidth > element.clientWidth + 1
-    : element.scrollHeight > element.clientHeight + 1;
-}
-
-// A wheel event over a nested scroller must scroll that element, not the page.
-function insideScroller(node, axis) {
-  for (let element = node; element && element !== document.body; element = element.parentElement) {
-    if (element instanceof HTMLElement && hasOverflow(element, axis)) return true;
-  }
-  return false;
-}
 
 function isEditable(node) {
   return Boolean(
@@ -60,107 +53,85 @@ function isEditable(node) {
   );
 }
 
-function step(time) {
-  const elapsed = previousTime ? Math.min(64, time - previousTime) : 1000 / 60;
-  previousTime = time;
-
-  const max = maxScroll();
-  target = clamp(target, 0, max);
-  const ease = 1 - Math.pow(1 - DAMPING, elapsed / (1000 / 60));
-
-  current = clamp(current + (target - current) * ease, 0, max);
-
-  if (Math.abs(target - current) < SETTLE) {
-    current = target;
-    window.scrollTo(0, current);
-    frameId = 0;
-    previousTime = 0;
-    return;
-  }
-
-  window.scrollTo(0, current);
-  frameId = requestAnimationFrame(step);
+function tick(time) {
+  lenis.raf(time);
+  frame = requestAnimationFrame(tick);
 }
 
-// Ease towards a position. Calling it again mid-flight only moves the target,
-// which is what keeps the motion continuous while the wheel keeps turning.
-function animateTo(value) {
-  if (!frameId) current = window.scrollY;
-  target = clamp(value, 0, maxScroll());
-  if (frameId) return;
-  previousTime = 0;
-  frameId = requestAnimationFrame(step);
+function startLoop() {
+  if (!frame) frame = requestAnimationFrame(tick);
+}
+
+function stopLoop() {
+  if (frame) cancelAnimationFrame(frame);
+  frame = 0;
+}
+
+function mount() {
+  if (lenis || !smoothScrollEnabled()) return;
+
+  lenis = new Lenis({
+    lerp: LERP,
+    wheelMultiplier: WHEEL_MULTIPLIER,
+    smoothWheel: true,
+    // Touch stays native even on hybrid devices (touchscreen laptops).
+    syncTouch: false,
+    // Let panels/modals that scroll on their own keep their own scroll.
+    allowNestedScroll: true,
+    stopInertiaOnNavigate: true,
+  });
+
+  // The theme ships `html { scroll-behavior: smooth }`. Every frame write would
+  // restart the browser's own animation and the two would fight, so it is
+  // switched off only while the engine is running.
+  document.documentElement.style.scrollBehavior = 'auto';
+
+  startLoop();
+}
+
+function unmount() {
+  stopLoop();
+  lenis?.destroy();
+  lenis = null;
+  document.documentElement.style.scrollBehavior = '';
+}
+
+// The drawer and the lightbox lock the page with `body.disable-scrolling`;
+// Lenis has to stop too, otherwise it keeps easing towards a stale target and
+// the page jumps when the overlay closes.
+function syncLock() {
+  if (!lenis) return;
+  if (document.body.classList.contains('disable-scrolling')) lenis.stop();
+  else lenis.start();
 }
 
 export function smoothScrollTo(value) {
-  if (!smoothScrollEnabled()) {
-    window.scrollTo(0, clamp(value, 0, maxScroll()));
+  const max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const target = clamp(value, 0, max);
+  if (lenis) {
+    lenis.scrollTo(target, { duration: MOVE_DURATION, easing: easeOutExpo });
     return;
   }
-  animateTo(value);
+  window.scrollTo({ top: target, behavior: 'auto' });
 }
 
 export function resetSmoothScroll() {
-  if (frameId) cancelAnimationFrame(frameId);
-  frameId = 0;
-  previousTime = 0;
-  target = 0;
-  current = 0;
+  if (lenis) {
+    lenis.scrollTo(0, { immediate: true, force: true });
+    lenis.resize();
+    return;
+  }
   window.scrollTo(0, 0);
 }
 
-function onWheel(event) {
-  if (event.defaultPrevented || event.ctrlKey || !smoothScrollEnabled()) return;
-  if (document.body.classList.contains('disable-scrolling')) return;
-
-  // Horizontal gestures belong to the browser (and to the carousels).
-  if (event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
-  if (Math.abs(event.deltaY) < 0.5) return;
-  if (insideScroller(event.target, 'y')) return;
-
-  const unit =
-    event.deltaMode === 1 ? LINE_HEIGHT : event.deltaMode === 2 ? window.innerHeight : 1;
-  const delta = clamp(event.deltaY * unit, -MAX_STEP, MAX_STEP);
-
-  event.preventDefault();
-  animateTo((frameId ? target : window.scrollY) + delta);
-}
-
-// Anything that scrolls the page outside this engine — scrollbar drag, keyboard,
-// browser scroll restoration — becomes the new reference point.
-function onScroll() {
-  const position = window.scrollY;
-  if (!frameId) {
-    target = position;
-    current = position;
-    return;
-  }
-  if (Math.abs(position - current) > 3) {
-    target = position;
-    current = position;
-  }
-}
-
-function onKeyDown(event) {
-  if (!smoothScrollEnabled() || event.defaultPrevented) return;
-  if (event.metaKey || event.ctrlKey || event.altKey) return;
-  if (isEditable(event.target)) return;
-
-  const page = window.innerHeight * 0.9;
-  let next = null;
-
-  if (event.key === 'PageDown') next = (frameId ? target : window.scrollY) + page;
-  else if (event.key === 'PageUp') next = (frameId ? target : window.scrollY) - page;
-  else if (event.key === 'Home') next = 0;
-  else if (event.key === 'End') next = maxScroll();
-  if (next === null) return;
-
-  event.preventDefault();
-  animateTo(next);
+function anchorOffset() {
+  const header = document.getElementById('header-container');
+  return (header ? header.getBoundingClientRect().height : 0) + ANCHOR_GAP;
 }
 
 function onAnchorClick(event) {
-  if (event.defaultPrevented || event.button > 0) return;
+  if (!lenis || event.defaultPrevented || event.button > 0) return;
+
   const link = event.target.closest?.('a[href^="#"]');
   if (!link) return;
 
@@ -171,41 +142,60 @@ function onAnchorClick(event) {
   if (!section) return;
 
   event.preventDefault();
-  const header = document.getElementById('header-container');
-  const offset = (header ? header.getBoundingClientRect().height : 0) + ANCHOR_GAP;
-  smoothScrollTo(section.getBoundingClientRect().top + window.scrollY - offset);
+  // A numeric target rather than the element: the theme sets
+  // `html { scroll-padding-top: 160px }`, and Lenis would subtract that on top
+  // of the sticky-header offset, leaving a double gap.
+  const top = section.getBoundingClientRect().top + window.scrollY - anchorOffset();
+  lenis.scrollTo(top, { duration: MOVE_DURATION, easing: easeOutExpo });
 
   if (window.history?.replaceState) window.history.replaceState(null, '', hash);
 }
 
-function onResize() {
-  if (!frameId) {
-    target = window.scrollY;
-    current = target;
-    return;
-  }
-  target = clamp(target, 0, maxScroll());
+function onKeyDown(event) {
+  if (!lenis || event.defaultPrevented) return;
+  if (event.metaKey || event.ctrlKey || event.altKey) return;
+  if (isEditable(event.target)) return;
+
+  const page = window.innerHeight * KEY_PAGE;
+  const from = lenis.targetScroll;
+  let next = null;
+
+  if (event.key === 'PageDown') next = from + page;
+  else if (event.key === 'PageUp') next = from - page;
+  else if (event.key === 'Home') next = 0;
+  else if (event.key === 'End') next = document.documentElement.scrollHeight;
+  if (next === null) return;
+
+  event.preventDefault();
+  lenis.scrollTo(next, { duration: KEY_DURATION, easing: easeOutExpo });
 }
 
-// The theme ships `html { scroll-behavior: smooth }`. Every frame write would
-// restart the browser's own animation and the two would fight, so the engine
-// turns it off while it is active and restores the theme behaviour otherwise.
-function syncCssScrollBehavior() {
-  document.documentElement.style.scrollBehavior = smoothScrollEnabled() ? 'auto' : '';
+// A tab in the background must not keep a raf loop alive.
+function onVisibilityChange() {
+  if (!lenis) return;
+  if (document.hidden) stopLoop();
+  else startLoop();
 }
 
 export function initSmoothScroll() {
   if (bound) return;
   bound = true;
 
-  syncCssScrollBehavior();
+  mount();
+
   ['(pointer: coarse)', '(prefers-reduced-motion: reduce)'].forEach((query) => {
-    window.matchMedia(query).addEventListener?.('change', syncCssScrollBehavior);
+    window.matchMedia(query).addEventListener?.('change', () => {
+      if (smoothScrollEnabled()) mount();
+      else unmount();
+    });
   });
 
-  window.addEventListener('wheel', onWheel, { passive: false });
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('keydown', onKeyDown);
-  window.addEventListener('resize', onResize);
   document.addEventListener('click', onAnchorClick);
+  window.addEventListener('keydown', onKeyDown);
+  document.addEventListener('visibilitychange', onVisibilityChange);
+
+  new MutationObserver(syncLock).observe(document.body, {
+    attributes: true,
+    attributeFilter: ['class'],
+  });
 }
