@@ -3,8 +3,13 @@ import Icon from './Icons.jsx';
 
 const formatPrice = (value) => value.toLocaleString('fa-IR');
 
-export default function Hero({ products, onProduct, onReserve }) {
-  const slides = products.slice(0, 5);
+export default function Hero({ products, slides: heroSlides, onProduct, onReserve }) {
+  const slides = heroSlides
+    .map((slide) => {
+      const product = products.find((item) => item.id === slide.id);
+      return product ? { ...product, image: slide.image } : null;
+    })
+    .filter(Boolean);
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef(null);
@@ -76,7 +81,7 @@ export default function Hero({ products, onProduct, onReserve }) {
                 if (diff < -count / 2) diff += count;
                 const abs = Math.abs(diff);
                 const scale = abs === 0 ? 1 : abs === 1 ? 0.82 : 0.68;
-                const offsetMul = diff === 0 ? 0 : Math.sign(diff) * (abs >= 2 ? 1.57 : 0.88);
+                const offsetMul = diff === 0 ? 0 : Math.sign(diff) * (abs >= 2 ? 1.61 : 0.9);
                 return (
                   <button
                     type="button"

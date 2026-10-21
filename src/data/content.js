@@ -173,6 +173,16 @@ export const products = [
   },
 ];
 
+// Hero slider pairs each slide with the artwork that actually depicts that dish,
+// so the name/price under the slider always matches the centered plate.
+export const heroSlides = [
+  { id: 'double-steak', image: '/assets/slide3.webp' },
+  { id: 'alfredo-pasta', image: '/assets/slide2.webp' },
+  { id: 'charcoal-chicken', image: '/assets/slide4.webp' },
+  { id: 'season-salad', image: '/assets/testimonial-salad.webp' },
+  { id: 'naval-burger', image: '/assets/intro-burger.webp' },
+];
+
 export const latestProducts = [
   'chef-pizza',
   'saffron-kebab',

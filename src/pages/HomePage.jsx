@@ -6,14 +6,14 @@ import BenefitsSection from '../components/BenefitsSection.jsx';
 import LatestFood from '../components/LatestFood.jsx';
 import BlogSection from '../components/BlogSection.jsx';
 import FinalCta from '../components/FinalCta.jsx';
-import { products } from '../data/content.js';
+import { products, heroSlides } from '../data/content.js';
 
 export default function HomePage({ onAdd, onProduct, onPost, onReserve, onCategory, onMenu, onBlog }) {
   const featured = products.filter((item) => item.featured);
 
   return (
     <>
-      <Hero products={featured} onProduct={onProduct} onReserve={onReserve} />
+      <Hero products={products} slides={heroSlides} onProduct={onProduct} onReserve={onReserve} />
       <Categories onCategory={onCategory} />
       <FeaturedProducts products={featured} onAdd={onAdd} onOpen={onProduct} onViewAll={onMenu} />
       <PromoBanners onMenu={onMenu} onProduct={onProduct} onReserve={onReserve} />
