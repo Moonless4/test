@@ -752,6 +752,8 @@
 /* ===== Footer ===== */
 .site-footer {
   position: relative;
+  margin: 0 20px 20px;
+  border-radius: 34px;
   background:
     linear-gradient(180deg, rgba(26, 0, 7, 0.97) 0%, #1a0007 100%),
     url('/assets/footer-bg.png') center bottom / cover no-repeat;
@@ -1305,6 +1307,11 @@
 
   .trust-badge {
     flex: 1 1 44%;
+  }
+
+  .site-footer {
+    margin: 0 12px 12px;
+    border-radius: 26px;
   }
 
   .footer__bottom {
