@@ -11,7 +11,7 @@
   margin: 0 auto;
   padding: 44px 24px 0;
   border-radius: var(--radius-xl);
-  background: var(--wine);
+  background: #000;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -27,54 +27,17 @@
   border-radius: inherit;
 }
 
-.hero__cover {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 32%;
-  opacity: 0.62;
-  filter: saturate(0.9) contrast(1.03);
-  transform: scale(1.02);
-}
-
-.hero__wash {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(36, 0, 10, 0.86) 0%, rgba(36, 0, 10, 0.28) 34%, rgba(36, 0, 10, 0.3) 56%, rgba(36, 0, 10, 0.94) 88%, #24000a 100%),
-    radial-gradient(120% 90% at 50% 100%, rgba(36, 0, 10, 0.35) 0%, transparent 65%),
-    linear-gradient(90deg, rgba(36, 0, 10, 0.5) 0%, transparent 30%, transparent 70%, rgba(36, 0, 10, 0.5) 100%);
-}
-
 .hero__frame {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: fill;
-  opacity: 0.5;
+  opacity: 0.58;
   pointer-events: none;
   mix-blend-mode: screen;
-}
-
-.hero__edge {
-  position: absolute;
-  top: 150px;
-  width: 46px;
-  opacity: 0.55;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.hero__edge--right {
-  right: 20px;
-}
-
-.hero__edge--left {
-  left: 20px;
-  transform: scaleX(-1);
+  /* crush the artwork's dark plate to black so the hero stays pure black */
+  filter: contrast(1.7);
 }
 
 .hero__leaf {
@@ -460,10 +423,6 @@
     font-size: 19px;
   }
 
-  .hero__edge {
-    display: none;
-  }
-
   .food-carousel__controls {
     padding-bottom: 16px;
   }
@@ -474,11 +433,6 @@
     min-height: 640px;
     padding: 24px 10px 0;
     border-radius: 26px;
-  }
-
-  .hero__cover {
-    object-position: center 30%;
-    opacity: 0.5;
   }
 
   .hero__frame {

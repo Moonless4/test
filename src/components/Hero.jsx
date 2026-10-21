@@ -33,13 +33,9 @@ export default function Hero({ products, onProduct, onReserve }) {
         onMouseLeave={() => setPaused(false)}
       >
         <div className="hero__bg" aria-hidden="true">
-          <img className="hero__cover" src="/assets/hero-cover.webp" alt="" />
-          <span className="hero__wash" />
           <img className="hero__frame" src="/assets/hero-bg.png" alt="" />
         </div>
 
-        <img className="hero__edge hero__edge--right" src="/assets/hero-edge.png" alt="" aria-hidden="true" />
-        <img className="hero__edge hero__edge--left" src="/assets/hero-edge.png" alt="" aria-hidden="true" />
         <img className="hero__leaf" src="/assets/yellow-leaf.png" alt="" aria-hidden="true" />
         <img className="hero__dots hero__dots--one" src="/assets/purple-dots.png" alt="" aria-hidden="true" />
         <img className="hero__dots hero__dots--two" src="/assets/yellow-dots.png" alt="" aria-hidden="true" />
