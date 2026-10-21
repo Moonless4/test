@@ -18,7 +18,20 @@ export default function LatestFood({ products, onOpen, onAdd, onViewAll }) {
     <section className="latest section" aria-labelledby="latest-title">
       <div className="container">
         <div id="latest-title">
-          <SectionHeading icon="leaf" title="جدیدترین غذاهای منو ما" script="Latests Food">
+          <SectionHeading
+            icon="leaf"
+            title={
+              <>
+                جدیدترین <span className="title-highlight">غذاهای</span> منو ما
+              </>
+            }
+            script="Latests Food"
+          >
+            {onViewAll && (
+              <button type="button" className="text-link text-link--button" onClick={onViewAll}>
+                مشاهده همه
+              </button>
+            )}
             <div className="latest__nav" aria-hidden="true">
               <span className="latest__arrow">
                 <Icon name="chevronRight" size={16} />
@@ -27,11 +40,6 @@ export default function LatestFood({ products, onOpen, onAdd, onViewAll }) {
                 <Icon name="chevronLeft" size={16} />
               </span>
             </div>
-            {onViewAll && (
-              <button type="button" className="text-link text-link--button" onClick={onViewAll}>
-                مشاهده همه
-              </button>
-            )}
           </SectionHeading>
         </div>
 
