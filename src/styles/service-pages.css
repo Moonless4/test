@@ -8,6 +8,12 @@
   box-sizing: border-box;
 }
 
+/* Service pages open on the same plain heading band as the projects page, so
+   the heading itself carries no extra band padding below it. */
+.sp-page-head {
+  padding-block-end: 0;
+}
+
 .sp-band-soft {
   background: #fff;
 }
