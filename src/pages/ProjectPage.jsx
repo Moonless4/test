@@ -1,31 +1,18 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import PageSection from '../components/PageSection.jsx';
-import PageHeading from '../components/PageHeading.jsx';
+import Band from '../components/editorial/Band.jsx';
+import WorkCard from '../components/editorial/WorkCard.jsx';
+import SectionHead from '../components/services/SectionHead.jsx';
+import ServiceCta from '../components/services/ServiceCta.jsx';
 import Button from '../components/Button.jsx';
 import Breadcrumbs from '../components/Breadcrumbs.jsx';
 import Lightbox from '../components/Lightbox.jsx';
-import { findProject, projects, projectUrl } from '../content/projects.js';
+import { findProject, projects } from '../content/projects.js';
 import { findProjectDetails } from '../content/project-details.js';
 import { findService } from '../content/services.js';
 import NotFoundPage from './NotFoundPage.jsx';
 
-const HERO_FACTS = ['تعداد طبقات', 'واحدها', 'زیربنا', 'سال شروع'];
-
-function HeroMeta({ details }) {
-  const rows = details.facts.filter(([title]) => HERO_FACTS.includes(title));
-  if (!rows.length) return null;
-  return (
-    <div className="rb-project-meta">
-      {rows.map(([title, value]) => (
-        <div className="rb-project-meta-item" key={title}>
-          <span className="rb-project-meta-title">{title}</span>
-          <span className="rb-project-meta-value">{value}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
+const HERO_FACTS = ['کاربری', 'سال شروع', 'زیربنا', 'تعداد طبقات'];
 
 function Progress({ value }) {
   if (typeof value !== 'number' || value >= 100) return null;
@@ -48,6 +35,8 @@ function Progress({ value }) {
   );
 }
 
+// Project detail: an editorial case study — photographic hero, the concept and
+// challenge, a facts sheet, the gallery and the related work.
 export default function ProjectPage() {
   const { slug } = useParams();
   const [lightbox, setLightbox] = useState(null);
@@ -56,115 +45,133 @@ export default function ProjectPage() {
 
   if (!project) return <NotFoundPage />;
 
-  const relatedProjects = projects.filter((item) => item.slug !== project.slug);
-  const relatedServices = (details?.services || []).map(findService).filter(Boolean);
+  const heroFacts = details ? details.facts.filter(([title]) => HERO_FACTS.includes(title)) : [];
+  const related = projects.filter((item) => item.slug !== project.slug).slice(0, 3);
+  const services = (details?.services || []).map(findService).filter(Boolean);
 
   return (
-    <>
-      <PageSection>
-        <Breadcrumbs
-          items={[
-            { href: '/', label: 'خانه' },
-            { href: '/projects', label: 'پروژه‌ها' },
-            { label: project.title },
-          ]}
-        />
-        <div className="rb-project-hero">
-          <div className="rb-project-media-col">
-            <figure className="rb-project-hero-media">
-              <img src={project.image} alt={project.title} width="900" height="640" />
+    <div className="ed-page">
+      <section className="ed-case-hero">
+        <div className="ed-case-hero-media" aria-hidden="true">
+          <img src={project.image} alt="" width="1920" height="1080" />
+        </div>
+        <div className="ed-case-hero-veil" aria-hidden="true" />
+
+        <div className="ed-case-hero-inner">
+          <Breadcrumbs
+            items={[
+              { href: '/', label: 'خانه' },
+              { href: '/projects', label: 'پروژه‌ها' },
+              { label: project.title },
+            ]}
+          />
+
+          <div className="ed-case-hero-copy">
+            <div className="ed-case-hero-eyebrow">
+              {details?.category ? <span className="sp-eyebrow">{details.category}</span> : null}
               {project.status ? (
-                <span
-                  className="rb-detail-badge rb-project-status"
-                  style={{ background: project.statusColor || 'var(--primary-100)' }}
-                >
+                <span className="ed-case-status" style={{ background: project.statusColor || 'var(--primary-100)' }}>
                   {project.status}
                 </span>
               ) : null}
-            </figure>
-            {details?.gallery?.length ? (
-              <div className="rb-project-thumbs">
-                {details.gallery.map((image, index) => (
-                  <button
-                    type="button"
-                    className="rb-project-thumb"
-                    key={image}
-                    onClick={() => setLightbox(image)}
-                    aria-label={`بزرگ‌نمایش تصویر ${index + 1}`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${project.title} — تصویر ${index + 1}`}
-                      loading="lazy"
-                    />
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
-          <div className="rb-project-hero-body">
-            <span className="rb-project-eyebrow">
-              <i className="luxinaicon luxina-icon-map-pin-2-fill" aria-hidden="true" />
-              {details ? `${details.category} · ${details.location}` : 'پروژهٔ لوکسینا'}
-            </span>
-            <h1 className="rb-project-title">{project.title}</h1>
-            {details?.lead ? <p className="rb-project-lead">{details.lead}</p> : null}
-            {details ? <HeroMeta details={details} /> : null}
-            <div className="rb-detail-actions">
-              <Button href="/consultation" variant="primary">
-                درخواست مشاوره
-              </Button>
-              <Button href="/contact" variant="gray">
-                تماس با ما
-              </Button>
+            </div>
+
+            <h1 className="ed-case-title">{project.title}</h1>
+
+            {details?.lead ? <p className="ed-case-lead">{details.lead}</p> : null}
+
+            <div className="ed-case-actions">
+              <Button href="/consultation">درخواست مشاوره</Button>
+              {details?.location ? (
+                <span className="ed-case-location">
+                  <i className="luxinaicon luxina-icon-map-pin-2-fill" aria-hidden="true" />
+                  {details.location}
+                </span>
+              ) : null}
             </div>
           </div>
+
+          {heroFacts.length ? (
+            <div className="sp-hero-facts">
+              {heroFacts.map(([title, value]) => (
+                <div className="sp-hero-fact" key={title}>
+                  <span className="sp-hero-fact-label">{title}</span>
+                  <span className="sp-hero-fact-value">{value}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
-      </PageSection>
+      </section>
 
       {details ? (
-        <PageSection>
-          <PageHeading title="معرفی پروژه" subtitle="Project overview" icon="luxina-icon-building-line" />
-          <div className="rb-project-overview">
-            <div className="rb-project-main">
+        <Band tone="soft">
+          <div className="ed-case-overview">
+            <div className="ed-prose">
+              <span className="sp-kicker">
+                <span className="sp-kicker-rule" aria-hidden="true" />
+                معرفی پروژه
+              </span>
+              <p className="ed-prose-lead">{details.lead}</p>
               {details.body.map((paragraph) => (
-                <p className="rb-detail-text" key={paragraph.slice(0, 24)}>
-                  {paragraph}
-                </p>
+                <p key={paragraph.slice(0, 24)}>{paragraph}</p>
               ))}
-              <div className="rb-project-highlights-wrap">
-                <span className="rb-project-subtitle">ویژگی‌های شاخص پروژه</span>
-                <ul className="rb-project-highlights">
-                  {details.highlights.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <aside className="rb-project-facts">
-              <span className="rb-project-facts-title">مشخصات پروژه</span>
-              <ul className="rb-project-facts-list">
-                {details.facts.map(([title, value]) => (
-                  <li key={title}>
-                    <span className="rb-project-facts-label">{title}</span>
-                    <span className="rb-project-facts-value">{value}</span>
-                  </li>
+
+              <h2 className="ed-case-subtitle">ویژگی‌های شاخص پروژه</h2>
+              <ul className="ed-prose-list">
+                {details.highlights.map((item) => (
+                  <li key={item}>{item}</li>
                 ))}
               </ul>
+            </div>
+
+            <aside className="ed-article-aside">
+              <span className="ed-article-aside-title">مشخصات پروژه</span>
+              <div className="ed-facts">
+                {details.facts.map(([title, value]) => (
+                  <div className="ed-facts-row" key={title}>
+                    <span className="ed-facts-label">{title}</span>
+                    <span className="ed-facts-value">{value}</span>
+                  </div>
+                ))}
+              </div>
               <Progress value={details.progress} />
               <Button href="/consultation" variant="primary" className="rb-project-facts-button">
                 درخواست بازدید
               </Button>
             </aside>
           </div>
-        </PageSection>
+        </Band>
       ) : null}
 
-      {relatedServices.length ? (
-        <PageSection>
-          <PageHeading title="خدمات مرتبط" subtitle="Related services" icon="luxina-icon-pencil-ruler-2-fill" />
+      {details?.gallery?.length ? (
+        <Band>
+          <SectionHead
+            kicker="گالری پروژه"
+            title="نماها و جزئیات اجرا"
+            text="برای دیدن تصویر در اندازهٔ کامل، روی هر قاب کلیک کنید."
+          />
+          <div className="sp-gallery">
+            {details.gallery.map((image, index) => (
+              <button
+                type="button"
+                className={`sp-gallery-item sp-gallery-item-${index + 1}`}
+                key={image}
+                onClick={() => setLightbox(image)}
+                aria-label={`بزرگ‌نمایش تصویر ${index + 1}`}
+              >
+                <img src={image} alt={`${project.title} — تصویر ${index + 1}`} loading="lazy" />
+              </button>
+            ))}
+          </div>
+        </Band>
+      ) : null}
+
+      {services.length ? (
+        <Band tone="soft">
+          <SectionHead kicker="خدمات این پروژه" title="مسیر اجرای پروژه" />
           <div className="rb-project-services">
-            {relatedServices.map((service) => (
+            {services.map((service) => (
               <a className="rb-service-chip" href={`/services/${service.slug}`} key={service.slug}>
                 <i className={`luxinaicon ${service.icon}`} aria-hidden="true" />
                 <span className="rb-service-chip-body">
@@ -175,44 +182,40 @@ export default function ProjectPage() {
               </a>
             ))}
           </div>
-        </PageSection>
+        </Band>
       ) : null}
 
-      {relatedProjects.length ? (
-        <PageSection>
-          <PageHeading title="پروژه‌های دیگر" subtitle="More projects" icon="luxina-icon-building-line" />
-          <div className="rb-related">
-            {relatedProjects.map((item) => (
-              <a className="rb-related-card" href={projectUrl(item)} key={item.slug}>
-                <img src={item.image} alt={item.title} loading="lazy" />
-                <span className="rb-related-card-body">
-                  <span className="rb-related-card-title">{item.title}</span>
-                  {item.status ? <span className="rb-related-card-cat">{item.status}</span> : null}
-                </span>
-              </a>
-            ))}
-          </div>
-        </PageSection>
-      ) : null}
-
-      <PageSection>
-        <div className="rb-project-cta">
-          <div className="rb-project-cta-text">
-            <span className="rb-project-cta-title">پروژهٔ مشابهی در ذهن دارید؟</span>
-            <p>تیم لوکسینا از مرحلهٔ ایده و طراحی تا تحویل کلید همراه شماست.</p>
-          </div>
-          <div className="rb-detail-actions">
-            <Button href="/consultation" variant="tertiary">
-              درخواست مشاوره
-            </Button>
-            <Button href="/projects" variant="gray">
-              همه پروژه‌ها
-            </Button>
-          </div>
+      <Band>
+        <div className="ed-related-head">
+          <SectionHead kicker="پروژه‌های مرتبط" title="کارهای دیگر لوکسینا" />
+          <a className="ed-more-link" href="/projects">
+            همهٔ پروژه‌ها
+            <i className="luxinaicon luxina-icon-arrow-left-line" aria-hidden="true" />
+          </a>
         </div>
-      </PageSection>
+        <div className="ed-portfolio ed-portfolio--pair">
+          {related.map((item, index) => (
+            <WorkCard
+              key={item.slug}
+              project={item}
+              details={findProjectDetails(item.slug)}
+              index={index}
+              size="third"
+              reveal={false}
+            />
+          ))}
+        </div>
+      </Band>
+
+      <Band>
+        <ServiceCta
+          image={project.image}
+          title="پروژه‌ای در همین مقیاس در ذهن دارید؟"
+          text="تیم لوکسینا از بررسی زمین و امکان‌سنجی تا تحویل کلید همراه شماست. قدم اول یک جلسهٔ مشاورهٔ کوتاه است."
+        />
+      </Band>
 
       <Lightbox src={lightbox} onClose={() => setLightbox(null)} />
-    </>
+    </div>
   );
 }

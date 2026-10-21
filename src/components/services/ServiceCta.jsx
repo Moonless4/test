@@ -53,7 +53,7 @@ export default function ServiceCta({ image, title = 'برای پروژه خود 
           <span className="sp-cta-contact-value">{SERVICE_CONTACT.address}</span>
         </li>
         <li>
-          <i className="luxinaicon luxina-icon-time-line" aria-hidden="true" />
+          <i className="luxinaicon luxina-icon-guide-fill" aria-hidden="true" />
           <span className="sp-cta-contact-label">ساعات پاسخ</span>
           <span className="sp-cta-contact-value">{SERVICE_CONTACT.hours}</span>
         </li>

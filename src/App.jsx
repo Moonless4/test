@@ -6,6 +6,8 @@ import AppRoutes from './routes.jsx';
 import { applyLayoutVars } from './lib/applyLayoutVars.js';
 import { initForms } from './lib/forms.js';
 import { initSliders } from './lib/initSliders.js';
+import { initReveals } from './lib/reveal.js';
+import { syncHeaderActive } from './lib/header.js';
 
 function isInternalLink(anchor) {
   if (!anchor || anchor.target === '_blank' || anchor.hasAttribute('download')) return false;
@@ -20,6 +22,7 @@ function RouteReady({ pathname }) {
     applyLayoutVars(document);
     initSliders(document);
     initForms(document);
+    initReveals(document);
   }, [pathname]);
 
   return null;
@@ -31,6 +34,7 @@ function Site() {
 
   useEffect(() => {
     document.body.classList.toggle('home', pathname === '/');
+    syncHeaderActive(pathname);
     window.scrollTo(0, 0);
   }, [pathname]);
 

@@ -1,37 +1,27 @@
-import PageHeading from '../PageHeading.jsx';
+import SectionHead from '../services/SectionHead.jsx';
+import ProcessRail from '../services/ProcessRail.jsx';
 
-// The five-step project timeline band.
+// The five stages every Luxina project goes through, on the shared process rail.
 const STEPS = [
-  ['مشـــاوره', 'اولــــــــــیه'],
-  ['طراحـــــــی', 'مفهومی'],
-  ['بـــــــــــرآورد', 'هزینه ها'],
-  ['شـــــروع', 'عملیات اجرایی'],
-  ['تــکــمـیل و', 'تــحــویل پروژه'],
+  { no: '۰۱', title: 'مشاورهٔ اولیه', text: 'شناخت نیاز، بازدید از زمین و تعریف محدودهٔ پروژه.' },
+  { no: '۰۲', title: 'طراحی مفهومی', text: 'پلان‌های اولیه، حجم‌شناسی و بررسی گزینه‌های طراحی.' },
+  { no: '۰۳', title: 'برآورد هزینه‌ها', text: 'برآورد شفاف متریال، نیروی کار و برنامهٔ زمانی اجرا.' },
+  { no: '۰۴', title: 'شروع عملیات اجرایی', text: 'آماده‌سازی کارگاه، اجرای سازه و کنترل کیفیت مرحله‌ای.' },
+  { no: '۰۵', title: 'تکمیل و تحویل', text: 'نازک‌کاری، تحویل کلید و پشتیبانی پس از بهره‌برداری.' },
 ];
 
 export default function TimelineSection() {
   return (
-    <section className="hp-section hp-timeline">
+    <section className="hp-band hp-band--sand">
       <div className="hp-inner">
-        <PageHeading title="تایم لاین پــروژه" subtitle="Project timeline" icon="luxina-iconguide-fill" />
-
-        <div className="luxina_timeline_container" style={{ '--timeline-count': STEPS.length }}>
-          <div className="luxina_timeline_inner">
-            {STEPS.map(([lead, rest], index) => (
-              <div
-                className="luxina_timeline_item"
-                key={lead}
-                style={{ backgroundImage: `url(/img/timeline-image${index + 1}.png)` }}
-              >
-                <span className="luxina_timeline_item_title">{lead}</span>
-                <span className="luxina_timeline_item_title">{rest}</span>
-                {index < STEPS.length - 1 ? (
-                  <i className="luxina_timeline_item_icon luxina-icon-arrow-left-line" aria-hidden="true" />
-                ) : null}
-              </div>
-            ))}
-          </div>
+        <div className="hp-band-head">
+          <SectionHead
+            kicker="تایم‌لاین پروژه"
+            title="مسیری که هر پروژه طی می‌کند"
+            text="پنج مرحلهٔ روشن؛ هر مرحله خروجی مشخصی دارد و تا تأیید کارفرما مرحلهٔ بعد آغاز نمی‌شود."
+          />
         </div>
+        <ProcessRail steps={STEPS} />
       </div>
     </section>
   );

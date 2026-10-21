@@ -1,10 +1,15 @@
 import { useParams } from 'react-router-dom';
-import PageSection from '../components/PageSection.jsx';
-import PageHeading from '../components/PageHeading.jsx';
-import Button from '../components/Button.jsx';
+import PageHero from '../components/editorial/PageHero.jsx';
+import Band from '../components/editorial/Band.jsx';
+import SectionHead from '../components/services/SectionHead.jsx';
+import FeatureList from '../components/services/FeatureList.jsx';
+import RelatedServices from '../components/services/RelatedServices.jsx';
+import ServiceCta from '../components/services/ServiceCta.jsx';
 import { findService } from '../content/services.js';
 import NotFoundPage from './NotFoundPage.jsx';
 
+// Secondary service page (/services/construction and siblings): a compact
+// editorial layout that still matches the four flagship service pages.
 export default function ServicePage() {
   const { slug } = useParams();
   const service = findService(slug);
@@ -12,29 +17,63 @@ export default function ServicePage() {
   if (!service) return <NotFoundPage />;
 
   return (
-    <PageSection>
-      <PageHeading title={service.title} subtitle={service.subtitle} icon={service.icon} />
-      <div className="rb-service">
-        <p className="rb-service-intro">{service.intro}</p>
-        <ul className="rb-service-list">
-          {service.points.map((point) => (
-            <li key={point}>{point}</li>
-          ))}
-        </ul>
-        {service.body.map((paragraph) => (
-          <p className="rb-detail-text" key={paragraph.slice(0, 24)}>
-            {paragraph}
-          </p>
-        ))}
-        <div className="rb-detail-actions">
-          <Button href="/consultation" variant="primary">
-            درخواست مشاوره
-          </Button>
-          <Button href="/contact" variant="gray">
-            تماس با ما
-          </Button>
+    <div className="ed-page">
+      <PageHero
+        image="/img/services/lux-hero.jpg"
+        eyebrow={`خدمات لوکسینا · ${service.subtitle}`}
+        icon={service.icon}
+        title={service.title}
+        lead={service.intro}
+        breadcrumbs={[{ href: '/', label: 'خانه' }, { href: '/services', label: 'خدمات' }, { label: service.title }]}
+        size="compact"
+        actions={[
+          { label: 'درخواست مشاوره', href: '/consultation' },
+          { label: 'همهٔ خدمات', href: '/services' },
+        ]}
+      />
+
+      <Band tone="soft">
+        <div className="ed-split">
+          <div className="ed-split-body">
+            <span className="sp-kicker">
+              <span className="sp-kicker-rule" aria-hidden="true" />
+              دربارهٔ این خدمت
+            </span>
+            <h2 className="ed-split-title">{service.title}</h2>
+            {service.body.map((paragraph) => (
+              <p className="ed-split-text" key={paragraph.slice(0, 24)}>
+                {paragraph}
+              </p>
+            ))}
+          </div>
+          <div className="ed-split-media">
+            <figure className="ed-split-figure">
+              <img src="/img/services/interior-hero.jpg" alt={service.title} loading="lazy" width="900" height="1120" />
+            </figure>
+          </div>
         </div>
-      </div>
-    </PageSection>
+      </Band>
+
+      <Band>
+        <SectionHead kicker="آنچه دریافت می‌کنید" title="خروجی این خدمت" />
+        <FeatureList
+          items={service.points.map((point, index) => ({
+            no: String(index + 1).padStart(2, '۰'),
+            title: point,
+            text: '',
+          }))}
+          columns={1}
+        />
+      </Band>
+
+      <Band tone="soft">
+        <SectionHead kicker="خدمات مرتبط" title="ادامهٔ مسیر با لوکسینا" />
+        <RelatedServices slug="interior-design" />
+      </Band>
+
+      <Band>
+        <ServiceCta image="/img/services/plans-hero.jpg" text={service.intro} />
+      </Band>
+    </div>
   );
 }

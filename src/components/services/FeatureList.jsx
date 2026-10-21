@@ -13,7 +13,7 @@ export default function FeatureList({ items, columns = 2 }) {
           ) : null}
           <div className="sp-feature-body">
             <h3 className="sp-feature-title">{item.title}</h3>
-            <p className="sp-feature-text">{item.text}</p>
+            {item.text ? <p className="sp-feature-text">{item.text}</p> : null}
           </div>
         </article>
       ))}
