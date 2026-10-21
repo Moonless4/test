@@ -261,12 +261,10 @@ main > section[id] {
   text-align: center;
 }
 
-.section-heading--center .section-heading__title-row {
-  align-items: center;
-}
-
-.section-heading--center p {
-  margin-inline: auto;
+.section-heading__symbol {
+  display: inline-flex;
+  color: var(--gold);
+  margin-bottom: 2px;
 }
 
 .section-heading__copy {

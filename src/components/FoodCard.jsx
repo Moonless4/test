@@ -4,7 +4,7 @@ import { formatPrice } from './ProductCard.jsx';
 export default function FoodCard({ product, onAdd, onOpen }) {
   return (
     <article className="food-card">
-      <div className="food-card__top">
+      <div className="food-card__media">
         <button
           type="button"
           className="food-card__thumb"
@@ -13,49 +13,40 @@ export default function FoodCard({ product, onAdd, onOpen }) {
         >
           <img src={product.image} alt={product.name} loading="lazy" />
         </button>
-
-        <div className="food-card__info">
-          <h3>
-            <button type="button" onClick={() => onOpen(product)}>
-              {product.name}
-            </button>
-          </h3>
-          <p>{product.description}</p>
-        </div>
+        {product.discount > 0 && (
+          <span className="food-card__badge">
+            {product.discount.toLocaleString('fa-IR')}٪
+          </span>
+        )}
       </div>
 
-      <div className="food-card__foot">
+      <div className="food-card__info">
+        <h3>
+          <button type="button" onClick={() => onOpen(product)}>
+            {product.name}
+          </button>
+        </h3>
+        <span className="food-card__chef">
+          <Icon name="cart" size={13} />
+          پیشنهاد سرآشپز
+        </span>
         <div className="food-card__price">
-          {(product.oldPrice || product.discount > 0) && (
-            <span className="food-card__meta">
-              {product.oldPrice && <del>{formatPrice(product.oldPrice)}</del>}
-              {product.discount > 0 && (
-                <span className="food-card__off">
-                  {product.discount.toLocaleString('fa-IR')}٪
-                </span>
-              )}
-            </span>
-          )}
+          {product.oldPrice && <del>{formatPrice(product.oldPrice)}</del>}
           <span className="food-card__now">
             {formatPrice(product.price)}
             <small>تومان</small>
           </span>
         </div>
-
-        <span className="food-card__chef">
-          <Icon name="chef" size={15} />
-          پیشنهاد سرآشپز
-        </span>
-
-        <button
-          type="button"
-          className="food-card__add"
-          onClick={() => onAdd(product)}
-          aria-label={`افزودن ${product.name} به سبد`}
-        >
-          <Icon name="cart" size={18} />
-        </button>
       </div>
+
+      <button
+        type="button"
+        className="food-card__add"
+        onClick={() => onAdd(product)}
+        aria-label={`افزودن ${product.name} به سبد`}
+      >
+        <Icon name="cart" size={19} />
+      </button>
     </article>
   );
 }

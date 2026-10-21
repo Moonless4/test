@@ -1,6 +1,8 @@
+import Icon from './Icons.jsx';
+
 export default function SectionHeading({
   eyebrow,
-  lead,
+  icon,
   title,
   highlight,
   script,
@@ -13,6 +15,11 @@ export default function SectionHeading({
   return (
     <div className={`section-heading section-heading--${align}`}>
       <div className="section-heading__copy">
+        {icon && (
+          <span className="section-heading__symbol" aria-hidden="true">
+            <Icon name={icon} size={26} />
+          </span>
+        )}
         {eyebrow && (
           <span className="section-heading__eyebrow">
             <img src="/assets/title-symbol.webp" alt="" aria-hidden="true" />
@@ -21,7 +28,6 @@ export default function SectionHeading({
         )}
         <div className="section-heading__title-row">
           <h2>
-            {lead && <span className="title-highlight">{lead} </span>}
             {title}
             {highlight && (
               <>
