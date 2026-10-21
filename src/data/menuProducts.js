@@ -476,7 +476,7 @@ export const menuProducts = [
     price: 105000,
     oldPrice: 125000,
     discount: 16,
-    image: '/assets/products/onion-rings.jpg',
+    image: '/assets/products/onion-rings.webp',
     weight: '۲۰۰ گرم',
     featured: false,
     badge: '',
