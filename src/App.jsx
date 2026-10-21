@@ -6,6 +6,7 @@ import AppRoutes from './routes.jsx';
 import { applyLayoutVars } from './lib/applyLayoutVars.js';
 import { initForms } from './lib/forms.js';
 import { initSliders } from './lib/initSliders.js';
+import { resetSmoothScroll } from './lib/smoothScroll.js';
 
 function isInternalLink(anchor) {
   if (!anchor || anchor.target === '_blank' || anchor.hasAttribute('download')) return false;
@@ -31,7 +32,7 @@ function Site() {
 
   useEffect(() => {
     document.body.classList.toggle('home', pathname === '/');
-    window.scrollTo(0, 0);
+    resetSmoothScroll();
   }, [pathname]);
 
   useEffect(() => {

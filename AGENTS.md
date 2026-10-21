@@ -66,3 +66,13 @@ up -d --build`), not a host `npm install`.
 - `public/img/` holds the downloaded media. The reference markup points some
   assets at theme-relative paths (`/luxina/wp-content/...`); rewrite those to
   the `/img/...` equivalent.
+- `src/lib/smoothScroll.js` (initialised in `main.jsx`) gives pointer devices
+  inertial scrolling: wheel, PageUp/PageDown/Home/End and `#anchor` clicks ease
+  `window.scrollY` towards an accumulated target once per frame. It scrolls the
+  real window, so sticky header, reveal observers and carousels are untouched.
+  Two gotchas: the theme ships `html { scroll-behavior: smooth }`, which restarts
+  the browser's own animation on every write, so the module switches `html` to
+  `auto` while active and restores it for touch/reduced-motion; and any wheel
+  inside a vertically scrollable child (or a horizontal carousel gesture) must
+  stay native — that guard lives in `onWheel`. Route changes call
+  `resetSmoothScroll()` from `App.jsx` instead of `window.scrollTo(0, 0)`.
