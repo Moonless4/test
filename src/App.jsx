@@ -1,34 +1,50 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Header from './components/Header.jsx';
 import MobileMenu from './components/MobileMenu.jsx';
-import Hero from './components/Hero.jsx';
-import Categories from './components/Categories.jsx';
-import FeaturedProducts from './components/FeaturedProducts.jsx';
-import PromoBanners from './components/PromoBanners.jsx';
-import BenefitsSection from './components/BenefitsSection.jsx';
-import Stats from './components/Stats.jsx';
-import AboutSection from './components/AboutSection.jsx';
-import ProductGrid from './components/ProductGrid.jsx';
-import LatestFood from './components/LatestFood.jsx';
-import OrderSection from './components/OrderSection.jsx';
-import ContactSection from './components/ContactSection.jsx';
-import FAQ from './components/FAQ.jsx';
-import Testimonials from './components/Testimonials.jsx';
-import BlogSection from './components/BlogSection.jsx';
-import FinalCta from './components/FinalCta.jsx';
 import Footer from './components/Footer.jsx';
 import ScrollTop from './components/ScrollTop.jsx';
 import SearchOverlay from './components/SearchOverlay.jsx';
 import CartDrawer from './components/CartDrawer.jsx';
-import ProductModal from './components/ProductModal.jsx';
 import CheckoutModal from './components/CheckoutModal.jsx';
 import ReservationModal from './components/ReservationModal.jsx';
 import AuthModal from './components/AuthModal.jsx';
-import ArticleModal from './components/ArticleModal.jsx';
 import Toast from './components/Toast.jsx';
-import { products } from './data/content.js';
+import HomePage from './pages/HomePage.jsx';
+import MenuPage from './pages/MenuPage.jsx';
+import BlogPage from './pages/BlogPage.jsx';
+import BlogPostPage from './pages/BlogPostPage.jsx';
+import ProductPage from './pages/ProductPage.jsx';
+import AboutPage from './pages/AboutPage.jsx';
+import ContactPage from './pages/ContactPage.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
+import { useRouter } from './router.jsx';
+import { posts, products } from './data/content.js';
 
 const STORAGE_KEY = 'naval-cart-v1';
+
+const matchRoute = (path) => {
+  if (path === '/') return { name: 'home' };
+  if (path === '/menu') return { name: 'menu' };
+  if (path === '/blog') return { name: 'blog' };
+  if (path === '/about') return { name: 'about' };
+  if (path === '/contact') return { name: 'contact' };
+
+  const postMatch = path.match(/^\/blog\/([\w-]+)$/);
+  if (postMatch) {
+    return posts.some((post) => post.id === postMatch[1])
+      ? { name: 'post', id: postMatch[1] }
+      : { name: 'notfound' };
+  }
+
+  const productMatch = path.match(/^\/food\/([\w-]+)$/);
+  if (productMatch) {
+    return products.some((product) => product.id === productMatch[1])
+      ? { name: 'product', id: productMatch[1] }
+      : { name: 'notfound' };
+  }
+
+  return { name: 'notfound' };
+};
 
 const readCart = () => {
   try {
@@ -46,6 +62,7 @@ const findProduct = (value) =>
   typeof value === 'string' ? products.find((product) => product.id === value) : value;
 
 export default function App() {
+  const { path, navigate } = useRouter();
   const [cart, setCart] = useState(readCart);
   const [filter, setFilter] = useState('all');
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -54,8 +71,6 @@ export default function App() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [reserveOpen, setReserveOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
-  const [product, setProduct] = useState(null);
-  const [post, setPost] = useState(null);
   const [toast, setToast] = useState('');
   const toastTimer = useRef(null);
 
@@ -103,86 +118,85 @@ export default function App() {
 
   const updateQty = useCallback((id, qty) => {
     setCart((prev) =>
-      qty <= 0 ? prev.filter((item) => item.id !== id) : prev.map((item) => (item.id === id ? { ...item, qty } : item))
+      qty <= 0 ? prev.filter((item) => item.id !== id) : prev.map((entry) => (entry.id === id ? { ...entry, qty } : entry))
     );
   }, []);
 
-  const removeItem = useCallback((id) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
-    showToast('محصول از سبد خرید حذف شد.');
-  }, [showToast]);
-
-  const scrollTo = useCallback((id) => {
-    const node = document.getElementById(id);
-    if (node) {
-      node.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, []);
-
-  const openProduct = useCallback((value) => {
-    const found = findProduct(value);
-    if (found) setProduct(found);
-  }, []);
-
-  const openMenu = useCallback(() => {
-    setCartOpen(false);
-    scrollTo('menu');
-  }, [scrollTo]);
-
-  const handleCategory = useCallback(
-    (categoryId) => {
-      setFilter(categoryId);
-      scrollTo('menu');
-    },
-    [scrollTo]
-  );
-
-  const onPromoProduct = useCallback(
+  const removeItem = useCallback(
     (id) => {
-      openProduct(id);
+      setCart((prev) => prev.filter((item) => item.id !== id));
+      showToast('محصول از سبد خرید حذف شد.');
     },
-    [openProduct]
+    [showToast]
   );
+
+  const goMenu = useCallback(
+    (categoryId) => {
+      setFilter(categoryId || 'all');
+      navigate('/menu');
+    },
+    [navigate]
+  );
+
+  const openProduct = useCallback(
+    (value) => {
+      const found = findProduct(value);
+      if (found) navigate(`/food/${found.id}`);
+    },
+    [navigate]
+  );
+
+  const openPost = useCallback((post) => navigate(`/blog/${post.id}`), [navigate]);
+
+  const goHome = useCallback(() => navigate('/'), [navigate]);
+  const goBlog = useCallback(() => navigate('/blog'), [navigate]);
+  const openReserve = useCallback(() => setReserveOpen(true), []);
+
+  const route = matchRoute(path);
+
+  const page = (() => {
+    switch (route.name) {
+      case 'menu':
+        return <MenuPage filter={filter} onFilter={setFilter} onAdd={addToCart} onOpen={openProduct} />;
+      case 'blog':
+        return <BlogPage onOpenPost={openPost} />;
+      case 'post':
+        return <BlogPostPage id={route.id} onMenu={goMenu} onBlog={goBlog} />;
+      case 'product':
+        return <ProductPage id={route.id} onAdd={addToCart} onOpen={openProduct} onMenu={goMenu} />;
+      case 'about':
+        return <AboutPage onMenu={goMenu} onReserve={openReserve} />;
+      case 'contact':
+        return <ContactPage onToast={showToast} />;
+      case 'home':
+        return (
+          <HomePage
+            onAdd={addToCart}
+            onProduct={openProduct}
+            onPost={openPost}
+            onReserve={openReserve}
+            onCategory={goMenu}
+            onMenu={goMenu}
+            onBlog={goBlog}
+          />
+        );
+      default:
+        return <NotFoundPage />;
+    }
+  })();
 
   return (
     <div className="app">
       <Header
         cartCount={cartCount}
-        onCart={() => setCartOpen(true)}
         onSearch={() => setSearchOpen(true)}
         onLogin={() => setAuthOpen(true)}
         onMenu={() => setMobileOpen(true)}
-        onCategory={handleCategory}
+        onCart={() => setCartOpen(true)}
+        onCategory={goMenu}
       />
 
-      <main>
-        <Hero products={products.filter((item) => item.featured)} onProduct={openProduct} onReserve={() => setReserveOpen(true)} />
-        <Categories onCategory={handleCategory} />
-        <FeaturedProducts
-          products={products.filter((item) => item.featured)}
-          onAdd={addToCart}
-          onOpen={openProduct}
-          onViewAll={openMenu}
-        />
-        <PromoBanners onMenu={openMenu} onProduct={onPromoProduct} onReserve={() => setReserveOpen(true)} />
-        <BenefitsSection />
-        <Stats />
-        <AboutSection onMenu={openMenu} onReserve={() => setReserveOpen(true)} />
-        <ProductGrid
-          filter={filter}
-          onFilter={setFilter}
-          onAdd={addToCart}
-          onOpen={openProduct}
-          onViewAll={() => setFilter('all')}
-        />
-        <LatestFood products={products} onOpen={openProduct} onAdd={addToCart} />
-        <OrderSection onMenu={openMenu} />
-        <FAQ />
-        <ContactSection onToast={showToast} />
-        <Testimonials />
-        <BlogSection onOpenPost={setPost} />
-        <FinalCta onReserve={() => setReserveOpen(true)} onMenu={openMenu} />
-      </main>
+      <main>{page}</main>
 
       <Footer onToast={showToast} />
       <ScrollTop />
@@ -194,14 +208,14 @@ export default function App() {
           setMobileOpen(false);
           setAuthOpen(true);
         }}
-        onCategory={handleCategory}
+        onCategory={goMenu}
       />
 
       <SearchOverlay
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
         onOpenProduct={openProduct}
-        onOpenPost={setPost}
+        onOpenPost={openPost}
       />
 
       <CartDrawer
@@ -216,11 +230,9 @@ export default function App() {
         }}
         onBrowse={() => {
           setCartOpen(false);
-          openMenu();
+          goMenu();
         }}
       />
-
-      <ProductModal product={product} onClose={() => setProduct(null)} onAdd={addToCart} />
 
       <CheckoutModal
         open={checkoutOpen}
@@ -235,8 +247,6 @@ export default function App() {
       <ReservationModal open={reserveOpen} onClose={() => setReserveOpen(false)} />
 
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onToast={showToast} />
-
-      <ArticleModal post={post} onClose={() => setPost(null)} onMenu={openMenu} />
 
       <Toast message={toast} />
     </div>

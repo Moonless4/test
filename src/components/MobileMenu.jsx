@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { categories, navLinks } from '../data/content.js';
 import Icon from './Icons.jsx';
 import { BrandMark } from './Header.jsx';
+import { Link } from '../router.jsx';
 
 export default function MobileMenu({ open, onClose, onLogin, onCategory }) {
   useEffect(() => {
@@ -30,10 +31,10 @@ export default function MobileMenu({ open, onClose, onLogin, onCategory }) {
 
         <nav className="mobile-menu__nav" aria-label="ناوبری موبایل">
           {navLinks.map((link) => (
-            <a key={link.id} href={link.href} onClick={onClose}>
+            <Link key={link.id} to={link.href} onClick={onClose}>
               <span>{link.label}</span>
               <Icon name="chevronLeft" size={18} />
-            </a>
+            </Link>
           ))}
         </nav>
 

@@ -1,12 +1,8 @@
-import { useState } from 'react';
 import { posts } from '../data/content.js';
 import SectionHeading from './SectionHeading.jsx';
 import Icon from './Icons.jsx';
 
-export default function BlogSection({ onOpenPost }) {
-  const [expanded, setExpanded] = useState(false);
-  const visible = expanded ? posts : posts.slice(0, 4);
-
+export default function BlogSection({ items = posts.slice(0, 4), onOpenPost, onViewAll }) {
   return (
     <section className="blog section" id="blog" aria-labelledby="blog-title">
       <div className="container">
@@ -18,20 +14,17 @@ export default function BlogSection({ onOpenPost }) {
             script="From our kitchen"
             text="دستورهای آشپزی، نکات تغذیه و داستان‌هایی از پشت صحنه رستوران."
           >
-            <button
-              type="button"
-              className="text-link text-link--button"
-              onClick={() => setExpanded((value) => !value)}
-              aria-expanded={expanded}
-            >
-              {expanded ? 'نمایش کمتر' : 'مشاهده همه مقالات'}
-              <Icon name={expanded ? 'chevronRight' : 'chevronLeft'} size={16} />
-            </button>
+            {onViewAll && (
+              <button type="button" className="text-link text-link--button" onClick={onViewAll}>
+                مشاهده همه مقالات
+                <Icon name="chevronLeft" size={16} />
+              </button>
+            )}
           </SectionHeading>
         </div>
 
         <div className="blog-grid">
-          {visible.map((post) => (
+          {items.map((post) => (
             <article className="blog-card" key={post.id}>
               <button
                 type="button"

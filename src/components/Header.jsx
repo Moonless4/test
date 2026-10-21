@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { categories, navLinks } from '../data/content.js';
 import Icon from './Icons.jsx';
+import { Link, useRouter } from '../router.jsx';
 
 function BrandMark({ variant = 'header' }) {
   return (
@@ -20,6 +21,7 @@ function BrandMark({ variant = 'header' }) {
 }
 
 export default function Header({ cartCount, onCart, onSearch, onLogin, onMenu, onCategory }) {
+  const { path } = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
   const closeTimer = useRef(null);
@@ -52,16 +54,16 @@ export default function Header({ cartCount, onCart, onSearch, onLogin, onMenu, o
                   onMouseEnter={openMega}
                   onMouseLeave={closeMega}
                 >
-                  <a
-                    className={`nav-link ${megaOpen ? 'is-open' : ''}`}
-                    href={link.href}
+                  <Link
+                    className={`nav-link ${megaOpen ? 'is-open' : ''} ${path === link.href ? 'is-active' : ''}`}
+                    to={link.href}
                     onClick={() => setMegaOpen(false)}
                     aria-expanded={megaOpen}
                   >
                     {link.id === 'home' && <Icon name="home" size={15} />}
                     {link.label}
                     <Icon name="chevronLeft" size={14} className="nav-link__caret" />
-                  </a>
+                  </Link>
                   <div className={`mega ${megaOpen ? 'is-open' : ''}`} aria-hidden={!megaOpen}>
                     <div className="mega__cols">
                       <div className="mega__list">
@@ -83,8 +85,8 @@ export default function Header({ cartCount, onCart, onSearch, onLogin, onMenu, o
                           ))}
                         </div>
                       </div>
-                      <a
-                        href="#menu"
+                      <Link
+                        to="/menu"
                         className="mega__promo"
                         onClick={() => setMegaOpen(false)}
                       >
@@ -97,22 +99,26 @@ export default function Header({ cartCount, onCart, onSearch, onLogin, onMenu, o
                             <Icon name="chevronLeft" size={15} />
                           </span>
                         </span>
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 </div>
               ) : (
-                <a className="nav-link" key={link.id} href={link.href}>
+                <Link
+                  className={`nav-link ${path === link.href ? 'is-active' : ''}`}
+                  key={link.id}
+                  to={link.href}
+                >
                   {link.id === 'home' && <Icon name="home" size={15} />}
                   {link.label}
-                </a>
+                </Link>
               )
             )}
           </nav>
 
-          <a className="header__brand" href="#home" aria-label="صفحه اصلی رستوران نوال">
+          <Link className="header__brand" to="/" aria-label="صفحه اصلی رستوران نوال">
             <BrandMark />
-          </a>
+          </Link>
 
           <div className="header__actions">
             <button type="button" className="icon-btn menu-btn" onClick={onMenu} aria-label="منوی موبایل">

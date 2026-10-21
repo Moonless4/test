@@ -1,9 +1,9 @@
 export const navLinks = [
-  { id: 'home', label: 'خانه', href: '#home' },
-  { id: 'menu', label: 'منو', href: '#menu', hasMega: true },
-  { id: 'about', label: 'درباره ما', href: '#about' },
-  { id: 'contact', label: 'تماس با ما', href: '#contact' },
-  { id: 'blog', label: 'وبلاگ', href: '#blog' },
+  { id: 'home', label: 'خانه', href: '/' },
+  { id: 'menu', label: 'منو', href: '/menu', hasMega: true },
+  { id: 'about', label: 'درباره ما', href: '/about' },
+  { id: 'contact', label: 'تماس با ما', href: '/contact' },
+  { id: 'blog', label: 'وبلاگ', href: '/blog' },
 ];
 
 export const categories = [
