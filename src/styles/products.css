@@ -16,17 +16,18 @@
 .specials-band {
   position: relative;
   margin: 14px 0 0;
-  padding: 26px 0 20px;
+  padding-bottom: 56px;
 }
 
 .specials-band::before {
   content: '';
   position: absolute;
-  top: 58px;
-  bottom: 54px;
-  inset-inline: 27%;
+  top: calc(50% - 28px);
+  bottom: 0;
+  left: 0;
+  right: 0;
   border-radius: 26px;
-  background: #b31b2a;
+  background: #b31b2a url('/assets/featured-bg.png') center / 100% 100% no-repeat;
 }
 
 .specials-band .product-track {
@@ -572,13 +573,11 @@
   }
 
   .specials-band {
-    padding: 20px 0 16px;
+    padding-bottom: 40px;
   }
 
   .specials-band::before {
-    top: 46px;
-    bottom: 44px;
-    inset-inline: 13%;
+    top: calc(50% - 20px);
   }
 
   .specials-band .product-track__item {
