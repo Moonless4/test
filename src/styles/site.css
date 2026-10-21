@@ -100,12 +100,141 @@ body:not(.home) .rb-section:first-of-type {
 
 /* ---- Forms ------------------------------------------------------------ */
 
+/* The request form is a white card: every field is its own rounded box with an
+   icon, and the submit sits in a footer row. Styles are scoped to the contact
+   form wrapper so the auth form (`page .rb-auth`) keeps its own look. */
 .luxina_contact_form-wrap {
   max-width: 720px;
 }
 
-.rb-form-submit {
-  margin-top: 6px;
+.rb-request-form {
+  width: 100%;
+  max-width: none;
+}
+
+.rb-request-form .rb-form {
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px;
+  border-radius: 24px;
+  background: #fff;
+  border: 1px solid var(--tertiary-100-05);
+  box-shadow: 0 32px 64px -48px var(--text-main-30);
+}
+
+.rb-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.rb-field {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 58px;
+  padding-inline: 20px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: var(--body);
+  transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.rb-field:focus-within {
+  background: #fff;
+  border-color: var(--primary-100);
+}
+
+.rb-field:has(.rb-invalid) {
+  border-color: #d9534f;
+}
+
+.rb-field-icon {
+  flex: none;
+  font-size: 1.15rem;
+  color: var(--text-main-30);
+  transition: color 0.2s ease-in-out;
+}
+
+.rb-field:focus-within .rb-field-icon {
+  color: var(--primary-100);
+}
+
+.rb-request-form .rb-field .form-control {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  box-shadow: none;
+}
+
+.rb-request-form .rb-field .form-control::placeholder {
+  color: var(--text-main-50);
+}
+
+.rb-field-area {
+  align-items: flex-start;
+  padding-block: 17px;
+}
+
+.rb-field-area .rb-field-icon {
+  margin-top: 2px;
+}
+
+.rb-request-form .rb-field textarea.form-control {
+  height: auto;
+  min-height: 92px;
+  padding: 0;
+  line-height: 1.9;
+  resize: vertical;
+}
+
+.rb-field .rb-field-error {
+  flex: 0 0 100%;
+  margin: 0 0 10px;
+}
+
+.rb-form-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-top: 8px;
+}
+
+.rb-request-form .rb-form-submit {
+  gap: 8px;
+  min-width: 240px;
+  justify-content: center;
+}
+
+.rb-request-form .rb-form-note {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .rb-request-form .rb-form {
+    padding: 24px;
+  }
+
+  .rb-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rb-request-form .rb-form-submit {
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 .rb-form-note {
