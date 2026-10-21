@@ -16,12 +16,12 @@
 
 import Lenis from 'lenis';
 
-// Physics. `lerp` is the share of the remaining distance the page covers per
-// frame: lower = heavier. Lenis defaults to 0.1; 0.08 gives the wheel input a
-// weighted, slightly delayed catch-up that still settles in well under a
-// second, which is the "expensive studio site" feel without lag.
-const LERP = 0.08;
-const WHEEL_MULTIPLIER = 1;
+// Physics, matched to the reference studio site (pethemes.com): Lenis with its
+// default `lerp: 0.1` and a 1.25 wheel multiplier, so every wheel notch travels
+// a quarter further and catches up slightly quicker than a heavier 0.08 while
+// keeping the soft, weighted settle.
+const LERP = 0.1;
+const WHEEL_MULTIPLIER = 1.25;
 
 // Programmatic moves (anchors, keyboard) get a fixed-length glide so they read
 // as one deliberate motion rather than a decaying flick.
