@@ -156,6 +156,25 @@
   height: 0;
 }
 
+/* The handle and the panel inside that block are absolutely positioned, so a
+   collapsed (zero height) wrap kept painting them inside the card once the
+   pointer left. Clipping the wrap while the card is at rest hides the whole
+   block; on hover the wrap gets its full height and paints normally. */
+.hp-services .luxina_services_item:not(:hover) .luxina_services_item-subtitle-wrap {
+  overflow: hidden;
+}
+
+/* The reference theme leans on a page-wide border-box reset the captured
+   stylesheets do not ship. Without it the title block (height:100% plus its own
+   padding and border) grows past the fixed tile height, so the card's icon and
+   title were pushed under the tile's bottom edge and only a cut-off line of text
+   stayed visible. */
+.hp-services .luxina_services_item,
+.hp-services .luxina_services_item-title-wrap,
+.hp-services .luxina_services_item-subtitle-wrap {
+  box-sizing: border-box;
+}
+
 /* ---- Section head (projects / blog) ----------------------------------- */
 
 .hp-section-head {
