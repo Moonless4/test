@@ -32,8 +32,8 @@
 
 .specials-band .product-track {
   position: relative;
-  margin: 0;
-  padding: 0;
+  margin: 0 4%;
+  padding: 8px 0 22px;
 }
 
 .specials-band .product-track__item {
