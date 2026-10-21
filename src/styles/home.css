@@ -395,9 +395,11 @@
   margin-bottom: 24px;
 }
 
-/* The glass panel behind the FAQ column. */
+/* The glass panel behind the FAQ column. It is decorative, so it has to stay
+   under the heading and the questions instead of blurring them out. */
 .hp-faq .luxina-faq-bg {
   position: absolute;
+  z-index: -1;
   top: -62px;
   inset-inline-start: -100px;
   width: 352px;
