@@ -11,7 +11,7 @@ export const drinkProducts = [
     price: 68000,
     oldPrice: null,
     discount: 0,
-    image: '/assets/drink-lemonade.jpg',
+    image: '/assets/products/mint-lemonade.webp',
     weight: '۳۵۰ میلی‌لیتر',
   },
   {
@@ -25,7 +25,7 @@ export const drinkProducts = [
     price: 75000,
     oldPrice: null,
     discount: 0,
-    image: '/assets/drink-orange-juice.jpg',
+    image: '/assets/products/fresh-orange-juice.webp',
     weight: '۳۰۰ میلی‌لیتر',
   },
   {
@@ -39,7 +39,7 @@ export const drinkProducts = [
     price: 72000,
     oldPrice: null,
     discount: 0,
-    image: '/assets/drink-iced-tea.jpg',
+    image: '/assets/products/iced-peach-tea.webp',
     weight: '۳۵۰ میلی‌لیتر',
   },
   {
@@ -53,7 +53,7 @@ export const drinkProducts = [
     price: 95000,
     oldPrice: null,
     discount: 0,
-    image: '/assets/drink-latte.jpg',
+    image: '/assets/products/naval-latte.webp',
     weight: '۳۰۰ میلی‌لیتر',
   },
 ];
