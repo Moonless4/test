@@ -16,10 +16,14 @@ export default function FeaturedProducts({ products, onAdd, onOpen, onViewAll })
   return (
     <section className="featured section" id="specials" aria-labelledby="specials-title">
       <div className="container">
-        <div className="section-heading-wrap title-accent" id="specials-title">
+        <div className="section-heading-wrap title-accent specials-heading" id="specials-title">
           <SectionHeading
             eyebrow="پیشنهاد ویژه"
-            title="منوی محبوب امروز"
+            title={
+              <>
+                منوی <span className="title-highlight">محبوب امروز</span>
+              </>
+            }
             script="Today’s Special"
             text="تازه‌ترین و محبوب‌ترین طعم‌های نوال، انتخاب‌شده توسط سرآشپز."
           >
