@@ -704,28 +704,11 @@
   gap: 30px;
   padding: 56px 52px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, #33000f 0%, var(--wine) 52%, #1d0007 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #fffaf0 0%, var(--cream-soft) 55%, #f7ead5 100%);
+  border: 1px solid rgba(203, 2, 54, 0.07);
+  color: var(--ink);
   overflow: hidden;
   isolation: isolate;
-}
-
-.order__bg {
-  position: absolute;
-  inset: auto 0 0;
-  width: 100%;
-  opacity: 0.5;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.order__dots {
-  position: absolute;
-  top: 26px;
-  left: 26px;
-  width: 58px;
-  opacity: 0.4;
-  z-index: 0;
 }
 
 .order__copy {
@@ -736,16 +719,16 @@
 .order__copy h2 {
   font-size: clamp(27px, 3vw, 38px);
   line-height: 1.5;
-  color: #fff;
+  color: var(--ink);
 }
 
 .order__copy h2 em {
   font-style: normal;
-  color: var(--gold);
+  color: var(--primary);
 }
 
 .order__copy > p {
-  color: rgba(255, 255, 255, 0.66);
+  color: var(--muted);
   font-size: 14px;
   line-height: 2;
   margin-top: 10px;
@@ -769,8 +752,9 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  border: 1px solid rgba(253, 202, 1, 0.45);
-  color: var(--gold);
+  border: 1px solid rgba(203, 2, 54, 0.22);
+  background: #fff;
+  color: var(--primary);
   display: grid;
   place-items: center;
   font-size: 12px;
@@ -778,14 +762,14 @@
 }
 
 .order-step h3 {
-  color: #fff;
+  color: var(--ink);
   font-size: 14.5px;
   font-weight: 700;
   line-height: 1.6;
 }
 
 .order-step p {
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--muted);
   font-size: 12px;
   line-height: 1.85;
   margin-top: 2px;
@@ -803,7 +787,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: var(--gold);
+  color: var(--primary);
 }
 
 .order__phone span {
@@ -813,7 +797,7 @@
 }
 
 .order__phone small {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--muted);
   font-size: 10px;
 }
 
@@ -839,8 +823,8 @@
   width: 360px;
   height: 360px;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 40%, rgba(253, 202, 1, 0.22), rgba(253, 202, 1, 0.04) 55%, transparent 70%);
-  border: 1px solid rgba(253, 202, 1, 0.15);
+  background: radial-gradient(circle at 50% 40%, rgba(203, 2, 54, 0.09), rgba(203, 2, 54, 0.03) 55%, transparent 70%);
+  border: 1px solid rgba(203, 2, 54, 0.1);
 }
 
 .order__visual > img {
@@ -848,7 +832,7 @@
   z-index: 2;
   width: 100%;
   max-width: 340px;
-  filter: drop-shadow(0 30px 30px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 24px 30px rgba(36, 0, 10, 0.16));
 }
 
 .order__badge {

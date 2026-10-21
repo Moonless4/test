@@ -6,11 +6,8 @@ export default function OrderSection({ onMenu }) {
     <section className="order section" aria-labelledby="order-title">
       <div className="container">
         <div className="order__panel">
-          <img className="order__bg" src="/assets/middle-promo-bg.png" alt="" aria-hidden="true" />
-          <img className="order__dots" src="/assets/yellow-dots.png" alt="" aria-hidden="true" />
-
           <div className="order__copy">
-            <span className="section-heading__eyebrow section-heading__eyebrow--light">
+            <span className="section-heading__eyebrow">
               <img src="/assets/title-symbol.webp" alt="" aria-hidden="true" />
               سفارش آسان
             </span>
