@@ -1,4 +1,5 @@
 import { menuProducts } from './menuProducts.js';
+import { blogExtraPosts } from './blogPosts.js';
 
 export const navLinks = [
   { id: 'home', label: 'خانه', href: '/' },
@@ -460,6 +461,7 @@ export const posts = [
       'بعد از غذا، چای یا دمنوش گرم بهترین انتخاب است. در نوال می‌توانید انواع دمنوش‌های گیاهی و چای سنتی را همراه با دسر سفارش دهید.',
     ],
   },
+  ...blogExtraPosts,
 ];
 
 export const footerColumns = [
