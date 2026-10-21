@@ -56,7 +56,9 @@ export default function ProjectPage() {
 
   if (!project) return <NotFoundPage />;
 
-  const relatedProjects = projects.filter((item) => item.slug !== project.slug);
+  const relatedProjects = projects
+    .filter((item) => item.slug !== project.slug)
+    .slice(0, 3);
   const relatedServices = (details?.services || []).map(findService).filter(Boolean);
 
   return (

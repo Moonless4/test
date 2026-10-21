@@ -1,4 +1,5 @@
 import Button from '../Button.jsx';
+import { featuredProject, projectUrl } from '../../content/projects.js';
 
 // Homepage hero: a dark, full-bleed band with the featured project on the right
 // and the building render standing on its lower edge. The second image is the
@@ -13,7 +14,7 @@ export default function HeroSection() {
             <p className="hp-hero-badge">انبوه سازی</p>
           </div>
 
-          <h2 className="hp-hero-title">برج پارس جردن</h2>
+          <h2 className="hp-hero-title">{featuredProject.title}</h2>
 
           <div className="hp-hero-author">
             <img src="/img/image.png" width="47" height="48" decoding="async" alt="" />
@@ -21,9 +22,9 @@ export default function HeroSection() {
             <p className="hp-hero-author-role">معمار و مجری</p>
           </div>
 
-          <p className="hp-hero-text">۲۵ طبقه اداری و تجاری در جردن؛ ۱۷٬۰۰۰ متر زیربنا، از فونداسیون تا تحویل کلید.</p>
+          <p className="hp-hero-text">{featuredProject.heroText}</p>
 
-          <Button href="/project/pars-jordan">مشاهدهٔ پروژه</Button>
+          <Button href={projectUrl(featuredProject)}>مشاهدهٔ پروژه</Button>
         </div>
       </div>
 
