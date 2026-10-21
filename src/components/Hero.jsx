@@ -96,7 +96,7 @@ export default function Hero({ products, onProduct, onReserve }) {
                   >
                     <span className="dish__shadow" aria-hidden="true" />
                     <img src={product.image} alt={product.name} loading={index > 1 ? 'lazy' : 'eager'} />
-                    {abs === 0 && product.discount > 0 && (
+                    {product.discount > 0 && (
                       <span className="hero__discount" aria-hidden="true">
                         <b>{product.discount.toLocaleString('fa-IR')}٪</b>
                         <small>تخفیف</small>
