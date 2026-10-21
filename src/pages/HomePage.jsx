@@ -4,6 +4,7 @@ import FeaturedProducts from '../components/FeaturedProducts.jsx';
 import PromoBanners from '../components/PromoBanners.jsx';
 import BenefitsSection from '../components/BenefitsSection.jsx';
 import LatestFood from '../components/LatestFood.jsx';
+import DeliveryBanner from '../components/DeliveryBanner.jsx';
 import BlogSection from '../components/BlogSection.jsx';
 import FinalCta from '../components/FinalCta.jsx';
 import { products, heroSlides } from '../data/content.js';
@@ -19,6 +20,7 @@ export default function HomePage({ onAdd, onProduct, onPost, onReserve, onCatego
       <PromoBanners onMenu={onMenu} onProduct={onProduct} onReserve={onReserve} />
       <BenefitsSection />
       <LatestFood products={products} onOpen={onProduct} onAdd={onAdd} onViewAll={onMenu} />
+      <DeliveryBanner onMenu={onMenu} />
       <BlogSection onOpenPost={onPost} onViewAll={onBlog} />
       <FinalCta onReserve={onReserve} onMenu={onMenu} />
     </>
