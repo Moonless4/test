@@ -1,0 +1,17 @@
+import PageSection from '../components/PageSection.jsx';
+import PageHeading from '../components/PageHeading.jsx';
+import RequestForm from '../components/RequestForm.jsx';
+
+export default function ConsultationPage() {
+  return (
+    <PageSection>
+      <PageHeading title="درخواست مشاوره" subtitle="Consultation request" icon="luxina-icon-customer-service-2-line" />
+      <RequestForm
+        type="consultation"
+        messagePlaceholder="درباره پروژه‌تان بنویسید"
+        submit="ثبت درخواست"
+        note="درخواست مشاورهٔ شما ثبت شد؛ برای هماهنگی جلسه تماس می‌گیریم."
+      />
+    </PageSection>
+  );
+}

@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
-import headerHtml from './content/header.html?raw';
-import footerHtml from './content/footer.html?raw';
-import { getContent } from './pages/pages.js';
+import Header from './components/Header.jsx';
+import Footer from './components/Footer.jsx';
+import AppRoutes from './routes.jsx';
 import { applyLayoutVars } from './lib/applyLayoutVars.js';
-import { initInteractions } from './lib/initInteractions.js';
+import { initForms } from './lib/forms.js';
 import { initSliders } from './lib/initSliders.js';
 
 function isInternalLink(anchor) {
@@ -13,25 +13,24 @@ function isInternalLink(anchor) {
   return Boolean(href) && href.startsWith('/') && !href.startsWith('//');
 }
 
+// Runs after the routed page is in the DOM (it is rendered inside the same
+// Suspense boundary), and re-runs for each route change.
+function RouteReady({ pathname }) {
+  useEffect(() => {
+    applyLayoutVars(document);
+    initSliders(document);
+    initForms(document);
+  }, [pathname]);
+
+  return null;
+}
+
 function Site() {
-  const { pathname, search } = useLocation();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  // Every rule of elementor-post-837.css is scoped under `.elementor-837`, the
-  // wrapper Elementor prints around the page content.
-  const html =
-    headerHtml +
-    '<div class="elementor elementor-837" data-elementor-id="837" data-elementor-type="wp-page">' +
-    getContent(pathname, search) +
-    '</div>' +
-    footerHtml;
-
   useEffect(() => {
-    const root = document.getElementById('root');
     document.body.classList.toggle('home', pathname === '/');
-    applyLayoutVars(root);
-    initInteractions(root);
-    initSliders(root);
     window.scrollTo(0, 0);
   }, [pathname]);
 
@@ -44,6 +43,8 @@ function Site() {
       if (!isInternalLink(anchor)) return;
       event.preventDefault();
       document.querySelector('#mobile-menu-container')?.classList.remove('open');
+      document.querySelector('#mobile-menu-overlay')?.style.setProperty('display', 'none');
+      document.body.classList.remove('disable-scrolling');
       navigate(anchor.getAttribute('href'));
     };
 
@@ -51,7 +52,18 @@ function Site() {
     return () => document.removeEventListener('click', onClick);
   }, [navigate]);
 
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  return (
+    <div id="container">
+      <Header />
+      <div id="page-body">
+        <Suspense fallback={<div className="rb-loading" aria-hidden="true" />}>
+          <AppRoutes />
+          <RouteReady pathname={pathname} />
+        </Suspense>
+      </div>
+      <Footer />
+    </div>
+  );
 }
 
 export default function App() {

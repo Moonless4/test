@@ -1,0 +1,37 @@
+// Route table. Every page is its own module, so the initial load only ships the
+// page the visitor asked for.
+import { lazy } from 'react';
+import { Routes, Route } from 'react-router-dom';
+
+const HomePage = lazy(() => import('./pages/HomePage.jsx'));
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage.jsx'));
+const ProjectPage = lazy(() => import('./pages/ProjectPage.jsx'));
+const BlogPage = lazy(() => import('./pages/BlogPage.jsx'));
+const ArticlePage = lazy(() => import('./pages/ArticlePage.jsx'));
+const ServicePage = lazy(() => import('./pages/ServicePage.jsx'));
+const AboutPage = lazy(() => import('./pages/AboutPage.jsx'));
+const ContactPage = lazy(() => import('./pages/ContactPage.jsx'));
+const ConsultationPage = lazy(() => import('./pages/ConsultationPage.jsx'));
+const CooperationPage = lazy(() => import('./pages/CooperationPage.jsx'));
+const LoginPage = lazy(() => import('./pages/LoginPage.jsx'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'));
+
+export default function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/projects" element={<ProjectsPage />} />
+      <Route path="/project/:slug" element={<ProjectPage />} />
+      <Route path="/blog" element={<BlogPage />} />
+      <Route path="/blog/:slug" element={<ArticlePage />} />
+      <Route path="/services/:slug" element={<ServicePage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/consultation" element={<ConsultationPage />} />
+      <Route path="/cooperation" element={<CooperationPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/404" element={<NotFoundPage />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}

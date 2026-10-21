@@ -15,39 +15,49 @@ up -d --build`), not a host `npm install`.
 
 - `index.html` loads the theme's original stylesheets by absolute path from
   `public/assets/...` (fonts, Swiper, Bootstrap grid, Elementor CSS). Those
-  files are self-hosted copies; do not re-link the reference site.
-- `src/content/` holds markup captured from the reference page: `header.html`,
-  `footer.html` and `home.js` (an array of section HTML strings). Content for
-  routes that the reference page did not expose as markup lives in
-  `articles.js` (blog posts), `services.js` (footer service pages) and
-  `projects.js` (the homepage-hero project, which is not in the projects grid).
-- `src/pages/pages.js` maps every route to markup. Listing pages reuse the
-  captured homepage sections, so section lookups go by widget name / data-id
-  (`sectionWith`, `sectionById`, both in `src/pages/blocks.js`) — never by array
-  index, which shifts whenever a section is removed. `blocks.js` holds the
-  shared widget builders (`heading`, `section`).
-- Project detail pages live in `src/pages/projectPage.js`: title/image/status
-  come from the captured projects grid, while overview, facts, gallery and
-  related services come from `src/content/project-details.js`, keyed by the
-  project slug used in the card link. The gallery lightbox is wired in
-  `src/lib/initInteractions.js`.
-- There is no backend: form validation and the login/signup session live in
-  `src/lib/initInteractions.js` and `src/lib/account.js` (localStorage only), so
-  submissions and accounts exist per browser and are not persisted server-side.
-- `src/App.jsx` concatenates header + sections + footer into one
-  `dangerouslySetInnerHTML` fragment on purpose. The header tag opens
-  `#container` and `#page-body`, and the section/footer markup closes them, so
-  splitting the pieces into separately-rendered components breaks the original
-  DOM nesting. Keep them in one fragment, or re-balance the wrappers first.
-- `public/img/` holds the downloaded media. The reference markup points some
-  assets at theme-relative paths (`/luxina/wp-content/...`); rewrite those to
-  the `/img/...` equivalent.
+  files are self-hosted copies; do not re-link the reference site. They are
+  needed by the captured header, footer and homepage only — rebuilt pages never
+  reference Elementor classes.
+- `src/App.jsx` is the layout shell: `#container` → captured header → 
+  `#page-body` with the routed page → captured footer. `Header`/`Footer`
+  (`src/components/`) render `src/content/*.html` inside a slot with
+  `display: contents`, because the theme positions `#page-body` with
+  `#header-container + #page-body` and `body.sticky-header #header-container + *`.
+  `styles/site.css` restores that fixed-header offset for the slot.
+- `src/routes.jsx` is the route table. Every page module in `src/pages/` is
+  `React.lazy`-loaded, so the homepage markup only ships on `/`. A route with no
+  match renders `NotFoundPage`.
+- `src/pages/*.jsx` are real components built from `src/components/`
+  (`PageSection`, `PageHeading`, `Button`, `RequestForm`, `PostCard`,
+  `ProjectCard`, `Breadcrumbs`, `Faq`, `TeamBand`, `Lightbox`). Shared page
+  styles live in `src/styles/site.css`, imported from `src/main.jsx`; it
+  replaces the old `public/assets/css/rebuild.css`.
+- `HomePage.jsx` is the only page that renders captured markup
+  (`src/content/home.js`, an array of section HTML strings) inside the
+  `.elementor.elementor-837` wrapper that `elementor-post-837.css` is scoped to.
+  Keep it that way: it is the reference page itself.
+- Content lives in `src/content/`: `projects.js` (project cards + `findProject`),
+  `project-details.js` (overview, facts, gallery, related services keyed by the
+  project slug), `articles.js` (blog posts), `services.js` (footer service
+  pages). No markup is parsed out of captured sections anymore.
+- Behaviour lives in `src/lib/`: `header.js` (sticky header, mobile drawer,
+  sub-menus, account — bound once from `Header`), `forms.js` (validation bound
+  per route change, keeps the `.rb-form` / `data-rb-form` / `.rb-form-note`
+  contract), `initSliders.js` + `applyLayoutVars.js` (theme `data-settings`
+  grids and horizontal tracks), `account.js` (localStorage session). There is no
+  backend: submissions and accounts exist per browser only.
 
 ## Gotchas
 
 - Vite only accepts the preview hostname because `vite.config.js` appends
   `.${BASE44_SANDBOX_HOST_DOMAIN}` to `allowedHosts` when
   `BASE44_PREVIEW_MODE === "1"`; unset keeps Vite's default behavior.
-- The reference page's own theme JS (Swiper init, sticky header, dropdowns,
-  mobile drawer) is not wired up yet, so slider rows can overflow their
-  container horizontally.
+- `RouteReady` in `App.jsx` re-runs `applyLayoutVars`, `initSliders` and
+  `initForms` after every route render. It must stay inside the `Suspense`
+  boundary next to `AppRoutes`, otherwise lazy pages mount after those helpers
+  already ran and their grids/forms stay dead.
+- Header markup is captured HTML: edit account/menu behaviour in
+  `src/lib/header.js` and `src/lib/account.js`, not in JSX.
+- `public/img/` holds the downloaded media. The reference markup points some
+  assets at theme-relative paths (`/luxina/wp-content/...`); rewrite those to
+  the `/img/...` equivalent.
