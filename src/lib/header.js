@@ -12,33 +12,6 @@ function setDrawer(drawer, overlay, open) {
   document.body.classList.toggle('disable-scrolling', open);
 }
 
-// The captured markup marks "خانه" as the current item. The route decides the
-// real active entry, so every menu (desktop + mobile drawer) is re-marked on
-// each navigation.
-export function syncHeaderActive(pathname) {
-  const path = pathname.replace(/\/+$/, '') || '/';
-  document
-    .querySelectorAll('#header_inner .menu > li, .luxina-mobile-menu-wrap .menu > li')
-    .forEach((item) => {
-      const link = item.querySelector(':scope > a[href]');
-      const href = link?.getAttribute('href');
-      const active =
-        Boolean(href) &&
-        href.startsWith('/') &&
-        (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
-
-      item.classList.toggle('current-menu-item', active);
-      item.classList.toggle('current_page_item', active);
-      if (active) {
-        link.setAttribute('aria-current', 'page');
-        const parent = item.parentElement?.closest('li');
-        if (parent) parent.classList.add('current-menu-parent', 'current-menu-ancestor');
-      } else {
-        link.removeAttribute('aria-current');
-      }
-    });
-}
-
 export function initHeader(root) {
   if (!root) return;
   applyAccount(root);

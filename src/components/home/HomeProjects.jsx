@@ -1,45 +1,21 @@
-import SectionHead from '../services/SectionHead.jsx';
-import WorkCard from '../editorial/WorkCard.jsx';
+import PageHeading from '../PageHeading.jsx';
+import Button from '../Button.jsx';
+import ProjectsGrid from '../ProjectsGrid.jsx';
 import { projects } from '../../content/projects.js';
-import { findProjectDetails } from '../../content/project-details.js';
 
-// Selected work: one full-width flagship project, then the rest of the
-// portfolio as a compact editorial grid.
+// Homepage projects band: a heading row with the "all projects" button above a
+// three-card slider.
 export default function HomeProjects() {
-  const [featured, ...rest] = projects;
-
   return (
-    <section className="hp-band hp-band--paper">
+    <section className="hp-section hp-projects">
       <div className="hp-inner">
-        <div className="hp-band-head">
-          <SectionHead
-            kicker="پروژه‌های منتخب"
-            title="کارهایی که ایستاده‌اند"
-            text="هر پروژه یک مسئلهٔ متفاوت داشت؛ از زمین محدود جردن تا نمای شهری سعادت‌آباد."
-          />
-          <a className="ed-more-link hp-band-more" href="/projects">
-            همهٔ پروژه‌ها
-            <i className="luxinaicon luxina-icon-arrow-left-line" aria-hidden="true" />
-          </a>
+        <div className="hp-section-head">
+          <PageHeading title="پـروژه هـــــا" subtitle="Projects" icon="luxina-iconpencil-ruler-2-fill" />
+          <Button href="/projects" variant="gray">
+            همه پروژه ها
+          </Button>
         </div>
-
-        <div className="ed-portfolio hp-portfolio">
-          <WorkCard
-            project={featured}
-            details={findProjectDetails(featured.slug)}
-            index={0}
-            size="full"
-          />
-          {rest.slice(0, 3).map((project, index) => (
-            <WorkCard
-              key={project.slug}
-              project={project}
-              details={findProjectDetails(project.slug)}
-              index={index + 1}
-              size="third"
-            />
-          ))}
-        </div>
+        <ProjectsGrid projects={projects.filter((project) => project.slug !== 'pars-jordan')} arrows />
       </div>
     </section>
   );

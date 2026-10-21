@@ -13,7 +13,7 @@ import '../styles/home.css';
 // reference page, in the same order.
 export default function HomePage() {
   return (
-    <div className="hp-home ed-page">
+    <div className="hp-home">
       <HeroSection />
       <ServicesSection />
       <HomeProjects />

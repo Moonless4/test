@@ -1,32 +1,21 @@
-import SectionHead from '../services/SectionHead.jsx';
-import Button from '../Button.jsx';
+import PageHeading from '../PageHeading.jsx';
 import FaqList from '../FaqList.jsx';
 
-// FAQ band: photograph on one side, the accordion and the contact route on the
-// other.
+// Homepage FAQ band: photo beside the accordion, with the reference page's
+// faint glass panel behind the questions.
 export default function HomeFaq() {
   return (
-    <section className="hp-band hp-band--sand" id="faq">
+    <section className="hp-section hp-faq">
       <div className="hp-inner">
-        <div className="ed-split hp-faq-split">
-          <div className="ed-split-body">
-            <SectionHead
-              kicker="سوالات متداول"
-              title="پیش از شروع، این‌ها را بدانید"
-              text="اگر پاسخ سوال‌تان اینجا نبود، در یک تماس کوتاه روشن‌ترش می‌کنیم."
-            />
-            <div className="hp-faq-accordion">
-              <FaqList />
-            </div>
-            <Button href="/contact" variant="gray">
-              پرسش دیگری دارید؟
-            </Button>
+        <div className="hp-faq-grid">
+          <div className="hp-faq-media">
+            <img src="/img/faq-img.png" width="295" height="381" loading="lazy" decoding="async" alt="" />
           </div>
 
-          <div className="ed-split-media">
-            <figure className="ed-split-figure hp-faq-figure">
-              <img src="/img/faq-img.png" alt="" width="295" height="381" loading="lazy" />
-            </figure>
+          <div className="hp-faq-body">
+            <span className="luxina-faq-bg" aria-hidden="true" />
+            <PageHeading title="سوالات متداول" subtitle="Most asked question" icon="luxina-iconquestionnaire-fill" />
+            <FaqList />
           </div>
         </div>
       </div>

@@ -8,7 +8,6 @@ const ProjectsPage = lazy(() => import('./pages/ProjectsPage.jsx'));
 const ProjectPage = lazy(() => import('./pages/ProjectPage.jsx'));
 const BlogPage = lazy(() => import('./pages/BlogPage.jsx'));
 const ArticlePage = lazy(() => import('./pages/ArticlePage.jsx'));
-const ServicesPage = lazy(() => import('./pages/ServicesPage.jsx'));
 const ServicePage = lazy(() => import('./pages/ServicePage.jsx'));
 const InteriorDesignPage = lazy(() => import('./pages/services/InteriorDesignPage.jsx'));
 const OldHouseRenovationPage = lazy(() => import('./pages/services/OldHouseRenovationPage.jsx'));
@@ -33,7 +32,6 @@ export default function AppRoutes() {
       <Route path="/services/old-house-renovation" element={<OldHouseRenovationPage />} />
       <Route path="/services/luxury-construction" element={<LuxuryConstructionPage />} />
       <Route path="/services/architecture-plans" element={<ArchitecturePlansPage />} />
-      <Route path="/services" element={<ServicesPage />} />
       <Route path="/services/:slug" element={<ServicePage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/contact" element={<ContactPage />} />
