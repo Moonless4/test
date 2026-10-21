@@ -756,7 +756,7 @@
     linear-gradient(180deg, rgba(26, 0, 7, 0.97) 0%, #1a0007 100%),
     url('/assets/footer-bg.png') center bottom / cover no-repeat;
   color: #fff;
-  padding: 0 0 24px;
+  padding: 42px 0 24px;
   overflow: hidden;
 }
 
@@ -768,7 +768,6 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 22px;
-  margin-top: -42px;
   padding: 24px 30px;
   border-radius: 26px;
   background: linear-gradient(120deg, #d10a3e 0%, var(--primary) 55%, #a2002c 100%);
@@ -1270,7 +1269,6 @@
   }
 
   .newsletter {
-    margin-top: -30px;
     border-radius: 22px;
     padding: 20px 16px;
   }
