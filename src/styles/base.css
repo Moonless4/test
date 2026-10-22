@@ -590,6 +590,20 @@ select {
 .category-track {
   cursor: grab;
   overscroll-behavior-x: contain;
+  /* حرکت افقی با کشیدن مدیریت می‌شود، اسکرول عمودی صفحه آزاد می‌ماند */
+  touch-action: pan-y;
+}
+
+.acct-tabs img,
+.account-nav img,
+.menu-filters img,
+.product-track img,
+.category-track img,
+.acct-tabs svg,
+.product-track svg,
+.category-track svg {
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .acct-tabs.is-dragging,
