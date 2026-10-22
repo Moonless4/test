@@ -573,8 +573,14 @@
     display: inline-grid;
   }
 
+  /* Menu + search stay on the right, cart + account move to the far left */
   .header__actions {
+    width: 100%;
     gap: 8px;
+  }
+
+  .cart-btn {
+    margin-inline-start: auto;
   }
 
   .header__bar {
@@ -627,14 +633,8 @@
     width: 13px;
   }
 
-  /* Menu + search stay on the right, cart + account move to the far left */
   .header__actions {
-    width: 100%;
     gap: 6px;
-  }
-
-  .cart-btn {
-    margin-inline-start: auto;
   }
 
   .icon-btn {
