@@ -581,3 +581,24 @@ select {
     font-size: 13.5px;
   }
 }
+
+/* ردیف‌های افقی (کاروسل‌ها): با کشیدن ماوس هم حرکت می‌کنند؛ حالت لمسی خودکار است */
+.acct-tabs,
+.account-nav,
+.menu-filters,
+.product-track,
+.category-track {
+  cursor: grab;
+  overscroll-behavior-x: contain;
+}
+
+.acct-tabs.is-dragging,
+.account-nav.is-dragging,
+.menu-filters.is-dragging,
+.product-track.is-dragging,
+.category-track.is-dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+  user-select: none;
+}

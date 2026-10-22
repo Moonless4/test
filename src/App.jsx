@@ -31,6 +31,7 @@ import AccountRewards from './account/pages/RewardsPage.jsx';
 import AccountSettings from './account/pages/SettingsPage.jsx';
 import { AccountProvider } from './account/AccountContext.jsx';
 import { useRouter } from './router.jsx';
+import useDragScroll from './hooks/useDragScroll.js';
 import { posts, products } from './data/content.js';
 
 const STORAGE_KEY = 'naval-cart-v1';
@@ -85,6 +86,7 @@ const findProduct = (value) =>
 
 export default function App() {
   const { path, navigate } = useRouter();
+  useDragScroll();
   const [cart, setCart] = useState(readCart);
   const [filter, setFilter] = useState('all');
   const [mobileOpen, setMobileOpen] = useState(false);
