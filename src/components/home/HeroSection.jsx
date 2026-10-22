@@ -10,8 +10,8 @@ export default function HeroSection() {
       <div className="hp-hero-inner">
         <div className="hp-hero-copy">
           <div className="hp-hero-badges">
-            <p className="hp-hero-badge">ساخت و ساز</p>
-            <p className="hp-hero-badge">انبوه سازی</p>
+            <p className="hp-hero-badge">پروژهٔ شاخص</p>
+            <p className="hp-hero-badge">مسکونی</p>
           </div>
 
           <h2 className="hp-hero-title">{featuredProject.title}</h2>
