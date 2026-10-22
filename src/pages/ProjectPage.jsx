@@ -107,7 +107,7 @@ export default function ProjectPage() {
           <div className="rb-project-hero-body">
             <span className="rb-project-eyebrow">
               <i className="luxinaicon luxina-icon-map-pin-2-fill" aria-hidden="true" />
-              {details ? `${details.category} · ${details.location}` : 'پروژهٔ لوکسینا'}
+              {details ? `${details.category} · ${details.location}` : 'پروژهٔ آراتان'}
             </span>
             <h1 className="rb-project-title">{project.title}</h1>
             {details?.lead ? <p className="rb-project-lead">{details.lead}</p> : null}

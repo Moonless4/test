@@ -50,7 +50,7 @@ export const relatedServiceLinks = (slug) => SERVICE_LINKS.filter((item) => item
 export const interiorDesign = {
   slug: 'interior-design',
   title: 'طراحی داخلی و دکوراسیون',
-  eyebrow: 'خدمات لوکسینا · طراحی داخلی',
+  eyebrow: 'خدمات آراتان · طراحی داخلی',
   lead: 'طراحی داخلی از سبک زندگی ساکنان شروع می‌شود؛ چیدمان، متریال و نور در یک روایت منسجم کنار هم می‌نشینند.',
   image: '/img/services/interior-hero.jpg',
   facts: [
@@ -59,7 +59,7 @@ export const interiorDesign = {
     { label: 'نوع قرارداد', value: 'طراحی یا کلید در دست' },
   ],
   intro: {
-    kicker: 'نگاه لوکسینا',
+    kicker: 'نگاه آراتان',
     title: 'فضایی که دقیقاً شبیه شماست',
     paragraphs: [
       'هیچ دو خانه‌ای شبیه هم نیست. پیش از هر خطی روی کاغذ، مسیر حرکت روزانه، نور هر اتاق و وسایلی که باید بمانند را می‌بینیم.',
@@ -134,7 +134,7 @@ export const interiorDesign = {
 export const oldHouseRenovation = {
   slug: 'old-house-renovation',
   title: 'بازسازی خانه‌های قدیمی',
-  eyebrow: 'خدمات لوکسینا · بازسازی و مرمت',
+  eyebrow: 'خدمات آراتان · بازسازی و مرمت',
   lead: 'خانه‌های قدیمی حافظهٔ شهر هستند؛ سازه را تقویت می‌کنیم، هویت را نگه می‌داریم و تأسیسات را به استاندارد امروز می‌رسانیم.',
   image: '/img/services/reno-hero.jpg',
   facts: [
@@ -228,7 +228,7 @@ export const oldHouseRenovation = {
 export const luxuryConstruction = {
   slug: 'luxury-construction',
   title: 'ساخت و اجرای پروژه‌های لوکس',
-  eyebrow: 'خدمات لوکسینا · ساخت و اجرا',
+  eyebrow: 'خدمات آراتان · ساخت و اجرا',
   lead: 'از اولین اسکیس تا تحویل کلید: طراحی، مهندسی سازه، انتخاب متریال و اجرا در یک فرایند یکپارچه با کنترل کیفیت مستقل.',
   image: '/img/services/lux-hero.jpg',
   facts: [
@@ -348,7 +348,7 @@ export const luxuryConstruction = {
 export const architecturePlans = {
   slug: 'architecture-plans',
   title: 'طراحی نقشه و پروتوتایپ',
-  eyebrow: 'خدمات لوکسینا · طراحی معماری',
+  eyebrow: 'خدمات آراتان · طراحی معماری',
   lead: 'نقشهٔ درست، پایهٔ هر پروژه است؛ از تحلیل سایت و پلان‌ها تا نقشه‌های اجرایی، مدل سه‌بعدی و پروتوتایپ، در یک بستهٔ فنی منسجم.',
   image: '/img/services/plans-hero.jpg',
   facts: [
@@ -378,7 +378,7 @@ export const architecturePlans = {
     { no: '۰۸', title: 'پروتوتایپ ارائه', text: 'ماکت، برد ارائه و تور مجازی برای تصمیم نهایی.' },
   ],
   viewer: {
-    kicker: 'ابزار ارائهٔ لوکسینا',
+    kicker: 'ابزار ارائهٔ آراتان',
     title: 'پلان را از چهار نگاه ببینید',
     text: 'روی هر فضا کلیک کنید تا برنامهٔ عملکردی، متراژ و جزئیات آن را ببینید.',
     views: [

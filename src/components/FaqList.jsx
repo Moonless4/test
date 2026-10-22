@@ -4,7 +4,7 @@ import { useState } from 'react';
 // script the reference page used. The theme's classes still do the styling.
 export const FAQ_ITEMS = [
   {
-    question: 'لوکسینا چه پروژه‌هایی را می‌پذیرد؟',
+    question: 'آراتان چه پروژه‌هایی را می‌پذیرد؟',
     answer:
       'از طراحی داخلی یک آپارتمان تا ساخت ویلای لوکس، بازسازی خانهٔ قدیمی و تدوین نقشه‌های اجرایی. مقیاس پروژه تعیین‌کننده نیست؛ سطح دقت در اجرا تعیین‌کننده است.',
   },

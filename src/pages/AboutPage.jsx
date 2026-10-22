@@ -17,8 +17,8 @@ export default function AboutPage() {
         <PageHeading title="درباره ما" subtitle="About us" icon="luxina-icon-building-line" />
         <div className="rb-about">
           <p className="rb-service-intro">
-            لوکسینا یک استودیوی طراحی و اجراست؛ در طراحی داخلی، طراحی نقشه، بازسازی خانه‌های قدیمی و ساخت پروژه‌های
-            لوکس.
+            آراتان یک استودیوی معماری و طراحی داخلی است؛ در طراحی داخلی، طراحی نقشه، بازسازی خانه‌های قدیمی و ساخت
+            پروژه‌های مسکونی و تجاری.
           </p>
           <p className="rb-detail-text">
             کار از شناخت سبک زندگی کارفرما شروع می‌شود و با برنامهٔ شفاف، انتخاب متریال و نظارت مستمر تا تحویل کلید

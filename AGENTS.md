@@ -62,11 +62,20 @@ up -d --build`), not a host `npm install`.
   already ran and their grids/forms stay dead.
 - Header markup is captured HTML: edit menu behaviour in `src/lib/header.js`,
   not in JSX.
-- The theme header shows `logo.png` (white) at rest and swaps to `logo-2.png`
-  (colored) once `sticky-header-active` is set. Only the homepage has a dark
-  header at rest, so `styles/site.css` forces the colored logo on every other
-  page and gives the first `.rb-section` a top padding (the fixed header would
-  otherwise sit right on it).
+- Branding is ARATAN (`آراتان | ARATAN`). The logo lives in three files in
+  `public/img/`: `aratan-logo.png` (dark ink, transparent background — for the
+  light header/footer states), `aratan-logo-light.png` (white ink, transparent
+  background — for the dark states) and `aratan-favicon.png` (the mark alone,
+  square, used as the `index.html` favicon). Both header `<img>`s keep the
+  theme's swap behaviour: the first (light) shows at rest on the dark homepage
+  header, the second (dark) shows once `sticky-header-active` is set. Only the
+  homepage has a dark header at rest, so `styles/site.css` forces the second
+  logo on every other page and gives the first `.rb-section` a top padding (the
+  fixed header would otherwise sit right on it). The `width`/`height`
+  attributes on those `<img>`s must keep the 1766:840 ratio or the logo
+  stretches. The email address and the social handles still say `luxinastudio`
+  — they are contact details, not brand copy, and were left for the owner to
+  supply.
 - `public/img/` holds the downloaded media. The reference markup points some
   assets at theme-relative paths (`/luxina/wp-content/...`); rewrite those to
   the `/img/...` equivalent.

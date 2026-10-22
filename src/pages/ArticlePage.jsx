@@ -104,7 +104,7 @@ export default function ArticlePage() {
         inLanguage: 'fa-IR',
         articleSection: article.category,
         keywords: article.seo.keywords.join('، '),
-        publisher: { '@type': 'Organization', name: 'لوکسینا' },
+        publisher: { '@type': 'Organization', name: 'آراتان' },
       },
     });
   }, [article]);
