@@ -44,8 +44,10 @@ content from (see `backend/docs/DEPLOYMENT-DIRECTADMIN.md`). The cart, checkout,
 account panel are still the browser's own (`src/lib/data.ts` + `localStorage`) — but an order they
 finish is recorded here, which is what puts it on the admin panel's orders screen.
 
-- **The catalogue lives in this database.** `CatalogSeeder` holds the store's 32 products and six
-  categories — the same names, prices, photos and size/colour options the SPA shipped with — and the
+- **The catalogue lives in this database.** `CatalogSeeder` holds the store's 46 products and six
+  categories (the last eleven are the «پاییز ۱۴۰۵» arrivals picked from DigiStyle's and Modiseh's
+  current listings — ELSANA, RNS, Colleen, Tulika, Saad, Novin Leather, Gabrini — and both shops'
+  sites/CDNs refuse traffic from the sandbox, so their photos are free stock shots cut out locally) — the same names, prices, photos and size/colour options the SPA shipped with — and the
   admin panel is what edits them from now on. The sample rows an earlier version of that seeder wrote
   are removed by it, matched on their own SKUs.
 - **Catalogue photos are imported media**: the row records the address the photo is published at
