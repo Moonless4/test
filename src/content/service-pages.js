@@ -5,8 +5,8 @@
 export const SERVICE_CONTACT = {
   phone: '021-123 4567',
   phoneHref: 'tel:+982112345678',
-  email: 'info@archilux.ir',
-  address: 'تهران، خیابان اسکندری، کوچه ۱۶ مهربان',
+  email: 'info@luxinastudio.ir',
+  address: 'تهران، سعادت‌آباد، بلوار دریا، پلاک ۲۴، طبقه ۳',
   hours: 'شنبه تا پنجشنبه، ۹ تا ۱۸',
 };
 

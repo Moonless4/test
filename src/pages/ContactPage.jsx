@@ -6,7 +6,7 @@ const CONTACT = [
   {
     icon: 'luxina-icon-map-pin-2-fill',
     label: 'آدرس',
-    value: 'تهران، خیابان اسکندری، کوچه ۱۶ مهربان',
+    value: 'تهران، سعادت‌آباد، بلوار دریا، پلاک ۲۴، طبقه ۳',
   },
   {
     icon: 'luxina-icon-customer-service-2-line',
@@ -17,7 +17,7 @@ const CONTACT = [
   {
     icon: 'luxina-icon-mail-fill',
     label: 'ایمیل',
-    value: 'info@archilux.ir',
+    value: 'info@luxinastudio.ir',
     ltr: true,
   },
 ];
