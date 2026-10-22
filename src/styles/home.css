@@ -150,9 +150,10 @@
   isolation: isolate;
 }
 
-/* Compact 2x2 service grid: the tiles stay small instead of one tall row. */
+/* Desktop keeps the original single 4-column row; tablet and mobile collapse
+   into a compact 2x2 grid. */
 .hp-services .luxina_services_item {
-  --item-height: 340px;
+  --item-height: 520px;
 }
 
 @media (max-width: 1024px) {
@@ -354,6 +355,43 @@
   font-size: 1.125rem;
 }
 
+/* Below 769px the theme stacks the masked card into a fixed 290px column, so
+   two side-by-side promo cards would overflow the phone. Let the card fill its
+   half-width cell and shrink its inner parts to match. */
+@media (max-width: 768px) {
+  .hp-promos .luxina_masked_cart_container {
+    width: 100%;
+    --cta-img-width: 100%;
+    --cta-img-height: 140px;
+    --cta-content-overlap: 18px;
+  }
+
+  .hp-promos .luxina_masked_cart_content_inner {
+    box-sizing: border-box;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .hp-promos .luxina_cta_cart_title {
+    font-size: 0.95rem;
+  }
+
+  .hp-promos .luxina_cta_cart_subtitle {
+    font-size: 0.75rem;
+  }
+
+  .hp-promos .luxina_cta_cart_buttons_wrap {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .hp-promos .luxina_cta_cart_buttons_wrap .button {
+    width: 100%;
+  }
+}
+
 /* ---- Customers -------------------------------------------------------- */
 
 .hp-customers .luxina_customers_title-text,
@@ -531,12 +569,11 @@
   }
 
   .hp-promos .hp-inner {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .hp-promo {
-    width: 70%;
-    justify-self: center;
+    width: 100%;
   }
 
   .hp-team {

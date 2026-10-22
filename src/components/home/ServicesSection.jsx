@@ -35,8 +35,8 @@ const SERVICES = [
 ];
 
 const TRACK_STYLE = {
-  '--desktop-cols': 2,
-  '--desktop-gap': '16px',
+  '--desktop-cols': 4,
+  '--desktop-gap': '0px 0px',
   '--tablet-cols': 2,
   '--tablet-gap': '12px',
   '--mobile-cols': 2,
