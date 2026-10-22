@@ -28,6 +28,8 @@ export const menuFilters = [
   { id: 'steak', title: 'استیک' },
   { id: 'pasta', title: 'پاستا' },
   { id: 'starter', title: 'پیش غذا' },
+  { id: 'drink', title: 'نوشیدنی' },
+  { id: 'hot', title: 'نوشیدنی گرم' },
 ];
 
 export const products = [
