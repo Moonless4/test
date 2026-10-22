@@ -627,8 +627,14 @@
     width: 13px;
   }
 
+  /* Menu + search stay on the right, cart + account move to the far left */
   .header__actions {
+    width: 100%;
     gap: 6px;
+  }
+
+  .cart-btn {
+    margin-inline-start: auto;
   }
 
   .icon-btn {
@@ -637,6 +643,14 @@
   }
 
   .login-btn {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .login-btn span {
     display: none;
   }
 
