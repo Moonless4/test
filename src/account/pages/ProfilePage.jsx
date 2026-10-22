@@ -1,23 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icons.jsx';
 import { Link } from '../../router.jsx';
 import { useAccount } from '../AccountContext.jsx';
+import Avatar, { AVATAR_STYLES, DEFAULT_AVATAR } from '../Avatar.jsx';
+import { readAvatarFile } from '../avatarUpload.js';
 import { Field, PageHead, Panel } from '../ui.jsx';
 import { fa, formatDate } from '../../data/account.js';
-
-const AVATARS = [
-  '/assets/avatar1.png',
-  '/assets/avatar2.png',
-  '/assets/avatar3.png',
-  '/assets/avatar4.png',
-  '/assets/avatar5.png',
-  '/assets/avatar6.png',
-];
 
 export default function ProfilePage({ onToast }) {
   const { user, saveProfile, loyalty, orders } = useAccount();
   const [form, setForm] = useState(user);
   const [errors, setErrors] = useState({});
+  const [uploadError, setUploadError] = useState('');
+  const fileRef = useRef(null);
 
   useEffect(() => {
     setForm(user);
@@ -27,6 +22,21 @@ export default function ProfilePage({ onToast }) {
     const value = event.target.value;
     setForm((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => ({ ...prev, [key]: '' }));
+  };
+
+  const pickFile = () => fileRef.current?.click();
+
+  const onUpload = async (event) => {
+    const file = event.target.files && event.target.files[0];
+    event.target.value = '';
+    if (!file) return;
+    try {
+      setUploadError('');
+      const dataUrl = await readAvatarFile(file);
+      setForm((prev) => ({ ...prev, avatar: dataUrl }));
+    } catch (error) {
+      setUploadError(error.message);
+    }
   };
 
   const submit = (event) => {
@@ -44,6 +54,9 @@ export default function ProfilePage({ onToast }) {
     onToast('اطلاعات شخصی شما ذخیره شد.');
   };
 
+  const isCustomPhoto = typeof form.avatar === 'string' && form.avatar.startsWith('data:');
+  const avatarChanged = form.avatar !== user.avatar;
+
   return (
     <div className="acct-page">
       <PageHead title="اطلاعات شخصی" text="اطلاعات حساب خود را برای هماهنگی سفارش‌ها و رزروها به‌روز نگه دارید." />
@@ -51,26 +64,76 @@ export default function ProfilePage({ onToast }) {
       <div className="profile-grid">
         <Panel title="تصویر و شناسه حساب" className="profile-side">
           <div className="profile-avatar">
-            <img src={form.avatar} alt={`${form.firstName} ${form.lastName}`} />
+            <Avatar value={form.avatar} name={`${form.firstName} ${form.lastName}`} />
+            <button
+              type="button"
+              className="profile-avatar__camera"
+              onClick={pickFile}
+              aria-label="آپلود عکس پروفایل"
+              title="آپلود عکس پروفایل"
+            >
+              <Icon name="camera" size={14} />
+            </button>
             <span className="profile-avatar__tier">
               <Icon name="star" size={13} filled />
               {loyalty.tier}
             </span>
           </div>
 
-          <div className="avatar-picker" role="group" aria-label="انتخاب تصویر پروفایل">
-            {AVATARS.map((src) => (
+          <input
+            ref={fileRef}
+            type="file"
+            className="sr-only"
+            accept="image/png,image/jpeg,image/webp"
+            onChange={onUpload}
+            tabIndex={-1}
+          />
+
+          <div className="avatar-actions">
+            <button type="button" className="btn btn--outline btn--sm" onClick={pickFile}>
+              <Icon name="camera" size={15} />
+              آپلود عکس من
+            </button>
+            {isCustomPhoto && (
               <button
-                key={src}
                 type="button"
-                className={`avatar-picker__item ${form.avatar === src ? 'is-active' : ''}`}
-                onClick={() => setForm((prev) => ({ ...prev, avatar: src }))}
-                aria-label="انتخاب این تصویر"
-                aria-pressed={form.avatar === src}
+                className="btn btn--ghost btn--sm"
+                onClick={() => {
+                  setUploadError('');
+                  setForm((prev) => ({ ...prev, avatar: DEFAULT_AVATAR }));
+                }}
               >
-                <img src={src} alt="" />
+                <Icon name="trash" size={14} />
+                حذف عکس
               </button>
-            ))}
+            )}
+          </div>
+
+          <p className="avatar-note">
+            یکی از تصویرهای گرافیکی را انتخاب کنید یا عکس خودتان را آپلود کنید.
+          </p>
+          {uploadError && <p className="avatar-note avatar-note--error">{uploadError}</p>}
+          {avatarChanged && !uploadError && (
+            <p className="avatar-note avatar-note--pending">برای ثبت تصویر، «ذخیره تغییرات» را بزنید.</p>
+          )}
+
+          <div className="avatar-picker" role="group" aria-label="انتخاب تصویر پروفایل">
+            {AVATAR_STYLES.map((style) => {
+              const value = `graphic:${style.id}`;
+              return (
+                <button
+                  key={style.id}
+                  type="button"
+                  className={`avatar-picker__item ${form.avatar === value ? 'is-active' : ''}`}
+                  onClick={() => setForm((prev) => ({ ...prev, avatar: value }))}
+                  aria-label={`تصویر ${style.label}`}
+                  title={style.label}
+                  aria-pressed={form.avatar === value}
+                >
+                  <Avatar value={value} />
+                </button>
+              );
+            })}
           </div>
 
           <dl className="acct-rows acct-rows--compact">
@@ -125,6 +188,7 @@ export default function ProfilePage({ onToast }) {
                 onClick={() => {
                   setForm(user);
                   setErrors({});
+                  setUploadError('');
                 }}
               >
                 بازگردانی

@@ -130,7 +130,7 @@ export const createAccount = ({ firstName = '', lastName = '', phone = '', email
     phone,
     email,
     birthday: '',
-    avatar: '/assets/avatar2.png',
+    avatar: 'graphic:gold',
     memberSince: new Date().toISOString().slice(0, 10),
     tier: 'نقره‌ای',
   },

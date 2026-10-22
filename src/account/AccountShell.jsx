@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Icon from '../components/Icons.jsx';
 import { Link, useRouter } from '../router.jsx';
 import { useAccount } from './AccountContext.jsx';
+import Avatar from './Avatar.jsx';
 import { ConfirmDialog } from './ui.jsx';
 import { fa } from '../data/account.js';
 
@@ -54,7 +55,7 @@ export default function AccountShell({ active, onToast, onLogin, children }) {
         <aside className="account-sidebar">
           <Link className="account-sidebar__user" to="/account/profile">
             <span className="account-sidebar__avatar">
-              <img src={user.avatar} alt={fullName} />
+              <Avatar value={user.avatar} name={fullName} />
             </span>
             <span className="account-sidebar__id">
               <b>{fullName}</b>

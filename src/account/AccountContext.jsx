@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { createAccount, createId, DEFAULT_SETTINGS, REWARDS } from '../data/account.js';
+import { DEFAULT_AVATAR } from './Avatar.jsx';
 
 const ACCOUNTS_KEY = 'naval-accounts-v1';
 const SESSION_KEY = 'naval-account-session-v1';
@@ -17,8 +18,14 @@ const normalizeDigits = (value = '') =>
     .replace(/[۰-۹]/g, (digit) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)))
     .replace(/[٠-٩]/g, (digit) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)));
 
+/* Stock photos used before the graphic avatar set landed */
+const LEGACY_AVATAR = /^\/assets\/avatar\d+\.png$/;
+
+const normalizeAvatar = (avatar) =>
+  LEGACY_AVATAR.test(avatar || '') ? DEFAULT_AVATAR : avatar;
+
 const normalize = (account) => ({
-  user: { ...account.user },
+  user: { ...account.user, avatar: normalizeAvatar(account.user.avatar) },
   addresses: account.addresses || [],
   orders: account.orders || [],
   reservations: account.reservations || [],

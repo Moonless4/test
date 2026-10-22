@@ -68,6 +68,11 @@ matched in one block in `matchRoute()` in `src/App.jsx`.
 - `/account/*` is gated: signed-out visitors get the sign-in card in
   `AccountShell` (it opens `AuthModal` through the `onLogin` prop from
   `src/App.jsx`) instead of the demo dashboard.
+- `src/account/Avatar.jsx` renders `user.avatar`: either a `graphic:<id>` key
+  (the SVG avatars in `AVATAR_STYLES`, default `graphic:gold`) or a plain image
+  URL / data URL. Profile → «آپلود عکس من» turns the picked file into a 320px
+  square JPEG data URL with `src/account/avatarUpload.js` (JPG/PNG/WebP,
+  ≤ 6 MB) and saves it inside the account entry, so no upload server exists.
 - Favorites are product ids, so the heart buttons on `ProductCard`/`ProductPage`
   and the account favorites grid share one source of truth.
 - `src/styles/account.css` is the whole account design system (sidebar, panels,
