@@ -36,6 +36,19 @@ body.home.sticky-header:not(.sticky-header-active) #header_inner .header-logo::b
   display: none;
 }
 
+/* The captured header renders the logo at its intrinsic 101px width; on phones
+   that reads as too small, so it is scaled up (the header grows with it). */
+@media (max-width: 768px) {
+  #header_inner .header-logo {
+    max-width: 160px;
+  }
+
+  #header_inner .header-logo img {
+    width: 136px;
+    height: auto;
+  }
+}
+
 /* The fixed, opaque header sits above the page, so the first band of a rebuilt
    page needs its own top padding instead of touching the header edge. */
 body:not(.home) .rb-section:first-of-type {
