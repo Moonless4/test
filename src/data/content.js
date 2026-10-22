@@ -1,6 +1,7 @@
 import { menuProducts } from './menuProducts.js';
 import { blogExtraPosts } from './blogPosts.js';
 import { drinkProducts } from './drinks.js';
+import { dessertProducts } from './desserts.js';
 
 export const navLinks = [
   { id: 'home', label: 'خانه', href: '/' },
@@ -30,6 +31,7 @@ export const menuFilters = [
   { id: 'starter', title: 'پیش غذا' },
   { id: 'drink', title: 'نوشیدنی' },
   { id: 'hot', title: 'نوشیدنی گرم' },
+  { id: 'dessert', title: 'کیک و دسر' },
 ];
 
 export const products = [
@@ -179,6 +181,7 @@ export const products = [
   },
   ...menuProducts,
   ...drinkProducts,
+  ...dessertProducts,
 ];
 
 // Hero slider pairs each slide with the artwork that actually depicts that dish,

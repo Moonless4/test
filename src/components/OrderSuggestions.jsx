@@ -2,20 +2,21 @@ import { products } from '../data/content.js';
 import { formatPrice } from './ProductCard.jsx';
 import Icon from './Icons.jsx';
 
-const FOOD_CATEGORIES = ['pizza', 'sandwich', 'chicken', 'steak', 'pasta'];
-const DRINK_CATEGORIES = ['drink', 'hot'];
+const PREFERENCE = 'کنار غذای خود این‌ها را امتحان کنید';
 
-// پیشنهاد متناسب با هر آیتم سبد، به ترتیب اولویت:
-// کنار غذای اصلی → نوشیدنی و پیش‌غذای هم‌خوان، کنار پیش‌غذا → غذای اصلی و نوشیدنی، کنار نوشیدنی → غذا و خوراکی کنارش.
+// پیشنهاد بر اساس نوع دسته‌بندی آیتم سبد (به ترتیب اولویت نمایش):
+// غذای اصلی → نوشیدنی سرد و سالاد | نوشیدنی سرد → غذا و میان‌وعده سبک
+// نوشیدنی گرم → کیک و دسر | دسر → نوشیدنی گرم | پیش‌غذا → غذای اصلی و نوشیدنی سرد
 const PAIRINGS = {
-  pizza: ['mint-lemonade', 'caesar-salad', 'french-fries'],
-  sandwich: ['mint-lemonade', 'onion-rings', 'french-fries'],
-  chicken: ['fresh-orange-juice', 'season-salad', 'french-fries'],
-  steak: ['mint-lemonade', 'mushroom-soup', 'caesar-salad'],
-  pasta: ['bruschetta', 'mint-lemonade', 'caesar-salad'],
-  starter: ['royal-pizza', 'naval-burger', 'charcoal-chicken', 'mint-lemonade'],
-  drink: ['royal-pizza', 'naval-burger', 'charcoal-chicken', 'french-fries'],
-  hot: ['chef-pizza', 'naval-burger', 'grilled-chicken-breast', 'french-fries'],
+  pizza: ['mint-lemonade', 'caesar-salad', 'iced-peach-tea'],
+  sandwich: ['mint-lemonade', 'season-salad', 'fresh-orange-juice'],
+  chicken: ['fresh-orange-juice', 'season-salad', 'iced-peach-tea'],
+  steak: ['mint-lemonade', 'caesar-salad', 'fresh-orange-juice'],
+  pasta: ['iced-peach-tea', 'caesar-salad', 'mint-lemonade'],
+  drink: ['royal-pizza', 'french-fries', 'naval-burger', 'onion-rings'],
+  hot: ['chocolate-cake', 'berry-cheesecake'],
+  dessert: ['naval-latte'],
+  starter: ['royal-pizza', 'mint-lemonade', 'charcoal-chicken'],
 };
 
 export default function OrderSuggestions({ exclude = [], title, onAdd }) {
@@ -23,9 +24,10 @@ export default function OrderSuggestions({ exclude = [], title, onAdd }) {
   const cart = products.filter((product) => inCart.has(product.id));
   const categories = new Set(cart.map((product) => product.category));
 
-  const hasFood = FOOD_CATEGORIES.some((category) => categories.has(category));
   const hasStarter = categories.has('starter');
-  const hasDrink = DRINK_CATEGORIES.some((category) => categories.has(category));
+  const hasDessert = categories.has('dessert');
+
+  const onlyIn = (...ids) => cart.length > 0 && cart.every((product) => ids.includes(product.category));
 
   const wanted = cart.flatMap((product) => PAIRINGS[product.category] || []);
 
@@ -33,17 +35,20 @@ export default function OrderSuggestions({ exclude = [], title, onAdd }) {
   wanted.forEach((id) => {
     const product = products.find((item) => item.id === id);
     if (!product || inCart.has(product.id)) return;
-    // پیش‌غذا در سبد هست؟ پیش‌غذای دیگری پیشنهاد نشود
+    // برای سبدی که پیش‌غذا یا دسر دارد، آیتم هم‌گروه دوباره پیشنهاد نمی‌شود
     if (hasStarter && product.category === 'starter') return;
+    if (hasDessert && product.category === 'dessert') return;
     if (items.some((item) => item.id === product.id)) return;
     items.push(product);
   });
 
   if (items.length === 0) return null;
 
-  let heading = 'کنار غذای خود این‌ها را امتحان کنید';
-  if (!hasFood && hasStarter) heading = 'کنار پیش‌غذایتان این غذاها را امتحان کنید';
-  else if (!hasFood && !hasStarter && hasDrink) heading = 'کنار نوشیدنی‌تان این‌ها را امتحان کنید';
+  let heading = PREFERENCE;
+  if (onlyIn('drink')) heading = 'کنار نوشیدنی سردتان این‌ها را امتحان کنید';
+  else if (onlyIn('hot')) heading = 'کنار نوشیدنی گرمتان کیک و دسر امتحان کنید';
+  else if (onlyIn('dessert')) heading = 'کنار دسرتان یک نوشیدنی گرم امتحان کنید';
+  else if (onlyIn('starter')) heading = 'کنار پیش‌غذایتان این غذاها را امتحان کنید';
 
   return (
     <section className="order-suggest" aria-label="پیشنهادهای متناسب با سبد خرید">
