@@ -63,12 +63,6 @@
   pointer-events: none;
 }
 
-.hero__dots--one {
-  top: 118px;
-  left: 7%;
-  width: 52px;
-}
-
 .hero__dots--two {
   bottom: 132px;
   right: 8%;

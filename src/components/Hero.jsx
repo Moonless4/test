@@ -28,7 +28,6 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
         </div>
 
         <img className="hero__leaf" src="/assets/yellow-leaf.png" alt="" aria-hidden="true" />
-        <img className="hero__dots hero__dots--one" src="/assets/purple-dots.png" alt="" aria-hidden="true" />
         <img className="hero__dots hero__dots--two" src="/assets/yellow-dots.png" alt="" aria-hidden="true" />
 
         <div className="hero__content">
