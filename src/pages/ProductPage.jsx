@@ -121,11 +121,7 @@ export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [], o
               </p>
 
               {added && (
-                <OrderSuggestions
-                  exclude={[product.id, ...cartIds]}
-                  title="نوشیدنی یا پیش‌غذا کنار این غذا"
-                  onAdd={onAdd}
-                />
+                <OrderSuggestions exclude={[product.id, ...cartIds]} onAdd={onAdd} />
               )}
             </div>
           </div>
