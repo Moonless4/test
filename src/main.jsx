@@ -3,6 +3,7 @@ import App from './App.jsx';
 import { initSmoothScroll } from './lib/smoothScroll.js';
 import './styles/site.css';
 import './styles/service-pages.css';
+import './styles/blog.css';
 import './styles/scroll.css';
 
 initSmoothScroll();

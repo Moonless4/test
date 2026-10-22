@@ -1,31 +1,113 @@
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import PageSection from '../components/PageSection.jsx';
 import PageHeading from '../components/PageHeading.jsx';
 import Button from '../components/Button.jsx';
-import { articles, findArticle } from '../content/articles.js';
+import { articleUrl, findArticle, relatedArticles } from '../content/articles.js';
+import { applySeo } from '../lib/seo.js';
 import NotFoundPage from './NotFoundPage.jsx';
 
 function RelatedArticles({ current }) {
-  const items = articles.filter((article) => article.slug !== current.slug);
+  const items = relatedArticles(current);
   if (!items.length) return null;
   return (
-    <div className="rb-related">
-      {items.map((article) => (
-        <a className="rb-related-card" href={`/blog/${article.slug}`} key={article.slug}>
-          <img src={article.image} alt={article.title} loading="lazy" />
-          <span className="rb-related-card-body">
-            <span className="rb-related-card-cat">{article.category}</span>
-            <span className="rb-related-card-title">{article.title}</span>
-          </span>
-        </a>
-      ))}
-    </div>
+    <aside className="rb-related-wrap" aria-labelledby="rb-related-title">
+      <h2 className="rb-related-title" id="rb-related-title">
+        بیشتر بخوانید
+      </h2>
+      <div className="rb-related">
+        {items.map((article) => (
+          <a className="rb-related-card" href={articleUrl(article)} key={article.slug}>
+            <img src={article.image} alt={article.imageAlt} loading="lazy" />
+            <span className="rb-related-card-body">
+              <span className="rb-related-card-cat">{article.category}</span>
+              <span className="rb-related-card-title">{article.cardTitle}</span>
+              <span className="rb-related-card-time">{article.readingTime} مطالعه</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </aside>
   );
+}
+
+function Block({ block }) {
+  switch (block.type) {
+    case 'h2':
+      return <h2 className="rb-article-h2">{block.text}</h2>;
+    case 'h3':
+      return <h3 className="rb-article-h3">{block.text}</h3>;
+    case 'p':
+      return <p>{block.text}</p>;
+    case 'quote':
+      return <blockquote className="rb-article-quote">{block.text}</blockquote>;
+    case 'list':
+      return (
+        <ul className="rb-article-list">
+          {block.items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      );
+    case 'checklist':
+      return (
+        <section className="rb-article-checklist">
+          <h2 className="rb-article-checklist-title">{block.title}</h2>
+          <ul>
+            {block.items.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+      );
+    case 'img':
+      return (
+        <figure className="rb-article-figure">
+          <img src={block.src} alt={block.alt} loading="lazy" />
+          {block.caption ? <figcaption>{block.caption}</figcaption> : null}
+        </figure>
+      );
+    case 'cta':
+      return (
+        <div className="rb-article-cta">
+          <p>{block.text}</p>
+          <Button href={block.href} variant="primary">
+            {block.label}
+          </Button>
+        </div>
+      );
+    default:
+      return null;
+  }
 }
 
 export default function ArticlePage() {
   const { slug } = useParams();
   const article = findArticle(slug);
+
+  useEffect(() => {
+    if (!article) return undefined;
+    return applySeo({
+      title: article.seo.title,
+      description: article.seo.description,
+      keywords: article.seo.keywords,
+      image: article.image,
+      path: articleUrl(article),
+      published: article.isoDate,
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: article.title,
+        description: article.seo.description,
+        image: `${window.location.origin}${article.image}`,
+        datePublished: article.isoDate,
+        inLanguage: 'fa-IR',
+        articleSection: article.category,
+        keywords: article.seo.keywords.join('، '),
+        publisher: { '@type': 'Organization', name: 'لوکسینا' },
+      },
+    });
+  }, [article]);
 
   if (!article) return <NotFoundPage />;
 
@@ -33,27 +115,24 @@ export default function ArticlePage() {
     <PageSection>
       <PageHeading title="مقالات" subtitle="Weblog" icon="luxina-icon-book-line" />
       <article className="rb-article">
+        <header className="rb-article-header">
+          <div className="rb-article-meta">
+            <span className="rb-detail-badge">{article.category}</span>
+            <time dateTime={article.isoDate}>{article.dateLabel}</time>
+            <span className="rb-article-meta-sep" aria-hidden="true" />
+            <span>{article.readingTime} مطالعه</span>
+          </div>
+          <h1 className="rb-detail-title">{article.title}</h1>
+        </header>
         <figure className="rb-article-media">
-          <img src={article.image} alt={article.title} />
+          <img src={article.image} alt={article.imageAlt} />
         </figure>
-        <div className="rb-article-meta">
-          <span className="rb-detail-badge">{article.category}</span>
-        </div>
-        <h1 className="rb-detail-title">{article.title}</h1>
         <div className="rb-article-text">
-          {article.body.map((paragraph) => (
-            <p key={paragraph.slice(0, 24)}>{paragraph}</p>
+          {article.body.map((block, index) => (
+            <Block block={block} key={`${block.type}-${index}`} />
           ))}
         </div>
-        <ul className="rb-article-list">
-          {article.points.map((point) => (
-            <li key={point}>{point}</li>
-          ))}
-        </ul>
         <div className="rb-detail-actions">
-          <Button href="/consultation" variant="primary">
-            درخواست مشاوره
-          </Button>
           <Button href="/blog" variant="gray">
             همه مقالات
           </Button>

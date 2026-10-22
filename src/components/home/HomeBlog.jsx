@@ -13,7 +13,7 @@ export default function HomeBlog() {
           <Button href="/blog">همهٔ مقالات</Button>
         </div>
         <div className="hp-blog-posts">
-          <PostsGrid articles={articles.slice(0, 3)} />
+          <PostsGrid articles={articles} />
         </div>
       </div>
     </section>
