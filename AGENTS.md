@@ -426,6 +426,31 @@ not `curl -I` — a HEAD response says nothing about whether the file is served.
 `wp-theme/docker-compose.wordpress.yml` brings up a throwaway WordPress + WooCommerce stack to try
 the theme against; `wp-theme/dev/` holds what it needs.
 
+## Packaging the site for the host
+
+`npm run pack:site` (`tools/pack-site.mjs`) builds the storefront and writes the archive the owner
+uploads by hand, twice served from the preview at **`/styleon-site.zip`**:
+
+- `frontend/` — the contents of `dist/`. Its **contents**, not the folder, go in the shop domain's
+  document root; `frontend/.htaccess` is the transport/SPA config and travels with it.
+- `backend/` — the Laravel application, **with `backend/vendor/`** (the deployment guide prefers
+  uploading it, since shared hosts cap Composer's memory). It goes *above* the web root, never
+  inside `public_html/`, and its document root is `backend/public`.
+- `README-DEPLOY.txt` — the same two-destination summary, in Persian, for whoever does the upload.
+
+What deliberately stays behind: any `.env` (the host writes its own, with its own `APP_KEY`), the
+storefront's `node_modules`, runtime logs and caches, and every SQLite file. `storage/framework/*`,
+`storage/logs` and `bootstrap/cache` travel as **empty directories** — Laravel refuses to boot
+without them, and a directory whose every file was skipped has to be carried as its own zip entry
+(`tools/zip.mjs` writes those). The archive itself is excluded from the tree, because the build
+copies `public/` into `dist/` and a second run would otherwise find the previous archive inside the
+new one.
+
+`public/styleon-site.zip` is **gitignored** — it is tens of MB of build output. Regenerate it with
+`npm run pack:site` rather than committing it; the dev server serves it from `public/` whether or
+not git tracks it. The minimal ZIP writer both this script and `theme:build` use lives in
+`tools/zip.mjs`.
+
 ## Verifying a change
 
 1. `curl -s http://localhost:3000/ | head` — dev server serves the live HTML shell.

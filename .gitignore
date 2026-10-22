@@ -12,3 +12,7 @@ npm-debug.log*
 .vite
 
 *.tsbuildinfo
+
+# The site archive is a build artefact (tens of MB): regenerate it with `npm run pack:site`
+# rather than storing it. It is still served from the preview at /styleon-site.zip.
+public/styleon-site.zip
