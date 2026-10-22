@@ -5,7 +5,7 @@ import { useAccount } from '../AccountContext.jsx';
 import { ConfirmDialog, Field, PageHead, Panel, Toggle } from '../ui.jsx';
 
 export default function SettingsPage({ onToast }) {
-  const { settings, updateSettings, setLanguage } = useAccount();
+  const { settings, updateSettings, setLanguage, signOut } = useAccount();
   const { navigate } = useRouter();
 
   const [password, setPassword] = useState({ current: '', next: '', confirm: '' });
@@ -180,6 +180,7 @@ export default function SettingsPage({ onToast }) {
               type="button"
               className="btn btn--ghost"
               onClick={() => {
+                signOut();
                 onToast('از حساب کاربری خود خارج شدید.');
                 navigate('/');
               }}

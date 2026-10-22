@@ -17,13 +17,36 @@ const NAV_ITEMS = [
   { key: 'settings', to: '/account/settings', label: 'تنظیمات', icon: 'gear' },
 ];
 
-export default function AccountShell({ active, onToast, children }) {
-  const { user, loyalty, unreadCount } = useAccount();
+export default function AccountShell({ active, onToast, onLogin, children }) {
+  const { user, loyalty, unreadCount, isAuthenticated, signOut } = useAccount();
   const { navigate } = useRouter();
   const [logoutOpen, setLogoutOpen] = useState(false);
 
   const fullName = `${user.firstName} ${user.lastName}`.trim();
   const progress = Math.min(100, Math.round((loyalty.points / loyalty.nextRewardAt) * 100));
+
+  if (!isAuthenticated) {
+    return (
+      <div className="account">
+        <div className="container">
+          <div className="acct-signin">
+            <span className="acct-signin__icon">
+              <Icon name="user" size={32} />
+            </span>
+            <h1>برای دیدن حساب کاربری وارد شوید</h1>
+            <p>
+              سفارش‌ها، رزروها، علاقه‌مندی‌ها و امتیازهای باشگاه مشتریان پس از ورود یا ساخت حساب
+              نمایش داده می‌شوند.
+            </p>
+            <button type="button" className="btn btn--primary" onClick={onLogin}>
+              <Icon name="user" size={17} />
+              ورود یا ثبت‌نام
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="account">
@@ -84,6 +107,7 @@ export default function AccountShell({ active, onToast, children }) {
         open={logoutOpen}
         onClose={() => setLogoutOpen(false)}
         onConfirm={() => {
+          signOut();
           onToast('از حساب کاربری خود خارج شدید.');
           navigate('/');
         }}

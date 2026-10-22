@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import Modal from './Modal.jsx';
 import Icon from './Icons.jsx';
+import { useAccount } from '../account/AccountContext.jsx';
 
 export default function AuthModal({ open, onClose, onToast, onSuccess }) {
+  const { login, register } = useAccount();
   const [mode, setMode] = useState('login');
   const [form, setForm] = useState({ name: '', phone: '', password: '' });
   const [error, setError] = useState('');
@@ -19,7 +21,8 @@ export default function AuthModal({ open, onClose, onToast, onSuccess }) {
 
   const submit = (event) => {
     event.preventDefault();
-    if ((mode === 'register' && !form.name.trim()) || !form.phone.trim() || !form.password) {
+    const identifier = form.phone.trim();
+    if ((mode === 'register' && !form.name.trim()) || !identifier || !form.password) {
       setError('لطفاً همه فیلدها را تکمیل کنید.');
       return;
     }
@@ -28,7 +31,19 @@ export default function AuthModal({ open, onClose, onToast, onSuccess }) {
       return;
     }
     setError('');
-    onToast(mode === 'login' ? 'ورود شما با موفقیت انجام شد.' : 'حساب شما با موفقیت ایجاد شد.');
+
+    if (mode === 'register') {
+      const result = register({ name: form.name, identifier });
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      onToast('حساب شما با موفقیت ایجاد شد.');
+    } else {
+      const result = login({ identifier });
+      onToast(result.created ? 'حساب جدیدی با این شماره ساخته شد.' : 'ورود شما با موفقیت انجام شد.');
+    }
+
     onClose();
     onSuccess?.();
   };
@@ -115,6 +130,12 @@ export default function AuthModal({ open, onClose, onToast, onSuccess }) {
             <Icon name="chevronLeft" size={18} />
           </button>
         </form>
+
+        {mode === 'login' && (
+          <p className="auth__demo">
+            برای دیدن حساب نمونه با شماره ۰۹۱۲۱۲۳۴۵۶۷ و رمز دلخواه وارد شوید.
+          </p>
+        )}
 
         <p className="auth__terms">
           با ادامه، <a href="#footer">شرایط و ضوابط</a> و <a href="#footer">حریم خصوصی</a> نوال را

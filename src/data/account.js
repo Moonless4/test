@@ -342,6 +342,54 @@ export const demoAccount = {
 };
 
 /* =========================================================
+   Fresh account — what a new customer starts with
+   ========================================================= */
+
+export const createAccount = ({ firstName = '', lastName = '', phone = '', email = '' } = {}) => ({
+  user: {
+    firstName,
+    lastName,
+    phone,
+    email,
+    birthday: '',
+    avatar: '/assets/avatar2.png',
+    memberSince: new Date().toISOString().slice(0, 10),
+    tier: 'نقره‌ای',
+  },
+
+  addresses: [],
+  orders: [],
+  reservations: [],
+  favorites: [],
+
+  notifications: [
+    {
+      id: 'welcome',
+      type: 'system',
+      title: 'به نوال خوش آمدید',
+      body: 'حساب شما ساخته شد. سفارش‌ها، رزروها و امتیازهای باشگاه مشتریان از این پس همین‌جا نمایش داده می‌شوند.',
+      createdAt: new Date().toISOString(),
+      read: false,
+    },
+  ],
+
+  loyalty: {
+    points: 0,
+    nextRewardAt: 500,
+    tier: 'نقره‌ای',
+    rewards: demoAccount.loyalty.rewards,
+    history: [],
+  },
+
+  settings: {
+    notifications: { orders: true, reservations: true, offers: false, newsletter: false },
+    language: 'fa',
+    security: { twoFactor: false },
+    privacy: { personalized: true },
+  },
+});
+
+/* =========================================================
    Derived helpers
    ========================================================= */
 

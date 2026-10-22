@@ -253,7 +253,11 @@ export default function App() {
         };
 
         return (
-          <AccountShell active={route.section} onToast={showToast}>
+          <AccountShell
+            active={route.section}
+            onToast={showToast}
+            onLogin={() => setAuthOpen(true)}
+          >
             {sectionPages[route.section] || <AccountDashboard onMenu={goMenu} onReserve={openReserve} onReorder={reorder} />}
           </AccountShell>
         );

@@ -10,6 +10,50 @@
     linear-gradient(180deg, #fffaf2 0%, var(--paper) 46%);
 }
 
+/* Signed-out gate */
+.acct-signin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 520px;
+  margin: 40px auto;
+  padding: 44px 30px;
+  border-radius: 28px;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #fffdf8, #fff);
+  box-shadow: 0 24px 50px -40px rgba(53, 5, 19, 0.5);
+  text-align: center;
+}
+
+.acct-signin__icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--cream-soft);
+  color: var(--primary);
+}
+
+.acct-signin h1 {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.acct-signin p {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 12px;
+  line-height: 2;
+  color: var(--muted);
+}
+
+.acct-signin .btn {
+  margin-top: 8px;
+}
+
 .account__grid {
   display: grid;
   grid-template-columns: 274px minmax(0, 1fr);

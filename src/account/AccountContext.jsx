@@ -1,32 +1,82 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { createId, demoAccount } from '../data/account.js';
+import { createAccount, createId, demoAccount } from '../data/account.js';
 
-const STORAGE_KEY = 'naval-account-v1';
+const ACCOUNTS_KEY = 'naval-accounts-v1';
+const SESSION_KEY = 'naval-account-session-v1';
+const GUEST_KEY = 'guest';
+const DEMO_KEY = demoAccount.user.phone;
 
 const AccountContext = createContext(null);
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
-const readState = () => {
+/* Persian/Arabic digits → Latin, so one phone always maps to one account */
+const normalizeDigits = (value = '') =>
+  value
+    .replace(/[۰-۹]/g, (digit) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)))
+    .replace(/[٠-٩]/g, (digit) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)));
+
+const normalize = (account) => ({
+  user: { ...account.user },
+  addresses: account.addresses || [],
+  orders: account.orders || [],
+  reservations: account.reservations || [],
+  favorites: account.favorites || [],
+  notifications: account.notifications || [],
+  loyalty: {
+    points: 0,
+    nextRewardAt: 500,
+    tier: 'نقره‌ای',
+    rewards: demoAccount.loyalty.rewards,
+    history: [],
+    ...account.loyalty,
+  },
+  settings: { ...clone(demoAccount.settings), ...account.settings },
+});
+
+const readAccounts = () => {
+  const fallback = {
+    [GUEST_KEY]: createAccount(),
+    [DEMO_KEY]: clone(demoAccount),
+  };
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return clone(demoAccount);
+    const raw = localStorage.getItem(ACCOUNTS_KEY);
+    if (!raw) return fallback;
     const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object' || !parsed.user) return clone(demoAccount);
-    return {
-      ...clone(demoAccount),
-      ...parsed,
-      user: { ...demoAccount.user, ...parsed.user },
-      loyalty: { ...demoAccount.loyalty, ...parsed.loyalty },
-      settings: { ...demoAccount.settings, ...parsed.settings },
-    };
+    if (!parsed || typeof parsed !== 'object') return fallback;
+    const accounts = {};
+    Object.entries(parsed).forEach(([key, value]) => {
+      if (value && typeof value === 'object' && value.user) accounts[key] = normalize(value);
+    });
+    return { ...fallback, ...accounts };
   } catch {
-    return clone(demoAccount);
+    return fallback;
+  }
+};
+
+const readSession = () => {
+  try {
+    return localStorage.getItem(SESSION_KEY) || null;
+  } catch {
+    return null;
+  }
+};
+
+const writeSession = (key) => {
+  try {
+    if (key) localStorage.setItem(SESSION_KEY, key);
+    else localStorage.removeItem(SESSION_KEY);
+  } catch {
+    /* storage can be unavailable in private mode */
   }
 };
 
 export function AccountProvider({ children }) {
-  const [state, setState] = useState(readState);
+  const [accounts, setAccounts] = useState(readAccounts);
+  const [session, setSession] = useState(readSession);
+  const signedIn = Boolean(session && accounts[session]);
+  const activeKey = signedIn ? session : GUEST_KEY;
+  const [state, setState] = useState(() => accounts[activeKey]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,13 +84,72 @@ export function AccountProvider({ children }) {
     return () => clearTimeout(timer);
   }, []);
 
+  /* Every mutation is written back under the signed-in phone (or the guest profile) */
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      /* storage can be unavailable in private mode */
-    }
-  }, [state]);
+    setAccounts((prev) => {
+      if (prev[activeKey] === state) return prev;
+      const next = { ...prev, [activeKey]: state };
+      try {
+        localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(next));
+      } catch {
+        /* storage can be unavailable in private mode */
+      }
+      return next;
+    });
+  }, [state, activeKey]);
+
+  const activate = useCallback((key, account) => {
+    writeSession(key);
+    setSession(key);
+    setState(account);
+  }, []);
+
+  const saveAccount = useCallback((key, account) => {
+    setAccounts((prev) => {
+      const next = { ...prev, [key]: account };
+      try {
+        localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(next));
+      } catch {
+        /* storage can be unavailable in private mode */
+      }
+      return next;
+    });
+  }, []);
+
+  /* Login never falls back to the demo customer: an unknown number starts an empty account */
+  const login = useCallback(
+    ({ identifier }) => {
+      const key = normalizeDigits(identifier).trim().toLowerCase();
+      const existing = accounts[key];
+      const account = existing ? normalize(existing) : createAccount({ phone: key });
+
+      if (!existing) saveAccount(key, account);
+      activate(key, account);
+      return { created: !existing };
+    },
+    [accounts, activate, saveAccount]
+  );
+
+  const register = useCallback(
+    ({ name, identifier }) => {
+      const key = normalizeDigits(identifier).trim().toLowerCase();
+      if (accounts[key]) {
+        return { ok: false, error: 'این شماره قبلاً ثبت‌نام کرده است؛ از تب «ورود» وارد شوید.' };
+      }
+      const parts = name.trim().split(/\s+/);
+      const firstName = parts.shift() || '';
+      const account = createAccount({ firstName, lastName: parts.join(' '), phone: key });
+
+      saveAccount(key, account);
+      activate(key, account);
+      return { ok: true };
+    },
+    [accounts, activate, saveAccount]
+  );
+
+  const signOut = useCallback(() => {
+    activate(null, accounts[GUEST_KEY] || createAccount());
+  }, [accounts, activate]);
 
   const isFavorite = useCallback(
     (productId) => state.favorites.includes(productId),
@@ -187,9 +296,13 @@ export function AccountProvider({ children }) {
     () => ({
       ...state,
       loading,
+      isAuthenticated: signedIn,
       unreadCount: state.notifications.filter((item) => !item.read).length,
       isFavorite,
       toggleFavorite,
+      login,
+      register,
+      signOut,
       saveProfile,
       saveAddress,
       deleteAddress,
@@ -206,8 +319,12 @@ export function AccountProvider({ children }) {
     [
       state,
       loading,
+      signedIn,
       isFavorite,
       toggleFavorite,
+      login,
+      register,
+      signOut,
       saveProfile,
       saveAddress,
       deleteAddress,
