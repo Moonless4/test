@@ -46,8 +46,9 @@ export default function useDragScroll() {
       }
 
       if (event.cancelable) event.preventDefault();
-      // چیدمان راست‌به‌چپ: محتوا با دست/ماوس همراه می‌شود
-      row.scrollLeft = startLeft + dx;
+      // محتوا باید با دست/ماوس همراه شود؛ در چیدمان راست‌به‌چپ علامت اسکرول برعکس است
+      const sign = getComputedStyle(row).direction === 'rtl' ? -1 : 1;
+      row.scrollLeft = startLeft + sign * dx;
     };
 
     const endDrag = () => {
