@@ -1,7 +1,6 @@
 // Header behaviours from the reference theme's JS: sticky state, the mobile
-// drawer, collapsible sub-menus and the account display. The header markup lives
-// for the whole session, so everything here is bound exactly once.
-import { applyAccount, clearAccount } from './account.js';
+// drawer and collapsible sub-menus. The header markup lives for the whole
+// session, so everything here is bound exactly once.
 
 let bound = false;
 
@@ -14,8 +13,6 @@ function setDrawer(drawer, overlay, open) {
 
 export function initHeader(root) {
   if (!root) return;
-  applyAccount(root);
-
   if (bound) return;
   bound = true;
 
@@ -46,12 +43,5 @@ export function initHeader(root) {
 
   root.querySelectorAll('.menu-item-has-children > a[href="#"]').forEach((link) => {
     link.addEventListener('click', (event) => event.preventDefault());
-  });
-
-  document.addEventListener('click', (event) => {
-    if (!event.target.closest?.('.rb-logout')) return;
-    event.preventDefault();
-    clearAccount();
-    applyAccount(document);
   });
 }

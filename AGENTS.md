@@ -41,11 +41,15 @@ up -d --build`), not a host `npm install`.
   project slug), `articles.js` (blog posts), `services.js` (footer service
   pages). No markup is parsed out of captured sections anymore.
 - Behaviour lives in `src/lib/`: `header.js` (sticky header, mobile drawer,
-  sub-menus, account — bound once from `Header`), `forms.js` (validation bound
-  per route change, keeps the `.rb-form` / `data-rb-form` / `.rb-form-note`
-  contract), `initSliders.js` + `applyLayoutVars.js` (theme `data-settings`
-  grids and horizontal tracks), `account.js` (localStorage session). There is no
-  backend: submissions and accounts exist per browser only.
+  sub-menus — bound once from `Header`), `forms.js` (validation bound per route
+  change, keeps the `.rb-form` / `data-rb-form` / `.rb-form-note` contract),
+  `initSliders.js` + `applyLayoutVars.js` (theme `data-settings` grids and
+  horizontal tracks). There is no backend: submissions exist per browser only.
+- The site has no accounts: there is no `/login` route, no login page and no
+  account markup in the captured header, so `/login` falls through to
+  `NotFoundPage`. The header's consultation action (`.header-action-btn-wrap`,
+  label + phone number + icon) is always visible — `styles/site.css` only keeps
+  it on one line, it does not hide the text behind a hover.
 
 ## Gotchas
 
@@ -56,8 +60,8 @@ up -d --build`), not a host `npm install`.
   `initForms` after every route render. It must stay inside the `Suspense`
   boundary next to `AppRoutes`, otherwise lazy pages mount after those helpers
   already ran and their grids/forms stay dead.
-- Header markup is captured HTML: edit account/menu behaviour in
-  `src/lib/header.js` and `src/lib/account.js`, not in JSX.
+- Header markup is captured HTML: edit menu behaviour in `src/lib/header.js`,
+  not in JSX.
 - The theme header shows `logo.png` (white) at rest and swaps to `logo-2.png`
   (colored) once `sticky-header-active` is set. Only the homepage has a dark
   header at rest, so `styles/site.css` forces the colored logo on every other

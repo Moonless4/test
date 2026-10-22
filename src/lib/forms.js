@@ -1,8 +1,6 @@
-// Client-side form validation for the request and auth forms. Keeps the same
-// rules and the same `.rb-invalid` / `.rb-field-error` contract as the theme
-// form it replaces.
-import { applyAccount, setAccount } from './account.js';
-
+// Client-side form validation for the request forms. Keeps the same rules and
+// the same `.rb-invalid` / `.rb-field-error` contract as the theme form it
+// replaces.
 const toEnglishDigits = (value) =>
   value
     .replace(/[۰-۹]/g, (digit) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)))
@@ -20,7 +18,6 @@ const validators = {
     const digits = toEnglishDigits(value).replace(/\D/g, '');
     return (digits.length >= 8 && digits.length <= 11) || 'شماره تماس معتبر وارد کنید.';
   },
-  password: (value) => value.length >= 6 || 'رمز عبور باید حداقل ۶ کاراکتر باشد.',
 };
 
 function setFieldError(field, message) {
@@ -64,14 +61,6 @@ function handleSubmit(event) {
   }
 
   const note = form.querySelector('.rb-form-note');
-  const type = form.dataset.rbForm;
-  if (type === 'login' || type === 'signup') {
-    const email = form.querySelector('[name="email"]')?.value.trim() || '';
-    const name = form.querySelector('[name="name"]')?.value.trim() || email.split('@')[0];
-    setAccount({ name, email });
-    applyAccount(document);
-  }
-
   if (note) note.hidden = false;
   fields.forEach((field) => {
     field.value = '';

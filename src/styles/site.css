@@ -51,7 +51,6 @@ body:not(.home) .rb-section:first-of-type {
 .rb-article,
 .rb-service,
 .rb-about,
-.rb-auth,
 .rb-contact-card,
 .rb-about-stat,
 .rb-related-card,
@@ -102,7 +101,7 @@ body:not(.home) .rb-section:first-of-type {
 
 /* The request form is a white card: every field is its own rounded box with an
    icon, and the submit sits in a footer row. Styles are scoped to the contact
-   form wrapper so the auth form (`page .rb-auth`) keeps its own look. */
+   form wrapper. */
 .luxina_contact_form-wrap {
   max-width: 720px;
 }
@@ -252,33 +251,6 @@ body:not(.home) .rb-section:first-of-type {
   margin-top: 4px;
   font-size: 0.78rem;
   color: #d9534f;
-}
-
-.rb-form-switch {
-  margin-top: 14px;
-  color: var(--text-main-70);
-  font-size: 0.9rem;
-}
-
-.rb-form-switch a {
-  color: var(--secondary-100);
-  font-weight: 700;
-}
-
-.rb-auth {
-  max-width: 560px;
-  margin-inline: auto;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 32px;
-}
-
-.rb-auth .luxina_contact_form-wrap {
-  max-width: none;
 }
 
 .rb-detail-actions {
@@ -980,57 +952,15 @@ body:not(.home) .rb-section:first-of-type {
 }
 
 /* ---- Header actions ---------------------------------------------------
-   The account and consultation actions are icon-only and reveal their label on
-   hover instead of opening a list. */
-
-.header-actions-wrap .luxina-account {
-  gap: 0;
-  padding: 10px 12px;
-}
-
-.header-actions-wrap .luxina-account-display_name {
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  transition: max-width 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
-}
-
-.header-actions-wrap .luxina-account-wrap:hover .luxina-account-display_name,
-.header-actions-wrap .luxina-account-wrap:focus-within .luxina-account-display_name,
-.header-actions-wrap .luxina-account-wrap.logged-in-wrap .luxina-account-display_name {
-  max-width: 140px;
-  opacity: 1;
-  margin-inline-end: 8px;
-}
-
-/* Guests have no popover: the list only duplicated the icon's own label. */
-.header-actions-wrap .luxina-account-items:empty {
-  display: none;
-}
+   The consultation action stays on screen at all times: its label and phone
+   number are no longer hidden behind a hover on the icon. */
 
 .header-actions-wrap .header-action-btn-wrap {
-  gap: 0;
   white-space: nowrap;
-}
-
-.header-actions-wrap .header-action-btn-wrap > .header-action-btn-text-wrap {
-  gap: 0;
 }
 
 .header-actions-wrap .header-action-btn-wrap .header-action-btn-text {
   display: inline-block;
-  max-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-width 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
-}
-
-.header-actions-wrap .header-action-btn-wrap:hover .header-action-btn-text,
-.header-actions-wrap .header-action-btn-wrap:focus-within .header-action-btn-text {
-  max-width: 180px;
-  opacity: 1;
-  margin-inline-end: 8px;
 }
 
 /* ---- Responsive ------------------------------------------------------- */
@@ -1066,8 +996,7 @@ body:not(.home) .rb-section:first-of-type {
 
   .rb-article,
   .rb-service,
-  .rb-about,
-  .rb-auth {
+  .rb-about {
     padding: 20px;
   }
 
