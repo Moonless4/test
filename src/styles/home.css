@@ -179,6 +179,23 @@
   .hp-services .luxina_services_item-icon {
     margin-bottom: 12px;
   }
+
+  /* The theme sizes the hover panel for a full-width tile: 36px side padding
+     leaves ~40px of text in a half-width card, so the copy wrapped onto every
+     word and the panel grew taller than the card. Both the panel and its arrow
+     tab are scaled to the compact grid. */
+  .hp-services .luxina_services_item-subtitle-wrap {
+    padding-inline: 10px;
+  }
+
+  .hp-services .luxina_services_item-subtitle {
+    font-size: 0.75rem;
+    padding: 20px 10px 14px;
+  }
+
+  .hp-services .luxina_services_item-subtitle-arrow-wrap .luxina_pro_icon_container {
+    padding: 0 12px;
+  }
 }
 
 /* The service subtitle is collapsed until the card is hovered; its target
