@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Heart, ShoppingBag } from 'lucide-react';
-import { products } from '../../lib/data';
+import { useProductsByIds } from '../../hooks/useCatalog';
+import { SectionLoading } from '../ui/SectionState';
 import { useStore } from '../../context/StoreContext';
 import { toFa } from '../../lib/format';
 import EmptyState from '../ui/EmptyState';
@@ -11,7 +12,14 @@ import Img from '../ui/Img';
 /** Compact wishlist list for the account area; the full page lives at /wishlist. */
 export default function WishlistPanel() {
   const { wishlist, toggleWishlist, addToCart } = useStore();
-  const items = products.filter((product) => wishlist.includes(product.id));
+  // The ids live in the wishlist; the products come from the catalogue, so a retired product simply
+  // drops out instead of leaving a row pointing at nothing.
+  const { data, loading } = useProductsByIds(wishlist);
+  const items = data ?? [];
+
+  if (loading && wishlist.length > 0) {
+    return <SectionLoading label="در حال دریافت کالاها…" />;
+  }
 
   if (items.length === 0) {
     return (

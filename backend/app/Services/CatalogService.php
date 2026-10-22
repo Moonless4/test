@@ -119,10 +119,39 @@ class CatalogService
         // Lists, not array keys: PHP would turn a shoe size like "39" into the integer 39, and the
         // rail compares every option as a string.
         return [
-            'sizes' => array_values(array_unique($sizes)),
+            'sizes' => $this->sortSizes(array_values(array_unique($sizes))),
             'colors' => array_values(array_unique($colors)),
             'brands' => array_values(array_unique($brands)),
         ];
+    }
+
+    /**
+     * A size list is a scale, so it is presented in one: letter sizes first in the order the
+     * catalogue holds them (S، M، L، XL…), then waist and shoe numbers ascending, then a label such
+     * as «تک‌سایز». Without this the rail lists whatever order the rows happened to be read in.
+     *
+     * @param  array<int, string>  $sizes
+     * @return array<int, string>
+     */
+    private function sortSizes(array $sizes): array
+    {
+        $letters = [];
+        $numbers = [];
+        $other = [];
+
+        foreach ($sizes as $size) {
+            if (is_numeric($size)) {
+                $numbers[] = $size;
+            } elseif (preg_match('/^[A-Za-z]+$/', $size) === 1) {
+                $letters[] = $size;
+            } else {
+                $other[] = $size;
+            }
+        }
+
+        sort($numbers, SORT_NUMERIC);
+
+        return array_merge($letters, $numbers, $other);
     }
 
     public function findVisibleProduct(int|string $key): Product
