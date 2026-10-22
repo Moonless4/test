@@ -571,11 +571,10 @@
 
   .menu-btn {
     display: inline-grid;
-    position: absolute;
-    right: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 4;
+  }
+
+  .header__actions {
+    gap: 8px;
   }
 
   .header__bar {
@@ -629,20 +628,16 @@
   }
 
   .header__actions {
-    gap: 0;
+    gap: 6px;
   }
 
   .icon-btn {
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
   }
 
   .login-btn {
     display: none;
-  }
-
-  .menu-btn {
-    right: 10px;
   }
 
   .cart-count {
