@@ -131,12 +131,6 @@ export default function AuthModal({ open, onClose, onToast, onSuccess }) {
           </button>
         </form>
 
-        {mode === 'login' && (
-          <p className="auth__demo">
-            برای دیدن حساب نمونه با شماره ۰۹۱۲۱۲۳۴۵۶۷ و رمز دلخواه وارد شوید.
-          </p>
-        )}
-
         <p className="auth__terms">
           با ادامه، <a href="#footer">شرایط و ضوابط</a> و <a href="#footer">حریم خصوصی</a> نوال را
           می‌پذیرید.

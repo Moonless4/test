@@ -1,10 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { createAccount, createId, demoAccount } from '../data/account.js';
+import { createAccount, createId, DEFAULT_SETTINGS, REWARDS } from '../data/account.js';
 
 const ACCOUNTS_KEY = 'naval-accounts-v1';
 const SESSION_KEY = 'naval-account-session-v1';
 const GUEST_KEY = 'guest';
-const DEMO_KEY = demoAccount.user.phone;
+/* The old sample customer is gone; drop any trace of it left in storage */
+const LEGACY_SAMPLE_KEY = '09121234567';
 
 const AccountContext = createContext(null);
 
@@ -27,27 +28,35 @@ const normalize = (account) => ({
     points: 0,
     nextRewardAt: 500,
     tier: 'نقره‌ای',
-    rewards: demoAccount.loyalty.rewards,
+    rewards: REWARDS,
     history: [],
     ...account.loyalty,
   },
-  settings: { ...clone(demoAccount.settings), ...account.settings },
+  settings: { ...clone(DEFAULT_SETTINGS), ...account.settings },
 });
 
 const readAccounts = () => {
-  const fallback = {
-    [GUEST_KEY]: createAccount(),
-    [DEMO_KEY]: clone(demoAccount),
-  };
+  const fallback = { [GUEST_KEY]: createAccount() };
   try {
     const raw = localStorage.getItem(ACCOUNTS_KEY);
     if (!raw) return fallback;
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return fallback;
     const accounts = {};
+    let dropped = false;
     Object.entries(parsed).forEach(([key, value]) => {
+      if (key === LEGACY_SAMPLE_KEY) {
+        dropped = true;
+        return;
+      }
       if (value && typeof value === 'object' && value.user) accounts[key] = normalize(value);
     });
+    if (dropped) {
+      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+      if (localStorage.getItem(SESSION_KEY) === LEGACY_SAMPLE_KEY) {
+        localStorage.removeItem(SESSION_KEY);
+      }
+    }
     return { ...fallback, ...accounts };
   } catch {
     return fallback;
@@ -116,7 +125,7 @@ export function AccountProvider({ children }) {
     });
   }, []);
 
-  /* Login never falls back to the demo customer: an unknown number starts an empty account */
+  /* Login never falls back to a prepared profile: an unknown number starts an empty account */
   const login = useCallback(
     ({ identifier }) => {
       const key = normalizeDigits(identifier).trim().toLowerCase();

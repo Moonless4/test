@@ -49,10 +49,10 @@ interaction directly (cart, quick view, filters, FAQ, search, checkout).
 `reservations/:id`) render inside `src/account/AccountShell.jsx`; routes are
 matched in one block in `matchRoute()` in `src/App.jsx`.
 
-- `src/data/account.js` holds the demo customer in the shape a future API would
-  return (user, addresses, orders with priced items, reservations, favorites,
-  notifications, loyalty, settings) plus status dictionaries and Persian/Jalali
-  formatters (`fa`, `money`, `formatDate`, `orderTotal`, …). Edit seed data there.
+- `src/data/account.js` holds the account domain: `createAccount()` (empty new
+  customer), `REWARDS`, `DEFAULT_SETTINGS`, status dictionaries and Persian/Jalali
+  formatters (`fa`, `money`, `formatDate`, `orderTotal`, …). There is no seeded
+  sample customer — every account starts empty; edit shared defaults there.
 - `src/account/AccountContext.jsx` is the only state layer. It keeps one account
   per login identifier in `localStorage` under `naval-accounts-v1`
   (`{ [phone]: account }`) and the signed-in identifier under
@@ -63,9 +63,8 @@ matched in one block in `matchRoute()` in `src/App.jsx`.
 - Auth is a local simulation (no server, passwords are not stored): a login with
   an unknown number starts a brand-new empty account (from `createAccount()` in
   `src/data/account.js`), registration is refused for an already-used number, and
-  sign-out clears the session. Only the seeded demo number `09121234567` loads
-  the rich demo customer; the demo data used to leak into every new account, so
-  keep the demo entry keyed to that phone.
+  sign-out clears the session. No sample/demo customer exists any more; the
+  provider also purges the removed `09121234567` entry from stored accounts.
 - `/account/*` is gated: signed-out visitors get the sign-in card in
   `AccountShell` (it opens `AuthModal` through the `onLogin` prop from
   `src/App.jsx`) instead of the demo dashboard.
