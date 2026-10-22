@@ -21,12 +21,17 @@ use Illuminate\Database\Seeder;
  * attributes. Swapping in a real export is a data job: replace `PRODUCTS` (or edit the rows in the
  * admin panel) — nothing in the storefront or the API knows which catalogue it is rendering.
  *
- * Photos are **imported**, not uploaded: every row records the address the photo is published at
- * (`media.source_url`). They are licensed Unsplash fashion photographs, and each one was looked at
- * before it was assigned: the product's own name follows what the picture actually shows (a suit
- * photo sits on a suit, a boot photo on a boot), and a product's gallery only carries pictures of the
- * same kind of item. Several photos in that set are editorial shots of branded goods — the picture is
- * used as it is published on Unsplash, not as a claim that this shop sells that brand.
+ * **Product photos are local packshots**: a background-free WebP cut out of the photograph that shows
+ * that product, composited on a transparent 4:5 canvas and served by the storefront from its own
+ * `public/catalog` directory at `/catalog/<photo>.webp`. The gallery below still names the photograph
+ * each picture came from, so the product's own photo stays with the product — only its background is
+ * gone, and nothing is hotlinked for a product.
+ *
+ * Category tiles are still **imported** photos: their row records the address the tile is published
+ * at (`media.source_url`) because they are editorial banners rather than packshots. Every picture was
+ * looked at before it was assigned: the product's own name follows what the photo actually shows (a
+ * suit photo sits on a suit, a boot photo on a boot), and a product's gallery only carries pictures
+ * of the same kind of item.
  *
  * Prices are plain Toman integers. A discounted product carries both numbers: `price` is what the
  * shopper pays and `compare_at_price` is the original shown struck through above it; the discount
@@ -38,10 +43,17 @@ use Illuminate\Database\Seeder;
  */
 class CatalogSeeder extends Seeder
 {
-    /** Every photo is published at this size — the 4:5 crop a product card assumes. */
+    /** Category tiles are hotlinked at this size — the wide crop a tile assumes. */
     private const IMAGE_BASE = 'https://images.unsplash.com/photo-';
 
     private const IMAGE_PARAMS = '?auto=format&fit=crop&w=800&h=1000&q=70';
+
+    /** Product packshots: transparent WebP files the storefront serves itself, already 4:5. */
+    private const PACKSHOT_DIR = '/catalog/';
+
+    private const PACKSHOT_WIDTH = 1000;
+
+    private const PACKSHOT_HEIGHT = 1250;
 
     /**
      * slug => [name, subtitle, photo]
@@ -802,6 +814,8 @@ class CatalogSeeder extends Seeder
             $this->attachGallery($product, $seed['gallery']);
         }
 
+        $this->purgeOrphanedImports();
+
         $this->command?->info('Catalogue seeded: '.count(self::PRODUCTS).' products.');
     }
 
@@ -822,7 +836,51 @@ class CatalogSeeder extends Seeder
     }
 
     /**
-     * Records a photo the catalogue publishes at its own address.
+     * Drops the imported photo rows nothing points at any more.
+     *
+     * Product photos used to be hotlinked (`imported/<hash>.jpg`); the packshots that replaced them
+     * carry their own `catalog/<photo>.webp` path, so the old rows would be left behind as orphans by
+     * a re-seed. Only that old convention is swept — a photo uploaded in the admin panel lives under
+     * a different path and is never touched, and a category tile still using its imported row keeps it.
+     */
+    private function purgeOrphanedImports(): void
+    {
+        Media::query()
+            ->where('path', 'like', 'imported/%')
+            ->whereNotIn('id', ProductImage::query()->select('media_id'))
+            ->whereNotIn('id', Category::query()->whereNotNull('image_media_id')->select('image_media_id'))
+            ->delete();
+    }
+
+    /**
+     * Records a local packshot: a background-free 4:5 WebP the storefront serves from `public/catalog`.
+     *
+     * The file ships with the storefront build rather than living in Laravel's storage, so the row
+     * carries the URL the browser should use and leaves the byte counts null — the same shape an
+     * imported photo has. Keyed on its own path, so re-running the seeder updates the row.
+     */
+    private function packshotImage(string $photo): Media
+    {
+        $file = $photo.'.webp';
+
+        return Media::query()->updateOrCreate(
+            ['disk' => 'public', 'path' => 'catalog/'.$file],
+            [
+                'source_url' => self::PACKSHOT_DIR.$file,
+                'original_name' => $file,
+                'mime_type' => 'image/webp',
+                'size_bytes' => null,
+                'width' => self::PACKSHOT_WIDTH,
+                'height' => self::PACKSHOT_HEIGHT,
+                'checksum' => null,
+                'is_public' => true,
+                'uploaded_by' => null,
+            ],
+        );
+    }
+
+    /**
+     * Records a category tile the catalogue publishes at its own address.
      *
      * `media` is unique per (disk, path), and an imported row still has to be told apart from every
      * other one, so its path is a stable name derived from the address itself — never a file that
@@ -856,7 +914,7 @@ class CatalogSeeder extends Seeder
         $ids = [];
 
         foreach ($gallery as $position => $photo) {
-            $media = $this->importedImage($photo, $product->name);
+            $media = $this->packshotImage($photo);
             $ids[] = $media->getKey();
 
             ProductImage::query()->updateOrCreate(

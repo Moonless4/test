@@ -53,6 +53,15 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   downloaded, so `size_bytes`/`checksum` are null for those rows; a photo uploaded in the admin panel
   is still a real file on the public disk. `php artisan db:seed --class=CatalogSeeder --force` re-runs
   it idempotently.
+- **Product photos are background-free packshots, and the shop serves them itself**: every product
+  photo is a transparent WebP at `public/catalog/<photo>.webp` (1000×1250, the 4:5 the cards assume),
+  cut out of the photograph that shows that product and composited on a transparent canvas. The
+  media row still points at that file through `source_url` (`/catalog/…`, root-relative so it
+  resolves on the storefront's own origin), and `CatalogSeeder::packshotImage()` writes it — so
+  `public/catalog` must travel with the frontend build: a host that deploys only `dist/` gets the
+  images from `dist/catalog` because Vite copies `public/`. Category tiles are the only catalogue
+  photos still hotlinked from `images.unsplash.com`; a re-seed sweeps the product rows that used to
+  be hotlinked (`imported/%`, orphans only) so nothing stale is left in `media`.
 - **The filter rail's options are their own endpoint** — `GET /api/v1/products/filters`, registered
   *before* `products/{product}`: the sizes, colours and brands of the **whole** published catalogue
   (`attributes.size`/`attributes.color` plus the `brand` column). The rail is built from that and
@@ -160,10 +169,12 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
 - **Discounted products must always show the original price with a strikethrough above the
   discounted price.** That rule lives in `src/components/ui/PriceDisplay.tsx`; the red badge is
   `DiscountBadge`. Both are driven by `price` / `originalPrice` in `src/lib/data.ts`.
-- **Images** are hotlinked from `images.unsplash.com` and need network access in the browser.
-  Always build URLs through `src/lib/images.ts` (`img`, `heroImg`, `wideImg`, `avatarImg`) so the
-  crop size and `auto=format` (AVIF/WebP) parameters stay consistent. Product cards assume a 4:5
-  image area. The hero slider carries two crops per slide: `image` (1800×780, tablets and desktop)
+- **Images**: product photography is **local** — `/catalog/<photo>.webp`, transparent and already
+  4:5 (`public/catalog`, written by the catalogue seeder), so a product card needs no crop and no
+  third-party CDN. Editorial artwork (hero slides, category tiles, avatars) is still hotlinked from
+  `images.unsplash.com` and needs network access in the browser; build those URLs through
+  `src/lib/images.ts` (`img`, `heroImg`, `wideImg`, `avatarImg`) so the crop size and `auto=format`
+  (AVIF/WebP) parameters stay consistent. Product cards assume a 4:5 image area. The hero slider carries two crops per slide: `image` (1800×780, tablets and desktop)
   and `imagePhone` (1100×1000). The wide crop inside a phone-height box is zoomed in ~2.6× (only a
   third of the photo survives `object-cover`), so `Hero` picks `imagePhone` under
   `matchMedia('(max-width: 639px)')` and its box keeps that ~11:10 shape (`aspect-[11/10]`,
