@@ -1,0 +1,63 @@
+# Medora storefront — the static build, on Apache/LiteSpeed shared hosting.
+#
+# Vite copies `public/` into `dist/`, so this file travels with the build and applies to the
+# document root the shop is served from. It carries nothing about the application: only transport
+# (compression, cache policy) and the one rewrite a single-page app needs. A host that does not
+# read .htaccess (nginx, a CDN) has to express the same three things in its own configuration.
+
+# --- client routes -------------------------------------------------------
+# Every URL that is not a real file is a client route (`/shop`, `/product/…`, `/blog/…`, and the
+# admin panel's own prefix), so it is answered with the shell and the router takes over. Without
+# this a deep link or a refresh 404s.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # The API lives on the Laravel app's own host/prefix and is never a client route.
+  RewriteRule ^api/ - [L]
+
+  # A real file or directory wins: assets, product photos, fonts, the theme archive.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  RewriteRule . /index.html [L]
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType font/woff2 .woff2
+  AddType image/avif .avif
+  AddType image/webp .webp
+</IfModule>
+
+# --- compression ---------------------------------------------------------
+# Text assets only: fonts, AVIF, WebP and PNG are already compressed, and re-compressing them
+# costs CPU on every request for no bytes saved.
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/css text/javascript text/plain text/xml application/javascript application/json application/xml image/svg+xml
+</IfModule>
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript text/plain text/xml application/javascript application/json application/xml image/svg+xml
+</IfModule>
+
+# --- caching -------------------------------------------------------------
+<IfModule mod_headers.c>
+  # Vite fingerprints every CSS/JS file in `assets/` with a content hash, and the shell names the
+  # current hashes — so those two are the only files whose URL changes when their bytes do.
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Photos, fonts and the hero are not hashed, so they are cached for a month instead of a year:
+  # a re-seed or a replaced photo must not be invisible for a year.
+  <FilesMatch "\.(avif|webp|png|jpe?g|svg|ico|woff2)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

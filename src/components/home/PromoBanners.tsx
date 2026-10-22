@@ -13,7 +13,12 @@ export default function PromoBanners() {
       <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
         {BANNERS.map((banner, i) => (
           <Reveal key={banner.id} delay={i * 100}>
-            <BannerTile to={banner.to} image={banner.image} label={banner.label} />
+            <BannerTile
+              to={banner.to}
+              image={banner.image}
+              label={banner.label}
+              sizes="(min-width: 640px) 50vw, 100vw"
+            />
           </Reveal>
         ))}
       </div>

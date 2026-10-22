@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { useCategories } from '../../hooks/useCatalog';
+import { unsplashSrcSet } from '../../lib/images';
 import Img from '../ui/Img';
 import Reveal from '../ui/Reveal';
 import { SectionError, SectionLoading } from '../ui/SectionState';
@@ -60,8 +61,12 @@ export default function CategoryCards() {
                   to={`/shop/${category.id}`}
                   className="group flex flex-col items-center text-center transition-transform duration-500 ease-out group-hover:-translate-y-1"
                 >
+                  {/* A tile is at most 190px wide, so it asks for a 400px crop instead of the
+                      800×1000 the catalogue publishes — the browser still gets a 2× image. */}
                   <Img
                     src={category.image}
+                    srcSet={unsplashSrcSet(category.image, 400)}
+                    sizes="(min-width: 1024px) 190px, (min-width: 640px) 168px, 136px"
                     alt=""
                     loading="lazy"
                     decoding="async"

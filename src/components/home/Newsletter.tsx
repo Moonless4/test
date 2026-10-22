@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CheckCircle2, Mail } from 'lucide-react';
 import { promoArt } from '../../lib/data';
+import { unsplashSrcSet } from '../../lib/images';
 import Img from '../ui/Img';
 import Reveal from '../ui/Reveal';
 
@@ -22,6 +23,8 @@ export default function Newsletter() {
           <div className="relative min-h-[180px] lg:min-h-[300px]">
             <Img
               src={promoArt.newsletter}
+              srcSet={unsplashSrcSet(promoArt.newsletter, 600)}
+              sizes="(min-width: 1024px) 620px, 100vw"
               alt=""
               loading="lazy"
               decoding="async"

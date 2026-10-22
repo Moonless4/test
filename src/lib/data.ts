@@ -259,26 +259,38 @@ export const megaMenu: Record<CategoryId, MegaMenuSection[]> = {
   ],
 };
 
+/**
+ * The hero is the page's LCP, so its artwork is served from this origin instead of a third-party
+ * CDN (`public/hero`, AVIF with a WebP fallback, cut at the two crops `Hero` asks for). The first
+ * slide's four URLs are preloaded in `index.html` and must stay byte-identical to the ones here,
+ * or the photo is downloaded twice.
+ */
 export const heroSlides = [
   {
-    image: wideImg('1521572163474-6864f9cf17ab', 1800, 780),
-    imagePhone: wideImg('1521572163474-6864f9cf17ab', 1100, 1000),
+    image: '/hero/1521572163474-6864f9cf17ab-wide.webp',
+    imageAvif: '/hero/1521572163474-6864f9cf17ab-wide.avif',
+    imagePhone: '/hero/1521572163474-6864f9cf17ab-phone.webp',
+    imagePhoneAvif: '/hero/1521572163474-6864f9cf17ab-phone.avif',
     eyebrow: 'کالکشن پاییز و زمستان',
     title: ['استایل خاص', 'برای هر لحظه'],
     text: 'جدیدترین ترندهای لباس مردانه، زنانه و اکسسوری‌های خاص را اینجا پیدا کنید.',
     cta: { label: 'مشاهده مجموعه', to: '/shop' },
   },
   {
-    image: wideImg('1539109136881-3be0616acf4b', 1800, 780),
-    imagePhone: wideImg('1539109136881-3be0616acf4b', 1100, 1000),
+    image: '/hero/1539109136881-3be0616acf4b-wide.webp',
+    imageAvif: '/hero/1539109136881-3be0616acf4b-wide.avif',
+    imagePhone: '/hero/1539109136881-3be0616acf4b-phone.webp',
+    imagePhoneAvif: '/hero/1539109136881-3be0616acf4b-phone.avif',
     eyebrow: 'کالکشن زنانه',
     title: ['ظاهری مدرن', 'با حس روزمره'],
     text: 'ترکیبی از راحتی و ظرافت برای استایل‌های روزانه و مهمانی‌های خاص.',
     cta: { label: 'مشاهده مجموعه', to: '/shop/women' },
   },
   {
-    image: wideImg('1552374196-c4e7ffc6e126', 1800, 780),
-    imagePhone: wideImg('1552374196-c4e7ffc6e126', 1100, 1000),
+    image: '/hero/1552374196-c4e7ffc6e126-wide.webp',
+    imageAvif: '/hero/1552374196-c4e7ffc6e126-wide.avif',
+    imagePhone: '/hero/1552374196-c4e7ffc6e126-phone.webp',
+    imagePhoneAvif: '/hero/1552374196-c4e7ffc6e126-phone.avif',
     eyebrow: 'جدیدترین‌ها',
     title: ['ساده، دقیق', 'و همیشه شیک'],
     text: 'پوشاکی که با کیفیت دوخت و پارچه‌ی درست، سال‌ها همراه شما می‌ماند.',

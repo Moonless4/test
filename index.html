@@ -9,7 +9,8 @@
       content="مدورا | فروشگاه اینترنتی پوشاک و اکسسوری — جدیدترین ترندهای لباس مردانه، زنانه و اکسسوری‌های خاص."
     />
     <title>مدورا | MEDORA — پوشاک و اکسسوری</title>
-    <!-- Product photography is the only third-party host on the critical path. -->
+    <!-- Editorial artwork below the fold (category tiles, banners, avatars) is the only
+         third-party host left; the hero and the product packshots are served from here. -->
     <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="dns-prefetch" href="https://images.unsplash.com" />
     <!-- The two weights the first screen uses, before the CSS is parsed. -->
@@ -28,19 +29,23 @@
       crossorigin
     />
     <!-- The hero's first slide, preloaded per breakpoint so the LCP image starts before React
-         renders. The URLs must stay identical to the ones Hero asks for (see AGENTS.md). -->
+         renders. It is AVIF (the WebP fallback the <picture> names is not preloaded, so a browser
+         without AVIF simply fetches it without the hint). The URLs must stay identical to the ones
+         Hero asks for (see AGENTS.md). -->
     <link
       rel="preload"
       as="image"
+      type="image/avif"
       media="(max-width: 639px)"
-      href="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1100&h=1000&q=72"
+      href="/hero/1521572163474-6864f9cf17ab-phone.avif"
       fetchpriority="high"
     />
     <link
       rel="preload"
       as="image"
+      type="image/avif"
       media="(min-width: 640px)"
-      href="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1800&h=780&q=72"
+      href="/hero/1521572163474-6864f9cf17ab-wide.avif"
       fetchpriority="high"
     />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23123F50'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='16' font-weight='700' fill='white' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E" />

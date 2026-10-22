@@ -12,6 +12,10 @@ export default function Hero() {
   // The wide desktop crop inside a phone-height box zooms in ~2.6×, so phones take their own
   // crop, shaped like the box they fill.
   const [phone] = useState(() => window.matchMedia('(max-width: 639px)').matches);
+  // Only the first slide is on screen at load, and it is the page's LCP image: the two that
+  // rotate in are fetched once the browser is idle, so they cannot compete with it for
+  // bandwidth. The timeout keeps that from ever being later than the first rotation.
+  const [followers, setFollowers] = useState(false);
 
   useEffect(() => {
     const timer = window.setInterval(
@@ -19,6 +23,14 @@ export default function Hero() {
       SLIDE_MS,
     );
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const idle = window.requestIdleCallback(
+      () => setFollowers(true),
+      { timeout: SLIDE_MS - 2000 },
+    );
+    return () => window.cancelIdleCallback(idle);
   }, []);
 
   const move = (step: number) =>
@@ -43,14 +55,21 @@ export default function Hero() {
             >
               {/* The first slide is the page's LCP image; the other two sit inside the viewport as
                   well, so without a low priority they would compete with it. */}
-              <Img
-                src={phone ? slide.imagePhone : slide.image}
-                alt=""
-                loading={i === 0 ? 'eager' : 'lazy'}
-                priority={i === 0 ? 'high' : 'low'}
-                decoding="async"
-                className="h-full w-full object-cover object-center"
-              />
+              {i === 0 || followers ? (
+                <picture className="block h-full w-full">
+                  {/* AVIF is ~45% smaller than the WebP fallback and is what the LCP preload in
+                      `index.html` names; the WebP is what a browser without AVIF renders. */}
+                  <source type="image/avif" srcSet={phone ? slide.imagePhoneAvif : slide.imageAvif} />
+                  <Img
+                    src={phone ? slide.imagePhone : slide.image}
+                    alt=""
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                    priority={i === 0 ? 'high' : 'low'}
+                    decoding="async"
+                    className="h-full w-full object-cover object-center"
+                  />
+                </picture>
+              ) : null}
             </div>
           ))}
 

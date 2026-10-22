@@ -94,8 +94,11 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   exactly `{data:{path}}` (`tests/Feature/AdminPanelPathTest.php` asserts the whole body). The
   segment must stay equal in all three places that name it: `Setting::DEFAULT_ADMIN_PATH`, the
   `admin.path` row `SettingSeeder` writes, and `DEFAULT_ADMIN_PATH` in `src/admin/lib/basePath.ts`
-  (the SPA draws the panel at its own copy when the lookup fails). `src/admin/lib/basePath.ts` reads it once before the first render
-  (`main.tsx` → `initAdminBase()`), and `App.tsx` mounts `AdminApp` on that prefix alone — so the
+  (the SPA draws the panel at its own copy when the lookup fails). `src/admin/lib/basePath.ts` reads it once, and **it never holds up the
+  storefront**: `main.tsx` draws the shop immediately — the hero, the page's LCP image, must not wait
+  on a request — and re-renders only when the setting actually moved the panel off its default
+  segment, which is also what keeps a shop that never moved it from rendering twice. `App.tsx`
+  mounts `AdminApp` on that prefix alone — so the
   shop can move the panel from its own Settings screen without a deployment (that screen reloads at
   the new address, since the prefix is fixed for the life of a page load). Links inside the panel
   must go through `adminHref()`; a literal `/admin/…` would navigate off the mounted prefix.
@@ -173,10 +176,18 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   `DiscountBadge`. Both are driven by `price` / `originalPrice` in `src/lib/data.ts`.
 - **Images**: product photography is **local** — `/catalog/<photo>.webp`, transparent and already
   4:5 (`public/catalog`, written by the catalogue seeder), so a product card needs no crop and no
-  third-party CDN. Editorial artwork (hero slides, category tiles, avatars) is still hotlinked from
-  `images.unsplash.com` and needs network access in the browser; build those URLs through
-  `src/lib/images.ts` (`img`, `heroImg`, `wideImg`, `avatarImg`) so the crop size and `auto=format`
-  (AVIF/WebP) parameters stay consistent. Product cards assume a 4:5 image area. The hero slider carries two crops per slide: `image` (1800×780, tablets and desktop)
+  third-party CDN. **The hero is local too** (`public/hero/<id>-<crop>.avif` + a `.webp` fallback,
+  written by hand from the same Unsplash photo): it is the page's LCP, so it is the one piece of
+  artwork that must not sit behind a third-party connection, and AVIF is ~45% smaller than the WebP
+  it falls back to. Everything else editorial — category tiles, promo tiles, the newsletter, avatars,
+  blog photos — is still hotlinked from `images.unsplash.com` and needs network access in the
+  browser; build those URLs through `src/lib/images.ts` (`img`, `heroImg`, `wideImg`, `avatarImg`) so
+  the crop size and `auto=format` (AVIF/WebP) parameters stay consistent, and **size them where they
+  are drawn**: the `w`/`h` in those URLs are what the *source* asked for, never what the element
+  needs, so a tile drawn at 136px was downloading 800×1000 and a promo tile drawn at 343px was
+  downloading 1600×1100. `unsplashSrcSet(url, width)` (same file) emits a right-sized crop, a 2× one
+  and the source, and the call site passes the layout `sizes` — a fixed `src` alone is the old
+  behaviour. Product cards assume a 4:5 image area. The hero slider carries two crops per slide: `image` (1800×780, tablets and desktop)
   and `imagePhone` (1100×1000). The wide crop inside a phone-height box is zoomed in ~2.6× (only a
   third of the photo survives `object-cover`), so `Hero` picks `imagePhone` under
   `matchMedia('(max-width: 639px)')` and its box keeps that ~11:10 shape (`aspect-[11/10]`,
@@ -225,9 +236,12 @@ Measured on the production build (`npm run build` then `vite preview`) with mobi
   both weights are preloaded in `index.html` with `crossorigin`. The `@font-face` rules must keep
   pointing at the WOFF2 files or the preload is wasted.
 - **The hero's first slide is preloaded per breakpoint** in `index.html` (phone crop under 640px, the
-  wide crop above it). Those two URLs must stay byte-identical to the ones `Hero` asks for, or the
-  photo downloads twice. `Hero` gives slide 0 `priority="high"` and the other slides `"low"`: all
-  three sit inside the viewport, so without it the followers compete with the LCP image.
+  wide crop above it), as AVIF. Those two URLs must stay byte-identical to the ones `Hero` asks for,
+  or the photo downloads twice. `Hero` gives slide 0 `priority="high"` and the other slides `"low"`,
+  and mounts those two only once the browser is idle (`requestIdleCallback`, capped just below the
+  first rotation): all three sit inside the viewport, so without both the followers compete with the
+  LCP image for bandwidth. A browser without AVIF ignores the preload's `type` and renders the WebP
+  fallback the `<picture>` names.
 - `Img` exposes `priority`, which writes the lowercase `fetchpriority` attribute. React 18 drops the
   camelCase `fetchPriority` prop with a console warning — use `priority`, never `fetchPriority`.
 - **Route chunks**: every page except `HomePage` is `lazy()` in `App.tsx`, inside one `Suspense`
@@ -238,8 +252,12 @@ Measured on the production build (`npm run build` then `vite preview`) with mobi
   cannot shift the layout. The `.png` originals remain as the source and are no longer requested.
 - The dev server on port 3000 serves unbundled modules with no compression and no caching, so
   Lighthouse numbers against it mean nothing — measure the built app.
-- Left to the host, not done here: Brotli/Gzip on the wire and long-lived caching for the hashed
-  `dist/assets/*` files (Vite already fingerprints them). See "Porting to WordPress".
+- **The built app carries its own transport rules**: `public/.htaccess` (Vite copies `public/` into
+  `dist/`) turns Brotli/gzip on for text assets, gives the hashed `assets/*.css|js` a year and the
+  unhashed photos/fonts a month, and rewrites every URL that is not a real file to `index.html`, so a
+  deep link or a refresh does not 404. Nothing in it executes in the sandbox — it is the host's
+  Apache/LiteSpeed configuration, so it can only be verified on the host; a host on nginx has to
+  express the same three things itself. See "Porting to WordPress".
 
 ## Where things live
 

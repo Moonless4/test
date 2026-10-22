@@ -1,14 +1,24 @@
 import { Link } from 'react-router-dom';
+import { unsplashSrcSet } from '../../lib/images';
 import Img from '../ui/Img';
 
 type Props = {
   to: string;
   image: string;
   label: string;
+  /**
+   * The layout width this tile is drawn at, for the browser's `srcset` choice: `50vw` for a tile
+   * that shares a row, `100vw` for a full-bleed one.
+   */
+  sizes?: string;
 };
 
 /** Photo-only promo tile: olive canvas, soft corners, no copy. */
-export default function BannerTile({ to, image, label }: Props) {
+export default function BannerTile({ to, image, label, sizes = '100vw' }: Props) {
+  // These tiles are the widest artwork on the page and were downloading a 1600px source at every
+  // viewport; the browser now picks the crop that matches the screen it is drawn on.
+  const srcSet = unsplashSrcSet(image, 600);
+
   return (
     <Link
       to={to}
@@ -17,6 +27,8 @@ export default function BannerTile({ to, image, label }: Props) {
     >
       <Img
         src={image}
+        srcSet={srcSet}
+        sizes={srcSet ? sizes : undefined}
         alt=""
         loading="lazy"
         decoding="async"
