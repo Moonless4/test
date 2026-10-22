@@ -426,28 +426,29 @@ not `curl -I` — a HEAD response says nothing about whether the file is served.
 `wp-theme/docker-compose.wordpress.yml` brings up a throwaway WordPress + WooCommerce stack to try
 the theme against; `wp-theme/dev/` holds what it needs.
 
-## Packaging the site for the host
+## Exporting the project for the owner's host
 
-`npm run pack:site` (`tools/pack-site.mjs`) builds the storefront and writes the archive the owner
-uploads by hand, twice served from the preview at **`/styleon-site.zip`**:
+`npm run pack:project` (`tools/pack-project.mjs`) builds the storefront and writes the whole project
+to `public/styleon-project.zip`, served from the preview at **`/styleon-project.zip`**. Everything
+sits under one top-level `styleon/` folder: the frontend source, the built `dist/`, `server/`, the
+Laravel `backend/` (with `vendor/`), both `.env.example` templates and `DEPLOYMENT.md` — the
+self-hosting guide the owner reads first, and the file to update whenever the deployment story
+changes. The script refuses to write an archive that is missing any of those, so a rename cannot
+quietly produce a half-export.
 
-- `frontend/` — the contents of `dist/`. Its **contents**, not the folder, go in the shop domain's
-  document root; `frontend/.htaccess` is the transport/SPA config and travels with it.
-- `backend/` — the Laravel application, **with `backend/vendor/`** (the deployment guide prefers
-  uploading it, since shared hosts cap Composer's memory). It goes *above* the web root, never
-  inside `public_html/`, and its document root is `backend/public`.
-- `README-DEPLOY.txt` — the same two-destination summary, in Persian, for whoever does the upload.
+What deliberately stays behind: `node_modules/` (the lockfile travels), any `.env` (the host writes
+its own, with its own `APP_KEY`), runtime logs and caches, and every SQLite file. Laravel's
+`storage/framework/*`, `storage/logs` and `bootstrap/cache` travel as **empty directories** —
+Laravel refuses to boot without them, and a directory whose every file was skipped has to be carried
+as its own zip entry (`tools/zip.mjs` writes those). Also left out: the Base44 development
+environment (`docker-compose.base44.yml`, `.base44/`, `AGENTS.md` — they name the sandbox's hosts and
+the platform-managed env file) and the optional WordPress theme (`wp-theme/`, `tools/build-theme.mjs`
+and the `theme:*` scripts, which the packer strips from the archived `package.json`), because the
+site is not WordPress. The archive itself is excluded from the tree: the build copies `public/` into
+`dist/`, so a second run would otherwise find the previous archive inside the new one.
 
-What deliberately stays behind: any `.env` (the host writes its own, with its own `APP_KEY`), the
-storefront's `node_modules`, runtime logs and caches, and every SQLite file. `storage/framework/*`,
-`storage/logs` and `bootstrap/cache` travel as **empty directories** — Laravel refuses to boot
-without them, and a directory whose every file was skipped has to be carried as its own zip entry
-(`tools/zip.mjs` writes those). The archive itself is excluded from the tree, because the build
-copies `public/` into `dist/` and a second run would otherwise find the previous archive inside the
-new one.
-
-`public/styleon-site.zip` is **gitignored** — it is tens of MB of build output. Regenerate it with
-`npm run pack:site` rather than committing it; the dev server serves it from `public/` whether or
+`public/styleon-project.zip` is **gitignored** — tens of MB of build output. Regenerate it with
+`npm run pack:project` rather than committing it; the dev server serves it from `public/` whether or
 not git tracks it. The minimal ZIP writer both this script and `theme:build` use lives in
 `tools/zip.mjs`.
 
