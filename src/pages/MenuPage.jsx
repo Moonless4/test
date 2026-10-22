@@ -1,7 +1,5 @@
 import PageHero from '../components/PageHero.jsx';
 import ProductGrid from '../components/ProductGrid.jsx';
-import LatestFood from '../components/LatestFood.jsx';
-import { products } from '../data/content.js';
 
 export default function MenuPage({ filter, onFilter, onAdd, onOpen }) {
   return (
@@ -21,7 +19,6 @@ export default function MenuPage({ filter, onFilter, onAdd, onOpen }) {
         onOpen={onOpen}
         onViewAll={() => onFilter('all')}
       />
-      <LatestFood products={products} onOpen={onOpen} onAdd={onAdd} />
     </>
   );
 }
