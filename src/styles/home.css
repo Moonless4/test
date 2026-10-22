@@ -150,6 +150,36 @@
   isolation: isolate;
 }
 
+/* Compact 2x2 service grid: the tiles stay small instead of one tall row. */
+.hp-services .luxina_services_item {
+  --item-height: 340px;
+}
+
+@media (max-width: 1024px) {
+  .hp-services .luxina_services_item {
+    --item-height: 300px;
+  }
+}
+
+@media (max-width: 767px) {
+  .hp-services .luxina_services_item {
+    --item-height: 240px;
+  }
+
+  .hp-services .luxina_services_item-title {
+    font-size: 1rem;
+  }
+
+  .hp-services .luxina_services_item-title-wrap {
+    padding-bottom: 32px;
+    margin: 10px;
+  }
+
+  .hp-services .luxina_services_item-icon {
+    margin-bottom: 12px;
+  }
+}
+
 /* The service subtitle is collapsed until the card is hovered; its target
    height is measured by `ServicesSection`. */
 .hp-services .luxina_services_item-subtitle-wrap {

@@ -35,12 +35,12 @@ const SERVICES = [
 ];
 
 const TRACK_STYLE = {
-  '--desktop-cols': 4,
-  '--desktop-gap': '0px 0px',
+  '--desktop-cols': 2,
+  '--desktop-gap': '16px',
   '--tablet-cols': 2,
-  '--tablet-gap': '0px 0px',
-  '--mobile-cols': 1,
-  '--mobile-gap': '16px 0px',
+  '--tablet-gap': '12px',
+  '--mobile-cols': 2,
+  '--mobile-gap': '12px',
 };
 
 export default function ServicesSection() {
@@ -101,7 +101,7 @@ export default function ServicesSection() {
               </button>
             </div>
 
-            <div className="wrapper luxina_services_wrap desktop-columns desktop-columns-4 desktop-display-grid tablet-columns tablet-columns-2 tablet-display-grid mobile-columns mobile-columns-1 mobile-display-grid">
+            <div className="wrapper luxina_services_wrap desktop-columns desktop-columns-2 desktop-display-grid tablet-columns tablet-columns-2 tablet-display-grid mobile-columns mobile-columns-2 mobile-display-grid">
               {SERVICES.map((service) => (
                 <a
                   className="luxina_services_item-wrapper slider-slide"
@@ -111,7 +111,7 @@ export default function ServicesSection() {
                 >
                   <div
                     className="luxina_services_item"
-                    style={{ '--item-height': '520px', backgroundImage: `url(${service.image})` }}
+                    style={{ backgroundImage: `url(${service.image})` }}
                   >
                     <div className="luxina_services_item-title-wrap">
                       <i className={`luxinaicon ${service.icon} luxina_services_item-icon`} aria-hidden="true" />
