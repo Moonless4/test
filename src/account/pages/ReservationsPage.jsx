@@ -145,7 +145,7 @@ export default function ReservationsPage({ onToast, onReserve, onCancel, onResch
           }
           text={
             tab === 'upcoming'
-              ? 'یک شب دل‌نشین در نوال رزرو کنید؛ میز کنار پنجره یا تراس روباز.'
+              ? 'یک شب دل‌نشین در آترین رزرو کنید؛ میز کنار پنجره یا تراس روباز.'
               : 'با اولین رزرو، سابقه شما در این بخش ثبت می‌شود.'
           }
           actionLabel="رزرو میز"

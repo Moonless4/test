@@ -51,7 +51,7 @@ function StatItem({ stat }) {
 
 export default function Stats() {
   return (
-    <section className="stats-wrap" aria-label="آمار رستوران نوال">
+    <section className="stats-wrap" aria-label="آمار رستوران آترین">
       <div className="container">
         <div className="stats">
           <span className="stats__ornament stats__ornament--right" aria-hidden="true" />

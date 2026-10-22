@@ -8,9 +8,9 @@ export default function AboutPage({ onMenu, onReserve }) {
   return (
     <>
       <PageHero
-        eyebrow="درباره نوال"
+        eyebrow="درباره آترین"
         title="داستان"
-        highlight="رستوران نوال"
+        highlight="رستوران آترین"
         script="About us"
         text="از سال ۱۳۹۲ با عشق به طعم و مهمان‌نوازی؛ آشپزخانه‌ای که مواد اولیه تازه را پایه هر غذا می‌داند."
         crumbs={[{ label: 'درباره ما' }]}

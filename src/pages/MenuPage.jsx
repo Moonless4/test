@@ -7,7 +7,7 @@ export default function MenuPage({ filter, onFilter, onAdd, onOpen }) {
       <PageHero
         eyebrow="منوی رستوران"
         title="منوی کامل"
-        highlight="نوال"
+        highlight="آترین"
         script="Our Menu"
         text="از پیش‌غذاهای سبک تا استیک‌های گریل؛ روی هر غذا بزنید تا جزئیات کامل و مواد اولیه‌اش را ببینید."
         crumbs={[{ label: 'منو' }]}

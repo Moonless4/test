@@ -54,7 +54,7 @@ export default function AuthModal({ open, onClose, onToast, onSuccess }) {
         <span className="auth__logo">
           <Icon name="user" size={30} />
         </span>
-        <h2>{mode === 'login' ? 'خوش برگشتید' : 'به نوال خوش آمدید'}</h2>
+        <h2>{mode === 'login' ? 'خوش برگشتید' : 'به آترین خوش آمدید'}</h2>
         <p>برای پیگیری سفارش‌ها و رزروهای خود وارد شوید.</p>
 
         <div className="auth__tabs" role="tablist">
@@ -132,7 +132,7 @@ export default function AuthModal({ open, onClose, onToast, onSuccess }) {
         </form>
 
         <p className="auth__terms">
-          با ادامه، <a href="#footer">شرایط و ضوابط</a> و <a href="#footer">حریم خصوصی</a> نوال را
+          با ادامه، <a href="#footer">شرایط و ضوابط</a> و <a href="#footer">حریم خصوصی</a> آترین را
           می‌پذیرید.
         </p>
       </div>

@@ -11,7 +11,7 @@ export default function BenefitsSection() {
           <div className="benefits__head">
             <span className="section-heading__eyebrow">
               <img src="/assets/title-symbol.webp" alt="" aria-hidden="true" />
-              چرا رستوران نوال؟
+              چرا رستوران آترین؟
             </span>
             <h2 id="benefits-title">
               هر وعده، یک <span className="title-highlight">تجربه کامل</span>
@@ -37,7 +37,7 @@ export default function BenefitsSection() {
 
             <div className="benefits__visual">
               <span className="benefits__plate" aria-hidden="true" />
-              <img src="/assets/intro-burger.webp" alt="برگر مخصوص رستوران نوال" loading="lazy" />
+              <img src="/assets/intro-burger.webp" alt="برگر مخصوص رستوران آترین" loading="lazy" />
               <span className="benefits__seal">
                 <Icon name="fork" size={17} />
                 دست‌ساز و تازه

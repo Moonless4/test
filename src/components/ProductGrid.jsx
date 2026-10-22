@@ -16,7 +16,7 @@ export default function ProductGrid({ filter, onFilter, onAdd, onOpen, onViewAll
             title="غذاها بر اساس"
             highlight="دسته‌بندی"
             script="Our Menu"
-            text="از پیش‌غذاهای سبک تا استیک‌های گریل؛ هر سلیقه‌ای که داشته باشید، جای مناسبی در منوی نوال پیدا می‌کنید."
+            text="از پیش‌غذاهای سبک تا استیک‌های گریل؛ هر سلیقه‌ای که داشته باشید، جای مناسبی در منوی آترین پیدا می‌کنید."
           >
             <span className="menu-count">
               {visible.length.toLocaleString('fa-IR')} <small>غذا</small>

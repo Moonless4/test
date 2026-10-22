@@ -102,7 +102,7 @@ export const ORDER_FLOW = ['review', 'preparing', 'ready', 'delivered'];
    Account defaults — shared by every customer
    ========================================================= */
 
-export const ACCOUNT_RESTAURANT = 'نوال — شعبه سعادت‌آباد';
+export const ACCOUNT_RESTAURANT = 'آترین — شعبه سعادت‌آباد';
 
 export const REWARDS = [
   { id: 'rw-drink', title: 'نوشیدنی رایگان', description: 'یک نوشیدنی سرد دلخواه با هر سفارش', cost: 600, icon: 'cart' },
@@ -144,7 +144,7 @@ export const createAccount = ({ firstName = '', lastName = '', phone = '', email
     {
       id: 'welcome',
       type: 'system',
-      title: 'به نوال خوش آمدید',
+      title: 'به آترین خوش آمدید',
       body: 'حساب شما ساخته شد. سفارش‌ها، رزروها و امتیازهای باشگاه مشتریان از این پس همین‌جا نمایش داده می‌شوند.',
       createdAt: new Date().toISOString(),
       read: false,

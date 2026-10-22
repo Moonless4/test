@@ -48,7 +48,7 @@ export default function OrderSection({ onMenu }) {
 
           <div className="order__visual">
             <span className="order__ring" aria-hidden="true" />
-            <img src="/assets/promo-waiter.webp" alt="پیک سفارش رستوران نوال" loading="lazy" />
+            <img src="/assets/promo-waiter.webp" alt="پیک سفارش رستوران آترین" loading="lazy" />
             <span className="order__badge">
               <Icon name="scooter" size={24} />
               <b>ارسال سریع</b>

@@ -17,7 +17,7 @@ export default function Footer({ onToast }) {
     setError('');
     setSubscribed(true);
     setEmail('');
-    onToast('عضویت شما در خبرنامه نوال ثبت شد.');
+    onToast('عضویت شما در خبرنامه آترین ثبت شد.');
     setTimeout(() => setSubscribed(false), 6000);
   };
 
@@ -64,7 +64,7 @@ export default function Footer({ onToast }) {
           <div className="footer__brand">
             <BrandMark variant="footer" />
             <p>
-              رستوران نوال؛ از سال ۱۳۹۲ با عشق به طعم و مهمان‌نوازی، میزبان لحظه‌های خوب شما
+              رستوران آترین؛ از سال ۱۳۹۲ با عشق به طعم و مهمان‌نوازی، میزبان لحظه‌های خوب شما
               هستیم.
             </p>
             <div className="footer__social" aria-label="شبکه‌های اجتماعی">
@@ -104,13 +104,13 @@ export default function Footer({ onToast }) {
               <Icon name="phone" size={17} />
               <span dir="ltr">۰۲۱-۸۸۷۷۶۶۵۵</span>
             </a>
-            <a href="mailto:info@naval-restaurant.ir">
+            <a href="mailto:info@atrin-restaurant.ir">
               <Icon name="mail" size={17} />
-              <span>info@naval-restaurant.ir</span>
+              <span>info@atrin-restaurant.ir</span>
             </a>
             <p>
               <Icon name="pin" size={17} />
-              تهران، خیابان ولیعصر، نبش کوچه نوال، پلاک ۱۲
+              تهران، خیابان ولیعصر، نبش کوچه آترین، پلاک ۱۲
             </p>
             <p>
               <Icon name="clock" size={17} />
@@ -151,7 +151,7 @@ export default function Footer({ onToast }) {
         </div>
 
         <div className="footer__bottom">
-          <p>© ۱۴۰۴ رستوران نوال. تمامی حقوق محفوظ است.</p>
+          <p>© ۱۴۰۴ رستوران آترین. تمامی حقوق محفوظ است.</p>
           <div>
             <a href="#footer">پیگیری سفارش</a>
             <span aria-hidden="true">·</span>

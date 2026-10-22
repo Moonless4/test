@@ -207,7 +207,7 @@ export default function Dashboard({ onMenu, onReserve, onReorder }) {
             <EmptyState
               icon="box"
               title="هنوز سفارشی ثبت نکرده‌اید."
-              text="منوی نوال هر روز تازه آماده می‌شود؛ از یک غذای محبوب شروع کنید."
+              text="منوی آترین هر روز تازه آماده می‌شود؛ از یک غذای محبوب شروع کنید."
               actionLabel="مشاهده منو"
               onAction={() => onMenu('all')}
             />
@@ -263,7 +263,7 @@ export default function Dashboard({ onMenu, onReserve, onReorder }) {
             <EmptyState
               icon="calendar"
               title="رزرو فعالی ندارید."
-              text="میز خود را برای یک شب دل‌نشین در نوال رزرو کنید."
+              text="میز خود را برای یک شب دل‌نشین در آترین رزرو کنید."
               actionLabel="رزرو میز"
               onAction={onReserve}
             />

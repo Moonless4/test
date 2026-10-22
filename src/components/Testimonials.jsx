@@ -29,7 +29,7 @@ export default function Testimonials() {
               نظرات مشتریان ما
             </span>
             <h2 id="testimonials-title">
-              داستان‌هایی از سر میزهای <span className="title-highlight">نوال</span>
+              داستان‌هایی از سر میزهای <span className="title-highlight">آترین</span>
             </h2>
           </div>
 

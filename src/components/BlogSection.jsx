@@ -8,7 +8,7 @@ export default function BlogSection({ items = posts.slice(0, 4), onOpenPost, onV
       <div className="container">
         <div id="blog-title">
           <SectionHeading
-            eyebrow="وبلاگ نوال"
+            eyebrow="وبلاگ آترین"
             title="جدیدترین"
             highlight="اخبار سایت"
             script="From our kitchen"

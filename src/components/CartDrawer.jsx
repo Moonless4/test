@@ -33,7 +33,7 @@ export default function CartDrawer({ open, onClose, items, onQty, onRemove, onAd
               <Icon name="cart" size={38} />
             </span>
             <h3>سبد خرید شما خالی است</h3>
-            <p>از منوی متنوع نوال، غذای دلخواهتان را انتخاب کنید.</p>
+            <p>از منوی متنوع آترین، غذای دلخواهتان را انتخاب کنید.</p>
             <button type="button" className="btn btn--primary" onClick={onBrowse}>
               مشاهده منو
               <Icon name="chevronLeft" size={18} />

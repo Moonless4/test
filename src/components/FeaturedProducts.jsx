@@ -22,7 +22,7 @@ export default function FeaturedProducts({ products, onAdd, onOpen, onViewAll })
             title="منوی"
             highlight="محبوب امروز"
             script="Today’s Special"
-            text="تازه‌ترین و محبوب‌ترین طعم‌های نوال، انتخاب‌شده توسط سرآشپز."
+            text="تازه‌ترین و محبوب‌ترین طعم‌های آترین، انتخاب‌شده توسط سرآشپز."
           >
             <div className="carousel-arrows">
               <button type="button" className="round-arrow" onClick={() => scroll(1)} aria-label="محصولات قبلی">

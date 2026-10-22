@@ -8,9 +8,9 @@ export default function ContactPage({ onToast }) {
       <PageHero
         eyebrow="ارتباط با ما"
         title="تماس با"
-        highlight="رستوران نوال"
+        highlight="رستوران آترین"
         script="Say hello"
-        text="برای رزرو، پیگیری سفارش یا هر سؤالی درباره منو، تیم پشتیبانی نوال در کنار شماست."
+        text="برای رزرو، پیگیری سفارش یا هر سؤالی درباره منو، تیم پشتیبانی آترین در کنار شماست."
         crumbs={[{ label: 'تماس با ما' }]}
       />
       <ContactSection onToast={onToast} />

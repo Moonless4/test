@@ -156,7 +156,7 @@ export default function OrderDetailPage({ id, onReorder, onToast, onMenu }) {
                     <small>
                       {order.payment.status === 'refunded'
                         ? 'مبلغ سفارش به حساب شما بازگشت داده شد.'
-                        : 'در صورت نیاز با پشتیبانی نوال تماس بگیرید.'}
+                        : 'در صورت نیاز با پشتیبانی آترین تماس بگیرید.'}
                     </small>
                   </div>
                 </div>

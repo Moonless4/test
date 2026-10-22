@@ -6,11 +6,11 @@ export default function BlogPage({ onOpenPost }) {
   return (
     <>
       <PageHero
-        eyebrow="وبلاگ نوال"
+        eyebrow="وبلاگ آترین"
         title="همه"
         highlight="مقالات"
         script="From our kitchen"
-        text="دستورهای آشپزی، نکات تغذیه و داستان‌های پشت صحنه رستوران نوال."
+        text="دستورهای آشپزی، نکات تغذیه و داستان‌های پشت صحنه رستوران آترین."
         crumbs={[{ label: 'وبلاگ' }]}
       />
       <BlogSection items={posts} onOpenPost={onOpenPost} />

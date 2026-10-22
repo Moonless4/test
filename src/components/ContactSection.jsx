@@ -36,7 +36,7 @@ export default function ContactSection({ onToast }) {
 
           <div className="contact__visual">
             <span className="contact__blob" aria-hidden="true" />
-            <img src="/assets/contact-chef.webp" alt="پذیرایی سرآشپز نوال" loading="lazy" />
+            <img src="/assets/contact-chef.webp" alt="پذیرایی سرآشپز آترین" loading="lazy" />
             <span className="contact__note">
               <Icon name="check" size={18} />
               پاسخ‌گویی کمتر از ۲۴ ساعت
@@ -52,7 +52,7 @@ export default function ContactSection({ onToast }) {
               همیشه خوشحال می‌شویم <span className="title-highlight">بشنویم</span>
             </h2>
             <p className="contact__lead">
-              برای رزرو، پیشنهاد، انتقاد یا هر سوالی درباره منو و خدمات نوال، از هر راهی که راحت‌تر
+              برای رزرو، پیشنهاد، انتقاد یا هر سوالی درباره منو و خدمات آترین، از هر راهی که راحت‌تر
               است با ما در ارتباط باشید.
             </p>
 
@@ -65,7 +65,7 @@ export default function ContactSection({ onToast }) {
                     item.id === 'phone'
                       ? 'tel:+982188776655'
                       : item.id === 'email'
-                        ? 'mailto:info@naval-restaurant.ir'
+                        ? 'mailto:info@atrin-restaurant.ir'
                         : '#contact'
                   }
                 >

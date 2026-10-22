@@ -5,11 +5,11 @@ import { Link, useRouter } from '../router.jsx';
 
 function BrandMark({ variant = 'header' }) {
   return (
-    <span className={`brand brand--${variant}`} aria-label="رستوران نوال">
+    <span className={`brand brand--${variant}`} aria-label="رستوران آترین">
       <span className="brand__halo" aria-hidden="true" />
       <span className="brand__plate">
         <span className="brand__kicker">رستوران</span>
-        <span className="brand__name">نوال</span>
+        <span className="brand__name">آترین</span>
         <span className="brand__rule" aria-hidden="true">
           <i />
           <b />
@@ -116,7 +116,7 @@ export default function Header({ cartCount, onCart, onSearch, onLogin, onMenu, o
             )}
           </nav>
 
-          <Link className="header__brand" to="/" aria-label="صفحه اصلی رستوران نوال">
+          <Link className="header__brand" to="/" aria-label="صفحه اصلی رستوران آترین">
             <BrandMark />
           </Link>
 

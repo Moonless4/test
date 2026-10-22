@@ -52,12 +52,12 @@ export default function SettingsPage({ onToast }) {
             />
             <Toggle
               label="پیشنهادهای ویژه"
-              description="تخفیف‌ها و منوهای فصلی نوال"
+              description="تخفیف‌ها و منوهای فصلی آترین"
               checked={settings.notifications.offers}
               onChange={(value) => updateSettings('notifications', { offers: value })}
             />
             <Toggle
-              label="خبرنامه نوال"
+              label="خبرنامه آترین"
               description="داستان‌های آشپزخانه و دستورهای سرآشپز"
               checked={settings.notifications.newsletter}
               onChange={(value) => updateSettings('notifications', { newsletter: value })}

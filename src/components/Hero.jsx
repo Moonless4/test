@@ -21,7 +21,7 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
   const activeProduct = slides[active];
 
   return (
-    <section className="hero" id="home" aria-label="خوش‌آمدگویی رستوران نوال">
+    <section className="hero" id="home" aria-label="خوش‌آمدگویی رستوران آترین">
       <div className="hero__inner">
         <div className="hero__bg" aria-hidden="true">
           <img className="hero__frame" src="/assets/hero-bg.png" alt="" />
@@ -42,7 +42,7 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
             هـــم <strong>کامل می‌شوند</strong>
           </h1>
           <p className="hero__sub">
-            رستوران نوال؛ طعم‌های تازه، دستورهای ویژه و لحظه‌هایی که به یاد می‌مانند.
+            رستوران آترین؛ طعم‌های تازه، دستورهای ویژه و لحظه‌هایی که به یاد می‌مانند.
           </p>
           <div className="hero__cta">
             <a className="btn btn--gold" href="#menu">
