@@ -23,14 +23,7 @@ export default function PostCard({ article }) {
           <span className="luxina_post_content-bg post-card-shape" aria-hidden="true" />
           <span className="luxina_post_category">{article.category}</span>
           <h2 className="luxina_post_title post-title line-clamp line-clamp-1">{title}</h2>
-          <span className="luxina_post_subtitle rb-post-excerpt">{article.excerpt}</span>
-          <span className="rb-post-meta">
-            <span>{article.category}</span>
-            <span aria-hidden="true" className="rb-post-meta-dot" />
-            <time dateTime={article.isoDate}>{article.dateLabel}</time>
-            <span aria-hidden="true" className="rb-post-meta-dot" />
-            <span>{article.readingTime}</span>
-          </span>
+          <span className="luxina_post_subtitle line-clamp line-clamp-1">{article.excerpt}</span>
           <i className="luxina-icon-arrow-left-line luxina_post_icon" aria-hidden="true" />
           <div className="luxina_post_read_more-button post-card-button-shape">مطالعه</div>
         </div>

@@ -17,8 +17,8 @@ export default function HeroSection() {
           <h2 className="hp-hero-title">{featuredProject.title}</h2>
 
           <div className="hp-hero-author">
-            <img src="/img/image.png" width="47" height="48" decoding="async" alt="" />
-            <p className="hp-hero-author-name">صمد سلیمان زاده</p>
+            <img src="/img/hero-architect.jpg" width="48" height="48" decoding="async" alt="" />
+            <p className="hp-hero-author-name">آرش مهدوی</p>
             <p className="hp-hero-author-role">معمار و مجری</p>
           </div>
 

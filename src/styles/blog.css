@@ -1,46 +1,6 @@
-/* Blog: article body blocks, post-card meta line and the related-posts rail.
-   Everything else (card shell, grid, article frame) stays in the theme and in
-   site.css; these rules only cover what the longer editorial articles need. */
-
-/* ---- Post card -------------------------------------------------------- */
-
-/* The theme clamps the excerpt to one line; the editorial excerpts are one to
-   two sentences, so they get three lines before an ellipsis. */
-.rb-post-excerpt {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-  line-height: 1.9;
-}
-
-/* Editorial titles are full questions; one line would cut them mid-sentence. */
-.posts-style-3 .luxina_post_title.line-clamp {
-  -webkit-line-clamp: 2;
-  line-height: 1.7;
-}
-
-.rb-post-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 8px;
-  margin-top: 10px;
-  font-size: 0.75rem;
-  color: var(--text-main-50);
-}
-
-.rb-post-meta-dot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-/* The featured (first) card leaves room at the bottom for its button. */
-.posts-style-3 article:first-child .rb-post-meta {
-  margin-bottom: 8px;
-}
+/* Blog: article body blocks and the related-posts rail. Everything else (card
+   shell, grid, article frame) stays in the theme and in site.css; these rules
+   only cover what the longer editorial articles need. */
 
 /* ---- Article ---------------------------------------------------------- */
 
