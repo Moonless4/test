@@ -73,9 +73,10 @@ up -d --build`), not a host `npm install`.
   logo on every other page and gives the first `.rb-section` a top padding (the
   fixed header would otherwise sit right on it). The `width`/`height`
   attributes on those `<img>`s must keep the 1766:840 ratio or the logo
-  stretches. The email address and the social handles still say `luxinastudio`
-  — they are contact details, not brand copy, and were left for the owner to
-  supply.
+  stretches. The email address (`info@aratan.ir`)
+  and the social handles (`@aratan.studio`, Telegram + Instagram) are
+  Aratan-branded placeholders — the owner still needs to swap in the real
+  contact details.
 - `public/img/` holds the downloaded media. The reference markup points some
   assets at theme-relative paths (`/luxina/wp-content/...`); rewrite those to
   the `/img/...` equivalent.

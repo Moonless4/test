@@ -17,7 +17,7 @@ const CONTACT = [
   {
     icon: 'luxina-icon-mail-fill',
     label: 'ایمیل',
-    value: 'info@luxinastudio.ir',
+    value: 'info@aratan.ir',
     ltr: true,
   },
 ];

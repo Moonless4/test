@@ -5,7 +5,7 @@
 export const SERVICE_CONTACT = {
   phone: '021-123 4567',
   phoneHref: 'tel:+982112345678',
-  email: 'info@luxinastudio.ir',
+  email: 'info@aratan.ir',
   address: 'تهران، سعادت‌آباد، بلوار دریا، پلاک ۲۴، طبقه ۳',
   hours: 'شنبه تا پنجشنبه، ۹ تا ۱۸',
 };
