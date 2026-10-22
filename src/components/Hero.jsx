@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import Icon from './Icons.jsx';
 
 const formatPrice = (value) => value.toLocaleString('fa-IR');
@@ -11,8 +11,6 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
     })
     .filter(Boolean);
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const timer = useRef(null);
   const count = slides.length;
 
   const go = useCallback(
@@ -20,23 +18,11 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
     [count]
   );
 
-  useEffect(() => {
-    if (paused || count < 2) return undefined;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return undefined;
-    timer.current = setInterval(() => go(1), 6000);
-    return () => clearInterval(timer.current);
-  }, [go, paused, count]);
-
   const activeProduct = slides[active];
 
   return (
     <section className="hero" id="home" aria-label="خوش‌آمدگویی رستوران نوال">
-      <div
-        className="hero__inner"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-      >
+      <div className="hero__inner">
         <div className="hero__bg" aria-hidden="true">
           <img className="hero__frame" src="/assets/hero-bg.png" alt="" />
         </div>
