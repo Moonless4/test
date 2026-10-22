@@ -366,9 +366,17 @@
     --cta-content-overlap: 18px;
   }
 
-  .hp-promos .luxina_masked_cart_content_inner {
+  /* The theme's icon tab is sized for the reference's 290px card; on a 140px
+     half-width card it grows wider than the copy below it and covers the title,
+     so it is scaled down and the content gets the top room it needs. */
+  .hp-promos .luxina_masked_cart_container .luxina_masked_cart_icon_wrap {
+    padding: 0 15px;
+  }
+
+  .hp-promos .luxina_masked_cart_container .luxina_masked_cart_content_inner {
     box-sizing: border-box;
     padding: 12px;
+    padding-top: 16px;
     border-radius: 16px;
   }
 
