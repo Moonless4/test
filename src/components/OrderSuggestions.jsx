@@ -2,23 +2,21 @@ import { products } from '../data/content.js';
 import { formatPrice } from './ProductCard.jsx';
 import Icon from './Icons.jsx';
 
-const FOOD_CATEGORIES = ['pizza', 'sandwich', 'chicken', 'steak', 'pasta', 'dessert'];
+const FOOD_CATEGORIES = ['pizza', 'sandwich', 'chicken', 'steak', 'pasta'];
 const DRINK_CATEGORIES = ['drink', 'hot'];
 
-// پیشنهاد متناسب با هر آیتم سبد: کنار غذا نوشیدنی و پیش‌غذای هم‌خوان، کنار نوشیدنی غذا.
+// پیشنهاد متناسب با هر آیتم سبد، به ترتیب اولویت:
+// کنار غذای اصلی → نوشیدنی و پیش‌غذای هم‌خوان، کنار پیش‌غذا → غذای اصلی و نوشیدنی، کنار نوشیدنی → غذا و خوراکی کنارش.
 const PAIRINGS = {
-  pizza: ['mint-lemonade', 'iced-peach-tea', 'caesar-salad'],
-  sandwich: ['mint-lemonade', 'onion-rings', 'fresh-orange-juice'],
-  chicken: ['fresh-orange-juice', 'mint-lemonade', 'season-salad'],
-  steak: ['mint-lemonade', 'mushroom-soup', 'fresh-orange-juice'],
+  pizza: ['mint-lemonade', 'caesar-salad', 'french-fries'],
+  sandwich: ['mint-lemonade', 'onion-rings', 'french-fries'],
+  chicken: ['fresh-orange-juice', 'season-salad', 'french-fries'],
+  steak: ['mint-lemonade', 'mushroom-soup', 'caesar-salad'],
   pasta: ['bruschetta', 'mint-lemonade', 'caesar-salad'],
-  dessert: ['naval-latte', 'iced-peach-tea', 'fresh-orange-juice'],
-  starter: ['mint-lemonade', 'iced-peach-tea', 'naval-latte'],
-  drink: ['royal-pizza', 'naval-burger', 'charcoal-chicken'],
-  hot: ['chef-pizza', 'naval-burger', 'grilled-chicken-breast'],
+  starter: ['royal-pizza', 'naval-burger', 'charcoal-chicken', 'mint-lemonade'],
+  drink: ['royal-pizza', 'naval-burger', 'charcoal-chicken', 'french-fries'],
+  hot: ['chef-pizza', 'naval-burger', 'grilled-chicken-breast', 'french-fries'],
 };
-
-const pairFor = (items) => items.flatMap((item) => PAIRINGS[item.category] || []);
 
 export default function OrderSuggestions({ exclude = [], title, onAdd }) {
   const inCart = new Set(exclude);
@@ -29,15 +27,7 @@ export default function OrderSuggestions({ exclude = [], title, onAdd }) {
   const hasStarter = categories.has('starter');
   const hasDrink = DRINK_CATEGORIES.some((category) => categories.has(category));
 
-  const wanted = [];
-  if (hasFood || hasStarter) {
-    wanted.push(...pairFor(cart.filter((product) => hasFood && FOOD_CATEGORIES.includes(product.category))));
-    if (hasStarter) wanted.push(...pairFor(cart.filter((product) => product.category === 'starter')));
-  }
-  // سبدی که فقط نوشیدنی دارد، غذای هم‌خوان پیشنهاد می‌گیرد
-  if (!hasFood && !hasStarter && hasDrink) {
-    wanted.push(...pairFor(cart.filter((product) => DRINK_CATEGORIES.includes(product.category))));
-  }
+  const wanted = cart.flatMap((product) => PAIRINGS[product.category] || []);
 
   const items = [];
   wanted.forEach((id) => {
@@ -51,16 +41,14 @@ export default function OrderSuggestions({ exclude = [], title, onAdd }) {
 
   if (items.length === 0) return null;
 
-  const heading =
-    title ||
-    (hasDrink && !hasFood && !hasStarter
-      ? 'کنار نوشیدنی‌تان این‌ها را امتحان کنید'
-      : 'کنار غذای خود این‌ها را امتحان کنید');
+  let heading = 'کنار غذای خود این‌ها را امتحان کنید';
+  if (!hasFood && hasStarter) heading = 'کنار پیش‌غذایتان این غذاها را امتحان کنید';
+  else if (!hasFood && !hasStarter && hasDrink) heading = 'کنار نوشیدنی‌تان این‌ها را امتحان کنید';
 
   return (
     <section className="order-suggest" aria-label="پیشنهادهای متناسب با سبد خرید">
       <header className="order-suggest__head">
-        <h3>{heading}</h3>
+        <h3>{title || heading}</h3>
         <span>پیشنهاد سرآشپز</span>
       </header>
       <ul className="order-suggest__list">
