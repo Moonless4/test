@@ -17,6 +17,19 @@ import ProductPage from './pages/ProductPage.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
+import AccountShell from './account/AccountShell.jsx';
+import AccountDashboard from './account/pages/Dashboard.jsx';
+import AccountOrders from './account/pages/OrdersPage.jsx';
+import AccountOrderDetail from './account/pages/OrderDetailPage.jsx';
+import AccountReservations from './account/pages/ReservationsPage.jsx';
+import AccountReservationDetail from './account/pages/ReservationDetailPage.jsx';
+import AccountFavorites from './account/pages/FavoritesPage.jsx';
+import AccountAddresses from './account/pages/AddressesPage.jsx';
+import AccountProfile from './account/pages/ProfilePage.jsx';
+import AccountNotifications from './account/pages/NotificationsPage.jsx';
+import AccountRewards from './account/pages/RewardsPage.jsx';
+import AccountSettings from './account/pages/SettingsPage.jsx';
+import { AccountProvider } from './account/AccountContext.jsx';
 import { useRouter } from './router.jsx';
 import { posts, products } from './data/content.js';
 
@@ -34,6 +47,15 @@ const matchRoute = (path) => {
     return posts.some((post) => post.id === postMatch[1])
       ? { name: 'post', id: postMatch[1] }
       : { name: 'notfound' };
+  }
+
+  if (path === '/account') return { name: 'account', section: 'dashboard' };
+
+  const accountMatch = path.match(
+    /^\/account\/(orders|reservations|favorites|addresses|profile|notifications|rewards|settings)(?:\/([\w-]+))?$/
+  );
+  if (accountMatch) {
+    return { name: 'account', section: accountMatch[1], id: accountMatch[2] };
   }
 
   const productMatch = path.match(/^\/food\/([\w-]+)$/);
@@ -147,6 +169,30 @@ export default function App() {
     [navigate]
   );
 
+  const reorder = useCallback(
+    (order) => {
+      const available = (order.items || []).filter((item) =>
+        products.some((product) => product.id === item.productId)
+      );
+      if (!available.length) {
+        showToast('آیتم‌های این سفارش در منوی فعلی موجود نیستند.');
+        return;
+      }
+      setCart((prev) => {
+        const next = prev.map((entry) => ({ ...entry }));
+        available.forEach(({ productId, qty }) => {
+          const found = next.find((entry) => entry.id === productId);
+          if (found) found.qty += qty;
+          else next.push({ id: productId, qty });
+        });
+        return next;
+      });
+      showToast('آیتم‌های سفارش قبلی به سبد خرید اضافه شد.');
+      setCartOpen(true);
+    },
+    [showToast]
+  );
+
   const openPost = useCallback((post) => navigate(`/blog/${post.id}`), [navigate]);
 
   const goHome = useCallback(() => navigate('/'), [navigate]);
@@ -171,12 +217,47 @@ export default function App() {
             onOpen={openProduct}
             onMenu={goMenu}
             cartIds={cartIds}
+            onToast={showToast}
           />
         );
       case 'about':
         return <AboutPage onMenu={goMenu} onReserve={openReserve} />;
       case 'contact':
         return <ContactPage onToast={showToast} />;
+      case 'account': {
+        const sectionPages = {
+          dashboard: (
+            <AccountDashboard onMenu={goMenu} onReserve={openReserve} onReorder={reorder} />
+          ),
+          orders: route.id ? (
+            <AccountOrderDetail
+              id={route.id}
+              onReorder={reorder}
+              onToast={showToast}
+              onMenu={goMenu}
+            />
+          ) : (
+            <AccountOrders onReorder={reorder} onMenu={goMenu} />
+          ),
+          reservations: route.id ? (
+            <AccountReservationDetail id={route.id} onToast={showToast} onReserve={openReserve} />
+          ) : (
+            <AccountReservations onToast={showToast} onReserve={openReserve} />
+          ),
+          favorites: <AccountFavorites onAdd={addToCart} onMenu={goMenu} onToast={showToast} />,
+          addresses: <AccountAddresses onToast={showToast} />,
+          profile: <AccountProfile onToast={showToast} />,
+          notifications: <AccountNotifications onToast={showToast} />,
+          rewards: <AccountRewards onToast={showToast} />,
+          settings: <AccountSettings onToast={showToast} />,
+        };
+
+        return (
+          <AccountShell active={route.section} onToast={showToast}>
+            {sectionPages[route.section] || <AccountDashboard onMenu={goMenu} onReserve={openReserve} onReorder={reorder} />}
+          </AccountShell>
+        );
+      }
       case 'home':
         return (
           <HomePage
@@ -195,7 +276,8 @@ export default function App() {
   })();
 
   return (
-    <div className="app">
+    <AccountProvider>
+      <div className="app">
       <Header
         cartCount={cartCount}
         onSearch={() => setSearchOpen(true)}
@@ -256,9 +338,15 @@ export default function App() {
 
       <ReservationModal open={reserveOpen} onClose={() => setReserveOpen(false)} />
 
-      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onToast={showToast} />
+      <AuthModal
+        open={authOpen}
+        onClose={() => setAuthOpen(false)}
+        onToast={showToast}
+        onSuccess={() => navigate('/account')}
+      />
 
       <Toast message={toast} />
-    </div>
+      </div>
+    </AccountProvider>
   );
 }

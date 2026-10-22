@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Modal from './Modal.jsx';
 import Icon from './Icons.jsx';
 
-export default function AuthModal({ open, onClose, onToast }) {
+export default function AuthModal({ open, onClose, onToast, onSuccess }) {
   const [mode, setMode] = useState('login');
   const [form, setForm] = useState({ name: '', phone: '', password: '' });
   const [error, setError] = useState('');
@@ -30,6 +30,7 @@ export default function AuthModal({ open, onClose, onToast }) {
     setError('');
     onToast(mode === 'login' ? 'ورود شما با موفقیت انجام شد.' : 'حساب شما با موفقیت ایجاد شد.');
     onClose();
+    onSuccess?.();
   };
 
   return (

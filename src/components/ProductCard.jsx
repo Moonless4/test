@@ -1,8 +1,12 @@
 import Icon from './Icons.jsx';
+import { useAccount } from '../account/AccountContext.jsx';
 
 export const formatPrice = (value) => Number(value || 0).toLocaleString('fa-IR');
 
-export default function ProductCard({ product, onAdd, onOpen }) {
+export default function ProductCard({ product, onAdd, onOpen, onToast }) {
+  const { isFavorite, toggleFavorite } = useAccount();
+  const favorite = isFavorite(product.id);
+
   return (
     <article className="product-card">
       <div className="product-card__media">
@@ -26,6 +30,22 @@ export default function ProductCard({ product, onAdd, onOpen }) {
           aria-label={`جزئیات ${product.name}`}
         >
           <Icon name="plus" size={17} />
+        </button>
+        <button
+          type="button"
+          className={`product-card__fav ${favorite ? 'is-on' : ''}`}
+          aria-label={favorite ? `حذف ${product.name} از علاقه‌مندی‌ها` : `افزودن ${product.name} به علاقه‌مندی‌ها`}
+          aria-pressed={favorite}
+          onClick={() => {
+            const added = toggleFavorite(product.id);
+            onToast?.(
+              added
+                ? `${product.name} به علاقه‌مندی‌ها اضافه شد.`
+                : `${product.name} از علاقه‌مندی‌ها حذف شد.`
+            );
+          }}
+        >
+          <Icon name="heart" size={16} filled={favorite} />
         </button>
       </div>
 

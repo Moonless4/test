@@ -4,9 +4,12 @@ import Breadcrumbs from '../components/Breadcrumbs.jsx';
 import Icon from '../components/Icons.jsx';
 import ProductCard, { formatPrice } from '../components/ProductCard.jsx';
 import OrderSuggestions from '../components/OrderSuggestions.jsx';
+import { useAccount } from '../account/AccountContext.jsx';
 
-export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [] }) {
+export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [], onToast }) {
   const product = products.find((item) => item.id === id);
+  const { isFavorite, toggleFavorite } = useAccount();
+  const favorite = isFavorite(id);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -48,6 +51,20 @@ export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [] })
                   ۴٫۹
                   <small>(۱۲۴ نظر)</small>
                 </span>
+                <button
+                  type="button"
+                  className={`product-modal__fav ${favorite ? 'is-on' : ''}`}
+                  aria-pressed={favorite}
+                  aria-label={favorite ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
+                  onClick={() => {
+                    const added = toggleFavorite(product.id);
+                    onToast?.(
+                      added ? `${product.name} به علاقه‌مندی‌ها اضافه شد.` : `${product.name} از علاقه‌مندی‌ها حذف شد.`
+                    );
+                  }}
+                >
+                  <Icon name="heart" size={17} filled={favorite} />
+                </button>
               </div>
               <h1>{product.name}</h1>
               <p className="product-modal__desc">{product.longDescription}</p>
