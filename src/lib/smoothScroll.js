@@ -11,7 +11,7 @@
 // - touch devices (phones, tablets): the finger still drags the page 1:1, and
 //   Lenis takes over the glide after release, so the momentum has the same
 //   weight as the desktop wheel,
-// - `prefers-reduced-motion`: native scrolling,
+// - `prefers-reduced-motion`: inertia stays enabled, as requested by the owner,
 // - nested scrollers, horizontal gestures and the locked page (drawer,
 //   lightbox) pass through untouched.
 
@@ -42,10 +42,6 @@ let bound = false;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-export const smoothScrollEnabled = () => !prefersReducedMotion();
-
 function isEditable(node) {
   return Boolean(
     node?.closest?.('input, textarea, select, button, a, summary, [contenteditable="true"]'),
@@ -67,12 +63,14 @@ function stopLoop() {
 }
 
 function mount() {
-  if (lenis || !smoothScrollEnabled()) return;
+  if (lenis) return;
 
   lenis = new Lenis({
     lerp: LERP,
     wheelMultiplier: WHEEL_MULTIPLIER,
     smoothWheel: true,
+    // Keep inertia enabled even when the OS requests reduced motion.
+    respectReducedMotion: false,
     // The finger drags 1:1, the release glide is Lenis's.
     syncTouch: true,
     syncTouchLerp: SYNC_TOUCH_LERP,
@@ -88,13 +86,6 @@ function mount() {
   document.documentElement.style.scrollBehavior = 'auto';
 
   startLoop();
-}
-
-function unmount() {
-  stopLoop();
-  lenis?.destroy();
-  lenis = null;
-  document.documentElement.style.scrollBehavior = '';
 }
 
 // The drawer and the lightbox lock the page with `body.disable-scrolling`;
@@ -183,13 +174,6 @@ export function initSmoothScroll() {
   bound = true;
 
   mount();
-
-  ['(prefers-reduced-motion: reduce)'].forEach((query) => {
-    window.matchMedia(query).addEventListener?.('change', () => {
-      if (smoothScrollEnabled()) mount();
-      else unmount();
-    });
-  });
 
   document.addEventListener('click', onAnchorClick);
   window.addEventListener('keydown', onKeyDown);

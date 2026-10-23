@@ -1,7 +1,7 @@
 /* Lenis smooth scrolling.
    Structural rules from the library's recommended setup; they only take part
    while Lenis is active (it puts `lenis` classes on <html> on every device,
-   touch included, unless `prefers-reduced-motion` is set).
+   touch included, regardless of the reduced-motion preference).
    No visual change: the page keeps its own heights and overflow. */
 html.lenis,
 html.lenis body {

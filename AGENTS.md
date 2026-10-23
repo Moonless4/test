@@ -86,8 +86,10 @@ up -d --build`), not a host `npm install`.
   release glide eased with `syncTouchLerp: 0.06`), the PageUp/PageDown/Home/End
   keys and `#anchor` clicks via `lenis.scrollTo`, and scrolls the real window so
   the sticky header, carousels and the theme's own scroll state are untouched.
-  Lenis runs on every device; it is not created only under
-  `prefers-reduced-motion` (which also forces `lerp: 1` inside Lenis itself).
+  Lenis runs on every device, even under `prefers-reduced-motion`, as explicitly
+  requested by the owner. Do not add a media-query mount guard: the constructor
+  also needs `respectReducedMotion: false` or Lenis forces instant scrolling.
+  Other reduced-motion styles remain unchanged.
   `allowNestedScroll: true` is what keeps the horizontal project tracks on
   native swiping. Three gotchas: the theme ships
   `html { scroll-behavior: smooth }`, which restarts the browser's own
