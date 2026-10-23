@@ -81,13 +81,15 @@ up -d --build`), not a host `npm install`.
   assets at theme-relative paths (`/luxina/wp-content/...`); rewrite those to
   the `/img/...` equivalent.
 - `src/lib/smoothScroll.js` (initialised in `main.jsx`) is the Lenis engine
-  (`lerp: 0.1`, `wheelMultiplier: 1.25` — the reference site's own settings —
-  on one raf loop) for pointer devices. It owns wheel input, the
-  PageUp/PageDown/Home/End keys and `#anchor` clicks via `lenis.scrollTo`, and
-  scrolls the real window so the sticky header, carousels and the theme's own
-  scroll state are untouched. Lenis is not created at all on touch-first
-  devices or under `prefers-reduced-motion`; `syncTouch` stays off so hybrid
-  touchscreens keep native touch. Three gotchas: the theme ships
+  (`lerp: 0.06`, `wheelMultiplier: 1.2` — heavy, drawn-out inertia — on one raf
+  loop). It owns wheel input, touch momentum (`syncTouch`, finger drag 1:1,
+  release glide eased with `syncTouchLerp: 0.06`), the PageUp/PageDown/Home/End
+  keys and `#anchor` clicks via `lenis.scrollTo`, and scrolls the real window so
+  the sticky header, carousels and the theme's own scroll state are untouched.
+  Lenis runs on every device; it is not created only under
+  `prefers-reduced-motion` (which also forces `lerp: 1` inside Lenis itself).
+  `allowNestedScroll: true` is what keeps the horizontal project tracks on
+  native swiping. Three gotchas: the theme ships
   `html { scroll-behavior: smooth }`, which restarts the browser's own
   animation on every frame write, so the module switches `html` to `auto` while
   active; `body.disable-scrolling` (drawer, lightbox) is mirrored with

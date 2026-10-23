@@ -8,20 +8,24 @@
 //
 // What gets what:
 // - desktop mouse wheel / trackpad: smoothed by Lenis on a single raf loop,
-// - touch-first devices (phones, tablets): Lenis is never created, the browser
-//   keeps its own momentum,
+// - touch devices (phones, tablets): the finger still drags the page 1:1, and
+//   Lenis takes over the glide after release, so the momentum has the same
+//   weight as the desktop wheel,
 // - `prefers-reduced-motion`: native scrolling,
 // - nested scrollers, horizontal gestures and the locked page (drawer,
 //   lightbox) pass through untouched.
 
 import Lenis from 'lenis';
 
-// Physics, matched to the reference studio site (pethemes.com): Lenis with its
-// default `lerp: 0.1` and a 1.25 wheel multiplier, so every wheel notch travels
-// a quarter further and catches up slightly quicker than a heavier 0.08 while
-// keeping the soft, weighted settle.
-const LERP = 0.1;
-const WHEEL_MULTIPLIER = 1.25;
+// Heavy, drawn-out inertia: a low `lerp` lets the page keep travelling long
+// after the input stopped, which reads as weight rather than lag, and the 1.2
+// wheel multiplier keeps a notch's distance close to the browser's own.
+const LERP = 0.06;
+const WHEEL_MULTIPLIER = 1.2;
+
+// Touch: the drag itself stays 1:1 with the finger; only the release glide is
+// eased, and a low `syncTouchLerp` gives it the same long tail as the wheel.
+const SYNC_TOUCH_LERP = 0.06;
 
 // Programmatic moves (anchors, keyboard) get a fixed-length glide so they read
 // as one deliberate motion rather than a decaying flick.
@@ -40,12 +44,7 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Touch-first devices keep the browser's own momentum, which is smoother and
-// lighter than anything scripted.
-const touchFirstDevice = () =>
-  window.matchMedia('(pointer: coarse)').matches && navigator.maxTouchPoints > 0;
-
-export const smoothScrollEnabled = () => !touchFirstDevice() && !prefersReducedMotion();
+export const smoothScrollEnabled = () => !prefersReducedMotion();
 
 function isEditable(node) {
   return Boolean(
@@ -74,9 +73,11 @@ function mount() {
     lerp: LERP,
     wheelMultiplier: WHEEL_MULTIPLIER,
     smoothWheel: true,
-    // Touch stays native even on hybrid devices (touchscreen laptops).
-    syncTouch: false,
-    // Let panels/modals that scroll on their own keep their own scroll.
+    // The finger drags 1:1, the release glide is Lenis's.
+    syncTouch: true,
+    syncTouchLerp: SYNC_TOUCH_LERP,
+    // Let panels/modals that scroll on their own keep their own scroll —
+    // including the horizontal project tracks, which keep native swiping.
     allowNestedScroll: true,
     stopInertiaOnNavigate: true,
   });
@@ -183,7 +184,7 @@ export function initSmoothScroll() {
 
   mount();
 
-  ['(pointer: coarse)', '(prefers-reduced-motion: reduce)'].forEach((query) => {
+  ['(prefers-reduced-motion: reduce)'].forEach((query) => {
     window.matchMedia(query).addEventListener?.('change', () => {
       if (smoothScrollEnabled()) mount();
       else unmount();
