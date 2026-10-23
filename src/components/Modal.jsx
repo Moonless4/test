@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import Icon from './Icons.jsx';
+import { lockScroll, unlockScroll } from '../lib/smoothScroll.js';
 
 export function useOverlay(open, onClose) {
   useEffect(() => {
@@ -8,9 +9,11 @@ export function useOverlay(open, onClose) {
       if (event.key === 'Escape') onClose();
     };
     document.body.classList.add('no-scroll');
+    lockScroll();
     window.addEventListener('keydown', onKey);
     return () => {
       document.body.classList.remove('no-scroll');
+      unlockScroll();
       window.removeEventListener('keydown', onKey);
     };
   }, [open, onClose]);

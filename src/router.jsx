@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { scrollToTop } from './lib/smoothScroll.js';
 
 const RouterContext = createContext(null);
 
@@ -19,12 +20,12 @@ export function RouterProvider({ children }) {
   const navigate = useCallback((to) => {
     const next = normalize(to);
     if (next === normalize(window.location.pathname)) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollToTop({ smooth: true });
       return;
     }
     window.history.pushState({}, '', to);
     setPath(next);
-    window.scrollTo({ top: 0, behavior: 'auto' });
+    scrollToTop();
   }, []);
 
   const value = useMemo(() => ({ path, navigate }), [path, navigate]);

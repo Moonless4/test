@@ -3,15 +3,18 @@ import { categories, navLinks } from '../data/content.js';
 import Icon from './Icons.jsx';
 import { BrandMark } from './Header.jsx';
 import { Link } from '../router.jsx';
+import { lockScroll, unlockScroll } from '../lib/smoothScroll.js';
 
 export default function MobileMenu({ open, onClose, onLogin, onCategory }) {
   useEffect(() => {
     if (!open) return undefined;
     const onKey = (e) => e.key === 'Escape' && onClose();
     document.body.classList.add('no-scroll');
+    lockScroll();
     window.addEventListener('keydown', onKey);
     return () => {
       document.body.classList.remove('no-scroll');
+      unlockScroll();
       window.removeEventListener('keydown', onKey);
     };
   }, [open, onClose]);
