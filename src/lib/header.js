@@ -4,8 +4,17 @@
 
 let bound = false;
 
+// The header only starts leaving once the page has scrolled past its own band,
+// so it never slides away while it is still the first thing on screen.
+const HIDE_AFTER = 200;
+
+// Ignore sub-threshold movement: Lenis writes a scroll position every frame and
+// a rounding wobble would otherwise flip the direction on each one.
+const DIRECTION_DELTA = 6;
+
 function setDrawer(drawer, overlay, open) {
   if (!drawer) return;
+  if (open) document.body.classList.remove('header-hidden');
   drawer.classList.toggle('open', open);
   if (overlay) overlay.style.display = open ? 'block' : 'none';
   document.body.classList.toggle('disable-scrolling', open);
@@ -17,7 +26,20 @@ export function initHeader(root) {
   bound = true;
 
   document.body.classList.add('sticky-header');
-  const onScroll = () => document.body.classList.toggle('sticky-header-active', window.scrollY > 24);
+
+  // Scrolling down slides the header out, scrolling up brings it straight back
+  // (`header-hidden` is what `styles/site.css` animates).
+  let lastY = window.scrollY;
+  const onScroll = () => {
+    const y = window.scrollY;
+    document.body.classList.toggle('sticky-header-active', y > 24);
+
+    if (Math.abs(y - lastY) < DIRECTION_DELTA) return;
+    const goingDown = y > lastY;
+    lastY = y;
+    const hide = goingDown && y > HIDE_AFTER && !document.body.classList.contains('disable-scrolling');
+    document.body.classList.toggle('header-hidden', hide);
+  };
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 

@@ -66,6 +66,11 @@ up -d --build`), not a host `npm install`.
   chunk loads (on refresh and on every route change).
 - Header markup is captured HTML: edit menu behaviour in `src/lib/header.js`,
   not in JSX.
+- The header hides on the way down and returns on the way up: `header.js` puts
+  `header-hidden` on `<body>` past `HIDE_AFTER` (200px) and only while the
+  scroll position grows, and `styles/site.css` slides the fixed header out with
+  `translateY(-100%)`. Route changes clear the class from `App.jsx`, and the
+  mobile drawer forces it off while open.
 - Branding is ARATAN (`آراتان | ARATAN`). The logo lives in three files in
   `public/img/`: `aratan-logo.png` (dark ink, transparent background — for the
   light header/footer states), `aratan-logo-light.png` (white ink, transparent

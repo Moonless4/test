@@ -15,6 +15,18 @@ body.sticky-header .site-header-slot + #page-body {
   margin-top: var(--header-height);
 }
 
+/* Hide-on-scroll: `header.js` puts `header-hidden` on <body> while the page
+   travels down and drops it again as soon as the user scrolls back up. The
+   header is fixed, so sliding it out is a transform — no other box moves, and
+   the transform transition is added to the theme's own background fade. */
+body.sticky-header #header-container {
+  transition: transform 0.35s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+body.sticky-header.header-hidden #header-container {
+  transform: translateY(-100%);
+}
+
 /* The theme keeps the white logo (`logo.png`) on screen until the header enters
    its scrolled state. Only the homepage has a light-on-dark header at rest; a
    rebuilt page shows the header on the light body, so the colored logo

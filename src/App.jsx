@@ -32,6 +32,7 @@ function Site() {
 
   useEffect(() => {
     document.body.classList.toggle('home', pathname === '/');
+    document.body.classList.remove('header-hidden');
     resetSmoothScroll();
   }, [pathname]);
 
