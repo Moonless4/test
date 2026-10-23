@@ -96,8 +96,12 @@ body:not(.home) .rb-section:first-of-type {
   gap: 24px;
 }
 
+/* The Suspense fallback for the lazy routes. It has to reserve a whole viewport:
+   with less, the footer (which renders eagerly, outside the Suspense boundary)
+   would sit right under the header and flash at the top of the page on every
+   refresh and route change, until the page chunk arrives. */
 .rb-loading {
-  min-height: 50vh;
+  min-height: 100vh;
 }
 
 .rb-narrow {

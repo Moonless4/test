@@ -60,6 +60,10 @@ up -d --build`), not a host `npm install`.
   `initForms` after every route render. It must stay inside the `Suspense`
   boundary next to `AppRoutes`, otherwise lazy pages mount after those helpers
   already ran and their grids/forms stay dead.
+- The header and footer render eagerly while every page is `React.lazy`, so the
+  `.rb-loading` fallback has to keep `min-height: 100vh`. Shrinking it makes the
+  footer sit under the header and flash at the top of the page while the page
+  chunk loads (on refresh and on every route change).
 - Header markup is captured HTML: edit menu behaviour in `src/lib/header.js`,
   not in JSX.
 - Branding is ARATAN (`آراتان | ARATAN`). The logo lives in three files in
