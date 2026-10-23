@@ -81,9 +81,9 @@ up -d --build`), not a host `npm install`.
   assets at theme-relative paths (`/luxina/wp-content/...`); rewrite those to
   the `/img/...` equivalent.
 - `src/lib/smoothScroll.js` (initialised in `main.jsx`) is the Lenis engine
-  (`lerp: 0.085`, `wheelMultiplier: 1.2` — weighted, but settling quickly — on
-  one raf loop). It owns wheel input, touch momentum (`syncTouch`, finger drag
-  1:1, release glide eased with `syncTouchLerp: 0.085`), the PageUp/PageDown/Home/End
+  (`lerp: 0.075`, `wheelMultiplier: 1.2` — soft, weighted glide — on one raf
+  loop). It owns wheel input, touch momentum (`syncTouch`, finger drag 1:1,
+  release glide eased with `syncTouchLerp: 0.075`), the PageUp/PageDown/Home/End
   keys and `#anchor` clicks via `lenis.scrollTo`, and scrolls the real window so
   the sticky header, carousels and the theme's own scroll state are untouched.
   Lenis runs on every device, even under `prefers-reduced-motion`, as explicitly

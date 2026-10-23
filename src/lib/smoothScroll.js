@@ -17,16 +17,16 @@
 
 import Lenis from 'lenis';
 
-// Weighted but not floaty: the `lerp` is low enough that the page still glides
-// after the input stopped, yet high enough that it comes to rest quickly
-// instead of drifting. The 1.2 wheel multiplier keeps a notch's distance close
-// to the browser's own.
-const LERP = 0.085;
+// Soft but not floaty: the `lerp` is low enough that the page still glides and
+// eases out after the input stopped, yet high enough that it comes to rest
+// without drifting. The 1.2 wheel multiplier keeps a notch's distance close to
+// the browser's own.
+const LERP = 0.075;
 const WHEEL_MULTIPLIER = 1.2;
 
 // Touch: the drag itself stays 1:1 with the finger; only the release glide is
-// eased, with the same shortened tail as the wheel.
-const SYNC_TOUCH_LERP = 0.085;
+// eased, with the same tail as the wheel.
+const SYNC_TOUCH_LERP = 0.075;
 
 // Programmatic moves (anchors, keyboard) get a fixed-length glide so they read
 // as one deliberate motion rather than a decaying flick.
