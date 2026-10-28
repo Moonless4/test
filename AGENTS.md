@@ -120,6 +120,16 @@ via `useSite()`, so a saved change shows on the site immediately.
   minutes, and the form carries an off-screen honeypot field (`name="company_website"`)
   that rejects bot submissions. The session is a 45-minute token in
   `sessionStorage` (`atrin-admin-session-v2`).
+- Two-factor is mandatory: there is no `disableTwoFactor()` and no control to
+  turn it off, and an account without 2FA (or after a legacy record) is forced
+  through enrollment at sign-in. Eight one-time backup codes are created at
+  enrollment (or once, on the next successful TOTP sign-in, for accounts that
+  predate them): only their PBKDF2 hashes are stored, the plaintext is returned
+  once to `AdminLogin` and shown on a single screen, and it is gone as soon as
+  the admin copies it or leaves that screen — there is no "show again" or
+  regenerate action. A backup code signs in once (`verifyBackupCode`) and is
+  then marked used. Neither the password nor its hash is ever rendered in the
+  panel or the JSON backup.
 - This is still a browser-only gate: anyone with devtools can edit their own
   localStorage/session and see the panel UI. Real protection needs a server.
 - Orders, newsletter sign-ups and their admin lists use `src/data/records.js`

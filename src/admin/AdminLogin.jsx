@@ -4,15 +4,40 @@ import { formatSecret } from './totp.js';
 import {
   confirmTwoFactorSetup,
   createAdminAccount,
-  finishSignIn,
   hasAdminAccount,
   isCryptoAvailable,
   startTwoFactorSetup,
+  verifyBackupCode,
   verifyPassword,
   verifyTwoFactor,
 } from './auth.js';
 
 const emptyForm = { username: '', password: '', confirm: '' };
+
+const copyText = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    try {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.top = '0';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.focus();
+      area.select();
+      area.setSelectionRange(0, text.length);
+      const done = document.execCommand('copy');
+      document.body.removeChild(area);
+      return done;
+    } catch {
+      return false;
+    }
+  }
+};
 
 export default function AdminLogin({ siteName, onSuccess }) {
   const [step, setStep] = useState(() => (hasAdminAccount() ? 'login' : 'setup'));
@@ -20,6 +45,10 @@ export default function AdminLogin({ siteName, onSuccess }) {
   const [code, setCode] = useState('');
   const [bait, setBait] = useState('');
   const [enrollment, setEnrollment] = useState(null);
+  const [recoveryCodes, setRecoveryCodes] = useState(null);
+  const [codesCopied, setCodesCopied] = useState(false);
+  const [backupMode, setBackupMode] = useState(false);
+  const [backupCode, setBackupCode] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -68,7 +97,8 @@ export default function AdminLogin({ siteName, onSuccess }) {
         setError(result.error);
         return;
       }
-      onSuccess();
+      setRecoveryCodes(result.backupCodes);
+      setStep('recovery');
     });
   };
 
@@ -86,8 +116,14 @@ export default function AdminLogin({ siteName, onSuccess }) {
         return;
       }
       if (!result.twoFactorEnabled) {
-        finishSignIn();
-        onSuccess();
+        // Two-factor cannot be turned off, so an account without it must enroll now.
+        const started = startTwoFactorSetup();
+        if (!started.ok) {
+          setError(started.error);
+          return;
+        }
+        setEnrollment({ secret: started.secret, url: started.url });
+        setStep('enroll');
         return;
       }
       setStep('code');
@@ -103,8 +139,36 @@ export default function AdminLogin({ siteName, onSuccess }) {
         setError(result.error);
         return;
       }
+      if (result.backupCodes?.length) {
+        setRecoveryCodes(result.backupCodes);
+        setStep('recovery');
+        return;
+      }
       onSuccess();
     });
+  };
+
+  const confirmBackup = (event) => {
+    event.preventDefault();
+    run(async () => {
+      const result = await verifyBackupCode(backupCode);
+      if (!result.ok) {
+        setBackupCode('');
+        setError(result.error);
+        return;
+      }
+      onSuccess();
+    });
+  };
+
+  const copyRecoveryCodes = async () => {
+    const copiedOk = await copyText(recoveryCodes.join('\n'));
+    if (!copiedOk) {
+      setError('کپی نشد؛ کدها را دستی یادداشت کنید.');
+      return;
+    }
+    setError('');
+    setCodesCopied(true);
   };
 
   const copySecret = async () => {
@@ -240,6 +304,53 @@ export default function AdminLogin({ siteName, onSuccess }) {
           </form>
         ) : null}
 
+        {step === 'recovery' && recoveryCodes ? (
+          codesCopied ? (
+            <div className="admin-login__step">
+              <h1>کدهای پشتیبان ذخیره شد</h1>
+              <p>
+                کدهای پشتیبان کپی شدند و دیگر در هیچ صفحه‌ای نمایش داده نمی‌شوند. در صورت از دست
+                دادن دسترسی برنامه، هر کد یک بار برای ورود قابل استفاده است.
+              </p>
+              <button type="button" className="adm-btn adm-btn--gold adm-btn--block" onClick={onSuccess}>
+                ورود به پنل
+                <Icon name="chevronLeft" size={17} />
+              </button>
+            </div>
+          ) : (
+            <div className="admin-login__step">
+              <h1>کدهای پشتیبان ورود</h1>
+              <p>
+                این کدها فقط همین یک بار نمایش داده می‌شوند. هر کد یک بار برای ورود کار می‌کند؛
+                آن‌ها را در جای امن نگه دارید.
+              </p>
+
+              <div className="admin-login__codes">
+                {recoveryCodes.map((item) => (
+                  <code key={item} dir="ltr">
+                    {item}
+                  </code>
+                ))}
+              </div>
+
+              {error ? <p className="adm-hint adm-hint--error">{error}</p> : null}
+
+              <button
+                type="button"
+                className="adm-btn adm-btn--ghost adm-btn--block"
+                onClick={copyRecoveryCodes}
+              >
+                <Icon name="box" size={16} />
+                کپی همه کدها
+              </button>
+              <button type="button" className="adm-btn adm-btn--gold adm-btn--block" onClick={onSuccess}>
+                ذخیره کردم، ورود به پنل
+                <Icon name="chevronLeft" size={17} />
+              </button>
+            </div>
+          )
+        ) : null}
+
         {step === 'login' ? (
           <form onSubmit={signIn}>
             <h1>ورود به پنل مدیریت</h1>
@@ -279,21 +390,27 @@ export default function AdminLogin({ siteName, onSuccess }) {
         ) : null}
 
         {step === 'code' ? (
-          <form onSubmit={confirmCode}>
-            <h1>کد دو مرحله‌ای</h1>
-            <p>کد ۶ رقمی Google Authenticator را وارد کنید. اعتبار کد تا ۳۰ ثانیه است.</p>
+          <form onSubmit={backupMode ? confirmBackup : confirmCode}>
+            <h1>{backupMode ? 'کد پشتیبان' : 'کد دو مرحله‌ای'}</h1>
+            <p>
+              {backupMode
+                ? 'یکی از کدهای پشتیبان ذخیره‌شده را وارد کنید؛ هر کد فقط یک بار کار می‌کند.'
+                : 'کد ۶ رقمی Google Authenticator را وارد کنید. اعتبار کد تا ۳۰ ثانیه است.'}
+            </p>
 
             <label className="adm-field">
-              <span className="adm-field__label">کد تأیید</span>
+              <span className="adm-field__label">{backupMode ? 'کد پشتیبان' : 'کد تأیید'}</span>
               <input
                 className="adm-input adm-input--ltr admin-login__code"
-                value={code}
-                onChange={(event) => setCode(event.target.value)}
-                inputMode="numeric"
+                value={backupMode ? backupCode : code}
+                onChange={(event) =>
+                  backupMode ? setBackupCode(event.target.value) : setCode(event.target.value)
+                }
+                inputMode={backupMode ? 'text' : 'numeric'}
                 autoComplete="one-time-code"
-                maxLength={7}
+                maxLength={backupMode ? 9 : 7}
                 dir="ltr"
-                placeholder="123456"
+                placeholder={backupMode ? 'ABCD-EFGH' : '123456'}
               />
             </label>
 
@@ -307,8 +424,22 @@ export default function AdminLogin({ siteName, onSuccess }) {
               type="button"
               className="admin-login__back admin-login__back--button"
               onClick={() => {
-                setStep('login');
+                setBackupMode((prev) => !prev);
                 setCode('');
+                setBackupCode('');
+                setError('');
+              }}
+            >
+              {backupMode ? 'استفاده از کد برنامه' : 'استفاده از کد پشتیبان'}
+            </button>
+            <button
+              type="button"
+              className="admin-login__back admin-login__back--button"
+              onClick={() => {
+                setStep('login');
+                setBackupMode(false);
+                setCode('');
+                setBackupCode('');
                 setError('');
               }}
             >

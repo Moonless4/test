@@ -25,6 +25,38 @@ const randomSalt = () => {
   return toBase64(bytes);
 };
 
+/* One-time recovery codes: shown once at enrollment, only their hashes stay. */
+const BACKUP_CODE_COUNT = 8;
+const BACKUP_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+const normalizeBackupCode = (value) =>
+  String(value || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
+
+const createBackupCodes = () => {
+  const bytes = new Uint8Array(BACKUP_CODE_COUNT * 8);
+  crypto.getRandomValues(bytes);
+  const codes = [];
+  for (let index = 0; index < BACKUP_CODE_COUNT; index += 1) {
+    let code = '';
+    for (let digit = 0; digit < 8; digit += 1) {
+      code += BACKUP_ALPHABET[bytes[index * 8 + digit] % BACKUP_ALPHABET.length];
+    }
+    codes.push(`${code.slice(0, 4)}-${code.slice(4)}`);
+  }
+  return codes;
+};
+
+// The plaintext codes are returned once; only their hashes are persisted.
+const buildBackupCodes = async (salt) => {
+  const codes = createBackupCodes();
+  const hashes = await Promise.all(
+    codes.map((item) => hashValue(normalizeBackupCode(item), salt))
+  );
+  return { codes, entries: hashes.map((hash) => ({ hash, usedAt: null })) };
+};
+
 const hashValue = async (value, salt) => {
   const key = await crypto.subtle.importKey('raw', encoder.encode(value), 'PBKDF2', false, [
     'deriveBits',
@@ -225,14 +257,16 @@ export const confirmTwoFactorSetup = async ({ secret, code }) => {
   if (!record) return { ok: false, error: 'حساب مدیر یافت نشد.' };
   const step = await matchTotpStep(secret, code);
   if (step === null) return { ok: false, error: 'کد تأیید درست نیست یا منقضی شده است.' };
+  const { codes, entries } = await buildBackupCodes(record.salt);
   writeRecord({
     ...record,
-    twoFactor: { enabled: true, secret, lastStep: step },
+    twoFactor: { enabled: true, secret, lastStep: step, backupCodes: entries },
     fails: 0,
     lockUntil: 0,
   });
   beginSession();
-  return { ok: true };
+  // The plaintext codes exist only in this return value — never stored, never shown again.
+  return { ok: true, backupCodes: codes };
 };
 
 export const verifyTwoFactor = async (code) => {
@@ -249,24 +283,51 @@ export const verifyTwoFactor = async (code) => {
   if (record.twoFactor.lastStep && step <= record.twoFactor.lastStep) {
     return { ok: false, error: 'این کد قبلاً استفاده شده است؛ کد جدید را وارد کنید.' };
   }
+  // Accounts enrolled before backup codes existed get one set, shown only this once.
+  const hasCodes = (record.twoFactor.backupCodes || []).length > 0;
+  const fresh = hasCodes ? null : await buildBackupCodes(record.salt);
   writeRecord({
     ...record,
-    twoFactor: { ...record.twoFactor, lastStep: step },
+    twoFactor: {
+      ...record.twoFactor,
+      lastStep: step,
+      ...(fresh ? { backupCodes: fresh.entries } : {}),
+    },
     fails: 0,
     lockUntil: 0,
   });
   beginSession();
-  return { ok: true };
+  return { ok: true, backupCodes: fresh?.codes };
 };
 
-export const disableTwoFactor = async (password) => {
+export const verifyBackupCode = async (input) => {
   const record = readRecord();
-  if (!record) return { ok: false, error: 'حساب مدیر یافت نشد.' };
-  if ((await hashValue(password || '', record.salt)) !== record.passHash) {
-    return { ok: false, error: 'رمز عبور درست نیست.' };
+  if (!record?.twoFactor?.enabled) return { ok: false, error: 'ورود دو مرحله‌ای فعال نیست.' };
+  const locked = lockMessage(record);
+  if (locked) return { ok: false, error: locked };
+  const clean = normalizeBackupCode(input);
+  if (clean.length !== 8) {
+    return { ok: false, error: 'کد پشتیبان باید ۸ کاراکتر باشد.' };
   }
-  writeRecord({ ...record, twoFactor: null });
-  return { ok: true };
+  const hashed = await hashValue(clean, record.salt);
+  const list = record.twoFactor.backupCodes || [];
+  const index = list.findIndex((entry) => !entry.usedAt && entry.hash === hashed);
+  if (index === -1) {
+    const next = registerFailure(record);
+    const message = lockMessage(next);
+    return { ok: false, error: message || 'کد پشتیبان درست نیست یا قبلاً استفاده شده است.' };
+  }
+  const backupCodes = list.map((entry, position) =>
+    position === index ? { ...entry, usedAt: new Date().toISOString() } : entry
+  );
+  writeRecord({
+    ...record,
+    twoFactor: { ...record.twoFactor, backupCodes },
+    fails: 0,
+    lockUntil: 0,
+  });
+  beginSession();
+  return { ok: true, remaining: backupCodes.filter((entry) => !entry.usedAt).length };
 };
 
 export const updateCredentials = async ({ currentPassword, username, password, confirm }) => {
@@ -290,4 +351,3 @@ export const updateCredentials = async ({ currentPassword, username, password, c
   return { ok: true };
 };
 
-export const finishSignIn = () => beginSession();
