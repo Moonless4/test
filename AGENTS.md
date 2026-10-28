@@ -125,13 +125,17 @@ via `useSite()`, so a saved change shows on the site immediately.
   On boot `provisionAdmin()` creates the record once, and re-syncs `username`
   whenever `ADMIN_USERNAME` rotates (password hash, 2FA secret and backup codes
   are preserved). There is no registration endpoint at all.
-- Login is three-stage — password → RFC 6238 TOTP → (backup code only when the
-  authenticator is unavailable) — with a single-use TOTP step, a server-side
-  3-failure / 20-minute lock (per account and per IP), and 8 single-use backup
-  codes created at enrollment whose plaintext is shown once and never re-shown.
-  Sensitive actions (credential change, backup-code regeneration) require a full
-  re-authentication token (`ReauthForm.jsx`), and a password change bumps
-  `sessionVersion`, which invalidates every existing session.
+- Sign-in is password → RFC 6238 TOTP, and a valid TOTP completes it: no backup
+  code is requested on a normal login. Enrolling the authenticator also signs the
+  admin in and shows the 8 single-use backup codes once (plaintext never stored or
+  re-shown). Backup codes are the emergency path only: when the app is
+  unreachable, the code step offers a quiet «به اپلیکیشن Google Authenticator
+  دسترسی ندارم» link that swaps TOTP for one single-use code — the password step
+  is still required. A server-side 3-failure / 20-minute lock (per account and per
+  IP) guards every factor. Sensitive actions (credential change, backup-code
+  regeneration) require a full re-authentication token (`ReauthForm.jsx`) with
+  password + TOTP, where a backup code is likewise only the emergency substitute;
+  a password change bumps `sessionVersion`, which invalidates every session.
 - Because this is a real server gate, verifying it needs the password: sign in at
   `/admin`, then check `/api/admin/session` returns `authenticated: true`.
 - Orders, newsletter sign-ups and their admin lists use `src/data/records.js`

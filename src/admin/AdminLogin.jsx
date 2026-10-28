@@ -114,7 +114,7 @@ export default function AdminLogin({ siteName, onSuccess }) {
         handleFailure(result, 'کد دو مرحله‌ای درست نیست.');
         return;
       }
-      setStep('backup');
+      onSuccess();
     });
   };
 
@@ -184,7 +184,7 @@ export default function AdminLogin({ siteName, onSuccess }) {
     </label>
   );
 
-  const stepLabel = { login: '۱ از ۳', totp: '۲ از ۳', backup: '۳ از ۳' }[step];
+  const stepLabel = { login: '۱ از ۲', totp: '۲ از ۲' }[step];
 
   return (
     <div className="admin-login" dir="rtl">
@@ -266,7 +266,8 @@ export default function AdminLogin({ siteName, onSuccess }) {
             <h1>کدهای پشتیبان ورود</h1>
             <p>
               این کدها فقط همین یک بار نمایش داده می‌شوند و هر کد تنها یک بار قابل استفاده است.
-              آن‌ها را در جای امن نگه دارید؛ برای ورود بعدی به یکی از آن‌ها نیاز دارید.
+              آن‌ها را در جای امن نگه دارید؛ فقط زمانی به آن‌ها نیاز دارید که به برنامه
+              Google Authenticator دسترسی نداشته باشید.
             </p>
 
             <div className="admin-login__codes">
@@ -289,7 +290,7 @@ export default function AdminLogin({ siteName, onSuccess }) {
               onClick={() => {
                 setCopiedCodes(false);
                 setRecoveryCodes(null);
-                setStep('backup');
+                onSuccess();
               }}
             >
               ذخیره کردم، ادامه
@@ -314,13 +315,27 @@ export default function AdminLogin({ siteName, onSuccess }) {
             <button type="button" className="admin-login__back admin-login__back--button" onClick={restart}>
               بازگشت
             </button>
+            <button
+              type="button"
+              className="admin-login__emergency"
+              onClick={() => {
+                setCode('');
+                setError('');
+                setStep('backup');
+              }}
+            >
+              به اپلیکیشن Google Authenticator دسترسی ندارم
+            </button>
           </form>
         ) : null}
 
         {step === 'backup' ? (
           <form onSubmit={submitBackup}>
-            <h1>کد پشتیبان</h1>
-            <p>یکی از کدهای پشتیبان ذخیره‌شده را وارد کنید؛ هر کد فقط یک بار کار می‌کند.</p>
+            <h1>ورود اضطراری با کد پشتیبان</h1>
+            <p>
+              این روش فقط برای زمانی است که به برنامه Google Authenticator دسترسی ندارید. یکی از
+              کدهای پشتیبان ذخیره‌شده را وارد کنید؛ هر کد تنها یک بار کار می‌کند.
+            </p>
 
             {codeField('کد پشتیبان', 'ABCD-EFGH', 9)}
             {error ? <p className="adm-hint adm-hint--error">{error}</p> : null}
@@ -330,8 +345,16 @@ export default function AdminLogin({ siteName, onSuccess }) {
               {busy ? 'در حال بررسی…' : 'ورود به پنل'}
               <Icon name="check" size={17} />
             </button>
-            <button type="button" className="admin-login__back admin-login__back--button" onClick={restart}>
-              بازگشت
+            <button
+              type="button"
+              className="admin-login__back admin-login__back--button"
+              onClick={() => {
+                setCode('');
+                setError('');
+                setStep('totp');
+              }}
+            >
+              بازگشت به کد دو مرحله‌ای
             </button>
           </form>
         ) : null}

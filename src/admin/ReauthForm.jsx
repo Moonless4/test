@@ -3,8 +3,9 @@ import Icon from '../components/Icons.jsx';
 import { Field, TextInput } from './ui.jsx';
 import { reauthenticate } from './api.js';
 
-// Full re-authentication (username + password + TOTP + one-time backup code)
-// required before any sensitive admin action. The token is single-use.
+// Full re-authentication (username + password + TOTP) required before any
+// sensitive admin action. A one-time backup code stands in for the authenticator
+// only when it is unreachable. The token is single-use.
 export default function ReauthForm({ title, description, actionLabel, onToken }) {
   const [form, setForm] = useState({ username: '', password: '', totp: '', backupCode: '' });
   const [error, setError] = useState('');
@@ -39,8 +40,19 @@ export default function ReauthForm({ title, description, actionLabel, onToken })
           type="password"
           dir="ltr"
         />
-        <TextInput label="کد Google Authenticator" value={form.totp} onChange={set('totp')} dir="ltr" />
-        <TextInput label="کد پشتیبان" value={form.backupCode} onChange={set('backupCode')} dir="ltr" />
+        <TextInput
+          label="کد Google Authenticator"
+          value={form.totp}
+          onChange={set('totp')}
+          dir="ltr"
+          hint="کد ۶ رقمی برنامه؛ کد پشتیبان را فقط وقتی وارد کنید که به برنامه دسترسی ندارید."
+        />
+        <TextInput
+          label="کد پشتیبان (فقط بدون دسترسی به برنامه)"
+          value={form.backupCode}
+          onChange={set('backupCode')}
+          dir="ltr"
+        />
       </div>
       {error ? <p className="adm-hint adm-hint--error">{error}</p> : null}
       <button type="submit" className="adm-btn adm-btn--gold" disabled={busy}>

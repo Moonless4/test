@@ -34,7 +34,6 @@ import {
   provisionAdmin,
   readAdmin,
   registerFailure,
-  updateChallenge,
   writeAdmin,
 } from './store.js';
 
@@ -232,10 +231,21 @@ const setupConfirm = async (req, res) => {
     backupCodes: entries,
     updatedAt: new Date().toISOString(),
   });
-  updateChallenge(token, 'backup');
   challenge.secret = null;
-  // Plaintext codes are returned exactly once and never stored or logged again.
-  return send(res, 200, { ok: true, next: 'backup', backupCodes: codes });
+  // Enrollment finishes the sign-in, and the plaintext codes are handed over
+  // exactly once — they are never stored or logged again.
+  const session = createSession(record.sessionVersion);
+  clearChallenge(token);
+  clearFailures();
+  return send(
+    res,
+    200,
+    { ok: true, authenticated: true, username: record.username, backupCodes: codes },
+    [
+      cookie(CHALLENGE_COOKIE, '', { maxAge: 0, req, path: '/api/admin' }),
+      cookie(SESSION_COOKIE, session, { maxAge: 30 * 60 * 1000, req }),
+    ]
+  );
 };
 
 const verifySecondFactor = async (req, res) => {
@@ -252,19 +262,38 @@ const verifySecondFactor = async (req, res) => {
   if (step === null) {
     return fail(res, clientIp(req), { error: 'کد دو مرحله‌ای درست نیست یا قبلاً استفاده شده است.' });
   }
-  writeAdmin({
+  const updated = writeAdmin({
     ...record,
     totp: { ...record.totp, lastStep: step },
     updatedAt: new Date().toISOString(),
   });
-  updateChallenge(challengeToken(req), 'backup');
-  return send(res, 200, { ok: true, next: 'backup' });
+  // A valid authenticator code completes the sign-in. Backup codes are reserved
+  // for the emergency path in verifyBackup, never asked for on a normal login.
+  const session = createSession(updated.sessionVersion);
+  clearChallenge(challengeToken(req));
+  clearFailures();
+  return send(
+    res,
+    200,
+    {
+      ok: true,
+      authenticated: true,
+      username: updated.username,
+      backupCodesRemaining: backupCodesRemaining(updated),
+    },
+    [
+      cookie(CHALLENGE_COOKIE, '', { maxAge: 0, req, path: '/api/admin' }),
+      cookie(SESSION_COOKIE, session, { maxAge: 30 * 60 * 1000, req }),
+    ]
+  );
 };
 
 const verifyBackup = async (req, res) => {
   const token = challengeToken(req);
   const challenge = getChallenge(token);
-  if (!challenge || challenge.stage !== 'backup') {
+  // Emergency sign-in only: the password step has already passed ('totp' stage)
+  // and one single-use backup code stands in for the authenticator app.
+  if (!challenge || challenge.stage !== 'totp') {
     return send(res, 401, { ok: false, error: 'نشست ورود منقضی شده است؛ دوباره وارد شوید.' });
   }
   const remaining = lockRemaining();
@@ -343,25 +372,29 @@ const reauth = async (req, res) => {
   const passwordOk = verifyPassword(body.password, record.password);
   if (!usernameOk || !passwordOk) return fail(res, ip);
 
-  const step = verifyTotp(record.totp?.secret, body.totp, record.totp?.lastStep || 0);
-  if (step === null) return fail(res, ip);
-  if (step > (record.totp?.lastStep || 0)) {
-    writeAdmin({ ...record, totp: { ...record.totp, lastStep: step } });
+  // The authenticator code is the normal second factor; a single-use backup code
+  // is accepted only as the emergency substitute when the app is unreachable.
+  const step = body.totp
+    ? verifyTotp(record.totp?.secret, body.totp, record.totp?.lastStep || 0)
+    : null;
+  if (step !== null) {
+    if (step > (record.totp?.lastStep || 0)) {
+      writeAdmin({ ...record, totp: { ...record.totp, lastStep: step } });
+    }
+  } else {
+    const clean = normalizeBackupCode(body.backupCode);
+    const codes = record.backupCodes || [];
+    const index = codes.findIndex(
+      (entry) => !entry.usedAt && entry.hash === hashBackupCode(clean, record.backupKey)
+    );
+    if (clean.length !== 8 || index === -1) {
+      return fail(res, ip, { error: 'کد دو مرحله‌ای یا کد پشتیبان درست نیست یا قبلاً استفاده شده است.' });
+    }
+    const backupCodes = codes.map((entry, position) =>
+      position === index ? { ...entry, usedAt: new Date().toISOString() } : entry
+    );
+    writeAdmin({ ...readAdmin(), backupCodes });
   }
-
-  const clean = normalizeBackupCode(body.backupCode);
-  const codes = record.backupCodes || [];
-  const index = codes.findIndex(
-    (entry) => !entry.usedAt && entry.hash === hashBackupCode(clean, record.backupKey)
-  );
-  if (clean.length !== 8 || index === -1) {
-    return fail(res, ip, { error: 'کد پشتیبان درست نیست یا قبلاً استفاده شده است.' });
-  }
-
-  const backupCodes = codes.map((entry, position) =>
-    position === index ? { ...entry, usedAt: new Date().toISOString() } : entry
-  );
-  writeAdmin({ ...readAdmin(), backupCodes });
   clearFailures();
   const granted = grantReauth(token);
   return send(res, 200, { ok: true, ...granted });

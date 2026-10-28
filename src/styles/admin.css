@@ -1004,6 +1004,27 @@
   font-family: inherit;
 }
 
+/* Emergency path: deliberately quiet, so it is not mistaken for a normal step. */
+.admin-login__emergency {
+  margin-top: 14px;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  opacity: 0.75;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.admin-login__emergency:hover {
+  color: var(--primary);
+  opacity: 1;
+}
+
 .admin-login__card .adm-btn:disabled {
   opacity: 0.6;
   cursor: progress;
