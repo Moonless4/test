@@ -2,12 +2,14 @@
 
 ## What this app is
 
-A Persian (RTL) restaurant site built with React 18 + Vite. There is no backend,
-database, or server API: the menu, blog, reviews, and forms are client-side, and
-the cart is persisted in `localStorage` (`naval-cart-v1`). Forms (contact,
-reservation, checkout, newsletter, auth) validate locally and show a confirmation
-in the UI; they do not send data anywhere. Menu, banners, blog, footer and the
-static pages are editable from the admin panel at `/admin` (see below).
+A Persian (RTL) restaurant site built with React 18 + Vite. The public site is
+client-side and has no database: the menu, blog, reviews, and forms are
+client-side, and the cart is persisted in `localStorage` (`naval-cart-v1`). Forms
+(contact, reservation, checkout, newsletter, customer auth) validate locally and
+show a confirmation in the UI; they do not send data anywhere. The single server
+component is the admin auth API in `server/` (see the admin panel section). Menu,
+banners, blog, footer and the static pages are editable from the admin panel at
+`/admin` (see below).
 
 ## Running locally
 
@@ -109,29 +111,29 @@ via `useSite()`, so a saved change shows on the site immediately.
   codes, newsletter subscribers, footer (link columns, socials, trust badges,
   legal links), content pages (`/p/:slug`), site identity and contact info,
   settings (admin credentials, 2FA, JSON backup/restore, reset).
-- Admin auth (`src/admin/auth.js` + `src/admin/totp.js`): there are no hardcoded
-  credentials. The first visit to `/admin` shows «راه‌اندازی مدیر» and stores the
-  chosen username/password only as salted PBKDF2-SHA256 hashes in
-  `localStorage` under `atrin-admin-auth-v2`; nothing secret is written into the
-  site content (legacy `settings.adminUsername/adminPassword` keys are stripped on
-  load and are no longer exported with backups). Login is two-step with a real
-  RFC 6238 TOTP secret (Google Authenticator, `otpauth://` URI shown at
-  enrollment), the code is single-use, 5 failed attempts lock sign-in for two
-  minutes, and the form carries an off-screen honeypot field (`name="company_website"`)
-  that rejects bot submissions. The session is a 45-minute token in
-  `sessionStorage` (`atrin-admin-session-v2`).
-- Two-factor is mandatory: there is no `disableTwoFactor()` and no control to
-  turn it off, and an account without 2FA (or after a legacy record) is forced
-  through enrollment at sign-in. Eight one-time backup codes are created at
-  enrollment (or once, on the next successful TOTP sign-in, for accounts that
-  predate them): only their PBKDF2 hashes are stored, the plaintext is returned
-  once to `AdminLogin` and shown on a single screen, and it is gone as soon as
-  the admin copies it or leaves that screen — there is no "show again" or
-  regenerate action. A backup code signs in once (`verifyBackupCode`) and is
-  then marked used. Neither the password nor its hash is ever rendered in the
-  panel or the JSON backup.
-- This is still a browser-only gate: anyone with devtools can edit their own
-  localStorage/session and see the panel UI. Real protection needs a server.
+- Admin auth lives in the `api` compose service (`server/index.js`,
+  `server/security.js`, `server/store.js`) and is reached through Vite's `/api`
+  proxy, so the browser only ever talks to port 3000. The browser keeps no
+  credential: `src/admin/api.js` calls `/api/admin/*`, the session is an
+  `HttpOnly; SameSite=Strict` cookie, and every authorization decision is made on
+  the server. `src/admin/AdminApp.jsx` opens the panel only after
+  `GET /api/admin/session` confirms the cookie.
+- The single administrator is provisioned from the platform secrets
+  `ADMIN_USERNAME` / `ADMIN_PASSWORD` (delivered via `/run/base44/app.env` to the
+  `api` service only, never written to the repo). The record lives in the
+  `admin_data` volume at `/data/admin.json` as an scrypt hash plus TOTP state.
+  On boot `provisionAdmin()` creates the record once, and re-syncs `username`
+  whenever `ADMIN_USERNAME` rotates (password hash, 2FA secret and backup codes
+  are preserved). There is no registration endpoint at all.
+- Login is three-stage — password → RFC 6238 TOTP → (backup code only when the
+  authenticator is unavailable) — with a single-use TOTP step, a server-side
+  3-failure / 20-minute lock (per account and per IP), and 8 single-use backup
+  codes created at enrollment whose plaintext is shown once and never re-shown.
+  Sensitive actions (credential change, backup-code regeneration) require a full
+  re-authentication token (`ReauthForm.jsx`), and a password change bumps
+  `sessionVersion`, which invalidates every existing session.
+- Because this is a real server gate, verifying it needs the password: sign in at
+  `/admin`, then check `/api/admin/session` returns `authenticated: true`.
 - Orders, newsletter sign-ups and their admin lists use `src/data/records.js`
   (`atrin-orders-v1`, `atrin-newsletter-v1` in `localStorage`). Checkout writes an
   order there; the footer newsletter form writes a subscriber. Discount codes are

@@ -2,5 +2,16 @@
   "previewPort": 3000,
   "healthPath": "/",
   "startCommand": "docker compose -f docker-compose.base44.yml up -d",
-  "secrets": []
+  "secrets": [
+    {
+      "name": "ADMIN_USERNAME",
+      "description": "Admin panel sign-in username. The auth API syncs the stored admin account name from it on boot.",
+      "requiredAtBoot": true
+    },
+    {
+      "name": "ADMIN_PASSWORD",
+      "description": "Admin panel sign-in password, used to provision the single admin account on first boot.",
+      "requiredAtBoot": true
+    }
+  ]
 }

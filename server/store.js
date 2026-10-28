@@ -48,8 +48,17 @@ export const writeAdmin = (record) => {
 
 /* Provision the single administrator once, from server-side environment values. */
 export const provisionAdmin = () => {
-  if (readAdmin()) return readAdmin();
   const username = (process.env.ADMIN_USERNAME || '').trim();
+  const existing = readAdmin();
+  if (existing) {
+    // ADMIN_USERNAME is the deployment's admin identity: a rotated value must
+    // take effect without wiping the stored password hash, 2FA secret or codes.
+    if (username && existing.username !== username) {
+      console.log('[auth] administrator username synced from ADMIN_USERNAME');
+      return writeAdmin({ ...existing, username, updatedAt: new Date().toISOString() });
+    }
+    return existing;
+  }
   const password = process.env.ADMIN_PASSWORD || '';
   if (!username || !password) return null;
 
