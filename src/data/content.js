@@ -191,7 +191,6 @@ export const heroSlides = [
   { id: 'alfredo-pasta', image: '/assets/slide2.webp' },
   { id: 'charcoal-chicken', image: '/assets/slide4.webp' },
   { id: 'season-salad', image: '/assets/testimonial-salad.webp' },
-  { id: 'naval-burger', image: '/assets/intro-burger.webp' },
 ];
 
 export const latestProducts = [
