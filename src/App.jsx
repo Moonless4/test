@@ -54,6 +54,18 @@ function Site() {
     return () => document.removeEventListener('click', onClick);
   }, [navigate]);
 
+  // The admin panel is its own surface: it renders without the site header,
+  // footer and content offsets.
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return (
+      <div id="container">
+        <Suspense fallback={<div className="rb-loading" aria-hidden="true" />}>
+          <AppRoutes />
+        </Suspense>
+      </div>
+    );
+  }
+
   return (
     <div id="container">
       <Header />

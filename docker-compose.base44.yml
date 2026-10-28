@@ -11,9 +11,13 @@ services:
       - BASE44_SANDBOX_HOST_DOMAIN
       - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
       - CHOKIDAR_USEPOLLING=1
+      - CONTENT_API_URL=http://api:4000
     volumes:
       - ./:/app
       - node_modules:/app/node_modules
+    depends_on:
+      api:
+        condition: service_healthy
     command:
       - sh
       - -ec
@@ -31,5 +35,37 @@ services:
       retries: 6
       start_period: 120s
 
+  # Content API + admin panel backend (server/). Plain node:22 with no
+  # dependencies, so it starts without an install step. The login falls back to
+  # admin/1234 in the code; PANEL_USER/PANEL_PASSWORD from the platform env file
+  # (last, so a dashboard value always wins) replace it.
+  api:
+    image: node:22
+    working_dir: /app
+    restart: on-failure
+    environment:
+      - PORT=4000
+      - DATA_DIR=/data
+    env_file:
+      - path: /run/base44/app.env
+        required: false
+    volumes:
+      - ./:/app
+      - content:/data
+    command: ["node", "server/index.js"]
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:4000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
 volumes:
   node_modules:
+  content:

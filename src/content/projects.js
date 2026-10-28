@@ -1,6 +1,6 @@
 // Every project shown in the site. `featured` marks the project introduced in
 // the homepage hero; the rest fill the projects grid.
-export const projects = [
+export let projects = [
   {
     slug: 'برج-آریا',
     title: 'برج آریا',
@@ -119,4 +119,12 @@ export const projectUrl = (project) => `/project/${project.slug}`;
 
 export const findProject = (slug) => projects.find((project) => project.slug === slug);
 
-export const featuredProject = projects.find((project) => project.featured) || projects[0];
+export const findFeaturedProject = () => projects.find((project) => project.featured) || projects[0];
+
+// The admin panel's saved list replaces the module's static one. Only the card
+// fields stay here; the detail page content is split out into
+// `project-details.js` by `hydrateProjectDetails`.
+export function hydrateProjects(list) {
+  if (!Array.isArray(list) || !list.length) return;
+  projects = list.map(({ details, ...card }) => card);
+}

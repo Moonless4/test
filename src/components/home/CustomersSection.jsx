@@ -1,20 +1,11 @@
 import { Fragment } from 'react';
+import { site } from '../../content/site.js';
 
 // Partner logos band ("افتخارات همکاری"). The placeholder cell keeps the title
-// badge inside the grid on desktop, exactly like the reference page.
-const LOGOS = [
-  { src: '/img/customer-1.png', square: 'hide-desktop hide-tablet hide-mobile' },
-  { src: '/img/customer-2.png', square: '' },
-  { src: '/img/customer-3.png', square: 'hide-mobile' },
-  { src: '/img/customer-4.png', square: '' },
-  { src: '/img/customer-5.png', square: 'hide-desktop hide-tablet hide-mobile' },
-  { src: '/img/customer-6.png', square: 'hide-desktop' },
-  { src: '/img/customer-7-1.png', square: 'hide-desktop hide-mobile' },
-  { src: '/img/customer-8.png', square: 'hide-desktop' },
-  { src: '/img/customer-9.png', square: 'hide-desktop hide-tablet hide-mobile' },
-];
-
+// badge inside the grid on desktop.
 export default function CustomersSection() {
+  const logos = site.clients || [];
+
   return (
     <section className="hp-section hp-customers">
       <div className="hp-inner">
@@ -30,8 +21,8 @@ export default function CustomersSection() {
             className="luxina_customers_items"
             style={{ '--desktop-cols': 5, '--tablet-cols': 4, '--mobile-cols': 2 }}
           >
-            {LOGOS.map((logo, index) => (
-              <Fragment key={logo.src}>
+            {logos.map((logo, index) => (
+              <Fragment key={`${logo.src}-${index}`}>
                 <div className="luxina_customers_item">
                   <img
                     className="luxina_customers_item-img"
@@ -40,7 +31,7 @@ export default function CustomersSection() {
                     decoding="async"
                     loading="lazy"
                   />
-                  <span className={`luxina_customers_item-square ${logo.square}`.trim()} aria-hidden="true" />
+                  <span className={`luxina_customers_item-square ${logo.square || ''}`.trim()} aria-hidden="true" />
                 </div>
                 {index === 1 ? (
                   <span

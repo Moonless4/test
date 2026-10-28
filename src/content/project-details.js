@@ -2,7 +2,7 @@
 // (title, status, two specs), so the rest of each project page — overview,
 // facts, gallery and related services — lives here, keyed by the project slug
 // used in the card's link.
-export const projectDetails = {
+export let projectDetails = {
   'برج-آریا': {
     category: 'مسکونی',
     location: 'تهران، جردن',
@@ -356,3 +356,14 @@ export const projectDetails = {
 };
 
 export const findProjectDetails = (slug) => projectDetails[slug] || null;
+
+// Saved projects carry their detail page content on the record; the pages read
+// it from here, keyed by slug.
+export function hydrateProjectDetails(list) {
+  if (!Array.isArray(list)) return;
+  const next = {};
+  list.forEach((project) => {
+    if (project?.slug && project.details) next[project.slug] = project.details;
+  });
+  projectDetails = next;
+}

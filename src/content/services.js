@@ -1,5 +1,5 @@
 // Service pages behind the footer "خدمات" menu.
-export const services = [
+export let services = [
   {
     slug: 'construction',
     title: 'ساخت و اجرا',
@@ -88,3 +88,8 @@ export const services = [
 ];
 
 export const findService = (slug) => services.find((service) => service.slug === slug);
+
+export function hydrateServices(list) {
+  if (!Array.isArray(list) || !list.length) return;
+  services = list;
+}

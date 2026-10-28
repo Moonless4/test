@@ -18,6 +18,7 @@ const ContactPage = lazy(() => import('./pages/ContactPage.jsx'));
 const ConsultationPage = lazy(() => import('./pages/ConsultationPage.jsx'));
 const CooperationPage = lazy(() => import('./pages/CooperationPage.jsx'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'));
+const AdminApp = lazy(() => import('./admin/AdminApp.jsx'));
 
 export default function AppRoutes() {
   return (
@@ -36,6 +37,7 @@ export default function AppRoutes() {
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/consultation" element={<ConsultationPage />} />
       <Route path="/cooperation" element={<CooperationPage />} />
+      <Route path="/admin/*" element={<AdminApp />} />
       <Route path="/404" element={<NotFoundPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

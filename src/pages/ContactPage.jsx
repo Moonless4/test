@@ -1,33 +1,22 @@
 import PageSection from '../components/PageSection.jsx';
 import PageHeading from '../components/PageHeading.jsx';
 import RequestForm from '../components/RequestForm.jsx';
+import { site } from '../content/site.js';
 
-const CONTACT = [
-  {
-    icon: 'luxina-icon-map-pin-2-fill',
-    label: 'آدرس',
-    value: 'تهران، سعادت‌آباد، بلوار دریا، پلاک ۲۴، طبقه ۳',
-  },
-  {
-    icon: 'luxina-icon-customer-service-2-line',
-    label: 'تلفن',
-    value: '021-123 4567',
-    ltr: true,
-  },
-  {
-    icon: 'luxina-icon-mail-fill',
-    label: 'ایمیل',
-    value: 'info@aratan.ir',
-    ltr: true,
-  },
-];
-
+// The contact cards are filled from the admin panel's contact settings.
 export default function ContactPage() {
+  const { contact } = site;
+  const cards = [
+    { icon: 'luxina-icon-map-pin-2-fill', label: 'آدرس', value: contact.address },
+    { icon: 'luxina-icon-customer-service-2-line', label: 'تلفن', value: contact.phone, ltr: true },
+    { icon: 'luxina-icon-mail-fill', label: 'ایمیل', value: contact.email, ltr: true },
+  ].filter((item) => item.value);
+
   return (
     <PageSection>
       <PageHeading title="تماس با ما" subtitle="Contact us" icon="luxina-icon-question-answer-fill" />
       <div className="rb-contact-info">
-        {CONTACT.map((item) => (
+        {cards.map((item) => (
           <div className="rb-contact-card" key={item.label}>
             <i className={`luxinaicon ${item.icon}`} aria-hidden="true" />
             <span className="rb-contact-label">{item.label}</span>

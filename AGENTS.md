@@ -44,12 +44,51 @@ up -d --build`), not a host `npm install`.
   sub-menus — bound once from `Header`), `forms.js` (validation bound per route
   change, keeps the `.rb-form` / `data-rb-form` / `.rb-form-note` contract),
   `initSliders.js` + `applyLayoutVars.js` (theme `data-settings` grids and
-  horizontal tracks). There is no backend: submissions exist per browser only.
+  horizontal tracks). The contact/cooperation forms are still per-browser only —
+  they have no submission endpoint.
 - The site has no accounts: there is no `/login` route, no login page and no
   account markup in the captured header, so `/login` falls through to
   `NotFoundPage`. The header's consultation action (`.header-action-btn-wrap`,
   label + phone number + icon) is always visible — `styles/site.css` only keeps
   it on one line, it does not hide the text behind a hover.
+
+## Admin panel and content
+
+The site is editable at `/admin` (login, then a dashboard) and the backend is a
+second compose service, `api`:
+
+- `server/index.js` — the whole API on Node's built-in `http` module, no
+  dependencies: `GET /api/content` (public), `POST /api/login`, `POST
+  /api/logout`, `GET /api/session`, `GET|PUT /api/admin/content` (behind the
+  session). The session is an HMAC-signed httpOnly cookie; the signing key is
+  generated once into the data volume. Login reads `PANEL_USER` /
+  `PANEL_PASSWORD` from the environment and falls back to `admin` / `1234` in
+  the code, so a dashboard secret always wins.
+- `server/store.js` + `server/seed.js` — the content is one JSON document in the
+  `content` volume (`/data/site.json`), written atomically. The first boot seeds
+  it from the `src/content/*.js` modules, so the panel opens on the real site.
+- The document has five keys: `settings` (hero, home services, team, about,
+  contact, socials, header, footer, clients, faqs), `projects` (card fields plus
+  a nested `details`), `services`, `articles`, `servicePages`.
+- The front end still reads `src/content/*.js`; those modules export `let` and a
+  `hydrate*` function, so the saved document replaces their static arrays before
+  the first render. `src/lib/siteContent.js` fetches the document and
+  `main.jsx` waits for it — a failed request leaves the static content in place,
+  which is why the site must keep working without the API.
+- `settings` is read directly from `src/content/site.js` by the components that
+  render it (hero, team, FAQ, clients, about, contact). The captured header and
+  footer markup cannot read data, so `src/lib/siteChrome.js` fills their editable
+  spots by selector (menu labels, consultation action, footer contact/socials/
+  licences). Only the first N menu/social items are mapped onto the markup — the
+  panel cannot add or remove those nodes.
+- `src/admin/` is the dashboard: `schema.js` declares every section (where its
+  data lives and its fields), `fields.jsx` renders the forms (text, textarea,
+  image, switch, `lines`, `pairs` for `[title, value]` rows, `json` for the
+  article bodies and the service pages), `AdminApp.jsx` holds the session, the
+  draft document and the per-section save. Saving sends only the section's
+  top-level key, so two sections never overwrite each other.
+- `styles/admin.css` is self-contained under `.adm-*`, and `App.jsx` renders
+  `/admin` without the site header, footer or content offsets.
 
 ## Gotchas
 

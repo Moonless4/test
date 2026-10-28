@@ -2,7 +2,7 @@
 // Each service keeps its own structure and data; only the shared contact block
 // and the service index below are reused across them.
 
-export const SERVICE_CONTACT = {
+export let SERVICE_CONTACT = {
   phone: '021-123 4567',
   phoneHref: 'tel:+982112345678',
   email: 'info@aratan.ir',
@@ -10,7 +10,7 @@ export const SERVICE_CONTACT = {
   hours: 'شنبه تا پنجشنبه، ۹ تا ۱۸',
 };
 
-export const SERVICE_LINKS = [
+export let SERVICE_LINKS = [
   {
     slug: 'interior-design',
     title: 'طراحی داخلی و دکوراسیون',
@@ -45,9 +45,21 @@ export const findServiceLink = (slug) => SERVICE_LINKS.find((item) => item.slug 
 
 export const relatedServiceLinks = (slug) => SERVICE_LINKS.filter((item) => item.slug !== slug);
 
+// The four service pages, their shared contact block and the service index are
+// all editable; the saved document replaces the static content above.
+export function hydrateServicePages(doc) {
+  if (!doc || typeof doc !== 'object') return;
+  SERVICE_CONTACT = doc.SERVICE_CONTACT || SERVICE_CONTACT;
+  SERVICE_LINKS = doc.SERVICE_LINKS || SERVICE_LINKS;
+  interiorDesign = doc.interiorDesign || interiorDesign;
+  oldHouseRenovation = doc.oldHouseRenovation || oldHouseRenovation;
+  luxuryConstruction = doc.luxuryConstruction || luxuryConstruction;
+  architecturePlans = doc.architecturePlans || architecturePlans;
+}
+
 /* ---- Interior design --------------------------------------------------- */
 
-export const interiorDesign = {
+export let interiorDesign = {
   slug: 'interior-design',
   title: 'طراحی داخلی و دکوراسیون',
   eyebrow: 'خدمات آراتان · طراحی داخلی',
@@ -131,7 +143,7 @@ export const interiorDesign = {
 
 /* ---- Old house renovation --------------------------------------------- */
 
-export const oldHouseRenovation = {
+export let oldHouseRenovation = {
   slug: 'old-house-renovation',
   title: 'بازسازی خانه‌های قدیمی',
   eyebrow: 'خدمات آراتان · بازسازی و مرمت',
@@ -225,7 +237,7 @@ export const oldHouseRenovation = {
 
 /* ---- Luxury construction ---------------------------------------------- */
 
-export const luxuryConstruction = {
+export let luxuryConstruction = {
   slug: 'luxury-construction',
   title: 'ساخت و اجرای پروژه‌های لوکس',
   eyebrow: 'خدمات آراتان · ساخت و اجرا',
@@ -345,7 +357,7 @@ export const luxuryConstruction = {
 
 /* ---- Architectural plans ---------------------------------------------- */
 
-export const architecturePlans = {
+export let architecturePlans = {
   slug: 'architecture-plans',
   title: 'طراحی نقشه و پروتوتایپ',
   eyebrow: 'خدمات آراتان · طراحی معماری',

@@ -2,5 +2,16 @@
   "previewPort": 3000,
   "healthPath": "/",
   "startCommand": "docker compose -f docker-compose.base44.yml up -d --build",
-  "secrets": []
+  "secrets": [
+    {
+      "name": "PANEL_USER",
+      "description": "Optional: admin panel username. Remove/replace to change the default `admin`.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "PANEL_PASSWORD",
+      "description": "Optional: admin panel password. Replace the default `1234` before handing the site over.",
+      "requiredAtBoot": false
+    }
+  ]
 }

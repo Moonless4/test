@@ -13,7 +13,7 @@
 
 export const CATEGORIES = ['معماری', 'طراحی داخلی', 'بازسازی', 'ایده و الهام'];
 
-export const articles = [
+export let articles = [
   {
     slug: 'redesigning-old-house',
     title: 'چطور یک خانه قدیمی را بدون از بین بردن هویت آن بازطراحی کنیم؟',
@@ -579,6 +579,11 @@ export const articles = [
 export const articleUrl = (article) => `/blog/${article.slug}`;
 
 export const findArticle = (slug) => articles.find((article) => article.slug === slug);
+
+export function hydrateArticles(list) {
+  if (!Array.isArray(list) || !list.length) return;
+  articles = list;
+}
 
 // Related posts are chosen by hand per article (see `related`), so each post
 // recommends the two most relevant others instead of the same list everywhere.

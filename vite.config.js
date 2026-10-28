@@ -19,6 +19,14 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     allowedHosts,
+    // The content API runs as its own compose service. Proxying it here keeps
+    // the browser on one origin, so the admin session cookie stays same-site.
+    proxy: {
+      '/api': {
+        target: process.env.CONTENT_API_URL || 'http://localhost:4000',
+        changeOrigin: false,
+      },
+    },
     // bind mounts inside Docker do not always emit filesystem events
     watch: { usePolling: true, interval: 400 },
   },
