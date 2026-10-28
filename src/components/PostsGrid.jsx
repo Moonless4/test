@@ -24,7 +24,7 @@ export default function PostsGrid({ articles }) {
       style={TRACK_STYLE}
     >
       <div className="list-posts wrapper desktop-columns desktop-columns-2 tablet-columns tablet-columns-2 mobile-columns mobile-columns-1 luxina_post_items posts-style-3">
-        {articles.map((article) => (
+        {articles.filter((article) => article.published !== false).map((article) => (
           <PostCard key={article.slug} article={article} />
         ))}
       </div>

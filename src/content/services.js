@@ -87,7 +87,8 @@ export let services = [
   },
 ];
 
-export const findService = (slug) => services.find((service) => service.slug === slug);
+export const findService = (slug) =>
+  services.find((service) => service.slug === slug && service.visible !== false);
 
 export function hydrateServices(list) {
   if (!Array.isArray(list) || !list.length) return;

@@ -1,39 +1,9 @@
 import { useEffect, useRef } from 'react';
+import { site } from '../../content/site.js';
 
 // Homepage services band. The cards are the theme's own service tiles (hover
 // opens the subtitle), so the only thing React has to do is measure each
 // subtitle once so the CSS height transition knows its target height.
-const SERVICES = [
-  {
-    title: 'طراحی نقشه و پروتوتایپ',
-    subtitle: 'از تحلیل سایت تا نقشه‌های اجرایی',
-    icon: 'luxina-iconbrush-fill',
-    image: '/img/service-image1.png',
-    slug: 'architecture-plans',
-  },
-  {
-    title: 'ساخت و اجرای پروژه‌های لوکس',
-    subtitle: 'یک تیم، از کانسپت تا تحویل کلید',
-    icon: 'luxina-iconbuilding-3-fill',
-    image: '/img/service-image2.png',
-    slug: 'luxury-construction',
-  },
-  {
-    title: 'بازسازی خانه های قدیمی',
-    subtitle: 'هویت بنا می‌ماند، عملکرد به‌روز می‌شود',
-    icon: 'luxina-iconbuilding-fill',
-    image: '/img/service-image4.png',
-    slug: 'old-house-renovation',
-  },
-  {
-    title: 'طراحی داخلی و دکوراسیون',
-    subtitle: 'چیدمان، متریال و نور در یک روایت',
-    icon: 'luxina-iconpencil-ruler-2-fill',
-    image: '/img/service-image2.png',
-    slug: 'interior-design',
-  },
-];
-
 const TRACK_STYLE = {
   '--desktop-cols': 4,
   '--desktop-gap': '0px 0px',
@@ -45,6 +15,8 @@ const TRACK_STYLE = {
 
 export default function ServicesSection() {
   const rootRef = useRef(null);
+  const services = site.homeServices || [];
+  const heading = site.homeHeadings || {};
 
   useEffect(() => {
     const root = rootRef.current;
@@ -84,8 +56,8 @@ export default function ServicesSection() {
               </svg>
             </div>
             <i className="luxina-icon-pencil-ruler-fill luxina_services_title-icon" aria-hidden="true" />
-            <span className="luxina_services_title-text">خدمات</span>
-            <span className="luxina_services_title-subtitle">Services</span>
+            <span className="luxina_services_title-text">{heading.servicesTitle || 'خدمات'}</span>
+            <span className="luxina_services_title-subtitle">{heading.servicesSubtitle || 'Services'}</span>
           </div>
 
           <div
@@ -102,7 +74,7 @@ export default function ServicesSection() {
             </div>
 
             <div className="wrapper luxina_services_wrap desktop-columns desktop-columns-2 desktop-display-grid tablet-columns tablet-columns-2 tablet-display-grid mobile-columns mobile-columns-2 mobile-display-grid">
-              {SERVICES.map((service) => (
+              {services.map((service) => (
                 <a
                   className="luxina_services_item-wrapper slider-slide"
                   href={`/services/${service.slug}`}

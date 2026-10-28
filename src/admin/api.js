@@ -24,7 +24,15 @@ export const verifyTwoFactor = (code) => request('/api/2fa/verify', { method: 'P
 export const getTwoFactorStatus = () => request('/api/admin/2fa');
 export const regenerateBackupCodes = (password, code) =>
   request('/api/admin/2fa/backup-codes', { method: 'POST', body: { password, code } });
-export const resetTwoFactor = (password, code) =>
-  request('/api/admin/2fa/reset', { method: 'POST', body: { password, code } });
+
 export const getContent = () => request('/api/admin/content');
 export const saveContent = (patch) => request('/api/admin/content', { method: 'PUT', body: patch });
+
+export const getMessages = () => request('/api/admin/messages');
+export const markMessageRead = (id, read) =>
+  request('/api/admin/messages/read', { method: 'POST', body: { id, read } });
+export const deleteMessage = (id) => request('/api/admin/messages/delete', { method: 'POST', body: { id } });
+
+export const getMedia = () => request('/api/admin/media');
+export const uploadMedia = (payload) => request('/api/admin/media', { method: 'POST', body: payload });
+export const deleteMedia = (id) => request('/api/admin/media/delete', { method: 'POST', body: { id } });

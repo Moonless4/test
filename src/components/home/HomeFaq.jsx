@@ -1,5 +1,6 @@
 import PageHeading from '../PageHeading.jsx';
 import FaqList from '../FaqList.jsx';
+import { site } from '../../content/site.js';
 
 // Homepage FAQ band: photo beside the accordion, with the reference page's
 // faint glass panel behind the questions.
@@ -9,12 +10,16 @@ export default function HomeFaq() {
       <div className="hp-inner">
         <div className="hp-faq-grid">
           <div className="hp-faq-media">
-            <img src="/img/faq-img.png" width="295" height="381" loading="lazy" decoding="async" alt="" />
+            <img src={site.faqBlock?.image || '/img/faq-img.png'} width="295" height="381" loading="lazy" decoding="async" alt="" />
           </div>
 
           <div className="hp-faq-body">
             <span className="luxina-faq-bg" aria-hidden="true" />
-            <PageHeading title="پرسش‌های متداول" subtitle="Questions & answers" icon="luxina-iconquestionnaire-fill" />
+            <PageHeading
+              title={site.homeHeadings?.faqTitle || 'پرسش‌های متداول'}
+              subtitle={site.homeHeadings?.faqSubtitle || 'Questions & answers'}
+              icon="luxina-iconquestionnaire-fill"
+            />
             <FaqList />
           </div>
         </div>

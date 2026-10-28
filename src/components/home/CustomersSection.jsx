@@ -13,8 +13,8 @@ export default function CustomersSection() {
           <div className="luxina_customers_title-wrap title-in-items">
             <span className="luxina_customers_title-bg" aria-hidden="true" />
             <i className="luxina-icon-user-star-fill luxina_customers_title-icon" aria-hidden="true" />
-            <span className="luxina_customers_title-text">افتخارات همکاری</span>
-            <span className="luxina_customers_title-subtitle">Partnership honors</span>
+            <span className="luxina_customers_title-text">{site.homeHeadings?.clientsTitle || 'افتخارات همکاری'}</span>
+            <span className="luxina_customers_title-subtitle">{site.homeHeadings?.clientsSubtitle || 'Partnership honors'}</span>
           </div>
 
           <div
@@ -27,7 +27,7 @@ export default function CustomersSection() {
                   <img
                     className="luxina_customers_item-img"
                     src={logo.src}
-                    alt=""
+                    alt={logo.label || ''}
                     decoding="async"
                     loading="lazy"
                   />

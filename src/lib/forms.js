@@ -37,6 +37,42 @@ function setFieldError(field, message) {
   error.textContent = message;
 }
 
+async function sendRequest(form) {
+  const value = (name) => form.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+  const note = form.querySelector('.rb-form-note');
+  const button = form.querySelector('.rb-form-submit');
+  const originalNote = note?.textContent || '';
+  if (button) button.disabled = true;
+  try {
+    const response = await fetch('/api/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        name: value('name'),
+        phone: value('phone'),
+        message: value('message'),
+        type: form.dataset.rbForm || 'contact',
+      }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || 'ارسال پیام ناموفق بود. دوباره تلاش کنید.');
+    if (note) {
+      note.textContent = originalNote;
+      note.hidden = false;
+    }
+    Array.from(form.querySelectorAll('input, textarea')).forEach((field) => {
+      field.value = '';
+    });
+  } catch (error) {
+    if (note) {
+      note.textContent = error.message || 'ارسال پیام ناموفق بود. دوباره تلاش کنید.';
+      note.hidden = false;
+    }
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
 function handleSubmit(event) {
   event.preventDefault();
   const form = event.currentTarget;
@@ -60,11 +96,7 @@ function handleSubmit(event) {
     return;
   }
 
-  const note = form.querySelector('.rb-form-note');
-  if (note) note.hidden = false;
-  fields.forEach((field) => {
-    field.value = '';
-  });
+  sendRequest(form);
 }
 
 export function initForms(root = document) {

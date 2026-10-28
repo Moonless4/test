@@ -11,10 +11,14 @@ export default function TeamBand() {
     <PageSection className="rb-team-section">
       <div className="rb-team">
         <div className="rb-team-body">
-          <PageHeading title="تیــــــــــم مــــــــــا" subtitle="Our Team" icon="luxina-iconteam-fill" />
+          <PageHeading
+            title={site.homeHeadings?.teamTitle || 'تیــــــــــم مــــــــــا'}
+            subtitle={site.homeHeadings?.teamSubtitle || 'Our Team'}
+            icon="luxina-iconteam-fill"
+          />
           <p className="rb-team-text">{team.intro}</p>
           <Button href="/cooperation" variant="primary">
-            فرصت‌های همکاری
+            {site.homeHeadings?.teamCta || 'فرصت‌های همکاری'}
           </Button>
         </div>
         <img className="rb-team-image" src={team.image} alt="" width="474" height="552" loading="lazy" />

@@ -1,233 +1,788 @@
-// The dashboard is generated from this table: each entry says where its data
-// lives in the saved document and which fields the form shows. Field paths are
-// relative to the entry's `path`, so `details.lead` edits a project's detail
-// page copy from the same form as its card.
+// The admin panel is generated from these definitions. Each entry declares
+// where its data lives, what the editor shows and how the list is labelled, so
+// the panel only ever edits real fields of the saved document.
 //
-// Field types: text | textarea | url | image | number | switch | lines | pairs | json
+// Field types: text | textarea | richtext | number | switch | select | image |
+// url | lines | pairs | list | blocks | menu | order | deep
 
-const contactFields = [
-  { path: 'phone', label: 'تلفن', type: 'text' },
-  { path: 'phoneHref', label: 'لینک تلفن', type: 'text', hint: 'tel:+982112345678' },
-  { path: 'email', label: 'ایمیل', type: 'text' },
-  { path: 'address', label: 'آدرس', type: 'textarea' },
-  { path: 'hours', label: 'ساعات کاری', type: 'text' },
+const f = (path, label, type = 'text', extra = {}) => ({ path, label, type, ...extra });
+
+const seoFields = (prefix = '') => [
+  f(`${prefix}seoTitle`, 'عنوان SEO', 'text'),
+  f(`${prefix}seoDescription`, 'توضیح متا', 'textarea'),
 ];
 
-const projectFields = [
-  { path: 'title', label: 'نام پروژه', type: 'text' },
-  { path: 'slug', label: 'نشانی صفحه (slug)', type: 'text', hint: 'مثال: برج-آریا' },
-  { path: 'image', label: 'تصویر اصلی', type: 'image' },
-  { path: 'status', label: 'وضعیت', type: 'text' },
-  { path: 'statusColor', label: 'رنگ وضعیت', type: 'text', hint: '#40ce51' },
-  { path: 'featured', label: 'پروژهٔ شاخص (هیرو)', type: 'switch' },
-  { path: 'heroText', label: 'توضیح کوتاه', type: 'textarea' },
-  { path: 'specs', label: 'مشخصات روی کارت', type: 'pairs' },
-  { path: 'details.category', label: 'دسته', type: 'text' },
-  { path: 'details.location', label: 'موقعیت', type: 'text' },
-  { path: 'details.progress', label: 'پیشرفت اجرا (٪)', type: 'number' },
-  { path: 'details.lead', label: 'خلاصهٔ صفحهٔ پروژه', type: 'textarea' },
-  { path: 'details.body', label: 'معرفی پروژه (هر خط یک پاراگراف)', type: 'lines' },
-  { path: 'details.highlights', label: 'ویژگی‌های شاخص', type: 'lines' },
-  { path: 'details.facts', label: 'مشخصات کامل', type: 'pairs' },
-  { path: 'details.gallery', label: 'گالری تصاویر', type: 'lines' },
-  { path: 'details.services', label: 'خدمات مرتبط (slug)', type: 'lines' },
+const pageContent = (id) => `settings.pages.${id}`;
+
+export const HOME_LAYOUT_OPTIONS = [
+  ['hero', 'هیرو'],
+  ['services', 'خدمات'],
+  ['projects', 'پروژه‌ها'],
+  ['timeline', 'تایم‌لاین'],
+  ['promo', 'معرفی استودیو'],
+  ['clients', 'همکاران'],
+  ['team', 'تیم'],
+  ['blog', 'مقالات'],
+  ['faq', 'پرسش‌های متداول'],
 ];
 
-export const SECTIONS = [
+const homeServicesFields = [
+  f('title', 'عنوان', 'text'),
+  f('subtitle', 'زیرعنوان', 'text'),
+  f('image', 'تصویر', 'image'),
+  f('icon', 'کلاس آیکن', 'text', { hint: 'luxina-iconbrush-fill' }),
+  f('slug', 'لینک خدمت', 'text', { hint: '/services/architecture-plans' }),
+];
+
+const projectTabs = [
   {
-    id: 'hero',
-    label: 'هیرو سکشن',
-    path: 'settings.hero',
-    kind: 'object',
+    id: 'general',
+    label: 'عمومی',
     fields: [
-      { path: 'badge1', label: 'برچسب اول', type: 'text' },
-      { path: 'badge2', label: 'برچسب دوم', type: 'text' },
-      { path: 'title', label: 'عنوان اصلی', type: 'text' },
-      { path: 'text', label: 'متن زیر عنوان', type: 'textarea' },
-      { path: 'authorName', label: 'نام معمار', type: 'text' },
-      { path: 'authorRole', label: 'عنوان معمار', type: 'text' },
-      { path: 'authorImage', label: 'تصویر معمار', type: 'image' },
-      { path: 'image', label: 'تصویر هیرو', type: 'image' },
-      { path: 'ctaLabel', label: 'متن دکمه', type: 'text' },
-      { path: 'ctaHref', label: 'لینک دکمه', type: 'text' },
+      f('title', 'نام پروژه'),
+      f('slug', 'نشانی صفحه', 'text', { hint: 'برج-آریا' }),
+      f('image', 'تصویر اصلی', 'image'),
+      f('status', 'وضعیت اجرا'),
+      f('statusColor', 'رنگ وضعیت', 'text', { hint: '#ffb22c' }),
+      f('featured', 'پروژهٔ شاخص در هیرو', 'switch'),
+      f('visible', 'نمایش در سایت', 'switch', { default: true }),
     ],
   },
   {
-    id: 'home-services',
-    label: 'خدمات صفحهٔ اصلی',
-    path: 'settings.homeServices',
-    kind: 'list',
-    itemLabel: 'title',
-    itemFields: [
-      { path: 'title', label: 'عنوان', type: 'text' },
-      { path: 'subtitle', label: 'زیرعنوان', type: 'text' },
-      { path: 'image', label: 'تصویر', type: 'image' },
-      { path: 'icon', label: 'کلاس آیکن', type: 'text' },
-      { path: 'slug', label: 'لینک', type: 'text' },
+    id: 'description',
+    label: 'توضیحات',
+    fields: [
+      f('heroText', 'توضیح کوتاه کارت', 'textarea'),
+      f('details.lead', 'خلاصهٔ صفحهٔ پروژه', 'textarea'),
+      f('details.body', 'معرفی پروژه (هر خط یک پاراگراف)', 'lines'),
+      f('details.highlights', 'ویژگی‌های شاخص', 'lines'),
     ],
   },
   {
-    id: 'projects',
-    label: 'پروژه‌ها',
-    path: 'projects',
-    kind: 'collection',
-    itemLabel: 'title',
-    itemFields: projectFields,
+    id: 'images',
+    label: 'تصاویر',
+    fields: [f('details.gallery', 'گالری تصاویر', 'images')],
   },
   {
-    id: 'services',
-    label: 'خدمات سایت',
-    path: 'services',
-    kind: 'collection',
-    itemLabel: 'title',
-    itemFields: [
-      { path: 'title', label: 'عنوان', type: 'text' },
-      { path: 'slug', label: 'نشانی صفحه (slug)', type: 'text' },
-      { path: 'subtitle', label: 'زیرعنوان انگلیسی', type: 'text' },
-      { path: 'icon', label: 'کلاس آیکن', type: 'text' },
-      { path: 'intro', label: 'معرفی', type: 'textarea' },
-      { path: 'body', label: 'متن (هر خط یک پاراگراف)', type: 'lines' },
-      { path: 'points', label: 'نکته‌ها', type: 'lines' },
+    id: 'details',
+    label: 'مشخصات پروژه',
+    fields: [
+      f('details.category', 'دسته'),
+      f('details.location', 'موقعیت'),
+      f('details.progress', 'پیشرفت اجرا (٪)', 'number'),
+      f('specs', 'مشخصات روی کارت', 'pairs'),
+      f('details.facts', 'مشخصات کامل', 'pairs'),
+      f('details.services', 'خدمات مرتبط (نشانی خدمت)', 'lines'),
     ],
   },
   {
-    id: 'articles',
-    label: 'مقالات',
-    path: 'articles',
-    kind: 'collection',
-    itemLabel: 'title',
-    itemFields: [
-      { path: 'title', label: 'عنوان', type: 'text' },
-      { path: 'slug', label: 'نشانی صفحه (slug)', type: 'text' },
-      { path: 'cardTitle', label: 'عنوان کارت', type: 'text' },
-      { path: 'category', label: 'دسته', type: 'text' },
-      { path: 'image', label: 'تصویر', type: 'image' },
-      { path: 'imageAlt', label: 'توضیح تصویر', type: 'text' },
-      { path: 'dateLabel', label: 'تاریخ نمایشی', type: 'text' },
-      { path: 'isoDate', label: 'تاریخ استاندارد', type: 'text', hint: '2026-09-03' },
-      { path: 'readingTime', label: 'زمان مطالعه', type: 'text' },
-      { path: 'excerpt', label: 'خلاصه', type: 'textarea' },
-      { path: 'related', label: 'مقالات مرتبط (slug)', type: 'lines' },
-      { path: 'body', label: 'متن مقاله (JSON بلوک‌ها)', type: 'json' },
-      { path: 'seo', label: 'SEO (JSON)', type: 'json' },
+    id: 'seo',
+    label: 'SEO',
+    fields: [
+      f('seoTitle', 'عنوان SEO'),
+      f('seoDescription', 'توضیح متا', 'textarea'),
+      f('socialImage', 'تصویر شبکه‌های اجتماعی', 'image'),
+    ],
+  },
+];
+
+const serviceTabs = [
+  {
+    id: 'general',
+    label: 'عمومی',
+    fields: [
+      f('title', 'عنوان خدمت'),
+      f('slug', 'نشانی صفحه', 'text', { hint: 'architecture-plans' }),
+      f('subtitle', 'زیرعنوان انگلیسی'),
+      f('icon', 'کلاس آیکن'),
+      f('visible', 'نمایش در سایت', 'switch', { default: true }),
+    ],
+  },
+  {
+    id: 'content',
+    label: 'محتوا',
+    fields: [f('intro', 'معرفی', 'textarea'), f('body', 'متن (هر خط یک پاراگراف)', 'lines'), f('points', 'ویژگی‌ها و خدمات', 'lines')],
+  },
+  {
+    id: 'seo',
+    label: 'SEO',
+    fields: [f('seoTitle', 'عنوان SEO'), f('seoDescription', 'توضیح متا', 'textarea')],
+  },
+];
+
+const articleTabs = [
+  {
+    id: 'general',
+    label: 'عمومی',
+    fields: [
+      f('title', 'عنوان مقاله'),
+      f('cardTitle', 'عنوان روی کارت'),
+      f('slug', 'نشانی صفحه'),
+      f('category', 'دسته'),
+      f('image', 'تصویر شاخص', 'image'),
+      f('imageAlt', 'توضیح تصویر'),
+      f('dateLabel', 'تاریخ نمایشی'),
+      f('isoDate', 'تاریخ استاندارد', 'text', { hint: '2026-09-03' }),
+      f('readingTime', 'زمان مطالعه'),
+      f('published', 'منتشر شده', 'switch', { default: true }),
+    ],
+  },
+  {
+    id: 'content',
+    label: 'متن مقاله',
+    fields: [
+      f('excerpt', 'خلاصه', 'textarea'),
+      f('body', 'متن مقاله', 'blocks'),
+      f('related', 'مقالات مرتبط (نشانی)', 'lines'),
+    ],
+  },
+  {
+    id: 'seo',
+    label: 'SEO',
+    fields: [f('seo.title', 'عنوان SEO'), f('seo.description', 'توضیح متا', 'textarea'), f('seo.keywords', 'کلیدواژه‌ها', 'lines')],
+  },
+];
+
+export const PAGES = [
+  {
+    id: 'home',
+    view: 'page',
+    label: 'صفحهٔ اصلی',
+    route: '/',
+    path: 'settings',
+    description: 'هیرو، خدمات، ترتیب بخش‌ها و سئوی صفحهٔ اصلی',
+    tabs: [
+      {
+        id: 'hero',
+        label: 'هیرو',
+        path: 'settings.hero',
+        fields: [
+          f('badge1', 'برچسب اول'),
+          f('badge2', 'برچسب دوم'),
+          f('title', 'عنوان اصلی'),
+          f('text', 'متن زیر عنوان', 'textarea'),
+          f('authorName', 'نام معمار'),
+          f('authorRole', 'عنوان معمار'),
+          f('authorImage', 'تصویر معمار', 'image'),
+          f('image', 'تصویر هیرو', 'image'),
+          f('ctaLabel', 'متن دکمه'),
+          f('ctaHref', 'لینک دکمه'),
+        ],
+      },
+      {
+        id: 'services',
+        label: 'خدمات',
+        path: 'settings.homeServices',
+        list: true,
+        itemLabel: 'title',
+        itemFields: homeServicesFields,
+      },
+      {
+        id: 'layout',
+        label: 'ترتیب بخش‌ها',
+        path: 'settings.homeSections',
+        order: true,
+      },
+      {
+        id: 'about',
+        label: 'معرفی',
+        path: 'settings.about',
+        fields: [
+          f('intro', 'جملهٔ معرفی', 'textarea'),
+          f('body', 'متن معرفی (هر خط یک پاراگراف)', 'lines'),
+        ],
+      },
+      {
+        id: 'headings',
+        label: 'عناوین بخش‌ها',
+        path: 'settings.homeHeadings',
+        fields: [
+          f('servicesTitle', 'عنوان خدمات'),
+          f('servicesSubtitle', 'زیرعنوان خدمات'),
+          f('projectsTitle', 'عنوان پروژه‌ها'),
+          f('projectsSubtitle', 'زیرعنوان پروژه‌ها'),
+          f('projectsCta', 'دکمهٔ پروژه‌ها'),
+          f('timelineTitle', 'عنوان تایم‌لاین'),
+          f('timelineSubtitle', 'زیرعنوان تایم‌لاین'),
+          f('clientsTitle', 'عنوان همکاران'),
+          f('clientsSubtitle', 'زیرعنوان همکاران'),
+          f('teamTitle', 'عنوان تیم'),
+          f('teamSubtitle', 'زیرعنوان تیم'),
+          f('teamCta', 'دکمهٔ تیم'),
+          f('blogTitle', 'عنوان وبلاگ'),
+          f('blogSubtitle', 'زیرعنوان وبلاگ'),
+          f('blogCta', 'دکمهٔ وبلاگ'),
+          f('faqTitle', 'عنوان پرسش‌ها'),
+          f('faqSubtitle', 'زیرعنوان پرسش‌ها'),
+        ],
+      },
+      {
+        id: 'timeline',
+        label: 'تایم‌لاین',
+        path: 'settings.timeline',
+        fields: [
+          f('steps', 'مراحل', 'list', {
+            itemLabel: 'lead',
+            itemFields: [
+              f('lead', 'عنوان مرحله'),
+              f('rest', 'ادامهٔ عنوان'),
+              f('image', 'تصویر', 'image'),
+            ],
+          }),
+        ],
+      },
+      {
+        id: 'promo',
+        label: 'کارت‌های دعوت',
+        path: 'settings.promo',
+        fields: [
+          f('catalogTitle', 'عنوان کاتالوگ'),
+          f('catalogSubtitle', 'زیرعنوان کاتالوگ'),
+          f('catalogImage', 'تصویر کاتالوگ', 'image'),
+          f('catalogPrimaryLabel', 'دکمهٔ اول کاتالوگ'),
+          f('catalogPrimaryHref', 'لینک دکمهٔ اول'),
+          f('catalogSecondaryLabel', 'دکمهٔ دوم کاتالوگ'),
+          f('catalogSecondaryHref', 'لینک دکمهٔ دوم'),
+          f('consultTitle', 'عنوان مشاوره'),
+          f('consultSubtitle', 'زیرعنوان مشاوره'),
+          f('consultImage', 'تصویر مشاوره', 'image'),
+          f('consultPrimaryLabel', 'دکمهٔ اول مشاوره'),
+          f('consultPrimaryHref', 'لینک دکمهٔ اول'),
+          f('consultSecondaryLabel', 'دکمهٔ دوم مشاوره'),
+          f('consultSecondaryHref', 'لینک دکمهٔ دوم'),
+        ],
+      },
+      {
+        id: 'faq-block',
+        label: 'تصویر پرسش‌ها',
+        path: 'settings.faqBlock',
+        fields: [f('image', 'تصویر کنار پرسش‌ها', 'image')],
+      },
+      {
+        id: 'seo',
+        label: 'SEO',
+        path: 'settings.seo',
+        fields: [
+          f('title', 'عنوان صفحه'),
+          f('description', 'توضیح متا', 'textarea'),
+          f('keywords', 'کلیدواژه‌ها', 'lines'),
+          f('ogImage', 'تصویر اشتراک‌گذاری', 'image'),
+        ],
+      },
     ],
   },
   {
     id: 'about',
+    view: 'page',
     label: 'درباره ما',
-    path: 'settings.about',
-    kind: 'object',
-    fields: [
-      { path: 'intro', label: 'جملهٔ معرفی', type: 'textarea' },
-      { path: 'body', label: 'متن صفحه (هر خط یک پاراگراف)', type: 'lines' },
-      { path: 'stats', label: 'آمار', type: 'list', itemFields: [{ path: 'value', label: 'عدد', type: 'text' }, { path: 'label', label: 'عنوان', type: 'text' }] },
-    ],
-  },
-  {
-    id: 'team',
-    label: 'تیم ما',
-    path: 'settings.team',
-    kind: 'object',
-    fields: [
-      { path: 'intro', label: 'متن معرفی', type: 'textarea' },
-      { path: 'image', label: 'تصویر تیم', type: 'image' },
+    route: '/about',
+    path: 'settings',
+    description: 'معرفی، تاریخ، آمار و دکمه‌های صفحه',
+    tabs: [
       {
-        path: 'members',
-        label: 'اعضای تیم',
-        type: 'list',
-        itemFields: [
-          { path: 'name', label: 'نام', type: 'text' },
-          { path: 'role', label: 'سمت', type: 'text' },
-          { path: 'image', label: 'تصویر', type: 'image' },
+        id: 'copy',
+        label: 'عنوان صفحه',
+        path: pageContent('about'),
+        fields: [
+          f('title', 'عنوان صفحه'),
+          f('subtitle', 'زیرعنوان'),
+          f('icon', 'کلاس آیکن'),
+          f('ctaPrimaryLabel', 'دکمهٔ اول'),
+          f('ctaPrimaryHref', 'لینک دکمهٔ اول'),
+          f('ctaSecondaryLabel', 'دکمهٔ دوم'),
+          f('ctaSecondaryHref', 'لینک دکمهٔ دوم'),
         ],
       },
-    ],
-  },
-  {
-    id: 'faqs',
-    label: 'پرسش‌های متداول',
-    path: 'settings.faqs',
-    kind: 'list',
-    itemLabel: 'question',
-    itemFields: [
-      { path: 'question', label: 'پرسش', type: 'text' },
-      { path: 'answer', label: 'پاسخ', type: 'textarea' },
-    ],
-  },
-  {
-    id: 'clients',
-    label: 'افتخارات همکاری',
-    path: 'settings.clients',
-    kind: 'list',
-    itemFields: [
-      { path: 'src', label: 'تصویر لوگو', type: 'image' },
-      { path: 'square', label: 'کلاس نمایش مربع', type: 'text' },
+      {
+        id: 'story',
+        label: 'متن و آمار',
+        path: 'settings.about',
+        fields: [
+          f('intro', 'جملهٔ معرفی', 'textarea'),
+          f('body', 'متن صفحه (هر خط یک پاراگراف)', 'lines'),
+          f('stats', 'آمار', 'list', {
+            itemFields: [f('value', 'عدد'), f('label', 'عنوان')],
+          }),
+        ],
+      },
+      { id: 'seo', label: 'SEO', path: pageContent('about'), fields: seoFields() },
     ],
   },
   {
     id: 'contact',
-    label: 'آدرس و راه‌های ارتباطی',
-    path: 'settings.contact',
-    kind: 'object',
-    fields: contactFields,
-  },
-  {
-    id: 'socials',
-    label: 'شبکه‌های اجتماعی',
-    path: 'settings.socials',
-    kind: 'list',
-    itemLabel: 'label',
-    itemFields: [
-      { path: 'label', label: 'نام', type: 'text' },
-      { path: 'handle', label: 'آیدی نمایشی', type: 'text' },
-      { path: 'href', label: 'لینک', type: 'text' },
-      { path: 'icon', label: 'کلاس آیکن', type: 'text' },
+    view: 'page',
+    label: 'تماس با ما',
+    route: '/contact',
+    path: 'settings',
+    description: 'اطلاعات تماس، شبکه‌های اجتماعی و فرم',
+    tabs: [
+      {
+        id: 'copy',
+        label: 'عنوان صفحه',
+        path: pageContent('contact'),
+        fields: [
+          f('title', 'عنوان صفحه'),
+          f('subtitle', 'زیرعنوان'),
+          f('icon', 'کلاس آیکن'),
+          f('formMessagePlaceholder', 'راهنمای پیام'),
+          f('submitLabel', 'متن دکمهٔ ارسال'),
+          f('formNote', 'پیام پس از ارسال', 'textarea'),
+        ],
+      },
+      {
+        id: 'info',
+        label: 'اطلاعات تماس',
+        path: 'settings.contact',
+        fields: [
+          f('phone', 'تلفن'),
+          f('phoneHref', 'لینک تلفن', 'text', { hint: 'tel:+982112345678' }),
+          f('email', 'ایمیل'),
+          f('address', 'آدرس', 'textarea'),
+          f('hours', 'ساعات کاری'),
+        ],
+      },
+      {
+        id: 'socials',
+        label: 'شبکه‌های اجتماعی',
+        path: 'settings.socials',
+        list: true,
+        itemLabel: 'label',
+        itemFields: [f('label', 'نام'), f('handle', 'آیدی نمایشی'), f('href', 'لینک'), f('icon', 'کلاس آیکن')],
+      },
+      { id: 'seo', label: 'SEO', path: pageContent('contact'), fields: seoFields() },
     ],
   },
   {
-    id: 'header',
-    label: 'هدر و منو',
-    path: 'settings.header',
-    kind: 'object',
-    fields: [
-      { path: 'ctaLabel', label: 'متن دکمهٔ مشاوره', type: 'text' },
-      { path: 'ctaPhone', label: 'شمارهٔ دکمه', type: 'text' },
-      { path: 'ctaHref', label: 'لینک دکمه', type: 'text' },
+    id: 'page-projects',
+    view: 'page',
+    label: 'صفحهٔ پروژه‌ها',
+    route: '/projects',
+    path: 'settings',
+    description: 'عنوان، معرفی و سئوی فهرست پروژه‌ها',
+    tabs: [
       {
-        path: 'menu',
-        label: 'منوی اصلی',
-        type: 'list',
-        hint: 'تعداد آیتم‌های منو ثابت است؛ نام و لینک قابل ویرایش است.',
-        itemFields: [
-          { path: 'label', label: 'نام', type: 'text' },
-          { path: 'href', label: 'لینک', type: 'text' },
+        id: 'copy',
+        label: 'محتوا',
+        path: pageContent('projects'),
+        fields: [f('title', 'عنوان صفحه'), f('subtitle', 'زیرعنوان'), f('icon', 'کلاس آیکن'), f('intro', 'معرفی', 'textarea')],
+      },
+      { id: 'seo', label: 'SEO', path: pageContent('projects'), fields: seoFields() },
+    ],
+  },
+  {
+    id: 'blog',
+    view: 'page',
+    label: 'صفحهٔ وبلاگ',
+    route: '/blog',
+    path: 'settings',
+    description: 'عنوان، معرفی و سئوی وبلاگ',
+    tabs: [
+      {
+        id: 'copy',
+        label: 'محتوا',
+        path: pageContent('blog'),
+        fields: [f('title', 'عنوان صفحه'), f('subtitle', 'زیرعنوان'), f('icon', 'کلاس آیکن'), f('intro', 'معرفی', 'textarea')],
+      },
+      { id: 'seo', label: 'SEO', path: pageContent('blog'), fields: seoFields() },
+    ],
+  },
+  {
+    id: 'consultation',
+    view: 'page',
+    label: 'درخواست مشاوره',
+    route: '/consultation',
+    path: 'settings',
+    description: 'عنوان و متن فرم مشاوره',
+    tabs: [
+      {
+        id: 'copy',
+        label: 'محتوا',
+        path: pageContent('consultation'),
+        fields: [
+          f('title', 'عنوان صفحه'),
+          f('subtitle', 'زیرعنوان'),
+          f('icon', 'کلاس آیکن'),
+          f('messagePlaceholder', 'راهنمای پیام'),
+          f('submitLabel', 'متن دکمه'),
+          f('formNote', 'پیام پس از ارسال', 'textarea'),
+        ],
+      },
+      { id: 'seo', label: 'SEO', path: pageContent('consultation'), fields: seoFields() },
+    ],
+  },
+  {
+    id: 'cooperation',
+    view: 'page',
+    label: 'فرصت همکاری',
+    route: '/cooperation',
+    path: 'settings',
+    description: 'عنوان و متن فرم همکاری',
+    tabs: [
+      {
+        id: 'copy',
+        label: 'محتوا',
+        path: pageContent('cooperation'),
+        fields: [
+          f('title', 'عنوان صفحه'),
+          f('subtitle', 'زیرعنوان'),
+          f('icon', 'کلاس آیکن'),
+          f('messagePlaceholder', 'راهنمای پیام'),
+          f('submitLabel', 'متن دکمه'),
+          f('formNote', 'پیام پس از ارسال', 'textarea'),
+        ],
+      },
+      { id: 'seo', label: 'SEO', path: pageContent('cooperation'), fields: seoFields() },
+    ],
+  },
+];
+
+const menuField = f('menu', 'منوی اصلی', 'menu');
+const headerEntry = {
+  id: 'header',
+  view: 'section',
+  label: 'هدر و منو',
+  path: 'settings.header',
+  kind: 'object',
+  description: 'دکمهٔ مشاوره و ساختار منو؛ آیتم‌ها و زیرمنوها را آزادانه تغییر دهید.',
+  tabs: [
+    {
+      id: 'cta',
+      label: 'دکمهٔ مشاوره',
+      path: 'settings.header',
+      fields: [f('ctaLabel', 'متن دکمه'), f('ctaPhone', 'شمارهٔ تماس'), f('ctaHref', 'لینک دکمه')],
+    },
+    { id: 'menu', label: 'منوی اصلی', path: 'settings.header', fields: [menuField] },
+  ],
+};
+
+const footerEntry = {
+  id: 'footer',
+  view: 'section',
+  label: 'فوتر',
+  path: 'settings.footer',
+  kind: 'object',
+  description: 'معرفی، ستون‌های لینک، عناوین ستون‌ها، مجوزها و شبکه‌های اجتماعی.',
+  tabs: [
+    {
+      id: 'about',
+      label: 'معرفی',
+      path: 'settings.footer',
+      fields: [f('about', 'متن دربارهٔ استودیو', 'textarea')],
+    },
+    {
+      id: 'columns',
+      label: 'ستون‌های لینک',
+      path: 'settings.footer',
+      fields: [
+        f('quickTitle', 'عنوان ستون اول'),
+        f('quickSubtitle', 'زیرعنوان ستون اول'),
+        f('quickLinks', 'لینک‌های ستون اول', 'list', {
+          itemLabel: 'label',
+          itemFields: [f('label', 'عنوان'), f('href', 'لینک')],
+        }),
+        f('servicesTitle', 'عنوان ستون دوم'),
+        f('servicesSubtitle', 'زیرعنوان ستون دوم'),
+        f('serviceLinks', 'لینک‌های ستون دوم', 'list', {
+          itemLabel: 'label',
+          itemFields: [f('label', 'عنوان'), f('href', 'لینک')],
+        }),
+      ],
+    },
+    {
+      id: 'headings',
+      label: 'عناوین دیگر',
+      path: 'settings.footer',
+      fields: [
+        f('contactTitle', 'عنوان ستون تماس'),
+        f('contactSubtitle', 'زیرعنوان ستون تماس'),
+        f('licensesTitle', 'عنوان مجوزها'),
+        f('licensesSubtitle', 'زیرعنوان مجوزها'),
+        f('socialTitle', 'عنوان شبکه‌های اجتماعی'),
+        f('socialSubtitle', 'زیرعنوان شبکه‌های اجتماعی'),
+        f('licenses', 'مجوزها', 'list', {
+          itemLabel: 'label',
+          itemFields: [f('image', 'تصویر', 'image'), f('label', 'نام')],
+        }),
+      ],
+    },
+  ],
+};
+
+export const COLLECTIONS = [
+  {
+    id: 'projects',
+    view: 'collection',
+    label: 'پروژه‌ها',
+    path: 'projects',
+    itemLabel: 'title',
+    titleLabel: 'نام پروژه',
+    description: 'کارت پروژه، صفحهٔ جزئیات، گالری و سئو',
+    addLabel: 'پروژهٔ جدید',
+    preview: (item) => (item?.slug ? `/project/${item.slug}` : '/projects'),
+    tabs: projectTabs,
+  },
+  {
+    id: 'services',
+    view: 'collection',
+    label: 'خدمات',
+    path: 'services',
+    itemLabel: 'title',
+    titleLabel: 'عنوان خدمت',
+    description: 'خدمات فهرست‌شده در سایت و صفحهٔ هر خدمت',
+    addLabel: 'خدمت جدید',
+    preview: (item) => (item?.slug ? `/services/${item.slug}` : '/services'),
+    tabs: serviceTabs,
+  },
+  {
+    id: 'articles',
+    view: 'collection',
+    label: 'مقالات',
+    path: 'articles',
+    itemLabel: 'title',
+    titleLabel: 'عنوان مقاله',
+    description: 'مقاله، دسته‌بندی، متن بلوکی و سئو',
+    addLabel: 'مقالهٔ جدید',
+    preview: (item) => (item?.slug ? `/blog/${item.slug}` : '/blog'),
+    tabs: articleTabs,
+  },
+];
+
+export const SECTION_ENTRIES = [
+  {
+    id: 'hero',
+    view: 'section',
+    label: 'هیرو',
+    path: 'settings.hero',
+    kind: 'object',
+    tabs: [
+      {
+        id: 'content',
+        label: 'محتوا',
+        path: 'settings.hero',
+        fields: [
+          f('badge1', 'برچسب اول'),
+          f('badge2', 'برچسب دوم'),
+          f('title', 'عنوان اصلی'),
+          f('text', 'متن زیر عنوان', 'textarea'),
+          f('ctaLabel', 'متن دکمه'),
+          f('ctaHref', 'لینک دکمه'),
+          f('image', 'تصویر هیرو', 'image'),
+        ],
+      },
+      {
+        id: 'author',
+        label: 'معمار',
+        path: 'settings.hero',
+        fields: [f('authorName', 'نام'), f('authorRole', 'عنوان'), f('authorImage', 'تصویر', 'image')],
+      },
+    ],
+  },
+  {
+    id: 'home-layout',
+    view: 'section',
+    label: 'ترتیب بخش‌های صفحهٔ اصلی',
+    path: 'settings.homeSections',
+    kind: 'order',
+    description: 'ترتیب نمایش بخش‌های صفحهٔ اصلی و روشن/خاموش کردن هر بخش.',
+  },
+  {
+    id: 'team',
+    view: 'section',
+    label: 'تیم',
+    path: 'settings.team',
+    kind: 'object',
+    tabs: [
+      {
+        id: 'content',
+        label: 'معرفی',
+        path: 'settings.team',
+        fields: [f('intro', 'متن معرفی', 'textarea'), f('image', 'تصویر تیم', 'image')],
+      },
+      {
+        id: 'members',
+        label: 'اعضای تیم',
+        path: 'settings.team',
+        fields: [
+          f('members', 'اعضا', 'list', {
+            itemLabel: 'name',
+            itemFields: [f('name', 'نام'), f('role', 'سمت'), f('image', 'تصویر', 'image')],
+          }),
         ],
       },
     ],
   },
   {
-    id: 'footer',
-    label: 'فوتر',
-    path: 'settings.footer',
+    id: 'clients',
+    view: 'section',
+    label: 'همکاران و مشتریان',
+    path: 'settings.clients',
+    kind: 'list',
+    description: 'لوگوهای نوار همکاران.',
+    itemLabel: 'label',
+    itemFields: [f('src', 'تصویر لوگو', 'image'), f('label', 'نام (اختیاری)')],
+  },
+  {
+    id: 'achievements',
+    view: 'section',
+    label: 'دستاوردها و آمار',
+    path: 'settings.about.stats',
+    kind: 'list',
+    description: 'اعداد کلیدی که در صفحهٔ درباره ما نمایش داده می‌شوند.',
+    itemLabel: 'label',
+    itemFields: [f('value', 'عدد'), f('label', 'عنوان')],
+  },
+  {
+    id: 'faqs',
+    view: 'section',
+    label: 'پرسش‌های متداول',
+    path: 'settings.faqs',
+    kind: 'list',
+    description: 'پرسش‌های صفحهٔ اصلی و صفحهٔ درباره ما.',
+    itemLabel: 'question',
+    itemFields: [f('question', 'پرسش'), f('answer', 'پاسخ', 'textarea')],
+  },
+  {
+    id: 'contact-info',
+    view: 'section',
+    label: 'اطلاعات تماس',
+    path: 'settings.contact',
     kind: 'object',
-    fields: [
-      { path: 'about', label: 'متن دربارهٔ آراتان', type: 'textarea' },
+    description: 'تلفن، ایمیل، آدرس و ساعات کاری؛ در هدر، فوتر و صفحهٔ تماس استفاده می‌شود.',
+    tabs: [
       {
-        path: 'licenses',
-        label: 'مجوزها',
-        type: 'list',
-        itemFields: [
-          { path: 'image', label: 'تصویر مجوز', type: 'image' },
-          { path: 'label', label: 'نام', type: 'text' },
+        id: 'info',
+        label: 'اطلاعات',
+        path: 'settings.contact',
+        fields: [
+          f('phone', 'تلفن'),
+          f('phoneHref', 'لینک تلفن'),
+          f('email', 'ایمیل'),
+          f('address', 'آدرس', 'textarea'),
+          f('hours', 'ساعات کاری'),
+        ],
+      },
+    ],
+  },
+  {
+    id: 'socials',
+    view: 'section',
+    label: 'شبکه‌های اجتماعی',
+    path: 'settings.socials',
+    kind: 'list',
+    description: 'لینک‌های فوتر و صفحهٔ تماس.',
+    itemLabel: 'label',
+    itemFields: [f('label', 'نام'), f('handle', 'آیدی نمایشی'), f('href', 'لینک'), f('icon', 'کلاس آیکن')],
+  },
+  {
+    id: 'general',
+    view: 'section',
+    label: 'تنظیمات عمومی',
+    path: 'settings.general',
+    kind: 'object',
+    description: 'نام استودیو، شعار و نشان‌ها.',
+    tabs: [
+      {
+        id: 'identity',
+        label: 'هویت',
+        path: 'settings.general',
+        fields: [
+          f('studioName', 'نام استودیو'),
+          f('tagline', 'شعار'),
+          f('logo', 'نشان اصلی', 'image'),
+          f('logoLight', 'نشان روشن', 'image'),
+        ],
+      },
+    ],
+  },
+  {
+    id: 'seo',
+    view: 'section',
+    label: 'SEO سایت',
+    path: 'settings.seo',
+    kind: 'object',
+    description: 'عنوان و توضیح پیش‌فرض همهٔ صفحات.',
+    tabs: [
+      {
+        id: 'seo',
+        label: 'تنظیمات SEO',
+        path: 'settings.seo',
+        fields: [
+          f('title', 'عنوان سایت'),
+          f('description', 'توضیح پیش‌فرض', 'textarea'),
+          f('keywords', 'کلیدواژه‌ها', 'lines'),
+          f('ogImage', 'تصویر اشتراک‌گذاری', 'image'),
         ],
       },
     ],
   },
   {
     id: 'service-pages',
-    label: 'صفحات خدمات (پیشرفته)',
+    view: 'deep',
+    label: 'صفحات تفصیلی خدمات',
     path: 'servicePages',
-    kind: 'json',
-    hint: 'ساختار کامل چهار صفحهٔ خدمات؛ فقط با دانش JSON ویرایش کنید.',
+    kind: 'deep',
+    description: 'محتوای چهار صفحهٔ تفصیلی خدمات. هر بخش را می‌توانید باز کنید و متن یا تصویر آن را تغییر دهید.',
   },
+  headerEntry,
+  footerEntry,
+  {
+    id: 'licenses',
+    view: 'section',
+    label: 'مجوزها و گواهی‌ها',
+    path: 'settings.footer.licenses',
+    kind: 'list',
+    description: 'نشان‌های مجوز در فوتر.',
+    itemLabel: 'label',
+    itemFields: [f('image', 'تصویر', 'image'), f('label', 'نام')],
+  },
+].sort((a, b) => 0);
+
+export const NAV = [
+  { title: 'داشبورد', items: [{ id: 'dashboard', label: 'داشبورد', icon: 'grid' }] },
+  {
+    title: 'محتوا',
+    items: [
+      { id: 'pages', label: 'صفحات', icon: 'layers' },
+      { id: 'projects', label: 'پروژه‌ها', icon: 'frame' },
+      { id: 'services', label: 'خدمات', icon: 'draft' },
+      { id: 'articles', label: 'مقالات', icon: 'text' },
+    ],
+  },
+  {
+    title: 'بخش‌ها',
+    items: [
+      { id: 'hero', label: 'هیرو' },
+      { id: 'home-layout', label: 'ترتیب صفحهٔ اصلی' },
+      { id: 'team', label: 'تیم' },
+      { id: 'clients', label: 'همکاران' },
+      { id: 'achievements', label: 'دستاوردها' },
+      { id: 'faqs', label: 'پرسش‌های متداول' },
+    ],
+  },
+  {
+    title: 'سایت',
+    items: [
+      { id: 'header', label: 'هدر و منو' },
+      { id: 'footer', label: 'فوتر' },
+      { id: 'contact-info', label: 'اطلاعات تماس' },
+      { id: 'socials', label: 'شبکه‌های اجتماعی' },
+      { id: 'licenses', label: 'مجوزها' },
+      { id: 'media', label: 'کتابخانهٔ رسانه' },
+    ],
+  },
+  {
+    title: 'تنظیمات',
+    items: [
+      { id: 'general', label: 'تنظیمات عمومی' },
+      { id: 'seo', label: 'SEO' },
+      { id: 'service-pages', label: 'صفحات تفصیلی خدمات' },
+      { id: 'security', label: 'امنیت' },
+    ],
+  },
+  { title: 'پیام‌ها', items: [{ id: 'messages', label: 'پیام‌های تماس', badge: 'unread' }] },
 ];
+
+export const ENTRY_MAP = [...PAGES, ...COLLECTIONS, ...SECTION_ENTRIES].reduce((map, entry) => {
+  map[entry.id] = entry;
+  return map;
+}, {});

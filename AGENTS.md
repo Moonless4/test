@@ -54,25 +54,26 @@ up -d --build`), not a host `npm install`.
 
 ## Admin panel and content
 
-The site is editable at `/admin` (login, then a dashboard) and the backend is a
-second compose service, `api`:
+The site is editable at `/admin` and the backend is a second compose service,
+`api`:
 
-- `server/index.js` — the whole API on Node's built-in `http` module, no
-  dependencies: `GET /api/content` (public), `POST /api/login`, `POST
-  /api/logout`, `GET /api/session`, `GET|PUT /api/admin/content` (behind the
-  session). The session is an HMAC-signed httpOnly cookie; the signing key is
-  generated once into the data volume. Login reads `PANEL_USER` /
-  `PANEL_PASSWORD` from the environment and falls back to `admin` / `1234` in
-  the code, so a dashboard secret always wins.
-  `PANEL_USER` / `PANEL_PASSWORD` come from the platform env file
-  (`/run/base44/app.env`, wired as the last `env_file` entry of the `api`
-  service); the fallback only applies while they are unset, so the default
-  `admin` / `1234` stops working as soon as the secrets are delivered. Check
-  delivery without printing values:
-  `docker compose -f docker-compose.base44.yml exec -T api sh -c 'printenv PANEL_USER >/dev/null && echo present || echo missing'`.
-  A change on the secrets dashboard recreates `api` by itself — never run
-  `up`/`restart` for it; `POST /api/login` with `admin`/`1234` returning 401 is
-  the end-to-end proof that the secrets are active.
+- `server/index.js` — the API on Node's built-in `http` module, no
+  dependencies. Public: `GET /api/content`, `GET /api/media/<file>`, `POST
+  /api/messages`. Behind the session: `POST /api/login`, `/api/logout`, `GET
+  /api/session`, `GET|PUT /api/admin/content`, the 2FA endpoints, the message
+  inbox and the media library. The session is an HMAC-signed httpOnly cookie;
+  the signing key is generated once into the data volume. Login still reads
+  `PANEL_USER` / `PANEL_PASSWORD` from the environment (the `admin`/`1234`
+  fallback applies only while they are unset), so dashboard secrets always win
+  and the credentials themselves did not change.
+- The password is never stored as text. `server/password.js` hashes it with
+  salted scrypt (N=32768, r=8, p=1, 64-byte key) and
+  `/data/admin-credentials.json` holds only the username and
+  `{ algorithm, salt, hash, N, r, p, keylen }`. `ensureCredentials()` hashes the
+  environment password on first boot and re-hashes only when it changes. The
+  password is never returned by an endpoint, logged, or written into the content
+  document. Verify by checking the file's `password.hash` field exists (never
+  print the value) and that a wrong password returns 401.
 - Two-factor authentication is a second layer on the same password login, never
   a replacement: `server/twofactor.js` is a dependency-free TOTP (RFC 6238,
   SHA1/6 digits/30s, one step of drift). `POST /api/login` still checks
@@ -88,36 +89,52 @@ second compose service, `api`:
   `usedAt`. Failed second-factor attempts are counted per IP per scope
   (`login`, `setup`, `reauth`): six in ten minutes then 429, plus a 300ms delay
   on every miss. `GET /api/admin/2fa` returns status and the remaining count —
-  never the secret or a code; `POST /api/admin/2fa/backup-codes` and
-  `/api/admin/2fa/reset` re-authenticate with password + current code so a
-  stolen session cookie cannot re-seed the factor. The QR is rendered in the
-  browser (`qrcode` in `package.json`, `src/admin/TwoFactor.jsx`); the server
-  only sends the URI.
+  never the secret or a code; `POST /api/admin/2fa/backup-codes` re-authenticates
+  with password + current code so a stolen session cookie cannot re-seed the
+  factor. The QR is rendered in the browser (`qrcode` in `package.json`,
+  `src/admin/TwoFactor.jsx`); the server only sends the URI.
+- 2FA is permanent once configured. There is **no** `/api/admin/2fa/reset`
+  endpoint and no disable, skip or "turn off" control in the panel. The only
+  security operation is regenerating backup codes; `GET /api/admin/2fa` reports
+  `permanent: true`.
 - `server/store.js` + `server/seed.js` — the content is one JSON document in the
   `content` volume (`/data/site.json`), written atomically. The first boot seeds
-  it from the `src/content/*.js` modules, so the panel opens on the real site.
-- The document has five keys: `settings` (hero, home services, team, about,
-  contact, socials, header, footer, clients, faqs), `projects` (card fields plus
-  a nested `details`), `services`, `articles`, `servicePages`.
-- The front end still reads `src/content/*.js`; those modules export `let` and a
-  `hydrate*` function, so the saved document replaces their static arrays before
-  the first render. `src/lib/siteContent.js` fetches the document and
-  `main.jsx` waits for it — a failed request leaves the static content in place,
-  which is why the site must keep working without the API.
-- `settings` is read directly from `src/content/site.js` by the components that
-  render it (hero, team, FAQ, clients, about, contact). The captured header and
-  footer markup cannot read data, so `src/lib/siteChrome.js` fills their editable
-  spots by selector (menu labels, consultation action, footer contact/socials/
-  licences). Only the first N menu/social items are mapped onto the markup — the
-  panel cannot add or remove those nodes.
-- `src/admin/` is the dashboard: `schema.js` declares every section (where its
-  data lives and its fields), `fields.jsx` renders the forms (text, textarea,
-  image, switch, `lines`, `pairs` for `[title, value]` rows, `json` for the
-  article bodies and the service pages), `AdminApp.jsx` holds the session, the
-  draft document and the per-section save. Saving sends only the section's
-  top-level key, so two sections never overwrite each other.
-- `styles/admin.css` is self-contained under `.adm-*`, and `App.jsx` renders
-  `/admin` without the site header, footer or content offsets.
+  it from the `src/content/*.js` modules. On read, a saved document is merged
+  over a fresh seed (arrays of objects item by item) so keys added later appear
+  with their defaults while every saved value wins.
+- The document has `settings` plus `projects`, `services`, `articles` and the
+  nested `servicePages`. `settings` now also carries `general`, `seo`,
+  `homeSections` (home band order + visibility), `homeHeadings`, `timeline`,
+  `promo`, `faqBlock` and `pages` (copy and SEO for the static pages), and the
+  header `menu` (items, submenus, `enabled`, `icon`) and footer link columns.
+- Inbox and library: `/data/messages.json` (public form submissions, unread
+  flag), `/data/media.json` plus `/data/media/<file>` (uploaded images served
+  from `GET /api/media/<file>`). Both are separate from the content document and
+  never require a rebuild.
+- Front end wiring: `homeSections` drives `HomePage`; `settings.pages.*` drives
+  the about, contact, projects, blog, consultation and cooperation pages;
+  `settings.seo` + per-page SEO feed `PageMeta`; `projects[].seoTitle|visible`,
+  `articles[].published` and `services[].visible` control listings; the request
+  forms POST to `/api/messages`. The captured header/footer markup is filled
+  dynamically by `src/lib/siteChrome.js` — the header menu (items, submenus,
+  order, visibility) and footer link columns are rebuilt from the document, so
+  edit them in the panel, not in `header.html`/`footer.html`. `Header.jsx` calls
+  `applyHeaderChrome()` before `initHeader()` so the behaviour layer binds the
+  final anchors.
+- `src/admin/` — `schema.js` declares `PAGES`, `COLLECTIONS`, `SECTION_ENTRIES`
+  and the grouped `NAV`; `AdminApp.jsx` holds the session, draft document, dirty
+  state, save and unsaved-changes guard; `fields.jsx` renders every field type
+  (text, textarea, image + media picker, switch, lists, pairs, article blocks,
+  menu, order); `CollectionEditor.jsx` is the master–detail project/service/
+  article editor; `PageEditors.jsx` is the tabbed page and section editor;
+  `DeepEditor.jsx` is a label-driven editor for the nested service pages;
+  `Dashboard.jsx`, `PagesList.jsx`, `MessagesPanel.jsx` and `MediaLibrary.jsx`
+  cover the remaining views. Saving sends only the current entry's top-level
+  key. An entry's `view` (`page`, `collection`, `section`, `deep`) decides which
+  editor renders — ids must stay unique across the three lists.
+- `styles/admin.css` is a self-contained `.adm-*` design system (warm paper,
+  charcoal ink, hairlines, one bronze accent) and `App.jsx` renders `/admin`
+  without the site header, footer or content offsets.
 
 ## Gotchas
 

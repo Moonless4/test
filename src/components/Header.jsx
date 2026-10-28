@@ -12,8 +12,10 @@ export default function Header() {
   const ref = useRef(null);
 
   useEffect(() => {
-    initHeader(ref.current);
+    // The menu markup is rewritten from the saved content first, so the
+    // behaviour layer binds the drawer and dropdowns to the final anchors.
     applyHeaderChrome();
+    initHeader(ref.current);
   }, []);
 
   return <div ref={ref} className="site-header-slot" dangerouslySetInnerHTML={{ __html: headerHtml }} />;

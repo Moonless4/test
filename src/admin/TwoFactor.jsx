@@ -9,7 +9,6 @@ import {
   completeTwoFactorSetup,
   getTwoFactorStatus,
   regenerateBackupCodes,
-  resetTwoFactor,
   startTwoFactorSetup,
   verifyTwoFactor,
   verifyTwoFactorSetup,
@@ -308,7 +307,6 @@ export function SecurityPanel() {
   const [code, setCode] = useState('');
   const [codes, setCodes] = useState(null);
   const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
 
   const load = () =>
@@ -324,16 +322,9 @@ export function SecurityPanel() {
     event.preventDefault();
     setBusy(true);
     setError('');
-    setMessage('');
     try {
-      if (mode === 'reset') {
-        await resetTwoFactor(password, code);
-        setMessage('ورود دومرحله‌ای غیرفعال شد. در ورود بعدی دوباره راه‌اندازی می‌شود.');
-        setCodes(null);
-      } else {
-        const result = await regenerateBackupCodes(password, code);
-        setCodes(result.backupCodes);
-      }
+      const result = await regenerateBackupCodes(password, code);
+      setCodes(result.backupCodes);
       setMode('');
       setPassword('');
       setCode('');
@@ -346,48 +337,54 @@ export function SecurityPanel() {
   };
 
   return (
-    <div className="adm-panel">
-      <div className="adm-security">
+    <div className="adm-security-grid">
+      <section className="adm-card adm-card-pad">
+        <span className="adm-eyebrow">لایهٔ دوم ورود</span>
+        <h2>Google Authenticator</h2>
         <div className="adm-security-row">
-          <span>ورود دومرحله‌ای (Google Authenticator)</span>
+          <span>وضعیت ورود دومرحله‌ای</span>
           <strong className={status?.enabled ? 'adm-state-on' : 'adm-state-off'}>
-            {status ? (status.enabled ? 'فعال' : 'غیرفعال') : 'در حال بررسی…'}
+            {status ? (status.enabled ? 'فعال — الزامی' : 'در انتظار راه‌اندازی') : 'در حال بررسی…'}
           </strong>
         </div>
         {status?.enabled ? (
-          <p className="adm-note">
-            کدهای پشتیبان باقی‌مانده: {status.backupCodesLeft}. برای تغییر تنظیمات، رمز عبور و یک کد فعلی لازم
-            است؛ کلید یا کد QR اینجا نمایش داده نمی‌شود.
+          <p className="adm-muted">
+            کدهای پشتیبان باقی‌مانده: {status.backupCodesLeft}. ورود دومرحله‌ای پس از راه‌اندازی به‌طور دائمی
+            فعال می‌ماند و از این پنل قابل غیرفعال‌سازی نیست.
           </p>
         ) : (
-          <p className="adm-note">در ورود بعدی، راه‌اندازی Google Authenticator از شما خواسته می‌شود.</p>
+          <p className="adm-muted">در ورود بعدی، راه‌اندازی Google Authenticator از شما خواسته می‌شود.</p>
         )}
-
-        {codes ? (
-          <div className="adm-codes-block">
-            <p className="adm-note">کدهای پشتیبان جدید ساخته شد؛ کدهای قبلی دیگر معتبر نیستند.</p>
-            <BackupCodes codes={codes} onDismiss={() => setCodes(null)} />
-          </div>
-        ) : null}
-
+        <p className="adm-note">
+          کلید راه‌اندازی و کدهای پشتیبان هرگز در این صفحه نمایش داده نمی‌شوند؛ کدهای پشتیبان فقط یک بار، هنگام
+          راه‌اندازی یا ساخت مجدد، قابل مشاهده‌اند.
+        </p>
         {status?.enabled ? (
           <div className="adm-actions">
-            <button type="button" className="adm-ghost" onClick={() => setMode('codes')}>
+            <button type="button" className="adm-btn adm-btn-quiet" onClick={() => setMode('codes')}>
               ساخت مجدد کدهای پشتیبان
-            </button>
-            <button type="button" className="adm-ghost" onClick={() => setMode('reset')}>
-              غیرفعال‌کردن و راه‌اندازی مجدد
             </button>
           </div>
         ) : null}
+      </section>
+
+      <section className="adm-card adm-card-pad">
+        <span className="adm-eyebrow">کدهای اضطراری</span>
+        <h2>کدهای پشتیبان</h2>
+        {codes ? (
+          <div className="adm-codes-block">
+            <p className="adm-note">کدهای جدید ساخته شد؛ کدهای قبلی دیگر معتبر نیستند.</p>
+            <BackupCodes codes={codes} onDismiss={() => setCodes(null)} />
+          </div>
+        ) : (
+          <p className="adm-muted">
+            برای دریافت مجموعهٔ تازه، رمز عبور و یک کد فعلی برنامهٔ احراز هویت را وارد کنید. هر کد فقط یک بار
+            استفاده می‌شود.
+          </p>
+        )}
 
         {mode ? (
           <form className="adm-2fa-form adm-reauth" onSubmit={submit}>
-            <p className="adm-note">
-              {mode === 'reset'
-                ? 'برای غیرفعال‌کردن ورود دومرحله‌ای، رمز عبور و یک کد فعلی را وارد کنید.'
-                : 'برای ساخت کدهای پشتیبان جدید، رمز عبور و یک کد فعلی را وارد کنید.'}
-            </p>
             <label className="adm-field">
               <span className="adm-label">رمز عبور</span>
               <input
@@ -410,12 +407,12 @@ export function SecurityPanel() {
             </label>
             {error ? <p className="adm-error">{error}</p> : null}
             <div className="adm-actions">
-              <button type="submit" className="adm-primary" disabled={busy || !password || !code}>
-                {busy ? 'در حال بررسی…' : 'تأیید'}
+              <button type="submit" className="adm-btn" disabled={busy || !password || !code}>
+                {busy ? 'در حال بررسی…' : 'ساخت کدهای جدید'}
               </button>
               <button
                 type="button"
-                className="adm-ghost"
+                className="adm-btn adm-btn-quiet"
                 onClick={() => {
                   setMode('');
                   setPassword('');
@@ -429,9 +426,8 @@ export function SecurityPanel() {
           </form>
         ) : null}
 
-        {message ? <p className="adm-ok">{message}</p> : null}
         {!mode && error ? <p className="adm-error">{error}</p> : null}
-      </div>
+      </section>
     </div>
   );
 }

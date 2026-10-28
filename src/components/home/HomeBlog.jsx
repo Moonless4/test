@@ -2,6 +2,7 @@ import PageHeading from '../PageHeading.jsx';
 import Button from '../Button.jsx';
 import PostsGrid from '../PostsGrid.jsx';
 import { articles } from '../../content/articles.js';
+import { site } from '../../content/site.js';
 
 // Blog band: the heading sits in a narrow column beside the two-column cards.
 export default function HomeBlog() {
@@ -9,8 +10,12 @@ export default function HomeBlog() {
     <section className="hp-section hp-blog">
       <div className="hp-inner">
         <div className="hp-blog-aside">
-          <PageHeading title="وبلاگ" subtitle="Weblog" icon="luxina-iconbook-fill" />
-          <Button href="/blog">همهٔ مقالات</Button>
+          <PageHeading
+            title={site.homeHeadings?.blogTitle || 'وبلاگ'}
+            subtitle={site.homeHeadings?.blogSubtitle || 'Weblog'}
+            icon="luxina-iconbook-fill"
+          />
+          <Button href="/blog">{site.homeHeadings?.blogCta || 'همهٔ مقالات'}</Button>
         </div>
         <div className="hp-blog-posts">
           <PostsGrid articles={articles} />

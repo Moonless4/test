@@ -9,9 +9,13 @@ export default function HomeTeam() {
   return (
     <section className="hp-team">
       <div className="hp-team-body">
-        <PageHeading title="تیــــــــــم مــــــــــا" subtitle="Our Team" icon="luxina-iconteam-fill" />
+        <PageHeading
+          title={site.homeHeadings?.teamTitle || 'تیــــــــــم مــــــــــا'}
+          subtitle={site.homeHeadings?.teamSubtitle || 'Our Team'}
+          icon="luxina-iconteam-fill"
+        />
         <p className="hp-team-text">{team.intro}</p>
-        <Button href="/cooperation">فرصت‌های همکاری</Button>
+        <Button href="/cooperation">{site.homeHeadings?.teamCta || 'فرصت‌های همکاری'}</Button>
       </div>
       <div className="hp-team-media">
         <img src={team.image} width="474" height="552" loading="lazy" decoding="async" alt="" />

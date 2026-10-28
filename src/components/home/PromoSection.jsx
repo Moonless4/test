@@ -1,16 +1,9 @@
+import { site } from '../../content/site.js';
+
 // The two masked call-to-action cards ("catalogue" and "consultation"). The
 // masked-card geometry comes from the theme's own CSS; each card only supplies
-// its direction, artwork, copy and buttons.
-function PromoCard({
-  variant,
-  direction,
-  image,
-  title,
-  subtitle,
-  icon,
-  primary,
-  secondary,
-}) {
+// its direction, artwork, copy and buttons from the admin panel.
+function PromoCard({ variant, direction, image, title, subtitle, icon, primary, secondary }) {
   return (
     <div className={`hp-promo hp-promo--${variant}`}>
       <div className={`luxina_masked_cart_container direction-${direction} mobile_direction-up luxina_cta_cart_container`}>
@@ -60,33 +53,35 @@ function PromoCard({
 }
 
 export default function PromoSection() {
+  const promo = site.promo || {};
+
   return (
     <section className="hp-section hp-promos">
       <div className="hp-inner">
         <PromoCard
           variant="catalog"
           direction="right"
-          image="/img/catalog-image.png"
-          title="کاتـالـــوگ پـــروژه هـــا"
-          subtitle="Projects catalogue"
+          image={promo.catalogImage || '/img/catalog-image.png'}
+          title={promo.catalogTitle || 'کاتـالـــوگ پـــروژه هـــا'}
+          subtitle={promo.catalogSubtitle || 'Projects catalogue'}
           icon="luxina-iconfile-4-fill"
-          primary={{ label: 'مشاهده', href: '/projects' }}
+          primary={{ label: promo.catalogPrimaryLabel || 'مشاهده', href: promo.catalogPrimaryHref || '/projects' }}
           secondary={{
-            label: 'دانلود',
-            href: 'https://mihanmdf.ir/wp-content/uploads/2023/12/Pooya_catalog_mihanmdf.pdf',
+            label: promo.catalogSecondaryLabel || 'دانلود',
+            href: promo.catalogSecondaryHref || '#',
             icon: 'luxina-icondownload-line',
-            external: true,
+            external: /^https?:/.test(promo.catalogSecondaryHref || ''),
           }}
         />
         <PromoCard
           variant="consult"
           direction="left"
-          image="/img/consult-image.png"
-          title="درخواست مشاوره"
-          subtitle="Consultation request"
+          image={promo.consultImage || '/img/consult-image.png'}
+          title={promo.consultTitle || 'درخواست مشاوره'}
+          subtitle={promo.consultSubtitle || 'Consultation request'}
           icon="luxina-iconquestion-answer-fill"
-          primary={{ label: 'شروع مشاوره', href: '/consultation' }}
-          secondary={{ label: 'تماس با ما', href: '/contact' }}
+          primary={{ label: promo.consultPrimaryLabel || 'شروع مشاوره', href: promo.consultPrimaryHref || '/consultation' }}
+          secondary={{ label: promo.consultSecondaryLabel || 'تماس با ما', href: promo.consultSecondaryHref || '/contact' }}
         />
       </div>
     </section>

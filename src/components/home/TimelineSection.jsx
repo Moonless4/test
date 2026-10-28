@@ -1,31 +1,31 @@
 import PageHeading from '../PageHeading.jsx';
+import { site } from '../../content/site.js';
 
-// The five-step project timeline band.
-const STEPS = [
-  ['مشاوره', 'و شناخت نیاز'],
-  ['طراحی', 'کانسپت و پلان'],
-  ['برآورد', 'زمان و هزینه'],
-  ['اجرا', 'با نظارت مستمر'],
-  ['تحویل', 'کلید و مستندات'],
-];
-
+// The five-step project timeline band; steps and images come from the panel.
 export default function TimelineSection() {
+  const heading = site.homeHeadings || {};
+  const steps = site.timeline?.steps || [];
+
   return (
     <section className="hp-section hp-timeline">
       <div className="hp-inner">
-        <PageHeading title="تایم لاین پــروژه" subtitle="Project timeline" icon="luxina-iconguide-fill" />
+        <PageHeading
+          title={heading.timelineTitle || 'تایم لاین پــروژه'}
+          subtitle={heading.timelineSubtitle || 'Project timeline'}
+          icon="luxina-iconguide-fill"
+        />
 
-        <div className="luxina_timeline_container" style={{ '--timeline-count': STEPS.length }}>
+        <div className="luxina_timeline_container" style={{ '--timeline-count': steps.length }}>
           <div className="luxina_timeline_inner">
-            {STEPS.map(([lead, rest], index) => (
+            {steps.map((step, index) => (
               <div
                 className="luxina_timeline_item"
-                key={lead}
-                style={{ backgroundImage: `url(/img/timeline-image${index + 1}.png)` }}
+                key={`${step.lead}-${index}`}
+                style={{ backgroundImage: `url(${step.image || `/img/timeline-image${index + 1}.png`})` }}
               >
-                <span className="luxina_timeline_item_title">{lead}</span>
-                <span className="luxina_timeline_item_title">{rest}</span>
-                {index < STEPS.length - 1 ? (
+                <span className="luxina_timeline_item_title">{step.lead}</span>
+                <span className="luxina_timeline_item_title">{step.rest}</span>
+                {index < steps.length - 1 ? (
                   <i className="luxina_timeline_item_icon luxina-icon-arrow-left-line" aria-hidden="true" />
                 ) : null}
               </div>

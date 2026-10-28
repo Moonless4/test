@@ -87,10 +87,12 @@ export default function ArticlePage() {
 
   useEffect(() => {
     if (!article) return undefined;
+    const seo = article.seo || {};
+    const keywords = Array.isArray(seo.keywords) ? seo.keywords : [];
     return applySeo({
-      title: article.seo.title,
-      description: article.seo.description,
-      keywords: article.seo.keywords,
+      title: seo.title || article.title,
+      description: seo.description || article.excerpt,
+      keywords,
       image: article.image,
       path: articleUrl(article),
       published: article.isoDate,
@@ -98,12 +100,12 @@ export default function ArticlePage() {
         '@context': 'https://schema.org',
         '@type': 'Article',
         headline: article.title,
-        description: article.seo.description,
+        description: seo.description || article.excerpt,
         image: `${window.location.origin}${article.image}`,
         datePublished: article.isoDate,
         inLanguage: 'fa-IR',
         articleSection: article.category,
-        keywords: article.seo.keywords.join('، '),
+        keywords: keywords.join('، '),
         publisher: { '@type': 'Organization', name: 'آراتان' },
       },
     });

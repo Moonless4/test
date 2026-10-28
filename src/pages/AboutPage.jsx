@@ -3,15 +3,23 @@ import PageHeading from '../components/PageHeading.jsx';
 import Button from '../components/Button.jsx';
 import TeamBand from '../components/TeamBand.jsx';
 import Faq from '../components/Faq.jsx';
+import PageMeta from '../components/PageMeta.jsx';
 import { site } from '../content/site.js';
 
+// Page copy, stats and calls to action come from the admin panel's page editor.
 export default function AboutPage() {
   const { about } = site;
+  const page = site.pages?.about || {};
 
   return (
     <>
+      <PageMeta title={page.seoTitle} description={page.seoDescription} path="/about" />
       <PageSection>
-        <PageHeading title="درباره ما" subtitle="About us" icon="luxina-icon-building-line" />
+        <PageHeading
+          title={page.title || 'درباره ما'}
+          subtitle={page.subtitle || 'About us'}
+          icon={page.icon || 'luxina-icon-building-line'}
+        />
         <div className="rb-about">
           <p className="rb-service-intro">{about.intro}</p>
           {(about.body || []).map((paragraph, index) => (
@@ -28,11 +36,11 @@ export default function AboutPage() {
             ))}
           </div>
           <div className="rb-detail-actions">
-            <Button href="/consultation" variant="primary">
-              دریافت مشاوره
+            <Button href={page.ctaPrimaryHref || '/consultation'} variant="primary">
+              {page.ctaPrimaryLabel || 'دریافت مشاوره'}
             </Button>
-            <Button href="/projects" variant="gray">
-              مشاهدهٔ پروژه‌ها
+            <Button href={page.ctaSecondaryHref || '/projects'} variant="gray">
+              {page.ctaSecondaryLabel || 'مشاهدهٔ پروژه‌ها'}
             </Button>
           </div>
         </div>

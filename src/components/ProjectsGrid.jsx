@@ -47,7 +47,7 @@ export default function ProjectsGrid({ projects, carousel = false }) {
         </div>
       ) : null}
       <div className="list-projects projects-items wrapper desktop-columns desktop-columns-3 tablet-columns tablet-columns-2 mobile-columns mobile-columns-1">
-        {projects.map((project) => (
+        {projects.filter((project) => project.visible !== false).map((project) => (
           <ProjectCard key={project.slug} project={project} />
         ))}
       </div>

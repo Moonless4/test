@@ -12,9 +12,16 @@
 //   GET  /api/session              { authenticated }
 //   GET  /api/admin/content        the same document, behind the session
 //   PUT  /api/admin/content        merges the posted top-level keys and saves
-//   GET  /api/admin/2fa            { enabled, backupCodesLeft } (no secret, no codes)
+//   GET  /api/admin/2fa            { enabled, permanent, backupCodesLeft }
 //   POST /api/admin/2fa/backup-codes   { password, code } → new codes, once
-//   POST /api/admin/2fa/reset          { password, code } → 2FA off, setup next login
+//   POST /api/messages             public contact / consultation / cooperation form
+//   GET  /api/admin/messages       the inbox (session)
+//   GET  /api/admin/media          uploaded images (session); POST uploads one
+//   GET  /api/media/<file>         the uploaded image itself (public)
+//
+// The password is stored only as a salted scrypt hash (`server/password.js`,
+// `/data/admin-credentials.json`). 2FA is permanent once configured: there is
+// no endpoint that turns it off.
 //
 // The password alone never creates a session: a login first yields a signed,
 // short-lived "pending" cookie carrying the step it is allowed to perform.
@@ -22,8 +29,25 @@
 // The Vite dev server proxies `/api` here, so the browser stays on one origin
 // and the httpOnly cookies are normal same-site cookies.
 import { createServer } from 'node:http';
-import { createHmac, timingSafeEqual } from 'node:crypto';
-import { patchSecurity, patchSite, readSecret, readSecurity, readSite } from './store.js';
+import { createHmac, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
+import { readFile, rm, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import {
+  MEDIA_DIR,
+  ensureMediaDir,
+  patchSecurity,
+  patchSite,
+  readCredentials,
+  readMedia,
+  readMessages,
+  readSecret,
+  readSecurity,
+  readSite,
+  writeCredentials,
+  writeMedia,
+  writeMessages,
+} from './store.js';
+import { hashPassword, verifyPassword } from './password.js';
 import {
   createBackupCodes,
   formatSecret,
@@ -44,7 +68,8 @@ const SESSION_TTL = 1000 * 60 * 60 * 24 * 7;
 const PENDING_TTL = 1000 * 60 * 10;
 const ATTEMPT_WINDOW = 1000 * 60 * 10;
 const MAX_ATTEMPTS = 6;
-const MAX_BODY = 8 * 1024 * 1024;
+const MAX_BODY = 12 * 1024 * 1024;
+const MAX_MESSAGE_ATTEMPTS = 8;
 
 const RATE_ERROR = 'تلاش‌های ناموفق بیش از حد. چند دقیقه دیگر دوباره تلاش کنید.';
 
@@ -134,6 +159,21 @@ function sameValue(a = '', b = '') {
   return left.length === right.length && timingSafeEqual(left, right);
 }
 
+// The password is never written as text: the credential record only holds a
+// salted scrypt hash. It is rebuilt from the environment credentials when they
+// change (and only then), so the login itself stays exactly the same.
+async function ensureCredentials() {
+  const record = await readCredentials();
+  if (record && record.username === PANEL_USER && record.password?.hash) {
+    if (await verifyPassword(PANEL_PASSWORD, record.password)) return record;
+  }
+  return writeCredentials({
+    username: PANEL_USER,
+    password: await hashPassword(PANEL_PASSWORD),
+    updatedAt: new Date().toISOString(),
+  });
+}
+
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Failed second-factor attempts are counted in memory per client and scope.
@@ -146,14 +186,14 @@ const clientIp = (req) =>
 
 const attemptKey = (req, scope) => `${scope}:${clientIp(req)}`;
 
-function retryAfter(key) {
+function retryAfter(key, max = MAX_ATTEMPTS) {
   const entry = attempts.get(key);
   if (!entry) return 0;
   if (Date.now() - entry.startedAt > ATTEMPT_WINDOW) {
     attempts.delete(key);
     return 0;
   }
-  return entry.count >= MAX_ATTEMPTS ? Math.ceil((ATTEMPT_WINDOW - (Date.now() - entry.startedAt)) / 1000) : 0;
+  return entry.count >= max ? Math.ceil((ATTEMPT_WINDOW - (Date.now() - entry.startedAt)) / 1000) : 0;
 }
 
 function recordFailure(key) {
@@ -201,10 +241,68 @@ const server = createServer(async (req, res) => {
       return send(res, 200, await readSite());
     }
 
+    // Uploaded media is public: the site shows these images. Only the uploaded
+    // file names are addressable, and every one of them was written by an
+    // authenticated admin.
+    if (req.method === 'GET' && url.pathname.startsWith('/api/media/')) {
+      const file = decodeURIComponent(url.pathname.slice('/api/media/'.length));
+      if (!/^[a-z0-9][a-z0-9.-]*\.(png|jpe?g|webp|gif|avif)$/i.test(file)) {
+        return send(res, 404, { error: 'not found' });
+      }
+      try {
+        const bytes = await readFile(path.join(MEDIA_DIR, file));
+        const type =
+          /\.png$/i.test(file) ? 'image/png'
+          : /\.webp$/i.test(file) ? 'image/webp'
+          : /\.gif$/i.test(file) ? 'image/gif'
+          : /\.avif$/i.test(file) ? 'image/avif'
+          : 'image/jpeg';
+        res.writeHead(200, {
+          'Content-Type': type,
+          'Cache-Control': 'public, max-age=31536000, immutable',
+        });
+        return res.end(bytes);
+      } catch {
+        return send(res, 404, { error: 'not found' });
+      }
+    }
+
+    // Contact / consultation / cooperation forms. The message is validated and
+    // stored in the admin inbox; there is no client-visible read endpoint.
+    if (route === 'POST /api/messages') {
+      const key = attemptKey(req, 'messages');
+      if (retryAfter(key, MAX_MESSAGE_ATTEMPTS)) return send(res, 429, { error: RATE_ERROR });
+      const body = await readBody(req);
+      const name = String(body.name || '').trim().slice(0, 120);
+      const phone = String(body.phone || '').trim().slice(0, 60);
+      const text = String(body.message || '').trim().slice(0, 4000);
+      const type = ['contact', 'consultation', 'cooperation'].includes(body.type) ? body.type : 'contact';
+      if (name.length < 3 || phone.replace(/\D/g, '').length < 8) {
+        return send(res, 400, { error: 'نام و شمارهٔ تماس را کامل وارد کنید.' });
+      }
+      const list = await readMessages();
+      await writeMessages([
+        {
+          id: randomUUID(),
+          name,
+          phone,
+          message: text,
+          type,
+          createdAt: new Date().toISOString(),
+          read: false,
+        },
+        ...list,
+      ].slice(0, 2000));
+      recordFailure(key);
+      return send(res, 200, { ok: true });
+    }
+
     if (route === 'POST /api/login') {
       const body = await readBody(req);
-      const ok = sameValue(body.username, PANEL_USER) && sameValue(body.password, PANEL_PASSWORD);
-      if (!ok) {
+      const record = await ensureCredentials();
+      const userOk = sameValue(body.username, record.username);
+      const passwordOk = await verifyPassword(body.password, record.password);
+      if (!userOk || !passwordOk) {
         await delay(300);
         return send(res, 401, { error: 'نام کاربری یا رمز عبور درست نیست.' });
       }
@@ -358,19 +456,88 @@ const server = createServer(async (req, res) => {
         return send(res, 200, await patchSite(body));
       }
 
+      if (route === 'GET /api/admin/messages') {
+        const list = await readMessages();
+        return send(res, 200, {
+          messages: list,
+          unread: list.filter((entry) => !entry.read).length,
+        });
+      }
+
+      if (route === 'POST /api/admin/messages/read') {
+        const body = await readBody(req);
+        const list = await readMessages();
+        await writeMessages(
+          list.map((entry) => (entry.id === body.id ? { ...entry, read: Boolean(body.read) } : entry)),
+        );
+        return send(res, 200, { ok: true });
+      }
+
+      if (route === 'POST /api/admin/messages/delete') {
+        const body = await readBody(req);
+        const list = await readMessages();
+        await writeMessages(list.filter((entry) => entry.id !== body.id));
+        return send(res, 200, { ok: true });
+      }
+
+      if (route === 'GET /api/admin/media') {
+        return send(res, 200, { media: await readMedia() });
+      }
+
+      if (route === 'POST /api/admin/media') {
+        const body = await readBody(req);
+        const match = /^data:(image\/(?:png|jpeg|jpg|webp|gif|avif));base64,(.+)$/s.exec(String(body.dataUrl || ''));
+        if (!match) return send(res, 400, { error: 'فرمت تصویر پشتیبانی نمی‌شود.' });
+        const bytes = Buffer.from(match[2], 'base64');
+        if (!bytes.length || bytes.length > 8 * 1024 * 1024) {
+          return send(res, 400, { error: 'حجم تصویر باید کمتر از ۸ مگابایت باشد.' });
+        }
+        const ext = match[1] === 'image/jpeg' || match[1] === 'image/jpg' ? 'jpg' : match[1].split('/')[1];
+        const file = `${Date.now().toString(36)}-${randomBytes(4).toString('hex')}.${ext}`;
+        await ensureMediaDir();
+        await writeFile(path.join(MEDIA_DIR, file), bytes);
+        const entry = {
+          id: randomUUID(),
+          file,
+          url: `/api/media/${file}`,
+          name: String(body.name || 'تصویر').slice(0, 160),
+          mime: match[1],
+          size: bytes.length,
+          width: Number(body.width) || null,
+          height: Number(body.height) || null,
+          createdAt: new Date().toISOString(),
+        };
+        const list = await readMedia();
+        await writeMedia([entry, ...list]);
+        return send(res, 201, { item: entry, media: [entry, ...list] });
+      }
+
+      if (route === 'POST /api/admin/media/delete') {
+        const body = await readBody(req);
+        const list = await readMedia();
+        const entry = list.find((item) => item.id === body.id);
+        if (entry) {
+          await rm(path.join(MEDIA_DIR, entry.file), { force: true }).catch(() => {});
+          await writeMedia(list.filter((item) => item.id !== entry.id));
+        }
+        return send(res, 200, { ok: true });
+      }
+
       if (route === 'GET /api/admin/2fa') {
         const security = await readSecurity();
         return send(res, 200, {
           enabled: Boolean(security.enabled),
+          permanent: true,
           backupCodesLeft: (security.backupCodes || []).filter((entry) => entry && !entry.usedAt).length,
           enabledAt: security.enabledAt || null,
         });
       }
 
-      // Both security operations re-authenticate with the password plus a
-      // current TOTP or backup code, so a stolen session cookie cannot reset
-      // or re-seed the second factor.
-      if (route === 'POST /api/admin/2fa/backup-codes' || route === 'POST /api/admin/2fa/reset') {
+      // Regenerating backup codes re-authenticates with the password plus a
+      // current TOTP or code, so a stolen session cookie cannot re-seed the
+      // factor. There is deliberately no endpoint that turns 2FA off: once it
+      // is configured it stays required for every administrator login.
+      if (route === 'POST /api/admin/2fa/backup-codes') {
         const key = attemptKey(req, 'reauth');
         const wait = retryAfter(key);
         if (wait) return send(res, 429, { error: RATE_ERROR, retryAfter: wait });
@@ -390,11 +557,6 @@ const server = createServer(async (req, res) => {
           return send(res, 401, { error: 'کد تأیید درست نیست.' });
         }
         attempts.delete(key);
-
-        if (route === 'POST /api/admin/2fa/reset') {
-          await patchSecurity({ enabled: false, secret: null, backupCodes: [], pending: null, enabledAt: null });
-          return send(res, 200, { enabled: false });
-        }
 
         const codes = createBackupCodes(10);
         const backupKey = await readSecret();

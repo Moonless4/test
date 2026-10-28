@@ -5,6 +5,7 @@ import PageHeading from '../components/PageHeading.jsx';
 import Button from '../components/Button.jsx';
 import Breadcrumbs from '../components/Breadcrumbs.jsx';
 import Lightbox from '../components/Lightbox.jsx';
+import PageMeta from '../components/PageMeta.jsx';
 import { findProject, projects, projectUrl } from '../content/projects.js';
 import { findProjectDetails } from '../content/project-details.js';
 import { findService } from '../content/services.js';
@@ -63,6 +64,12 @@ export default function ProjectPage() {
 
   return (
     <>
+      <PageMeta
+        title={project.seoTitle || `${project.title} | آراتان`}
+        description={project.seoDescription || details?.lead}
+        image={project.socialImage || project.image}
+        path={`/project/${project.slug}`}
+      />
       <PageSection>
         <Breadcrumbs
           items={[
