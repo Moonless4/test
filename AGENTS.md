@@ -95,22 +95,40 @@ in `localStorage` under `atrin-site-v1`, deep-merged over the defaults in
 Admins edit through `update()`; every public component reads the same provider
 via `useSite()`, so a saved change shows on the site immediately.
 
-- Sections (`src/admin/panels/`): dashboard, products, categories, menu filters,
-  header mega menu, hero slides, promo banners, blog posts, footer (link columns,
-  socials, trust badges, legal links), content pages (`/p/:slug`), site identity
-  and contact info, settings (admin credentials, JSON backup/restore, reset).
-- Auth is a local simulation (`src/admin/auth.js`): the username/password live in
-  `settings.adminUsername` / `settings.adminPassword` (defaults `admin` / `1234`)
-  and the session is a `sessionStorage` flag, so it ends when the tab closes.
-  Anyone with the browser can read the credentials in the bundle — this protects
-  the UI, not real data.
+- Sections (`src/admin/panels/`): dashboard, orders, products, categories, menu
+  filters, header mega menu, hero slides, promo banners, blog posts, discount
+  codes, newsletter subscribers, footer (link columns, socials, trust badges,
+  legal links), content pages (`/p/:slug`), site identity and contact info,
+  settings (admin credentials, 2FA, JSON backup/restore, reset).
+- Admin auth (`src/admin/auth.js` + `src/admin/totp.js`): there are no hardcoded
+  credentials. The first visit to `/admin` shows «راه‌اندازی مدیر» and stores the
+  chosen username/password only as salted PBKDF2-SHA256 hashes in
+  `localStorage` under `atrin-admin-auth-v2`; nothing secret is written into the
+  site content (legacy `settings.adminUsername/adminPassword` keys are stripped on
+  load and are no longer exported with backups). Login is two-step with a real
+  RFC 6238 TOTP secret (Google Authenticator, `otpauth://` URI shown at
+  enrollment), the code is single-use, 5 failed attempts lock sign-in for two
+  minutes, and the form carries an off-screen honeypot field (`name="company_website"`)
+  that rejects bot submissions. The session is a 45-minute token in
+  `sessionStorage` (`atrin-admin-session-v2`).
+- This is still a browser-only gate: anyone with devtools can edit their own
+  localStorage/session and see the panel UI. Real protection needs a server.
+- Orders, newsletter sign-ups and their admin lists use `src/data/records.js`
+  (`atrin-orders-v1`, `atrin-newsletter-v1` in `localStorage`). Checkout writes an
+  order there; the footer newsletter form writes a subscriber. Discount codes are
+  edited in the panel and stored in the site content (`discountCodes`); they are
+  not applied in checkout yet.
 - Images are picked in the panel and converted to ≤1100px JPEG data URLs by
   `src/admin/imageUpload.js`, so everything stays inside localStorage; the
   backup/restore buttons in Settings move that content between browsers.
 - Routes: `/admin` and `/admin/<section>` are matched in `matchRoute()` in
   `src/App.jsx` and rendered without the public header/footer. Content pages use
   `/p/<slug>` and are rendered by `src/pages/InfoPage.jsx`.
-- Styles live in `src/styles/admin.css` (wine/gold/cream, same tokens as the site).
+- Styles live in `src/styles/admin.css`: the panel uses the site's brand red
+  (`--primary` / `--primary-bright`) for the sidebar, headings and buttons, on the
+  same cream surfaces as the rest of the site.
+- Two-factor codes are real TOTP: an automated check can read the secret from the
+  setup screen and compute a 6-digit code with `crypto.subtle` HMAC-SHA1.
 - Verification: sign in at `/admin`, add a product, then check it appears on
   `/menu`; edit a footer badge and confirm the public footer updates; delete the
   test record and use Settings → «بازگرداندن سایت به حالت اولیه» if needed.

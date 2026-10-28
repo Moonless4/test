@@ -3,6 +3,7 @@ import { useSite } from '../site/SiteContent.jsx';
 import Icon from './Icons.jsx';
 import { BrandMark } from './Header.jsx';
 import { Link } from '../router.jsx';
+import { addSubscriber } from '../data/records.js';
 
 const splitLink = (value) => {
   const [label, href] = value.split('|').map((part) => part.trim());
@@ -22,9 +23,14 @@ export default function Footer({ onToast }) {
       setError('لطفاً یک ایمیل معتبر وارد کنید.');
       return;
     }
+    const result = addSubscriber(email);
     setError('');
-    setSubscribed(true);
     setEmail('');
+    if (!result.ok) {
+      onToast('این ایمیل قبلاً در خبرنامه ثبت شده است.');
+      return;
+    }
+    setSubscribed(true);
     onToast('عضویت شما در خبرنامه آترین ثبت شد.');
     setTimeout(() => setSubscribed(false), 6000);
   };

@@ -26,10 +26,7 @@ export const defaultContent = {
     hours: 'هر روز از ۱۲:۰۰ تا ۲۳:۳۰',
     copyright: '© ۱۴۰۴ رستوران آترین. تمامی حقوق محفوظ است.',
   },
-  settings: {
-    adminUsername: 'admin',
-    adminPassword: '1234',
-  },
+  discountCodes: [],
   navLinks,
   megaMenu: {
     eyebrow: 'دسته‌بندی غذاها',

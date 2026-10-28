@@ -1,5 +1,6 @@
 /* ── Admin panel ─────────────────────────────────────────────
-   Same palette as the public site: wine, gold, cream. */
+   Brand palette of the public site: the wine-red brand color (--primary),
+   cream surfaces and white accents. */
 
 .admin {
   display: flex;
@@ -19,7 +20,7 @@
   flex-direction: column;
   gap: 20px;
   padding: 22px 16px;
-  background: linear-gradient(180deg, var(--wine-soft) 0%, var(--wine-deep) 100%);
+  background: linear-gradient(180deg, var(--primary-bright) 0%, var(--primary) 32%, #7d0020 100%);
   color: #fff;
 }
 
@@ -28,7 +29,7 @@
   align-items: center;
   gap: 12px;
   padding: 6px 8px 18px;
-  border-bottom: 1px solid rgba(253, 202, 1, 0.22);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22);
 }
 
 .admin__brand-mark {
@@ -37,8 +38,8 @@
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: var(--gold);
-  color: var(--wine);
+  background: #fff;
+  color: var(--primary);
   font-weight: 900;
   font-size: 20px;
 }
@@ -79,8 +80,8 @@
 }
 
 .admin__nav-item.is-active {
-  background: var(--gold);
-  color: var(--wine);
+  background: #fff;
+  color: var(--primary);
   font-weight: 800;
 }
 
@@ -90,7 +91,7 @@
   flex-direction: column;
   gap: 4px;
   padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .admin__side-link {
@@ -201,7 +202,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--gold);
+  background: var(--primary);
 }
 
 .adm-text {
@@ -252,8 +253,8 @@
 
 .adm-input:focus {
   outline: none;
-  border-color: var(--gold-deep);
-  box-shadow: 0 0 0 3px rgba(253, 202, 1, 0.22);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(203, 2, 54, 0.16);
 }
 
 .adm-input--ltr {
@@ -312,7 +313,7 @@
 }
 
 .adm-toggle input:checked + span {
-  background: var(--gold-deep);
+  background: var(--primary);
 }
 
 .adm-toggle input:checked + span::after {
@@ -339,13 +340,13 @@
 }
 
 .adm-btn--gold {
-  background: var(--gold);
-  color: var(--wine);
-  box-shadow: 0 12px 24px -16px rgba(217, 164, 0, 0.9);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 12px 24px -16px rgba(203, 2, 54, 0.9);
 }
 
 .adm-btn--gold:hover {
-  background: #ffd633;
+  background: var(--primary-dark);
 }
 
 .adm-btn--ghost {
@@ -392,8 +393,8 @@
   flex-wrap: wrap;
   padding: 14px;
   border-radius: var(--radius-md);
-  background: rgba(253, 202, 1, 0.09);
-  border: 1px dashed rgba(217, 164, 0, 0.45);
+  background: rgba(203, 2, 54, 0.05);
+  border: 1px dashed rgba(203, 2, 54, 0.3);
 }
 
 .adm-inline-add .adm-field {
@@ -495,7 +496,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 16px;
-  background: rgba(242, 226, 193, 0.4);
+  background: rgba(203, 2, 54, 0.06);
   border-bottom: 1px solid var(--line);
 }
 
@@ -528,9 +529,9 @@
 }
 
 .adm-editor {
-  border: 1px solid rgba(217, 164, 0, 0.55);
+  border: 1px solid rgba(203, 2, 54, 0.3);
   border-radius: var(--radius-md);
-  background: rgba(253, 202, 1, 0.07);
+  background: rgba(203, 2, 54, 0.045);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -640,8 +641,8 @@
   align-items: flex-start;
   padding: 14px 16px;
   border-radius: var(--radius-md);
-  background: rgba(253, 202, 1, 0.12);
-  border: 1px solid rgba(217, 164, 0, 0.35);
+  background: rgba(203, 2, 54, 0.07);
+  border: 1px solid rgba(203, 2, 54, 0.25);
   color: var(--wine);
 }
 
@@ -677,8 +678,8 @@
 }
 
 .adm-tab.is-active {
-  background: var(--wine);
-  border-color: var(--wine);
+  background: var(--primary);
+  border-color: var(--primary);
   color: #fff;
 }
 
@@ -745,7 +746,7 @@
 }
 
 .adm-shortcut:hover {
-  border-color: var(--gold-deep);
+  border-color: var(--primary);
   transform: translateY(-2px);
 }
 
@@ -755,8 +756,8 @@
   width: 36px;
   height: 36px;
   border-radius: 11px;
-  background: var(--gold);
-  color: var(--wine);
+  background: var(--primary);
+  color: #fff;
   flex: 0 0 36px;
 }
 
@@ -784,9 +785,9 @@
   place-items: center;
   padding: 30px 18px;
   background:
-    radial-gradient(circle at 15% 12%, rgba(253, 202, 1, 0.16), transparent 45%),
-    radial-gradient(circle at 85% 88%, rgba(203, 2, 54, 0.28), transparent 50%),
-    linear-gradient(160deg, var(--wine-soft), var(--wine-deep));
+    radial-gradient(circle at 15% 12%, rgba(255, 255, 255, 0.16), transparent 45%),
+    radial-gradient(circle at 85% 88%, rgba(36, 0, 10, 0.32), transparent 52%),
+    linear-gradient(160deg, var(--primary-bright), var(--primary-dark) 60%, #6d001c);
 }
 
 .admin-login__card {
@@ -806,8 +807,8 @@
   width: 54px;
   height: 54px;
   border-radius: 18px;
-  background: var(--gold);
-  color: var(--wine);
+  background: var(--primary);
+  color: #fff;
   margin-bottom: 4px;
 }
 
@@ -815,7 +816,7 @@
   margin: 0;
   font-size: 21px;
   font-weight: 900;
-  color: var(--wine);
+  color: var(--primary);
 }
 
 .admin-login__card > p {
@@ -892,4 +893,209 @@
   .adm-image__row {
     flex-direction: column;
   }
+}
+
+/* ── Login: multi-step form, honeypot, two-factor ─────────── */
+.admin-login__card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-login__card form > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.9;
+}
+
+/* Bots fill this off-screen field; real users never see it */
+.admin-login__bait {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.admin-login__secret {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(203, 2, 54, 0.06);
+  border: 1px dashed rgba(203, 2, 54, 0.35);
+}
+
+.admin-login__secret code,
+.admin-login__secret-code {
+  direction: ltr;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--wine);
+  word-break: break-all;
+}
+
+.admin-login__secret code {
+  flex: 1;
+  min-width: 150px;
+}
+
+.admin-login__secret-code {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(203, 2, 54, 0.06);
+}
+
+.admin-login__hint {
+  margin: 0;
+  font-size: 10.5px;
+  color: var(--muted);
+  line-height: 1.7;
+  word-break: break-all;
+}
+
+.admin-login__code {
+  letter-spacing: 6px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.admin-login__back--button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.admin-login__card .adm-btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* Status pills */
+.adm-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(36, 0, 10, 0.07);
+  color: var(--wine);
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.adm-pill--gold {
+  background: rgba(253, 202, 1, 0.24);
+  color: #7a5a00;
+}
+
+.adm-pill--green {
+  background: rgba(28, 124, 84, 0.14);
+  color: #136b47;
+}
+
+.adm-pill--wine {
+  background: rgba(36, 0, 10, 0.1);
+  color: var(--wine);
+}
+
+.adm-pill--red {
+  background: rgba(203, 2, 54, 0.12);
+  color: var(--primary-dark);
+}
+
+/* Orders */
+.adm-orders {
+  display: grid;
+  gap: 12px;
+}
+
+.adm-order {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #fff;
+  overflow: hidden;
+}
+
+.adm-order__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(203, 2, 54, 0.05);
+  border-bottom: 1px solid var(--line);
+}
+
+.adm-order__head b {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--wine);
+}
+
+.adm-order__head small {
+  display: block;
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.adm-order__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  padding: 14px 16px 0;
+}
+
+.adm-order__meta small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.adm-order__meta b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--wine);
+}
+
+.adm-order__address {
+  margin: 10px 16px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.9;
+}
+
+.adm-order__foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+}
+
+.adm-order__select {
+  width: auto;
+  min-width: 168px;
+}
+
+.adm-order__pay {
+  flex: 1;
+  min-width: 140px;
+  color: var(--muted);
+  font-size: 11.5px;
 }

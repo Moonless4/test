@@ -22,11 +22,27 @@ const mergeContent = (base, saved) => {
   return result;
 };
 
+// Older versions kept the admin username/password in plain text inside the
+// content tree. Drop those keys so nobody can read them from storage or a backup.
+const stripLegacyCredentials = (saved) => {
+  if (!saved?.settings) return saved;
+  const { adminUsername, adminPassword, ...settings } = saved.settings;
+  const next = { ...saved };
+  if (Object.keys(settings).length) next.settings = settings;
+  else delete next.settings;
+  try {
+    localStorage.setItem(SITE_STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    /* storage can be unavailable */
+  }
+  return next;
+};
+
 const readSaved = () => {
   try {
     const raw = localStorage.getItem(SITE_STORAGE_KEY);
     if (!raw) return defaultContent;
-    return mergeContent(defaultContent, JSON.parse(raw));
+    return mergeContent(defaultContent, stripLegacyCredentials(JSON.parse(raw)));
   } catch {
     return defaultContent;
   }

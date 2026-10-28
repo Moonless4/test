@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Modal from './Modal.jsx';
 import Icon from './Icons.jsx';
 import { formatPrice } from './ProductCard.jsx';
+import { addOrder } from '../data/records.js';
 
 const deliveryFee = 35000;
 const freeDeliveryFrom = 500000;
@@ -35,14 +36,30 @@ export default function CheckoutModal({ open, onClose, items, onComplete }) {
       return;
     }
     const code = `NW-${Math.floor(100000 + Math.random() * 900000)}`;
-    setOrder({
+    const count = items.reduce((sum, item) => sum + item.qty, 0);
+    const payment = form.payment === 'online' ? 'پرداخت آنلاین' : 'پرداخت در محل';
+    const time = form.time === 'asap' ? 'در اولین فرصت' : form.time;
+
+    addOrder({
       code,
       total,
-      count: items.reduce((sum, item) => sum + item.qty, 0),
+      subtotal,
+      delivery,
+      count,
       name: form.name.trim(),
-      payment: form.payment === 'online' ? 'پرداخت آنلاین' : 'پرداخت در محل',
-      time: form.time === 'asap' ? 'در اولین فرصت' : form.time,
+      phone: form.phone.trim(),
+      address: form.address.trim(),
+      payment,
+      time,
+      items: items.map((item) => ({
+        productId: item.product.id,
+        name: item.product.name,
+        price: item.product.price,
+        qty: item.qty,
+      })),
     });
+
+    setOrder({ code, total, count, name: form.name.trim(), payment, time });
     setError('');
     onComplete();
   };

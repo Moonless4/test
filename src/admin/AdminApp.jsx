@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSite } from '../site/SiteContent.jsx';
 import { useRouter } from '../router.jsx';
 import Icon from '../components/Icons.jsx';
-import { isAdminSignedIn, signOutAdmin } from './auth.js';
+import { isAdminSignedIn, signOutAdmin, touchSession } from './auth.js';
 import AdminLogin from './AdminLogin.jsx';
 import DashboardPanel from './panels/DashboardPanel.jsx';
+import OrdersPanel from './panels/OrdersPanel.jsx';
+import NewsletterPanel from './panels/NewsletterPanel.jsx';
+import DiscountsPanel from './panels/DiscountsPanel.jsx';
 import ProductsPanel from './panels/ProductsPanel.jsx';
 import CategoriesPanel from './panels/CategoriesPanel.jsx';
 import MenuPanel from './panels/MenuPanel.jsx';
@@ -19,6 +22,7 @@ import SettingsPanel from './panels/SettingsPanel.jsx';
 
 const SECTIONS = [
   { id: 'dashboard', label: 'داشبورد', icon: 'home' },
+  { id: 'orders', label: 'سفارش‌ها', icon: 'cart' },
   { id: 'products', label: 'غذاها', icon: 'fork' },
   { id: 'categories', label: 'دسته‌بندی‌ها', icon: 'box' },
   { id: 'menu', label: 'منو', icon: 'chef' },
@@ -28,12 +32,17 @@ const SECTIONS = [
   { id: 'blog', label: 'وبلاگ', icon: 'edit' },
   { id: 'footer', label: 'فوتر', icon: 'quote' },
   { id: 'pages', label: 'صفحات', icon: 'calendar' },
+  { id: 'discounts', label: 'کدهای تخفیف', icon: 'gift' },
+  { id: 'newsletter', label: 'خبرنامه', icon: 'mail' },
   { id: 'identity', label: 'هویت سایت', icon: 'star' },
   { id: 'settings', label: 'تنظیمات', icon: 'gear' },
 ];
 
 const PANELS = {
   dashboard: DashboardPanel,
+  orders: OrdersPanel,
+  discounts: DiscountsPanel,
+  newsletter: NewsletterPanel,
   products: ProductsPanel,
   categories: CategoriesPanel,
   menu: MenuPanel,
@@ -52,13 +61,15 @@ export default function AdminApp({ section }) {
   const { navigate } = useRouter();
   const [signedIn, setSignedIn] = useState(isAdminSignedIn);
 
+  // An expired session locks the panel again on the next panel navigation.
+  useEffect(() => {
+    if (isAdminSignedIn()) touchSession();
+    else setSignedIn(false);
+  }, [section]);
+
   if (!signedIn) {
     return (
-      <AdminLogin
-        settings={content.settings}
-        siteName={content.identity.siteName}
-        onSuccess={() => setSignedIn(true)}
-      />
+      <AdminLogin siteName={content.identity.siteName} onSuccess={() => setSignedIn(true)} />
     );
   }
 
