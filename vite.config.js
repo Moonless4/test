@@ -20,5 +20,15 @@ export default defineConfig({
       interval: 300,
     },
     allowedHosts: ['localhost', ...sandboxHosts],
+    // The admin auth API runs as its own compose service. Proxying keeps the
+    // session cookie on the app's own origin (SameSite=Strict keeps working)
+    // and leaves the browser talking only to port 3000.
+    proxy: {
+      '/api': {
+        target: process.env.API_PROXY_TARGET || 'http://api:4000',
+        changeOrigin: false,
+        xfwd: true,
+      },
+    },
   },
 });

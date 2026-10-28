@@ -1,18 +1,14 @@
 import { useState } from 'react';
 import Icon from '../components/Icons.jsx';
-import { formatSecret } from './totp.js';
 import {
   confirmTwoFactorSetup,
-  createAdminAccount,
-  hasAdminAccount,
-  isCryptoAvailable,
+  signIn,
   startTwoFactorSetup,
   verifyBackupCode,
-  verifyPassword,
-  verifyTwoFactor,
-} from './auth.js';
+  verifyTotp,
+} from './api.js';
 
-const emptyForm = { username: '', password: '', confirm: '' };
+const emptyCredentials = { username: '', password: '' };
 
 const copyText = async (text) => {
   try {
@@ -24,12 +20,9 @@ const copyText = async (text) => {
       area.value = text;
       area.setAttribute('readonly', '');
       area.style.position = 'fixed';
-      area.style.top = '0';
       area.style.opacity = '0';
       document.body.appendChild(area);
-      area.focus();
       area.select();
-      area.setSelectionRange(0, text.length);
       const done = document.execCommand('copy');
       document.body.removeChild(area);
       return done;
@@ -40,20 +33,19 @@ const copyText = async (text) => {
 };
 
 export default function AdminLogin({ siteName, onSuccess }) {
-  const [step, setStep] = useState(() => (hasAdminAccount() ? 'login' : 'setup'));
-  const [form, setForm] = useState(emptyForm);
+  const [step, setStep] = useState('login');
+  const [credentials, setCredentials] = useState(emptyCredentials);
   const [code, setCode] = useState('');
   const [bait, setBait] = useState('');
   const [enrollment, setEnrollment] = useState(null);
   const [recoveryCodes, setRecoveryCodes] = useState(null);
-  const [codesCopied, setCodesCopied] = useState(false);
-  const [backupMode, setBackupMode] = useState(false);
-  const [backupCode, setBackupCode] = useState('');
+  const [copiedCodes, setCopiedCodes] = useState(false);
   const [error, setError] = useState('');
+  const [locked, setLocked] = useState('');
   const [busy, setBusy] = useState(false);
-  const [copied, setCopied] = useState(false);
 
-  const field = (key) => (event) => setForm((prev) => ({ ...prev, [key]: event.target.value }));
+  const field = (key) => (event) =>
+    setCredentials((prev) => ({ ...prev, [key]: event.target.value }));
 
   const run = async (action) => {
     setBusy(true);
@@ -67,118 +59,96 @@ export default function AdminLogin({ siteName, onSuccess }) {
     }
   };
 
-  const createAccount = (event) => {
+  const handleFailure = (result, fallback) => {
+    if (result.locked) {
+      setLocked(result.error || 'تلاش‌های ناموفق زیاد بود؛ بعداً دوباره تلاش کنید.');
+      return;
+    }
+    setError(result.error || fallback);
+  };
+
+  const submitCredentials = (event) => {
     event.preventDefault();
     run(async () => {
-      const created = await createAdminAccount({
-        username: form.username,
-        password: form.password,
-        confirm: form.confirm,
-      });
-      if (!created.ok) {
-        setError(created.error);
+      const result = await signIn({ ...credentials, honeypot: bait });
+      if (!result.ok) {
+        setCredentials((prev) => ({ ...prev, password: '' }));
+        handleFailure(result, 'نام کاربری یا رمز عبور درست نیست.');
         return;
       }
-      const started = startTwoFactorSetup();
-      if (!started.ok) {
-        setError(started.error);
+      if (result.next === 'enroll') {
+        const started = await startTwoFactorSetup();
+        if (!started.ok) {
+          handleFailure(started, 'راه‌اندازی ورود دو مرحله‌ای ممکن نشد.');
+          return;
+        }
+        setEnrollment(started);
+        setStep('enroll');
         return;
       }
-      setEnrollment({ secret: started.secret, url: started.url });
-      setStep('enroll');
+      setStep('totp');
     });
   };
 
   const completeEnrollment = (event) => {
     event.preventDefault();
     run(async () => {
-      const result = await confirmTwoFactorSetup({ secret: enrollment.secret, code });
+      const result = await confirmTwoFactorSetup({ code });
       if (!result.ok) {
-        setError(result.error);
+        setCode('');
+        handleFailure(result, 'کد تأیید درست نیست.');
         return;
       }
       setRecoveryCodes(result.backupCodes);
+      setCode('');
       setStep('recovery');
     });
   };
 
-  const signIn = (event) => {
+  const submitTotp = (event) => {
     event.preventDefault();
     run(async () => {
-      const result = await verifyPassword({
-        username: form.username,
-        password: form.password,
-        honeypot: bait,
-      });
-      if (!result.ok) {
-        setForm((prev) => ({ ...prev, password: '' }));
-        setError(result.error);
-        return;
-      }
-      if (!result.twoFactorEnabled) {
-        // Two-factor cannot be turned off, so an account without it must enroll now.
-        const started = startTwoFactorSetup();
-        if (!started.ok) {
-          setError(started.error);
-          return;
-        }
-        setEnrollment({ secret: started.secret, url: started.url });
-        setStep('enroll');
-        return;
-      }
-      setStep('code');
-    });
-  };
-
-  const confirmCode = (event) => {
-    event.preventDefault();
-    run(async () => {
-      const result = await verifyTwoFactor(code);
+      const result = await verifyTotp({ code });
       if (!result.ok) {
         setCode('');
-        setError(result.error);
+        handleFailure(result, 'کد دو مرحله‌ای درست نیست.');
         return;
       }
-      if (result.backupCodes?.length) {
-        setRecoveryCodes(result.backupCodes);
-        setStep('recovery');
-        return;
-      }
-      onSuccess();
+      setStep('backup');
     });
   };
 
-  const confirmBackup = (event) => {
+  const submitBackup = (event) => {
     event.preventDefault();
     run(async () => {
-      const result = await verifyBackupCode(backupCode);
+      const result = await verifyBackupCode({ code });
       if (!result.ok) {
-        setBackupCode('');
-        setError(result.error);
+        setCode('');
+        handleFailure(result, 'کد پشتیبان درست نیست.');
         return;
       }
       onSuccess();
     });
   };
 
-  const copyRecoveryCodes = async () => {
-    const copiedOk = await copyText(recoveryCodes.join('\n'));
-    if (!copiedOk) {
+  const copyCodes = async () => {
+    const done = await copyText(recoveryCodes.join('\n'));
+    if (!done) {
       setError('کپی نشد؛ کدها را دستی یادداشت کنید.');
       return;
     }
     setError('');
-    setCodesCopied(true);
+    setCopiedCodes(true);
   };
 
-  const copySecret = async () => {
-    try {
-      await navigator.clipboard.writeText(enrollment.secret);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    } catch {
-      setError('کپی نشد؛ کلید را دستی وارد کنید.');
-    }
+  const restart = () => {
+    setStep('login');
+    setCredentials(emptyCredentials);
+    setCode('');
+    setError('');
+    setEnrollment(null);
+    setRecoveryCodes(null);
+    setCopiedCodes(false);
   };
 
   const baitField = (
@@ -197,6 +167,25 @@ export default function AdminLogin({ siteName, onSuccess }) {
     </div>
   );
 
+  const codeField = (label, placeholder, maxLength) => (
+    <label className="adm-field">
+      <span className="adm-field__label">{label}</span>
+      <input
+        className="adm-input adm-input--ltr admin-login__code"
+        value={code}
+        onChange={(event) => setCode(event.target.value)}
+        inputMode={maxLength === 7 ? 'numeric' : 'text'}
+        autoComplete="one-time-code"
+        maxLength={maxLength}
+        dir="ltr"
+        placeholder={placeholder}
+        autoFocus
+      />
+    </label>
+  );
+
+  const stepLabel = { login: '۱ از ۳', totp: '۲ از ۳', backup: '۳ از ۳' }[step];
+
   return (
     <div className="admin-login" dir="rtl">
       <div className="admin-login__card">
@@ -204,166 +193,22 @@ export default function AdminLogin({ siteName, onSuccess }) {
           <Icon name="shield" size={26} />
         </span>
 
-        {step === 'setup' ? (
-          <form onSubmit={createAccount}>
-            <h1>راه‌اندازی مدیر</h1>
-            <p>
-              اولین ورود است؛ برای {siteName} یک نام کاربری و رمز عبور قوی بسازید. این اطلاعات فقط
-              به‌صورت هش‌شده در همین مرورگر ذخیره می‌شود.
-            </p>
-
-            <label className="adm-field">
-              <span className="adm-field__label">نام کاربری</span>
-              <input
-                className="adm-input adm-input--ltr"
-                value={form.username}
-                onChange={field('username')}
-                autoComplete="username"
-                dir="ltr"
-              />
-            </label>
-
-            <label className="adm-field">
-              <span className="adm-field__label">رمز عبور (حداقل ۸ کاراکتر)</span>
-              <input
-                className="adm-input adm-input--ltr"
-                type="password"
-                value={form.password}
-                onChange={field('password')}
-                autoComplete="new-password"
-                dir="ltr"
-              />
-            </label>
-
-            <label className="adm-field">
-              <span className="adm-field__label">تکرار رمز عبور</span>
-              <input
-                className="adm-input adm-input--ltr"
-                type="password"
-                value={form.confirm}
-                onChange={field('confirm')}
-                autoComplete="new-password"
-                dir="ltr"
-              />
-            </label>
-
-            {baitField}
-            {!isCryptoAvailable() ? (
-              <p className="adm-hint adm-hint--error">
-                این مرورگر از رمزنگاری امن پشتیبانی نمی‌کند؛ از مرورگر به‌روز استفاده کنید.
-              </p>
-            ) : null}
-            {error ? <p className="adm-hint adm-hint--error">{error}</p> : null}
-
-            <button type="submit" className="adm-btn adm-btn--gold adm-btn--block" disabled={busy}>
-              {busy ? 'در حال ساخت…' : 'ساخت حساب و ادامه'}
-              <Icon name="chevronLeft" size={17} />
-            </button>
-          </form>
-        ) : null}
-
-        {step === 'enroll' && enrollment ? (
-          <form onSubmit={completeEnrollment}>
-            <h1>ورود دو مرحله‌ای گوگل</h1>
-            <p>
-              اپلیکیشن Google Authenticator را باز کنید، «افزودن حساب» و سپس «وارد کردن کلید
-              راه‌اندازی» را بزنید و این کلید را وارد کنید:
-            </p>
-
-            <div className="admin-login__secret">
-              <code dir="ltr">{formatSecret(enrollment.secret)}</code>
-              <button type="button" className="adm-btn adm-btn--ghost" onClick={copySecret}>
-                <Icon name={copied ? 'check' : 'box'} size={15} />
-                {copied ? 'کپی شد' : 'کپی کلید'}
-              </button>
-            </div>
-            <p className="admin-login__hint" dir="ltr">
-              {enrollment.url}
-            </p>
-
-            <label className="adm-field">
-              <span className="adm-field__label">کد ۶ رقمی برنامه</span>
-              <input
-                className="adm-input adm-input--ltr admin-login__code"
-                value={code}
-                onChange={(event) => setCode(event.target.value)}
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                maxLength={7}
-                dir="ltr"
-                placeholder="123456"
-              />
-            </label>
-
-            {error ? <p className="adm-hint adm-hint--error">{error}</p> : null}
-
-            <button type="submit" className="adm-btn adm-btn--gold adm-btn--block" disabled={busy}>
-              {busy ? 'در حال بررسی…' : 'فعال‌سازی و ورود'}
-              <Icon name="check" size={17} />
-            </button>
-          </form>
-        ) : null}
-
-        {step === 'recovery' && recoveryCodes ? (
-          codesCopied ? (
-            <div className="admin-login__step">
-              <h1>کدهای پشتیبان ذخیره شد</h1>
-              <p>
-                کدهای پشتیبان کپی شدند و دیگر در هیچ صفحه‌ای نمایش داده نمی‌شوند. در صورت از دست
-                دادن دسترسی برنامه، هر کد یک بار برای ورود قابل استفاده است.
-              </p>
-              <button type="button" className="adm-btn adm-btn--gold adm-btn--block" onClick={onSuccess}>
-                ورود به پنل
-                <Icon name="chevronLeft" size={17} />
-              </button>
-            </div>
-          ) : (
-            <div className="admin-login__step">
-              <h1>کدهای پشتیبان ورود</h1>
-              <p>
-                این کدها فقط همین یک بار نمایش داده می‌شوند. هر کد یک بار برای ورود کار می‌کند؛
-                آن‌ها را در جای امن نگه دارید.
-              </p>
-
-              <div className="admin-login__codes">
-                {recoveryCodes.map((item) => (
-                  <code key={item} dir="ltr">
-                    {item}
-                  </code>
-                ))}
-              </div>
-
-              {error ? <p className="adm-hint adm-hint--error">{error}</p> : null}
-
-              <button
-                type="button"
-                className="adm-btn adm-btn--ghost adm-btn--block"
-                onClick={copyRecoveryCodes}
-              >
-                <Icon name="box" size={16} />
-                کپی همه کدها
-              </button>
-              <button type="button" className="adm-btn adm-btn--gold adm-btn--block" onClick={onSuccess}>
-                ذخیره کردم، ورود به پنل
-                <Icon name="chevronLeft" size={17} />
-              </button>
-            </div>
-          )
-        ) : null}
+        {stepLabel ? <span className="admin-login__progress">مرحله {stepLabel}</span> : null}
 
         {step === 'login' ? (
-          <form onSubmit={signIn}>
+          <form onSubmit={submitCredentials}>
             <h1>ورود به پنل مدیریت</h1>
-            <p>مدیریت محتوای {siteName}</p>
+            <p>مدیریت محتوای {siteName} — نام کاربری و رمز عبور خود را وارد کنید.</p>
 
             <label className="adm-field">
               <span className="adm-field__label">نام کاربری</span>
               <input
                 className="adm-input adm-input--ltr"
-                value={form.username}
+                value={credentials.username}
                 onChange={field('username')}
                 autoComplete="username"
                 dir="ltr"
+                required
               />
             </label>
 
@@ -372,77 +217,120 @@ export default function AdminLogin({ siteName, onSuccess }) {
               <input
                 className="adm-input adm-input--ltr"
                 type="password"
-                value={form.password}
+                value={credentials.password}
                 onChange={field('password')}
                 autoComplete="current-password"
                 dir="ltr"
+                required
               />
             </label>
 
             {baitField}
             {error ? <p className="adm-hint adm-hint--error">{error}</p> : null}
+            {locked ? <p className="adm-hint adm-hint--error">{locked}</p> : null}
 
-            <button type="submit" className="adm-btn adm-btn--gold adm-btn--block" disabled={busy}>
-              {busy ? 'در حال بررسی…' : 'ورود به پنل'}
+            <button type="submit" className="adm-btn adm-btn--gold adm-btn--block" disabled={busy || Boolean(locked)}>
+              {busy ? 'در حال بررسی…' : 'ادامه'}
               <Icon name="chevronLeft" size={17} />
             </button>
           </form>
         ) : null}
 
-        {step === 'code' ? (
-          <form onSubmit={backupMode ? confirmBackup : confirmCode}>
-            <h1>{backupMode ? 'کد پشتیبان' : 'کد دو مرحله‌ای'}</h1>
+        {step === 'enroll' && enrollment ? (
+          <form onSubmit={completeEnrollment}>
+            <h1>راه‌اندازی Google Authenticator</h1>
             <p>
-              {backupMode
-                ? 'یکی از کدهای پشتیبان ذخیره‌شده را وارد کنید؛ هر کد فقط یک بار کار می‌کند.'
-                : 'کد ۶ رقمی Google Authenticator را وارد کنید. اعتبار کد تا ۳۰ ثانیه است.'}
+              بارکد زیر را با اپلیکیشن Google Authenticator اسکن کنید، سپس کد ۶ رقمی ساخته‌شده را
+              وارد کنید.
             </p>
 
-            <label className="adm-field">
-              <span className="adm-field__label">{backupMode ? 'کد پشتیبان' : 'کد تأیید'}</span>
-              <input
-                className="adm-input adm-input--ltr admin-login__code"
-                value={backupMode ? backupCode : code}
-                onChange={(event) =>
-                  backupMode ? setBackupCode(event.target.value) : setCode(event.target.value)
-                }
-                inputMode={backupMode ? 'text' : 'numeric'}
-                autoComplete="one-time-code"
-                maxLength={backupMode ? 9 : 7}
-                dir="ltr"
-                placeholder={backupMode ? 'ABCD-EFGH' : '123456'}
-              />
-            </label>
+            <img className="admin-login__qr" src={enrollment.qr} alt="بارکد ورود دو مرحله‌ای" width="200" height="200" />
+            <p className="admin-login__hint">اگر اسکن نشد، این کلید را دستی وارد کنید:</p>
+            <div className="admin-login__secret">
+              <code dir="ltr">{enrollment.formatted}</code>
+            </div>
+
+            {codeField('کد ۶ رقمی برنامه', '123456', 7)}
+            {error ? <p className="adm-hint adm-hint--error">{error}</p> : null}
+            {locked ? <p className="adm-hint adm-hint--error">{locked}</p> : null}
+
+            <button type="submit" className="adm-btn adm-btn--gold adm-btn--block" disabled={busy}>
+              {busy ? 'در حال بررسی…' : 'تأیید و ادامه'}
+              <Icon name="check" size={17} />
+            </button>
+          </form>
+        ) : null}
+
+        {step === 'recovery' && recoveryCodes ? (
+          <div className="admin-login__step">
+            <h1>کدهای پشتیبان ورود</h1>
+            <p>
+              این کدها فقط همین یک بار نمایش داده می‌شوند و هر کد تنها یک بار قابل استفاده است.
+              آن‌ها را در جای امن نگه دارید؛ برای ورود بعدی به یکی از آن‌ها نیاز دارید.
+            </p>
+
+            <div className="admin-login__codes">
+              {recoveryCodes.map((item) => (
+                <code key={item} dir="ltr">
+                  {item}
+                </code>
+              ))}
+            </div>
 
             {error ? <p className="adm-hint adm-hint--error">{error}</p> : null}
 
+            <button type="button" className="adm-btn adm-btn--ghost adm-btn--block" onClick={copyCodes}>
+              <Icon name="box" size={16} />
+              {copiedCodes ? 'کپی شد' : 'کپی همه کدها'}
+            </button>
+            <button
+              type="button"
+              className="adm-btn adm-btn--gold adm-btn--block"
+              onClick={() => {
+                setCopiedCodes(false);
+                setRecoveryCodes(null);
+                setStep('backup');
+              }}
+            >
+              ذخیره کردم، ادامه
+              <Icon name="chevronLeft" size={17} />
+            </button>
+          </div>
+        ) : null}
+
+        {step === 'totp' ? (
+          <form onSubmit={submitTotp}>
+            <h1>کد دو مرحله‌ای</h1>
+            <p>کد ۶ رقمی برنامه Google Authenticator را وارد کنید.</p>
+
+            {codeField('کد تأیید', '123456', 7)}
+            {error ? <p className="adm-hint adm-hint--error">{error}</p> : null}
+            {locked ? <p className="adm-hint adm-hint--error">{locked}</p> : null}
+
             <button type="submit" className="adm-btn adm-btn--gold adm-btn--block" disabled={busy}>
-              {busy ? 'در حال بررسی…' : 'تأیید و ورود'}
+              {busy ? 'در حال بررسی…' : 'تأیید کد'}
               <Icon name="check" size={17} />
             </button>
-            <button
-              type="button"
-              className="admin-login__back admin-login__back--button"
-              onClick={() => {
-                setBackupMode((prev) => !prev);
-                setCode('');
-                setBackupCode('');
-                setError('');
-              }}
-            >
-              {backupMode ? 'استفاده از کد برنامه' : 'استفاده از کد پشتیبان'}
+            <button type="button" className="admin-login__back admin-login__back--button" onClick={restart}>
+              بازگشت
             </button>
-            <button
-              type="button"
-              className="admin-login__back admin-login__back--button"
-              onClick={() => {
-                setStep('login');
-                setBackupMode(false);
-                setCode('');
-                setBackupCode('');
-                setError('');
-              }}
-            >
+          </form>
+        ) : null}
+
+        {step === 'backup' ? (
+          <form onSubmit={submitBackup}>
+            <h1>کد پشتیبان</h1>
+            <p>یکی از کدهای پشتیبان ذخیره‌شده را وارد کنید؛ هر کد فقط یک بار کار می‌کند.</p>
+
+            {codeField('کد پشتیبان', 'ABCD-EFGH', 9)}
+            {error ? <p className="adm-hint adm-hint--error">{error}</p> : null}
+            {locked ? <p className="adm-hint adm-hint--error">{locked}</p> : null}
+
+            <button type="submit" className="adm-btn adm-btn--gold adm-btn--block" disabled={busy}>
+              {busy ? 'در حال بررسی…' : 'ورود به پنل'}
+              <Icon name="check" size={17} />
+            </button>
+            <button type="button" className="admin-login__back admin-login__back--button" onClick={restart}>
               بازگشت
             </button>
           </form>

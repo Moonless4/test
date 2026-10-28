@@ -1,29 +1,73 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSite } from '../../site/SiteContent.jsx';
 import Icon from '../../components/Icons.jsx';
 import { AdminPanel, TextInput } from '../ui.jsx';
-import { getSecurityState, updateCredentials } from '../auth.js';
+import ReauthForm from '../ReauthForm.jsx';
+import {
+  changeCredentials,
+  fetchSession,
+  regenerateBackupCodes,
+} from '../api.js';
+
+const emptyCreds = { username: '', password: '', confirm: '' };
 
 export default function SettingsPanel() {
   const { content, update, reset } = useSite();
   const fileRef = useRef(null);
-  const [security, setSecurity] = useState(getSecurityState);
-  const [creds, setCreds] = useState({ currentPassword: '', username: '', password: '', confirm: '' });
+  const [security, setSecurity] = useState(null);
+  const [reauthToken, setReauthToken] = useState('');
+  const [creds, setCreds] = useState(emptyCreds);
+  const [freshCodes, setFreshCodes] = useState(null);
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    let alive = true;
+    fetchSession().then((result) => {
+      if (alive && result.authenticated) setSecurity(result);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const setCred = (key) => (value) => setCreds((prev) => ({ ...prev, [key]: value }));
 
+  const useToken = (token) => {
+    setReauthToken(token);
+    setError('');
+    setStatus('احراز هویت مجدد انجام شد؛ اکنون عملیات را تکمیل کنید.');
+  };
+
   const saveCredentials = async () => {
-    const result = await updateCredentials(creds);
+    setError('');
+    setStatus('');
+    const result = await changeCredentials({ ...creds, reauthToken });
     if (!result.ok) {
       setError(result.error);
+      if (result.reauthRequired) setReauthToken('');
       return;
     }
+    setCreds(emptyCreds);
+    setReauthToken('');
+    setStatus('اطلاعات ورود تغییر کرد؛ برای ادامه دوباره وارد شوید…');
+    // Every session was invalidated on the server.
+    window.location.assign('/admin');
+  };
+
+  const regenerateCodes = async () => {
     setError('');
-    setStatus('نام کاربری و رمز عبور به‌روزرسانی شد.');
-    setCreds({ currentPassword: '', username: '', password: '', confirm: '' });
-    setSecurity(getSecurityState());
+    setStatus('');
+    const result = await regenerateBackupCodes({ reauthToken });
+    if (!result.ok) {
+      setError(result.error);
+      if (result.reauthRequired) setReauthToken('');
+      return;
+    }
+    setReauthToken('');
+    setFreshCodes(result.backupCodes);
+    setSecurity((prev) => (prev ? { ...prev, backupCodesRemaining: result.backupCodes.length } : prev));
+    setStatus('کدهای پشتیبان جدید ساخته شد؛ کدهای قبلی دیگر کار نمی‌کنند.');
   };
 
   const exportBackup = () => {
@@ -60,62 +104,86 @@ export default function SettingsPanel() {
 
   return (
     <AdminPanel title="تنظیمات" description="امنیت ورود مدیر، پشتیبان‌گیری و بازنشانی محتوا.">
-      <h3 className="adm-subtitle">امنیت حساب مدیر</h3>
+      <h3 className="adm-subtitle">وضعیت امنیت حساب مدیر</h3>
       <div className="adm-inline">
-        <span className="adm-pill adm-pill--green">ورود دو مرحله‌ای: فعال (اجباری)</span>
-        {security.username ? (
+        <span className="adm-pill adm-pill--green">Google Authenticator + کد پشتیبان</span>
+        {security?.username ? (
           <span className="adm-pill" dir="ltr">
             {security.username}
           </span>
         ) : null}
+        {security ? (
+          <span className="adm-pill">کد پشتیبان باقی‌مانده: {security.backupCodesRemaining}</span>
+        ) : null}
       </div>
       <p className="adm-text">
-        رمز عبور فقط به‌صورت هش ذخیره می‌شود و نه رمز عبور و نه هش آن هیچ‌جا در پنل یا فایل پشتیبان
-        نمایش داده نمی‌شود. برای تغییر دسترسی، رمز فعلی را وارد کنید.
+        رمز عبور فقط به‌صورت هش در سرور ذخیره می‌شود و هیچ‌جا در پنل نمایش داده نمی‌شود. برای هر
+        تغییر حساس باید نام کاربری، رمز عبور، کد Google Authenticator و یک کد پشتیبان را دوباره
+        وارد کنید.
       </p>
 
-      <div className="adm-grid">
-        <TextInput
-          label="رمز عبور فعلی"
-          value={creds.currentPassword}
-          onChange={setCred('currentPassword')}
-          type="password"
-          dir="ltr"
-        />
-        <TextInput
-          label="نام کاربری جدید"
-          value={creds.username}
-          onChange={setCred('username')}
-          dir="ltr"
-        />
-        <TextInput
-          label="رمز عبور جدید (حداقل ۸ کاراکتر)"
-          value={creds.password}
-          onChange={setCred('password')}
-          type="password"
-          dir="ltr"
-        />
-        <TextInput
-          label="تکرار رمز عبور جدید"
-          value={creds.confirm}
-          onChange={setCred('confirm')}
-          type="password"
-          dir="ltr"
-        />
-      </div>
-      <div>
-        <button type="button" className="adm-btn adm-btn--gold" onClick={saveCredentials}>
-          <Icon name="check" size={16} />
-          ذخیره دسترسی جدید
-        </button>
-      </div>
+      <h3 className="adm-subtitle">تغییر نام کاربری و رمز عبور</h3>
+      {reauthToken ? (
+        <>
+          <div className="adm-grid">
+            <TextInput
+              label="نام کاربری جدید"
+              value={creds.username}
+              onChange={setCred('username')}
+              dir="ltr"
+            />
+            <TextInput
+              label="رمز عبور جدید"
+              value={creds.password}
+              onChange={setCred('password')}
+              type="password"
+              dir="ltr"
+            />
+            <TextInput
+              label="تکرار رمز عبور جدید"
+              value={creds.confirm}
+              onChange={setCred('confirm')}
+              type="password"
+              dir="ltr"
+            />
+          </div>
+          <div>
+            <button type="button" className="adm-btn adm-btn--gold" onClick={saveCredentials}>
+              <Icon name="check" size={16} />
+              ذخیره و خروج از همه نشست‌ها
+            </button>
+          </div>
+        </>
+      ) : (
+        <ReauthForm actionLabel="تأیید هویت برای تغییر اطلاعات ورود" onToken={useToken} />
+      )}
 
-      <h3 className="adm-subtitle">ورود دو مرحله‌ای گوگل</h3>
-      <p className="adm-text">
-        برای حفظ امنیت پنل، ورود دو مرحله‌ای همیشه فعال است و امکان غیرفعال‌کردن آن وجود ندارد.
-        کدهای پشتیبان فقط یک بار هنگام فعال‌سازی نمایش داده می‌شوند و پس از کپی‌شدن دیگر در پنل
-        دیده نمی‌شوند.
-      </p>
+      <h3 className="adm-subtitle">کدهای پشتیبان</h3>
+      {freshCodes ? (
+        <div className="admin-login__codes">
+          {freshCodes.map((item) => (
+            <code key={item} dir="ltr">
+              {item}
+            </code>
+          ))}
+        </div>
+      ) : null}
+      {freshCodes ? (
+        <p className="adm-hint">این کدها فقط همین یک بار نمایش داده شدند؛ همین حالا ذخیره کنید.</p>
+      ) : null}
+      {reauthToken ? (
+        <div>
+          <button type="button" className="adm-btn adm-btn--ghost" onClick={regenerateCodes}>
+            <Icon name="repeat" size={16} />
+            ساخت کدهای پشتیبان جدید
+          </button>
+        </div>
+      ) : (
+        <ReauthForm
+          actionLabel="تأیید هویت برای ساخت کدهای پشتیبان"
+          onToken={useToken}
+        />
+      )}
 
       <h3 className="adm-subtitle">پشتیبان‌گیری</h3>
       <p className="adm-text">

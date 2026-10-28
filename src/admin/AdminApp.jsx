@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSite } from '../site/SiteContent.jsx';
 import { useRouter } from '../router.jsx';
 import Icon from '../components/Icons.jsx';
-import { isAdminSignedIn, signOutAdmin, touchSession } from './auth.js';
+import { fetchSession, signOutAdmin } from './api.js';
 import AdminLogin from './AdminLogin.jsx';
 import DashboardPanel from './panels/DashboardPanel.jsx';
 import OrdersPanel from './panels/OrdersPanel.jsx';
@@ -59,17 +59,42 @@ const PANELS = {
 export default function AdminApp({ section }) {
   const { content } = useSite();
   const { navigate } = useRouter();
-  const [signedIn, setSignedIn] = useState(isAdminSignedIn);
+  // The panel opens only after the server confirms the session cookie.
+  const [session, setSession] = useState(null);
+  const [checked, setChecked] = useState(false);
 
-  // An expired session locks the panel again on the next panel navigation.
   useEffect(() => {
-    if (isAdminSignedIn()) touchSession();
-    else setSignedIn(false);
+    let alive = true;
+    fetchSession().then((result) => {
+      if (!alive) return;
+      setSession(result.authenticated ? result : null);
+      setChecked(true);
+    });
+    return () => {
+      alive = false;
+    };
   }, [section]);
 
-  if (!signedIn) {
+  if (!checked) {
     return (
-      <AdminLogin siteName={content.identity.siteName} onSuccess={() => setSignedIn(true)} />
+      <div className="admin-login" dir="rtl">
+        <div className="admin-login__card">
+          <p>در حال بررسی دسترسی…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <AdminLogin
+        siteName={content.identity.siteName}
+        onSuccess={() => {
+          fetchSession().then((result) =>
+            setSession(result.authenticated ? result : null)
+          );
+        }}
+      />
     );
   }
 
@@ -77,9 +102,9 @@ export default function AdminApp({ section }) {
   const Panel = PANELS[active];
   const current = SECTIONS.find((item) => item.id === active);
 
-  const signOut = () => {
-    signOutAdmin();
-    setSignedIn(false);
+  const signOut = async () => {
+    await signOutAdmin();
+    setSession(null);
     navigate('/admin');
   };
 

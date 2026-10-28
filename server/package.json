@@ -1,0 +1,14 @@
+{
+  "name": "atrin-admin-api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Server-side admin authentication API for the Atrin site",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  }
+}

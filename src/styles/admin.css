@@ -1125,3 +1125,42 @@
   color: var(--muted);
   font-size: 11.5px;
 }
+
+/* Admin login: step indicator, authenticator QR, re-authentication block */
+.admin-login__progress {
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(203, 2, 54, 0.08);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-login__qr {
+  align-self: center;
+  width: 200px;
+  height: 200px;
+  padding: 8px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid rgba(203, 2, 54, 0.16);
+}
+
+.adm-reauth {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 14px;
+  border: 1px dashed rgba(203, 2, 54, 0.28);
+  border-radius: 14px;
+  background: rgba(203, 2, 54, 0.04);
+}
+
+.adm-reauth__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--primary);
+}
