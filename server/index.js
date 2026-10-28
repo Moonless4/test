@@ -113,15 +113,24 @@ const clientIp = (req) =>
   req.socket.remoteAddress ||
   'unknown';
 
-// CSRF hardening on top of SameSite=Strict: a browser-sent Origin must match the host.
+// CSRF hardening on top of SameSite=Strict: a browser-sent Origin must belong to
+// this deployment. Sandbox previews expose the app on a different host than the
+// one the internal proxy forwards, so those suffixes are allowed explicitly.
+const previewSuffixes = () =>
+  [process.env.BASE44_PUBLIC_HOST_SUFFIX, process.env.BASE44_SANDBOX_HOST_DOMAIN].filter(Boolean);
+
 const sameOrigin = (req) => {
   const origin = req.headers.origin;
   if (!origin) return true;
+  let hostname;
   try {
-    return new URL(origin).host === String(req.headers['x-forwarded-host'] || req.headers.host || '');
+    hostname = new URL(origin).host;
   } catch {
     return false;
   }
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '');
+  if (hostname === host) return true;
+  return previewSuffixes().some((suffix) => hostname.endsWith(`-${suffix}`) || hostname.endsWith(`.${suffix}`));
 };
 
 const safeEqual = (a, b) => {
@@ -375,9 +384,6 @@ const changeCredentials = async (req, res) => {
   if (!auth) return;
   const body = await readJson(req);
   const reauthToken = req.headers['x-reauth-token'] || body.reauthToken;
-  if (!consumeReauth(auth.token, reauthToken)) {
-    return send(res, 403, { ok: false, error: 'احراز هویت مجدد لازم است.', reauthRequired: true });
-  }
 
   const record = readAdmin();
   const username = String(body.username || '').trim();
@@ -386,6 +392,10 @@ const changeCredentials = async (req, res) => {
   if (problem) return send(res, 400, { ok: false, error: problem });
   if (body.password !== body.confirm) {
     return send(res, 400, { ok: false, error: 'تکرار رمز عبور مطابقت ندارد.' });
+  }
+  // Validate first, then spend the single-use re-authentication token.
+  if (!consumeReauth(auth.token, reauthToken)) {
+    return send(res, 403, { ok: false, error: 'احراز هویت مجدد لازم است.', reauthRequired: true });
   }
 
   writeAdmin({

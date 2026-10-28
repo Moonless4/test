@@ -44,6 +44,9 @@ services:
     environment:
       - PORT=4000
       - ADMIN_DATA_DIR=/data
+      # Preview host suffixes, so the origin check accepts the public preview host.
+      - BASE44_PUBLIC_HOST_SUFFIX
+      - BASE44_SANDBOX_HOST_DOMAIN
     # Platform-delivered secrets (ADMIN_USERNAME, ADMIN_PASSWORD) — no key here
     # is repeated under `environment:` so dashboard values always win.
     env_file:
