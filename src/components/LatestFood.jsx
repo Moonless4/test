@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { categories, latestProducts } from '../data/content.js';
+import { latestProducts } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import FoodCard from './FoodCard.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import Icon from './Icons.jsx';
 
 export default function LatestFood({ products, onOpen, onAdd, onViewAll }) {
+  const { content } = useSite();
+  const { categories } = content;
   const [active, setActive] = useState('all');
 
   const newest = latestProducts

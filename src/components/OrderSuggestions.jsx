@@ -1,4 +1,4 @@
-import { products } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import { formatPrice } from './ProductCard.jsx';
 import Icon from './Icons.jsx';
 
@@ -20,6 +20,8 @@ const PAIRINGS = {
 };
 
 export default function OrderSuggestions({ exclude = [], title, onAdd }) {
+  const { content } = useSite();
+  const products = content.products;
   const inCart = new Set(exclude);
   const cart = products.filter((product) => inCart.has(product.id));
   const categories = new Set(cart.map((product) => product.category));

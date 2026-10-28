@@ -1,8 +1,11 @@
-import { posts } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import Icon from './Icons.jsx';
 
-export default function BlogSection({ items = posts.slice(0, 4), onOpenPost, onViewAll }) {
+export default function BlogSection({ items, onOpenPost, onViewAll }) {
+  const { content } = useSite();
+  const posts = items || content.posts.slice(0, 4);
+
   return (
     <section className="blog section" id="blog" aria-labelledby="blog-title">
       <div className="container">
@@ -24,7 +27,7 @@ export default function BlogSection({ items = posts.slice(0, 4), onOpenPost, onV
         </div>
 
         <div className="blog-grid">
-          {items.map((post) => (
+          {posts.map((post) => (
             <article className="blog-card" key={post.id}>
               <button
                 type="button"

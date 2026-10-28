@@ -1,9 +1,17 @@
 import { useState } from 'react';
-import { footerColumns } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import Icon from './Icons.jsx';
 import { BrandMark } from './Header.jsx';
+import { Link } from '../router.jsx';
+
+const splitLink = (value) => {
+  const [label, href] = value.split('|').map((part) => part.trim());
+  return { label, href };
+};
 
 export default function Footer({ onToast }) {
+  const { content } = useSite();
+  const { identity, footer } = content;
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [error, setError] = useState('');
@@ -63,101 +71,82 @@ export default function Footer({ onToast }) {
         <div className="footer__main">
           <div className="footer__brand">
             <BrandMark variant="footer" />
-            <p>
-              رستوران آترین؛ از سال ۱۳۹۲ با عشق به طعم و مهمان‌نوازی، میزبان لحظه‌های خوب شما
-              هستیم.
-            </p>
+            <p>{identity.footerAbout}</p>
             <div className="footer__social" aria-label="شبکه‌های اجتماعی">
-              <a href="#footer" aria-label="اینستاگرام">
-                <Icon name="instagram" size={19} />
-              </a>
-              <a href="#footer" aria-label="تلگرام">
-                <Icon name="telegram" size={19} />
-              </a>
-              <a href="#footer" aria-label="واتساپ">
-                <Icon name="whatsapp" size={19} />
-              </a>
-              <a href="#footer" aria-label="یوتیوب">
-                <Icon name="youtube" size={19} />
-              </a>
+              {footer.socials.map((social) => (
+                <a key={social.id} href={social.href || '#'} aria-label={social.label}>
+                  <Icon name={social.icon} size={19} />
+                </a>
+              ))}
             </div>
           </div>
 
-          {footerColumns.map((column) => (
+          {footer.columns.map((column) => (
             <div className="footer__col" key={column.title}>
               <h3>{column.title}</h3>
               <ul>
-                {column.links.map((link) => (
-                  <li key={link}>
-                    <a href={link === 'سوالات متداول' ? '#faq' : link === 'تماس با ما' ? '#contact' : '#menu'}>
-                      {link}
-                    </a>
-                  </li>
-                ))}
+                {column.links.map((raw) => {
+                  const { label, href } = splitLink(raw);
+                  return (
+                    <li key={`${column.title}-${label}`}>
+                      <a href={href || '#menu'}>{label}</a>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
 
           <div className="footer__col footer__contact">
             <h3>اطلاعات تماس</h3>
-            <a href="tel:+982188776655">
+            <a href={`tel:${identity.phoneHref}`}>
               <Icon name="phone" size={17} />
-              <span dir="ltr">۰۲۱-۸۸۷۷۶۶۵۵</span>
+              <span dir="ltr">{identity.phone}</span>
             </a>
-            <a href="mailto:info@atrin-restaurant.ir">
+            <a href={`mailto:${identity.email}`}>
               <Icon name="mail" size={17} />
-              <span>info@atrin-restaurant.ir</span>
+              <span>{identity.email}</span>
             </a>
             <p>
               <Icon name="pin" size={17} />
-              تهران، خیابان ولیعصر، نبش کوچه آترین، پلاک ۱۲
+              {identity.address}
             </p>
             <p>
               <Icon name="clock" size={17} />
-              هر روز از ۱۲:۰۰ تا ۲۳:۳۰
+              {identity.hours}
             </p>
           </div>
         </div>
 
         <div className="footer__trust">
-          <span className="trust-badge">
-            <Icon name="shield" size={22} />
-            <span>
-              <b>نماد اعتماد الکترونیکی</b>
-              <small>پرداخت امن و مطمئن</small>
+          {footer.badges.map((badge) => (
+            <span className="trust-badge" key={badge.id}>
+              <Icon name={badge.icon} size={22} />
+              <span>
+                <b>{badge.title}</b>
+                <small>{badge.subtitle}</small>
+              </span>
             </span>
-          </span>
-          <span className="trust-badge">
-            <Icon name="fork" size={22} />
-            <span>
-              <b>اتحادیه رستوران‌داران</b>
-              <small>عضو رسمی صنف</small>
-            </span>
-          </span>
-          <span className="trust-badge">
-            <Icon name="truck" size={22} />
-            <span>
-              <b>ارسال تضمینی</b>
-              <small>گرم و تازه درِ خانه</small>
-            </span>
-          </span>
-          <span className="trust-badge">
-            <Icon name="check" size={22} />
-            <span>
-              <b>ضمانت کیفیت</b>
-              <small>رضایت ۱۰۰٪ مهمانان</small>
-            </span>
-          </span>
+          ))}
         </div>
 
         <div className="footer__bottom">
-          <p>© ۱۴۰۴ رستوران آترین. تمامی حقوق محفوظ است.</p>
+          <p>{identity.copyright}</p>
           <div>
-            <a href="#footer">پیگیری سفارش</a>
-            <span aria-hidden="true">·</span>
-            <a href="#footer">حریم خصوصی</a>
-            <span aria-hidden="true">·</span>
-            <a href="#footer">شرایط و ضوابط</a>
+            {footer.legalLinks.map((link, index) => (
+              <span key={`${link.label}-${index}`}>
+                {index > 0 ? (
+                  <span aria-hidden="true" className="footer__dot">
+                    ·
+                  </span>
+                ) : null}
+                {link.href?.startsWith('/') ? (
+                  <Link to={link.href}>{link.label}</Link>
+                ) : (
+                  <a href={link.href || '#footer'}>{link.label}</a>
+                )}
+              </span>
+            ))}
           </div>
         </div>
       </div>

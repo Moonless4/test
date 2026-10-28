@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { posts, products, searchAliases } from '../data/content.js';
+import { searchAliases } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import Icon from './Icons.jsx';
 import { formatPrice } from './ProductCard.jsx';
 import { useOverlay } from './Modal.jsx';
@@ -7,6 +8,8 @@ import { useOverlay } from './Modal.jsx';
 const suggestions = ['پیتزا', 'استیک', 'برگر', 'سالاد', 'جوجه کباب'];
 
 export default function SearchOverlay({ open, onClose, onOpenProduct, onOpenPost }) {
+  const { content } = useSite();
+  const { products, posts } = content;
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
   useOverlay(open, onClose);

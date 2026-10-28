@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
-import { categories, navLinks } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import Icon from './Icons.jsx';
 import { BrandMark } from './Header.jsx';
 import { Link } from '../router.jsx';
 import { lockScroll, unlockScroll } from '../lib/smoothScroll.js';
 
 export default function MobileMenu({ open, onClose, onLogin, onCategory }) {
+  const { content } = useSite();
+  const { navLinks, categories, identity } = content;
+
   useEffect(() => {
     if (!open) return undefined;
     const onKey = (e) => e.key === 'Escape' && onClose();
@@ -65,9 +68,9 @@ export default function MobileMenu({ open, onClose, onLogin, onCategory }) {
             <Icon name="user" size={18} />
             ورود / ثبت نام
           </button>
-          <a className="mobile-menu__phone" href="tel:+982188776655" dir="ltr">
+          <a className="mobile-menu__phone" href={`tel:${identity.phoneHref}`} dir="ltr">
             <Icon name="phone" size={18} />
-            ۰۲۱-۸۸۷۷۶۶۵۵
+            {identity.phone}
           </a>
         </div>
       </aside>

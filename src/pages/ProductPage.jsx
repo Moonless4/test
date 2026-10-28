@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { products } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import Breadcrumbs from '../components/Breadcrumbs.jsx';
 import Icon from '../components/Icons.jsx';
 import ProductCard, { formatPrice } from '../components/ProductCard.jsx';
@@ -7,6 +7,8 @@ import OrderSuggestions from '../components/OrderSuggestions.jsx';
 import { useAccount } from '../account/AccountContext.jsx';
 
 export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [], onToast }) {
+  const { content } = useSite();
+  const products = content.products;
   const product = products.find((item) => item.id === id);
   const { isFavorite, toggleFavorite } = useAccount();
   const favorite = isFavorite(id);

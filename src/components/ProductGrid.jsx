@@ -1,9 +1,11 @@
-import { menuFilters, products } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import ProductCard from './ProductCard.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import Icon from './Icons.jsx';
 
 export default function ProductGrid({ filter, onFilter, onAdd, onOpen, onViewAll }) {
+  const { content } = useSite();
+  const { menuFilters, products } = content;
   const visible =
     filter === 'all' ? products : products.filter((product) => product.category === filter);
 

@@ -7,9 +7,11 @@ import DeliveryBanner from '../components/DeliveryBanner.jsx';
 import NewestMenu from '../components/NewestMenu.jsx';
 import BlogSection from '../components/BlogSection.jsx';
 import FinalCta from '../components/FinalCta.jsx';
-import { products, heroSlides } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 
 export default function HomePage({ onAdd, onProduct, onPost, onReserve, onCategory, onMenu, onBlog }) {
+  const { content } = useSite();
+  const { products, heroSlides } = content;
   const featured = products.filter((item) => item.featured);
 
   return (

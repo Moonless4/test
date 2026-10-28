@@ -1,9 +1,10 @@
-import { posts } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import Breadcrumbs from '../components/Breadcrumbs.jsx';
 import Icon from '../components/Icons.jsx';
 
 export default function BlogPostPage({ id, onMenu, onBlog }) {
-  const post = posts.find((item) => item.id === id);
+  const { content } = useSite();
+  const post = content.posts.find((item) => item.id === id);
 
   if (!post) return null;
 

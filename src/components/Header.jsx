@@ -1,15 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import { categories, navLinks } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import Icon from './Icons.jsx';
 import { Link, useRouter } from '../router.jsx';
 
 function BrandMark({ variant = 'header' }) {
+  const { content } = useSite();
+  const { prefix, siteName } = content.identity;
+
   return (
-    <span className={`brand brand--${variant}`} aria-label="رستوران آترین">
+    <span className={`brand brand--${variant}`} aria-label={`${prefix} ${siteName}`}>
       <span className="brand__halo" aria-hidden="true" />
       <span className="brand__plate">
-        <span className="brand__kicker">رستوران</span>
-        <span className="brand__name">آترین</span>
+        <span className="brand__kicker">{prefix}</span>
+        <span className="brand__name">{siteName}</span>
         <span className="brand__rule" aria-hidden="true">
           <i />
           <b />
@@ -22,6 +25,8 @@ function BrandMark({ variant = 'header' }) {
 
 export default function Header({ cartCount, onCart, onSearch, onLogin, onMenu, onCategory }) {
   const { path } = useRouter();
+  const { content } = useSite();
+  const { navLinks, categories, megaMenu } = content;
   const [scrolled, setScrolled] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
   const closeTimer = useRef(null);
@@ -67,7 +72,7 @@ export default function Header({ cartCount, onCart, onSearch, onLogin, onMenu, o
                   <div className={`mega ${megaOpen ? 'is-open' : ''}`} aria-hidden={!megaOpen}>
                     <div className="mega__cols">
                       <div className="mega__list">
-                        <span className="mega__eyebrow">دسته‌بندی غذاها</span>
+                        <span className="mega__eyebrow">{megaMenu.eyebrow}</span>
                         <div className="mega__grid">
                           {categories.map((cat) => (
                             <button
@@ -86,16 +91,16 @@ export default function Header({ cartCount, onCart, onSearch, onLogin, onMenu, o
                         </div>
                       </div>
                       <Link
-                        to="/menu"
+                        to={megaMenu.promo.href || '/menu'}
                         className="mega__promo"
                         onClick={() => setMegaOpen(false)}
                       >
-                        <img src="/assets/megamenu.webp" alt="پیشنهاد ویژه سرآشپز" loading="lazy" />
+                        <img src={megaMenu.promo.image} alt={megaMenu.promo.title} loading="lazy" />
                         <span className="mega__promo-copy">
-                          <small>پیشنهاد امروز</small>
-                          <strong>استیک گریل دو نفره</strong>
+                          <small>{megaMenu.promo.kicker}</small>
+                          <strong>{megaMenu.promo.title}</strong>
                           <span>
-                            مشاهده منو
+                            {megaMenu.promo.cta}
                             <Icon name="chevronLeft" size={15} />
                           </span>
                         </span>
@@ -116,7 +121,7 @@ export default function Header({ cartCount, onCart, onSearch, onLogin, onMenu, o
             )}
           </nav>
 
-          <Link className="header__brand" to="/" aria-label="صفحه اصلی رستوران آترین">
+          <Link className="header__brand" to="/" aria-label={`صفحه اصلی ${content.identity.siteName}`}>
             <BrandMark />
           </Link>
 

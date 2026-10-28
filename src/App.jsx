@@ -30,22 +30,36 @@ import AccountNotifications from './account/pages/NotificationsPage.jsx';
 import AccountRewards from './account/pages/RewardsPage.jsx';
 import AccountSettings from './account/pages/SettingsPage.jsx';
 import { AccountProvider } from './account/AccountContext.jsx';
+import InfoPage from './pages/InfoPage.jsx';
+import AdminApp from './admin/AdminApp.jsx';
+import { useSite } from './site/SiteContent.jsx';
 import { useRouter } from './router.jsx';
 import useDragScroll from './hooks/useDragScroll.js';
-import { posts, products } from './data/content.js';
 
 const STORAGE_KEY = 'naval-cart-v1';
 
-const matchRoute = (path) => {
+const matchRoute = (path, site) => {
   if (path === '/') return { name: 'home' };
   if (path === '/menu') return { name: 'menu' };
   if (path === '/blog') return { name: 'blog' };
   if (path === '/about') return { name: 'about' };
   if (path === '/contact') return { name: 'contact' };
 
+  if (path === '/admin' || path.startsWith('/admin/')) {
+    const section = path.split('/')[2] || 'dashboard';
+    return { name: 'admin', section };
+  }
+
+  const pageMatch = path.match(/^\/p\/([\w-]+)$/);
+  if (pageMatch) {
+    return site.pages?.[pageMatch[1]]
+      ? { name: 'page', slug: pageMatch[1] }
+      : { name: 'notfound' };
+  }
+
   const postMatch = path.match(/^\/blog\/([\w-]+)$/);
   if (postMatch) {
-    return posts.some((post) => post.id === postMatch[1])
+    return site.posts.some((post) => post.id === postMatch[1])
       ? { name: 'post', id: postMatch[1] }
       : { name: 'notfound' };
   }
@@ -61,7 +75,7 @@ const matchRoute = (path) => {
 
   const productMatch = path.match(/^\/food\/([\w-]+)$/);
   if (productMatch) {
-    return products.some((product) => product.id === productMatch[1])
+    return site.products.some((product) => product.id === productMatch[1])
       ? { name: 'product', id: productMatch[1] }
       : { name: 'notfound' };
   }
@@ -69,7 +83,7 @@ const matchRoute = (path) => {
   return { name: 'notfound' };
 };
 
-const readCart = () => {
+const readCart = (products) => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
@@ -81,13 +95,12 @@ const readCart = () => {
   }
 };
 
-const findProduct = (value) =>
-  typeof value === 'string' ? products.find((product) => product.id === value) : value;
-
 export default function App() {
   const { path, navigate } = useRouter();
+  const { content: site } = useSite();
+  const products = site.products;
   useDragScroll();
-  const [cart, setCart] = useState(readCart);
+  const [cart, setCart] = useState(() => readCart(site.products));
   const [filter, setFilter] = useState('all');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -119,7 +132,7 @@ export default function App() {
       cart
         .map((item) => ({ product: products.find((entry) => entry.id === item.id), qty: item.qty }))
         .filter((item) => item.product),
-    [cart]
+    [cart, products]
   );
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
@@ -165,10 +178,11 @@ export default function App() {
 
   const openProduct = useCallback(
     (value) => {
-      const found = findProduct(value);
+      const found =
+        typeof value === 'string' ? products.find((product) => product.id === value) : value;
       if (found) navigate(`/food/${found.id}`);
     },
-    [navigate]
+    [navigate, products]
   );
 
   const reorder = useCallback(
@@ -192,7 +206,7 @@ export default function App() {
       showToast('آیتم‌های سفارش قبلی به سبد خرید اضافه شد.');
       setCartOpen(true);
     },
-    [showToast]
+    [showToast, products]
   );
 
   const openPost = useCallback((post) => navigate(`/blog/${post.id}`), [navigate]);
@@ -201,10 +215,24 @@ export default function App() {
   const goBlog = useCallback(() => navigate('/blog'), [navigate]);
   const openReserve = useCallback(() => setReserveOpen(true), []);
 
-  const route = matchRoute(path);
+  const route = matchRoute(path, site);
+
+  useEffect(() => {
+    const title =
+      route.name === 'admin'
+        ? `${site.identity.siteName} | پنل مدیریت`
+        : `${site.identity.siteName} | ${site.identity.prefix}`;
+    document.title = title;
+  }, [route.name, site.identity.siteName, site.identity.prefix]);
+
+  if (route.name === 'admin') {
+    return <AdminApp section={route.section} />;
+  }
 
   const page = (() => {
     switch (route.name) {
+      case 'page':
+        return <InfoPage slug={route.slug} onMenu={goMenu} />;
       case 'menu':
         return <MenuPage filter={filter} onFilter={setFilter} onAdd={addToCart} onOpen={openProduct} />;
       case 'blog':

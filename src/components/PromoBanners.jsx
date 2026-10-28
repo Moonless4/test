@@ -1,7 +1,9 @@
-import { promoBanners } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import Icon from './Icons.jsx';
 
 export default function PromoBanners({ onMenu, onProduct, onReserve }) {
+  const { content } = useSite();
+  const promoBanners = content.promoBanners;
   const handle = (action) => {
     if (action === 'menu') onMenu();
     else if (action === 'reserve') onReserve();

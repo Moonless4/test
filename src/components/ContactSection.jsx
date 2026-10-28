@@ -1,10 +1,18 @@
 import { useState } from 'react';
-import { contactItems } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import Icon from './Icons.jsx';
 
 const iconMap = { mail: 'mail', phone: 'phone', clock: 'clock', pin: 'pin' };
 
 export default function ContactSection({ onToast }) {
+  const { content } = useSite();
+  const { identity } = content;
+  const contactItems = [
+    { id: 'email', title: 'ایمیل', value: identity.email, note: 'پاسخ‌گویی در کمتر از ۲۴ ساعت', icon: 'mail' },
+    { id: 'phone', title: 'تلفن', value: identity.phone, note: identity.hours, icon: 'phone' },
+    { id: 'hours', title: 'ساعت کاری', value: identity.hours, note: 'جمعه‌ها تا ۰۰:۳۰ بامداد', icon: 'clock' },
+    { id: 'address', title: 'آدرس', value: identity.address, note: 'پارکینگ اختصاصی رایگان', icon: 'pin' },
+  ];
   const [form, setForm] = useState({ name: '', phone: '', message: '' });
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
@@ -63,9 +71,9 @@ export default function ContactSection({ onToast }) {
                   key={item.id}
                   href={
                     item.id === 'phone'
-                      ? 'tel:+982188776655'
+                      ? `tel:${identity.phoneHref}`
                       : item.id === 'email'
-                        ? 'mailto:info@atrin-restaurant.ir'
+                        ? `mailto:${identity.email}`
                         : '#contact'
                   }
                 >

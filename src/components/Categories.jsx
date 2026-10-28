@@ -1,8 +1,10 @@
 import { useRef } from 'react';
-import { categories } from '../data/content.js';
+import { useSite } from '../site/SiteContent.jsx';
 import Icon from './Icons.jsx';
 
 export default function Categories({ onCategory }) {
+  const { content } = useSite();
+  const categories = content.categories;
   const trackRef = useRef(null);
 
   const scroll = (dir) => {

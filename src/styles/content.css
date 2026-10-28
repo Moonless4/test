@@ -1020,6 +1020,16 @@
   color: var(--gold);
 }
 
+.footer__bottom div > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer__dot {
+  color: rgba(255, 255, 255, 0.4);
+}
+
 /* Scroll top */
 .scroll-top {
   position: fixed;

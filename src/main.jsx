@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import { RouterProvider } from './router.jsx';
+import { SiteProvider } from './site/SiteContent.jsx';
 import { initSmoothScroll } from './lib/smoothScroll.js';
 import 'lenis/dist/lenis.css';
 import './styles/tokens.css';
@@ -16,13 +17,16 @@ import './styles/content.css';
 import './styles/pages.css';
 import './styles/overlays.css';
 import './styles/account.css';
+import './styles/admin.css';
 
 initSmoothScroll();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <RouterProvider>
-      <App />
+      <SiteProvider>
+        <App />
+      </SiteProvider>
     </RouterProvider>
   </React.StrictMode>
 );

@@ -6,7 +6,8 @@ A Persian (RTL) restaurant site built with React 18 + Vite. There is no backend,
 database, or server API: the menu, blog, reviews, and forms are client-side, and
 the cart is persisted in `localStorage` (`naval-cart-v1`). Forms (contact,
 reservation, checkout, newsletter, auth) validate locally and show a confirmation
-in the UI; they do not send data anywhere.
+in the UI; they do not send data anywhere. Menu, banners, blog, footer and the
+static pages are editable from the admin panel at `/admin` (see below).
 
 ## Running locally
 
@@ -84,6 +85,35 @@ matched in one block in `matchRoute()` in `src/App.jsx`.
   `naval-accounts-v1` / `naval-account-session-v1` keys afterwards if a check
   registers an account or mutates seed data; sign in as `09121234567` (any
   6+ character password) to get the demo customer back.
+
+## Admin panel (`/admin`)
+
+The site content is editable at `/admin` (login required). There is no backend:
+`src/site/SiteContent.jsx` is a React context that keeps the whole content tree
+in `localStorage` under `atrin-site-v1`, deep-merged over the defaults in
+`src/site/defaultContent.js` (which re-uses the arrays in `src/data/content.js`).
+Admins edit through `update()`; every public component reads the same provider
+via `useSite()`, so a saved change shows on the site immediately.
+
+- Sections (`src/admin/panels/`): dashboard, products, categories, menu filters,
+  header mega menu, hero slides, promo banners, blog posts, footer (link columns,
+  socials, trust badges, legal links), content pages (`/p/:slug`), site identity
+  and contact info, settings (admin credentials, JSON backup/restore, reset).
+- Auth is a local simulation (`src/admin/auth.js`): the username/password live in
+  `settings.adminUsername` / `settings.adminPassword` (defaults `admin` / `1234`)
+  and the session is a `sessionStorage` flag, so it ends when the tab closes.
+  Anyone with the browser can read the credentials in the bundle — this protects
+  the UI, not real data.
+- Images are picked in the panel and converted to ≤1100px JPEG data URLs by
+  `src/admin/imageUpload.js`, so everything stays inside localStorage; the
+  backup/restore buttons in Settings move that content between browsers.
+- Routes: `/admin` and `/admin/<section>` are matched in `matchRoute()` in
+  `src/App.jsx` and rendered without the public header/footer. Content pages use
+  `/p/<slug>` and are rendered by `src/pages/InfoPage.jsx`.
+- Styles live in `src/styles/admin.css` (wine/gold/cream, same tokens as the site).
+- Verification: sign in at `/admin`, add a product, then check it appears on
+  `/menu`; edit a footer badge and confirm the public footer updates; delete the
+  test record and use Settings → «بازگرداندن سایت به حالت اولیه» if needed.
 
 ## Assets
 
