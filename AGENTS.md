@@ -73,6 +73,26 @@ second compose service, `api`:
   A change on the secrets dashboard recreates `api` by itself — never run
   `up`/`restart` for it; `POST /api/login` with `admin`/`1234` returning 401 is
   the end-to-end proof that the secrets are active.
+- Two-factor authentication is a second layer on the same password login, never
+  a replacement: `server/twofactor.js` is a dependency-free TOTP (RFC 6238,
+  SHA1/6 digits/30s, one step of drift). `POST /api/login` still checks
+  `PANEL_USER` / `PANEL_PASSWORD` and then returns `{ twoFactor: "setup" }`
+  (never configured) or `{ twoFactor: "required" }` with a signed 10-minute
+  `aratan_2fa` pending cookie — no session. Setup is `POST /api/2fa/setup/start`
+  (secret + `otpauth://` URI, reused while pending), `/api/2fa/setup/verify`
+  (enables 2FA and is the only response that ever carries the 10 backup codes)
+  and `/api/2fa/setup/complete` (requires `{ saved: true }`, then the session).
+  Later logins use `/api/2fa/verify`, which accepts a 6-digit TOTP or an unused
+  backup code. State is `/data/security.json` in the `content` volume; backup
+  codes are stored as HMAC-SHA256 hashes only and a used code is marked
+  `usedAt`. Failed second-factor attempts are counted per IP per scope
+  (`login`, `setup`, `reauth`): six in ten minutes then 429, plus a 300ms delay
+  on every miss. `GET /api/admin/2fa` returns status and the remaining count —
+  never the secret or a code; `POST /api/admin/2fa/backup-codes` and
+  `/api/admin/2fa/reset` re-authenticate with password + current code so a
+  stolen session cookie cannot re-seed the factor. The QR is rendered in the
+  browser (`qrcode` in `package.json`, `src/admin/TwoFactor.jsx`); the server
+  only sends the URI.
 - `server/store.js` + `server/seed.js` — the content is one JSON document in the
   `content` volume (`/data/site.json`), written atomically. The first boot seeds
   it from the `src/content/*.js` modules, so the panel opens on the real site.

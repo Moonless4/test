@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { getContent, getSession, login, logout, saveContent } from './api.js';
 import { SECTIONS } from './schema.js';
 import { Fields, ItemsEditor, JsonField, getIn, setIn } from './fields.jsx';
+import { SecurityPanel, TwoFactorSetupScreen, TwoFactorVerifyScreen } from './TwoFactor.jsx';
 import '../styles/admin.css';
 
-function LoginScreen({ onSignedIn }) {
+const SECURITY_ITEM = { id: 'security', label: 'امنیت' };
+
+function LoginScreen({ onTwoFactor }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,8 +18,8 @@ function LoginScreen({ onSignedIn }) {
     setBusy(true);
     setError('');
     try {
-      await login(username, password);
-      onSignedIn();
+      const result = await login(username, password);
+      onTwoFactor(result?.twoFactor);
     } catch (loginError) {
       setError(loginError.message);
     } finally {
@@ -97,11 +100,20 @@ export default function AdminApp() {
   }
 
   if (status === 'out') {
-    return <LoginScreen onSignedIn={load} />;
+    return <LoginScreen onTwoFactor={(stage) => setStatus(stage === 'setup' ? 'setup' : 'verify')} />;
   }
 
-  const section = SECTIONS.find((item) => item.id === activeId) || SECTIONS[0];
-  const value = getIn(doc, section.path);
+  if (status === 'setup') {
+    return <TwoFactorSetupScreen onDone={load} onCancel={() => setStatus('out')} />;
+  }
+
+  if (status === 'verify') {
+    return <TwoFactorVerifyScreen onDone={load} onCancel={() => setStatus('out')} />;
+  }
+
+  const section =
+    activeId === 'security' ? SECURITY_ITEM : SECTIONS.find((item) => item.id === activeId) || SECTIONS[0];
+  const value = activeId === 'security' ? null : getIn(doc, section.path);
   const update = (next) => setDoc(setIn(doc, section.path, next));
 
   const save = async () => {
@@ -142,6 +154,13 @@ export default function AdminApp() {
               {item.label}
             </button>
           ))}
+          <button
+            type="button"
+            className={`adm-nav-item${activeId === 'security' ? ' is-active' : ''}`}
+            onClick={() => setActiveId('security')}
+          >
+            {SECURITY_ITEM.label}
+          </button>
         </nav>
         <div className="adm-side-foot">
           <a className="adm-link" href="/">
@@ -159,16 +178,21 @@ export default function AdminApp() {
             <h2>{section.label}</h2>
             {section.hint ? <p className="adm-hint">{section.hint}</p> : null}
           </div>
-          <div className="adm-head-actions">
-            {message ? <span className="adm-ok">{message}</span> : null}
-            {error ? <span className="adm-error">{error}</span> : null}
-            <button type="button" className="adm-primary" onClick={save} disabled={saving}>
-              {saving ? 'در حال ذخیره…' : 'ذخیرهٔ تغییرات'}
-            </button>
-          </div>
+          {activeId === 'security' ? null : (
+            <div className="adm-head-actions">
+              {message ? <span className="adm-ok">{message}</span> : null}
+              {error ? <span className="adm-error">{error}</span> : null}
+              <button type="button" className="adm-primary" onClick={save} disabled={saving}>
+                {saving ? 'در حال ذخیره…' : 'ذخیرهٔ تغییرات'}
+              </button>
+            </div>
+          )}
         </header>
 
-        <section className="adm-panel">
+        {activeId === 'security' ? (
+          <SecurityPanel />
+        ) : (
+          <section className="adm-panel">
           {section.kind === 'object' ? (
             <Fields fields={section.fields} value={value || {}} onChange={update} />
           ) : null}
@@ -183,8 +207,9 @@ export default function AdminApp() {
             />
           ) : null}
 
-          {section.kind === 'json' ? <JsonField key={section.id} value={value} onChange={update} /> : null}
-        </section>
+            {section.kind === 'json' ? <JsonField key={section.id} value={value} onChange={update} /> : null}
+          </section>
+        )}
       </main>
     </div>
   );
