@@ -5,12 +5,12 @@
   "secrets": [
     {
       "name": "ADMIN_USERNAME",
-      "description": "Admin panel sign-in username. The auth API syncs the stored admin account name from it on boot.",
+      "description": "Admin panel sign-in username. The auth API re-syncs the stored account name from it on boot.",
       "requiredAtBoot": true
     },
     {
       "name": "ADMIN_PASSWORD",
-      "description": "Admin panel sign-in password, used to provision the single admin account on first boot.",
+      "description": "Admin panel sign-in password. The auth API re-hashes the stored password from it on boot when it differs.",
       "requiredAtBoot": true
     }
   ]

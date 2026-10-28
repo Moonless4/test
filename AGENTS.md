@@ -122,9 +122,14 @@ via `useSite()`, so a saved change shows on the site immediately.
   `ADMIN_USERNAME` / `ADMIN_PASSWORD` (delivered via `/run/base44/app.env` to the
   `api` service only, never written to the repo). The record lives in the
   `admin_data` volume at `/data/admin.json` as an scrypt hash plus TOTP state.
-  On boot `provisionAdmin()` creates the record once, and re-syncs `username`
-  whenever `ADMIN_USERNAME` rotates (password hash, 2FA secret and backup codes
-  are preserved). There is no registration endpoint at all.
+  On boot `provisionAdmin()` creates the record, and afterwards re-syncs it
+  whenever either secret changes (`username`, and the password hash when the env
+  password no longer verifies). The enrolled 2FA secret and backup codes are
+  preserved. Because the secrets win at boot, a credential change made in the
+  panel lasts only until the next restart — rotate
+  `ADMIN_USERNAME` / `ADMIN_PASSWORD` in the dashboard for a permanent change.
+  There is no registration endpoint at all, and the env password bypasses the
+  panel's 10-character strength rule, so keep it long in production.
 - Sign-in is password → RFC 6238 TOTP, and a valid TOTP completes it: no backup
   code is requested on a normal login. Enrolling the authenticator also signs the
   admin in and shows the 8 single-use backup codes once (plaintext never stored or

@@ -2,7 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { hashPassword, randomKey } from './security.js';
+import { hashPassword, randomKey, verifyPassword } from './security.js';
 
 const DATA_DIR = process.env.ADMIN_DATA_DIR || path.join(process.cwd(), 'data');
 const RECORD_FILE = path.join(DATA_DIR, 'admin.json');
@@ -49,17 +49,25 @@ export const writeAdmin = (record) => {
 /* Provision the single administrator once, from server-side environment values. */
 export const provisionAdmin = () => {
   const username = (process.env.ADMIN_USERNAME || '').trim();
+  const password = process.env.ADMIN_PASSWORD || '';
   const existing = readAdmin();
   if (existing) {
-    // ADMIN_USERNAME is the deployment's admin identity: a rotated value must
-    // take effect without wiping the stored password hash, 2FA secret or codes.
-    if (username && existing.username !== username) {
-      console.log('[auth] administrator username synced from ADMIN_USERNAME');
-      return writeAdmin({ ...existing, username, updatedAt: new Date().toISOString() });
+    // ADMIN_USERNAME / ADMIN_PASSWORD are the deployment's admin credentials: a
+    // rotated value takes effect on boot without wiping the enrolled 2FA secret
+    // or the backup codes.
+    const usernameChanged = Boolean(username) && existing.username !== username;
+    const passwordChanged = Boolean(password) && !verifyPassword(password, existing.password);
+    if (usernameChanged || passwordChanged) {
+      console.log('[auth] administrator credentials synced from the environment');
+      return writeAdmin({
+        ...existing,
+        username: username || existing.username,
+        password: passwordChanged ? hashPassword(password) : existing.password,
+        updatedAt: new Date().toISOString(),
+      });
     }
     return existing;
   }
-  const password = process.env.ADMIN_PASSWORD || '';
   if (!username || !password) return null;
 
   const record = {
