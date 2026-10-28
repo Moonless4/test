@@ -191,7 +191,9 @@ export const heroSlides = [
   { id: 'alfredo-pasta', image: '/assets/slide2.webp' },
   { id: 'charcoal-chicken', image: '/assets/slide4.webp' },
   { id: 'season-salad', image: '/assets/testimonial-salad.webp' },
-  { id: 'seafood-spaghetti', image: '/assets/products/seafood-spaghetti.webp' },
+  /* The 4:3 photo (instead of the 2.1:1 product banner) keeps the dish whole
+     when the square slider slot crops it. */
+  { id: 'seafood-spaghetti', image: '/assets/products/seafood-spaghetti.jpg' },
 ];
 
 export const latestProducts = [

@@ -199,7 +199,10 @@
   width: 100%;
   aspect-ratio: 1;
   height: auto;
-  object-fit: contain;
+  /* Slide art is a mix of square cut-outs and wider dish photos: `cover` keeps
+     every slide the same visual size instead of shrinking wide photos into a
+     thin strip with empty space around it. */
+  object-fit: cover;
   filter: drop-shadow(0 34px 26px rgba(0, 0, 0, 0.42));
   transition: filter 0.4s var(--ease);
 }
