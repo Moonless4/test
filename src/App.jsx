@@ -4,8 +4,6 @@ import MobileMenu from './components/MobileMenu.jsx';
 import Footer from './components/Footer.jsx';
 import ScrollTop from './components/ScrollTop.jsx';
 import SearchOverlay from './components/SearchOverlay.jsx';
-import CartDrawer from './components/CartDrawer.jsx';
-import CheckoutModal from './components/CheckoutModal.jsx';
 import ReservationModal from './components/ReservationModal.jsx';
 import AuthModal from './components/AuthModal.jsx';
 import Toast from './components/Toast.jsx';
@@ -16,6 +14,7 @@ import BlogPostPage from './pages/BlogPostPage.jsx';
 import ProductPage from './pages/ProductPage.jsx';
 import AboutPage from './pages/AboutPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
+import CartPage from './pages/CartPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import AccountShell from './account/AccountShell.jsx';
 import AccountDashboard from './account/pages/Dashboard.jsx';
@@ -44,6 +43,7 @@ const matchRoute = (path, site) => {
   if (path === '/blog') return { name: 'blog' };
   if (path === '/about') return { name: 'about' };
   if (path === '/contact') return { name: 'contact' };
+  if (path === '/cart') return { name: 'cart' };
 
   if (path === '/admin' || path.startsWith('/admin/')) {
     const section = path.split('/')[2] || 'dashboard';
@@ -104,8 +104,6 @@ export default function App() {
   const [filter, setFilter] = useState('all');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [reserveOpen, setReserveOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [toast, setToast] = useState('');
@@ -204,9 +202,9 @@ export default function App() {
         return next;
       });
       showToast('آیتم‌های سفارش قبلی به سبد خرید اضافه شد.');
-      setCartOpen(true);
+      navigate('/cart');
     },
-    [showToast, products]
+    [showToast, products, navigate]
   );
 
   const openPost = useCallback((post) => navigate(`/blog/${post.id}`), [navigate]);
@@ -254,6 +252,19 @@ export default function App() {
         return <AboutPage onMenu={goMenu} onReserve={openReserve} />;
       case 'contact':
         return <ContactPage onToast={showToast} />;
+      case 'cart':
+        return (
+          <CartPage
+            items={cartItems}
+            onQty={updateQty}
+            onRemove={removeItem}
+            onAdd={addToCart}
+            onComplete={() => {
+              setCart([]);
+              showToast('سفارش شما با موفقیت ثبت شد.');
+            }}
+          />
+        );
       case 'account': {
         const sectionPages = {
           dashboard: (
@@ -317,7 +328,7 @@ export default function App() {
         onSearch={() => setSearchOpen(true)}
         onLogin={() => setAuthOpen(true)}
         onMenu={() => setMobileOpen(true)}
-        onCart={() => setCartOpen(true)}
+        onCart={() => navigate('/cart')}
         onCategory={goMenu}
       />
 
@@ -341,33 +352,6 @@ export default function App() {
         onClose={() => setSearchOpen(false)}
         onOpenProduct={openProduct}
         onOpenPost={openPost}
-      />
-
-      <CartDrawer
-        open={cartOpen}
-        onClose={() => setCartOpen(false)}
-        items={cartItems}
-        onQty={updateQty}
-        onRemove={removeItem}
-        onAdd={addToCart}
-        onCheckout={() => {
-          setCartOpen(false);
-          setCheckoutOpen(true);
-        }}
-        onBrowse={() => {
-          setCartOpen(false);
-          goMenu();
-        }}
-      />
-
-      <CheckoutModal
-        open={checkoutOpen}
-        onClose={() => setCheckoutOpen(false)}
-        items={cartItems}
-        onComplete={() => {
-          setCart([]);
-          showToast('سفارش شما با موفقیت ثبت شد.');
-        }}
       />
 
       <ReservationModal open={reserveOpen} onClose={() => setReserveOpen(false)} />

@@ -15,6 +15,7 @@ import './styles/products.css';
 import './styles/newest-menu.css';
 import './styles/content.css';
 import './styles/pages.css';
+import './styles/cart.css';
 import './styles/overlays.css';
 import './styles/account.css';
 import './styles/admin.css';

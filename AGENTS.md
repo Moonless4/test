@@ -43,6 +43,15 @@ interaction directly (cart, quick view, filters, FAQ, search, checkout).
   bare through Compose so the platform supplies them.
 - No host/origin values are hardcoded.
 
+## Cart & checkout
+
+The cart is a page, not an overlay: `/cart` (`src/pages/CartPage.jsx`, route `cart`
+in `matchRoute()`) holds all four steps — سبد خرید، اطلاعات تحویل، پرداخت، تأیید —
+and the header cart button navigates there. Steps advance in place; the summary
+sidebar reuses the `.cart-summary` styles and the page's own CSS is
+`src/styles/cart.css`. Submitting writes an order through `addOrder()` and clears
+the cart in `App.jsx`.
+
 ## Customer account area
 
 `/account` and its sub-routes (`orders`, `reservations`, `favorites`, `addresses`,
