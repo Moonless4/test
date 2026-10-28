@@ -64,6 +64,15 @@ second compose service, `api`:
   generated once into the data volume. Login reads `PANEL_USER` /
   `PANEL_PASSWORD` from the environment and falls back to `admin` / `1234` in
   the code, so a dashboard secret always wins.
+  `PANEL_USER` / `PANEL_PASSWORD` come from the platform env file
+  (`/run/base44/app.env`, wired as the last `env_file` entry of the `api`
+  service); the fallback only applies while they are unset, so the default
+  `admin` / `1234` stops working as soon as the secrets are delivered. Check
+  delivery without printing values:
+  `docker compose -f docker-compose.base44.yml exec -T api sh -c 'printenv PANEL_USER >/dev/null && echo present || echo missing'`.
+  A change on the secrets dashboard recreates `api` by itself — never run
+  `up`/`restart` for it; `POST /api/login` with `admin`/`1234` returning 401 is
+  the end-to-end proof that the secrets are active.
 - `server/store.js` + `server/seed.js` — the content is one JSON document in the
   `content` volume (`/data/site.json`), written atomically. The first boot seeds
   it from the `src/content/*.js` modules, so the panel opens on the real site.

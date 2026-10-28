@@ -5,7 +5,7 @@ import { Fields, ItemsEditor, JsonField, getIn, setIn } from './fields.jsx';
 import '../styles/admin.css';
 
 function LoginScreen({ onSignedIn }) {
-  const [username, setUsername] = useState('admin');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
