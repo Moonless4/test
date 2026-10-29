@@ -71,6 +71,7 @@ const cookie = (name, value, { maxAge, req, path = '/' }) => {
 const clearCookie = (name, req, path = '/') => cookie(name, '', { maxAge: 0, req, path });
 
 const send = (res, status, payload, cookies = []) => {
+  res.authStatus = status;
   const body = JSON.stringify(payload);
   const headers = {
     'Content-Type': 'application/json; charset=utf-8',
@@ -523,9 +524,15 @@ const server = http.createServer(async (req, res) => {
     return send(res, 404, { ok: false, error: 'not found' });
   }
 
+  // One line per auth call (cookie names only, never values) so a sign-in that
+  // breaks in a real browser can be read back from the log instead of guessed at.
+  const cookieNames = Object.keys(parseCookies(req.headers.cookie)).join(',') || '-';
   try {
-    return await handler(req, res);
+    const result = await handler(req, res);
+    console.log(`[auth] ${key} ${res.authStatus ?? '-'} cookies=${cookieNames}`);
+    return result;
   } catch (error) {
+    console.log(`[auth] ${key} failed cookies=${cookieNames}`);
     if (error?.message === 'too_large') return send(res, 413, { ok: false, error: 'درخواست بزرگ است.' });
     if (error?.message === 'bad_json') return send(res, 400, { ok: false, error: 'درخواست نامعتبر است.' });
     console.error('[auth] request failed', error?.message);
