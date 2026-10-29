@@ -18,6 +18,9 @@ export default defineConfig({
     watch: {
       usePolling: true,
       interval: 300,
+      // Only the client bundle can trigger hot reloads; the auth API's own files
+      // are not part of it, so their activity must never reload the page.
+      ignored: ['**/server/**', '**/.base44/**'],
     },
     allowedHosts: ['localhost', ...sandboxHosts],
     // The admin auth API runs as its own compose service. Proxying keeps the

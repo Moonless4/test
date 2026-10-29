@@ -141,6 +141,12 @@ via `useSite()`, so a saved change shows on the site immediately.
   regeneration) require a full re-authentication token (`ReauthForm.jsx`) with
   password + TOTP, where a backup code is likewise only the emergency substitute;
   a password change bumps `sessionVersion`, which invalidates every session.
+- The pending sign-in lives on the server for 10 minutes (the `atrin_admin_challenge`
+  cookie plus an in-memory challenge): `GET /api/admin/challenge` returns the
+  stage, so a reloaded login card resumes at the 2FA step instead of falling back
+  to the password form. `POST /api/admin/challenge/clear` drops it when the admin
+  chooses «بازگشت». `vite.config.js` ignores `server/` and `.base44/` in its
+  watcher, so API-side file activity never full-reloads the browser.
 - Because this is a real server gate, verifying it needs the password: sign in at
   `/admin`, then check `/api/admin/session` returns `authenticated: true`.
 - Orders, newsletter sign-ups and their admin lists use `src/data/records.js`

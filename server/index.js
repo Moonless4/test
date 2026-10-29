@@ -191,11 +191,40 @@ const login = async (req, res) => {
   const stage = enrolled ? 'totp' : 'enroll';
   const token = createChallenge(stage, record.username);
   const setCookie = cookie(CHALLENGE_COOKIE, token, {
-    maxAge: 5 * 60 * 1000,
+    maxAge: 10 * 60 * 1000,
     req,
     path: '/api/admin',
   });
   return send(res, 200, { ok: true, next: stage }, [setCookie]);
+};
+
+// The pending challenge lives on the server, so a reloaded login card can pick
+// the sign-in up where it left off instead of dropping back to the password form.
+const challengeStatus = async (req, res) => {
+  const challenge = getChallenge(challengeToken(req));
+  if (!challenge) return send(res, 200, { ok: true, stage: null });
+  if (challenge.stage !== 'enroll' || !challenge.secret) {
+    return send(res, 200, { ok: true, stage: challenge.stage });
+  }
+  const url = otpauthUrl(ISSUER, challenge.username, challenge.secret);
+  const qr = await QRCode.toDataURL(url, { margin: 1, width: 240, errorCorrectionLevel: 'M' });
+  return send(res, 200, {
+    ok: true,
+    stage: 'enroll',
+    enrollment: {
+      secret: challenge.secret,
+      formatted: formatSecret(challenge.secret),
+      otpauth: url,
+      qr,
+    },
+  });
+};
+
+const challengeAbort = async (req, res) => {
+  clearChallenge(challengeToken(req));
+  return send(res, 200, { ok: true }, [
+    cookie(CHALLENGE_COOKIE, '', { maxAge: 0, req, path: '/api/admin' }),
+  ]);
 };
 
 const setupStart = async (req, res) => {
@@ -461,6 +490,8 @@ const regenerateBackupCodes = async (req, res) => {
 
 const ROUTES = {
   'POST /api/admin/login': login,
+  'GET /api/admin/challenge': challengeStatus,
+  'POST /api/admin/challenge/clear': challengeAbort,
   'POST /api/admin/2fa/setup': setupStart,
   'POST /api/admin/2fa/setup/confirm': setupConfirm,
   'POST /api/admin/2fa/verify': verifySecondFactor,

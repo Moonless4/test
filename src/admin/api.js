@@ -23,6 +23,10 @@ export const signIn = ({ username, password }) =>
 
 export const startTwoFactorSetup = () => request('/2fa/setup', { method: 'POST' });
 
+export const fetchChallenge = () => request('/challenge');
+
+export const cancelChallenge = () => request('/challenge/clear', { method: 'POST' });
+
 export const confirmTwoFactorSetup = ({ code }) =>
   request('/2fa/setup/confirm', { method: 'POST', body: { code } });
 

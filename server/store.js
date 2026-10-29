@@ -9,7 +9,9 @@ const RECORD_FILE = path.join(DATA_DIR, 'admin.json');
 
 const SESSION_IDLE_MS = 30 * 60 * 1000;
 const SESSION_MAX_MS = 8 * 60 * 60 * 1000;
-const CHALLENGE_TTL_MS = 5 * 60 * 1000;
+// Long enough to scan the enrollment QR and type a code, and to survive a
+// reload of the login card without restarting the sign-in.
+const CHALLENGE_TTL_MS = 10 * 60 * 1000;
 const REAUTH_TTL_MS = 5 * 60 * 1000;
 
 export const MAX_FAILURES = 3;

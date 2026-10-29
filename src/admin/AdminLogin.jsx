@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Icon from '../components/Icons.jsx';
 import {
+  cancelChallenge,
   confirmTwoFactorSetup,
+  fetchChallenge,
   signIn,
   startTwoFactorSetup,
   verifyBackupCode,
@@ -33,7 +35,7 @@ const copyText = async (text) => {
 };
 
 export default function AdminLogin({ siteName, onSuccess }) {
-  const [step, setStep] = useState('login');
+  const [step, setStep] = useState('checking');
   const [credentials, setCredentials] = useState(emptyCredentials);
   const [code, setCode] = useState('');
   const [bait, setBait] = useState('');
@@ -43,6 +45,35 @@ export default function AdminLogin({ siteName, onSuccess }) {
   const [error, setError] = useState('');
   const [locked, setLocked] = useState('');
   const [busy, setBusy] = useState(false);
+
+  // A reload (dev server restart, preview refresh) must not drop the admin back
+  // to the password form: the pending step is kept on the server, so restore it.
+  useEffect(() => {
+    let alive = true;
+    const resume = async () => {
+      const result = await fetchChallenge();
+      if (!alive) return;
+      if (result.stage === 'enroll') {
+        if (result.enrollment) {
+          setEnrollment(result.enrollment);
+          setStep('enroll');
+          return;
+        }
+        const started = await startTwoFactorSetup();
+        if (!alive) return;
+        if (started.ok) {
+          setEnrollment(started);
+          setStep('enroll');
+          return;
+        }
+      }
+      setStep(result.stage === 'totp' ? 'totp' : 'login');
+    };
+    resume();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const field = (key) => (event) =>
     setCredentials((prev) => ({ ...prev, [key]: event.target.value }));
@@ -142,6 +173,7 @@ export default function AdminLogin({ siteName, onSuccess }) {
   };
 
   const restart = () => {
+    cancelChallenge();
     setStep('login');
     setCredentials(emptyCredentials);
     setCode('');
@@ -194,6 +226,13 @@ export default function AdminLogin({ siteName, onSuccess }) {
         </span>
 
         {stepLabel ? <span className="admin-login__progress">مرحله {stepLabel}</span> : null}
+
+        {step === 'checking' ? (
+          <div className="admin-login__step">
+            <h1>در حال بررسی وضعیت ورود…</h1>
+            <p>اگر ورود را آغاز کرده‌اید، به همان مرحله برمی‌گردید.</p>
+          </div>
+        ) : null}
 
         {step === 'login' ? (
           <form onSubmit={submitCredentials}>
