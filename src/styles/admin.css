@@ -1125,6 +1125,80 @@
   line-height: 1.9;
 }
 
+/* Line items of a stored order, so the panel shows what was actually ordered. */
+.adm-order__items {
+  margin: 12px 16px 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  background: rgba(203, 2, 54, 0.03);
+}
+
+.adm-order__items-title {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.adm-order__items ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.adm-order__items li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12.5px;
+  color: var(--wine);
+}
+
+.adm-order__items li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.adm-order__item-name {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.adm-order__item-qty {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.adm-order__item-price {
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.adm-order__totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.adm-order__totals b {
+  margin-inline-start: 4px;
+  color: var(--wine);
+  font-weight: 800;
+}
+
 .adm-order__foot {
   display: flex;
   align-items: center;

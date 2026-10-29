@@ -95,6 +95,38 @@ export default function OrdersPanel() {
 
               {order.address ? <p className="adm-order__address">{order.address}</p> : null}
 
+              {order.items?.length ? (
+                <div className="adm-order__items">
+                  <small className="adm-order__items-title">جزئیات اقلام</small>
+                  <ul>
+                    {order.items.map((item, itemIndex) => (
+                      <li key={`${order.id}-${item.productId || item.name}-${itemIndex}`}>
+                        <span className="adm-order__item-name">{item.name}</span>
+                        <span className="adm-order__item-qty">×{fa(item.qty || 1)}</span>
+                        <span className="adm-order__item-price">
+                          {money((item.price || 0) * (item.qty || 1))}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="adm-order__totals">
+                    {order.subtotal != null ? (
+                      <span>
+                        جمع اقلام <b>{money(order.subtotal)}</b>
+                      </span>
+                    ) : null}
+                    {order.delivery != null ? (
+                      <span>
+                        هزینه ارسال <b>{money(order.delivery)}</b>
+                      </span>
+                    ) : null}
+                    <span>
+                      مبلغ کل <b>{money(order.total || 0)}</b>
+                    </span>
+                  </div>
+                </div>
+              ) : null}
+
               <footer className="adm-order__foot">
                 <select
                   className="adm-input adm-select adm-order__select"

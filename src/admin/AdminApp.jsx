@@ -56,7 +56,7 @@ const PANELS = {
   settings: SettingsPanel,
 };
 
-export default function AdminApp({ section }) {
+export default function AdminApp({ section, adminPath = '/admin' }) {
   const { content } = useSite();
   const { navigate } = useRouter();
   // The panel opens only after the server confirms the session cookie.
@@ -105,7 +105,7 @@ export default function AdminApp({ section }) {
   const signOut = async () => {
     await signOutAdmin();
     setSession(null);
-    navigate('/admin');
+    navigate(adminPath);
   };
 
   return (
@@ -125,7 +125,7 @@ export default function AdminApp({ section }) {
               type="button"
               key={item.id}
               className={`admin__nav-item${item.id === active ? ' is-active' : ''}`}
-              onClick={() => navigate(`/admin/${item.id}`)}
+              onClick={() => navigate(`${adminPath}/${item.id}`)}
             >
               <Icon name={item.icon} size={17} />
               {item.label}
@@ -158,7 +158,7 @@ export default function AdminApp({ section }) {
         </header>
 
         <div className="admin__content">
-          <Panel onGo={(id) => navigate(`/admin/${id}`)} />
+          <Panel onGo={(id) => navigate(`${adminPath}/${id}`)} />
         </div>
       </div>
     </div>

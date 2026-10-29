@@ -31,6 +31,7 @@ import AccountSettings from './account/pages/SettingsPage.jsx';
 import { AccountProvider } from './account/AccountContext.jsx';
 import InfoPage from './pages/InfoPage.jsx';
 import AdminApp from './admin/AdminApp.jsx';
+import { adminPathOf } from './lib/adminPath.js';
 import { useSite } from './site/SiteContent.jsx';
 import { useRouter } from './router.jsx';
 import useDragScroll from './hooks/useDragScroll.js';
@@ -45,9 +46,10 @@ const matchRoute = (path, site) => {
   if (path === '/contact') return { name: 'contact' };
   if (path === '/cart') return { name: 'cart' };
 
-  if (path === '/admin' || path.startsWith('/admin/')) {
-    const section = path.split('/')[2] || 'dashboard';
-    return { name: 'admin', section };
+  const adminPath = adminPathOf(site);
+  if (path === adminPath || path.startsWith(`${adminPath}/`)) {
+    const section = path.slice(adminPath.length).split('/').filter(Boolean)[0] || 'dashboard';
+    return { name: 'admin', section, adminPath };
   }
 
   const pageMatch = path.match(/^\/p\/([\w-]+)$/);
@@ -224,7 +226,7 @@ export default function App() {
   }, [route.name, site.identity.siteName, site.identity.prefix]);
 
   if (route.name === 'admin') {
-    return <AdminApp section={route.section} />;
+    return <AdminApp section={route.section} adminPath={route.adminPath} />;
   }
 
   const page = (() => {

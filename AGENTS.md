@@ -149,6 +149,11 @@ via `useSite()`, so a saved change shows on the site immediately.
   watcher, so API-side file activity never full-reloads the browser.
 - Because this is a real server gate, verifying it needs the password: sign in at
   `/admin`, then check `/api/admin/session` returns `authenticated: true`.
+- The panel path is configurable: `adminPath` in the stored site content
+  (Settings → «مسیر ورود به پنل», resolved by `src/lib/adminPath.js` and used by
+  `matchRoute()` in `src/App.jsx` plus every in-panel link). It lives in the
+  browser's `atrin-site-v1` content like every other editable field, and the old
+  path returns 404 afterwards — it hides the panel, it is not extra security.
 - Orders, newsletter sign-ups and their admin lists use `src/data/records.js`
   (`atrin-orders-v1`, `atrin-newsletter-v1` in `localStorage`). Checkout writes an
   order there; the footer newsletter form writes a subscriber. Discount codes are

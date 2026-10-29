@@ -1,8 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSite } from '../../site/SiteContent.jsx';
+import { useRouter } from '../../router.jsx';
 import Icon from '../../components/Icons.jsx';
 import { AdminPanel, TextInput } from '../ui.jsx';
 import ReauthForm from '../ReauthForm.jsx';
+import {
+  DEFAULT_ADMIN_PATH,
+  adminPathOf,
+  cleanAdminPath,
+  validateAdminPath,
+} from '../../lib/adminPath.js';
 import {
   changeCredentials,
   fetchSession,
@@ -13,7 +20,11 @@ const emptyCreds = { username: '', password: '', confirm: '' };
 
 export default function SettingsPanel() {
   const { content, update, reset } = useSite();
+  const { navigate } = useRouter();
   const fileRef = useRef(null);
+  const adminPath = adminPathOf(content);
+  const [pathDraft, setPathDraft] = useState(adminPath);
+  const [pathError, setPathError] = useState('');
   const [security, setSecurity] = useState(null);
   const [reauthToken, setReauthToken] = useState('');
   const [creds, setCreds] = useState(emptyCreds);
@@ -52,7 +63,21 @@ export default function SettingsPanel() {
     setReauthToken('');
     setStatus('اطلاعات ورود تغییر کرد؛ برای ادامه دوباره وارد شوید…');
     // Every session was invalidated on the server.
-    window.location.assign('/admin');
+    window.location.assign(adminPath);
+  };
+
+  const saveAdminPath = () => {
+    const problem = validateAdminPath(pathDraft);
+    if (problem) {
+      setPathError(problem);
+      return;
+    }
+    const next = cleanAdminPath(pathDraft);
+    setPathError('');
+    update((prev) => ({ ...prev, adminPath: next }));
+    setPathDraft(next);
+    setStatus(`مسیر ورود پنل به ${next} تغییر کرد؛ مسیر قبلی دیگر باز نمی‌شود.`);
+    navigate(`${next}/settings`);
   };
 
   const regenerateCodes = async () => {
@@ -99,6 +124,8 @@ export default function SettingsPanel() {
   const resetAll = () => {
     if (!window.confirm('همه ویرایش‌ها پاک و سایت به حالت اولیه برگردد؟')) return;
     reset();
+    // The reset also restores the default panel path, so leave the old one.
+    navigate(DEFAULT_ADMIN_PATH);
     setStatus('سایت به حالت اولیه بازگردانده شد.');
   };
 
@@ -121,6 +148,29 @@ export default function SettingsPanel() {
         تغییر حساس باید نام کاربری، رمز عبور، کد Google Authenticator و یک کد پشتیبان را دوباره
         وارد کنید.
       </p>
+
+      <h3 className="adm-subtitle">مسیر ورود به پنل</h3>
+      <p className="adm-text">
+        آدرس فعلی پنل <b dir="ltr">{adminPath}</b> است. با تغییر آن، آدرس قبلی بسته می‌شود؛ مسیر
+        جدید را جایی ذخیره کنید تا بعداً به پنل دسترسی داشته باشید.
+      </p>
+      <div className="adm-inline-add">
+        <TextInput
+          label="آدرس دلخواه پنل"
+          value={pathDraft}
+          onChange={(value) => {
+            setPathDraft(value);
+            setPathError('');
+          }}
+          hint="مثال: /atrin-panel — فقط حروف انگلیسی، عدد و خط تیره"
+          dir="ltr"
+        />
+        <button type="button" className="adm-btn adm-btn--gold" onClick={saveAdminPath}>
+          <Icon name="check" size={16} />
+          ذخیره مسیر
+        </button>
+      </div>
+      {pathError ? <p className="adm-hint adm-hint--error">{pathError}</p> : null}
 
       <h3 className="adm-subtitle">تغییر نام کاربری و رمز عبور</h3>
       {reauthToken ? (

@@ -27,6 +27,8 @@ export const defaultContent = {
     copyright: '© ۱۴۰۴ رستوران آترین. تمامی حقوق محفوظ است.',
   },
   discountCodes: [],
+  // Path of the admin panel; editable in Settings → مسیر ورود به پنل.
+  adminPath: '/admin',
   navLinks,
   megaMenu: {
     eyebrow: 'دسته‌بندی غذاها',
