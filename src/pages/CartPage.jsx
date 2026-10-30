@@ -62,7 +62,8 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
     setForm((prev) => ({
       ...prev,
       name: prev.name || [user.firstName, user.lastName].filter(Boolean).join(' '),
-      phone: prev.phone || user.phone || '',
+      /* The account key may be an email, which must never land in the phone field */
+      phone: prev.phone || (isValidPhone(user.phone) ? user.phone : ''),
     }));
   }, [isAuthenticated, user.firstName, user.lastName, user.phone]);
 
