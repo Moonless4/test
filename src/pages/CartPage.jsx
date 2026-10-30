@@ -25,7 +25,7 @@ const STEPS = [
 
 export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) {
   const { navigate } = useRouter();
-  const { isAuthenticated, user, loyalty, register, spendPoints, earnPoints } = useAccount();
+  const { isAuthenticated, user, loyalty, login, register, spendPoints, earnPoints } = useAccount();
   const [step, setStep] = useState(1);
   const [order, setOrder] = useState(null);
   const [error, setError] = useState('');
@@ -37,6 +37,7 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
     payment: 'online',
   });
   const [account, setAccount] = useState({ name: '', phone: '', password: '' });
+  const [accountMode, setAccountMode] = useState('register');
   const [accountError, setAccountError] = useState('');
   const [usePoints, setUsePoints] = useState(false);
   const [pointsInput, setPointsInput] = useState(0);
@@ -94,7 +95,7 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
     return true;
   };
 
-  /* Before leaving the cart a signed-out customer gets an account */
+  /* Before the payment steps a signed-out customer gets an account or signs in */
   const createAccountAndContinue = () => {
     const name = account.name.trim();
     const phone = account.phone.trim();
@@ -112,13 +113,65 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
     }
     const result = register({ name, identifier: phone });
     if (!result.ok) {
-      setAccountError(result.error);
+      setAccountMode('login');
+      setAccountError('این شماره قبلاً ثبت‌نام کرده است؛ رمز عبور خود را وارد کنید تا وارد شوید.');
       return;
     }
     setAccountError('');
     setForm((prev) => ({ ...prev, name, phone }));
     setStep(2);
   };
+
+  const signInAndContinue = () => {
+    const phone = account.phone.trim();
+    if (!isValidPhone(phone)) {
+      setAccountError('شماره موبایل را در قالب ۰۹۱۲۳۴۵۶۷۸۹ وارد کنید.');
+      return;
+    }
+    if (account.password.length < 6) {
+      setAccountError('رمز عبور باید حداقل ۶ کاراکتر باشد.');
+      return;
+    }
+    login({ identifier: phone });
+    setAccountError('');
+    setForm((prev) => ({ ...prev, phone }));
+    setStep(2);
+  };
+
+  const handleAccountContinue = () =>
+    accountMode === 'login' ? signInAndContinue() : createAccountAndContinue();
+
+  const nameField = (
+    <label>
+      <span>نام و نام خانوادگی</span>
+      <input value={account.name} onChange={updateAccount('name')} placeholder="نام شما" />
+    </label>
+  );
+
+  const phoneField = (
+    <label>
+      <span>شماره موبایل</span>
+      <input
+        value={account.phone}
+        onChange={updateAccount('phone')}
+        placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+        inputMode="tel"
+        dir="ltr"
+      />
+    </label>
+  );
+
+  const passwordField = (
+    <label>
+      <span>رمز عبور</span>
+      <input
+        type="password"
+        value={account.password}
+        onChange={updateAccount('password')}
+        placeholder="حداقل ۶ کاراکتر"
+      />
+    </label>
+  );
 
   const goStep = (key) => {
     if (key >= step) return;
@@ -127,6 +180,12 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
   };
 
   const submit = () => {
+    if (!isAuthenticated) {
+      setAccountError('برای ثبت سفارش ابتدا حساب کاربری خود را بسازید یا وارد شوید.');
+      setError('');
+      setStep(1);
+      return;
+    }
     if (!validateDelivery()) {
       setStep(2);
       return;
@@ -332,44 +391,37 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
                           <Icon name="user" size={17} />
                         </span>
                         <div>
-                          <b>ساخت حساب کاربری</b>
-                          <small>برای ادامه سفارش و استفاده از امتیازهای باشگاه، حساب خود را بسازید.</small>
+                          <b>{accountMode === 'login' ? 'ورود به حساب کاربری' : 'ساخت حساب کاربری'}</b>
+                          <small>
+                            {accountMode === 'login'
+                              ? 'برای ادامه سفارش با شماره موبایل و رمز عبور خود وارد شوید.'
+                              : 'برای ادامه سفارش و ثبت اطلاعات تحویل، ابتدا حساب خود را بسازید.'}
+                          </small>
                         </div>
                       </header>
 
                       <div className="checkout__form">
                         <div className="checkout__row">
-                          <label>
-                            <span>نام و نام خانوادگی</span>
-                            <input
-                              value={account.name}
-                              onChange={updateAccount('name')}
-                              placeholder="نام شما"
-                            />
-                          </label>
-                          <label>
-                            <span>شماره موبایل</span>
-                            <input
-                              value={account.phone}
-                              onChange={updateAccount('phone')}
-                              placeholder="۰۹۱۲۳۴۵۶۷۸۹"
-                              inputMode="tel"
-                              dir="ltr"
-                            />
-                          </label>
+                          {accountMode === 'register' && nameField}
+                          {phoneField}
+                          {accountMode === 'login' && passwordField}
                         </div>
-                        <label>
-                          <span>رمز عبور</span>
-                          <input
-                            type="password"
-                            value={account.password}
-                            onChange={updateAccount('password')}
-                            placeholder="حداقل ۶ کاراکتر"
-                          />
-                        </label>
+                        {accountMode === 'register' && passwordField}
                         {accountError && (
                           <span className="form-hint form-hint--error">{accountError}</span>
                         )}
+                        <button
+                          type="button"
+                          className="cart-account__switch"
+                          onClick={() => {
+                            setAccountMode(accountMode === 'login' ? 'register' : 'login');
+                            setAccountError('');
+                          }}
+                        >
+                          {accountMode === 'login'
+                            ? 'حساب کاربری ندارم؛ ثبت‌نام می‌کنم'
+                            : 'قبلاً حساب ساخته‌ام؛ وارد می‌شوم'}
+                        </button>
                       </div>
                     </div>
                   )}
@@ -381,9 +433,13 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
                     <button
                       type="button"
                       className="btn btn--primary"
-                      onClick={() => (isAuthenticated ? setStep(2) : createAccountAndContinue())}
+                      onClick={isAuthenticated ? () => setStep(2) : handleAccountContinue}
                     >
-                      {isAuthenticated ? 'ادامه: اطلاعات تحویل' : 'ساخت حساب و ادامه'}
+                      {isAuthenticated
+                        ? 'ادامه: اطلاعات تحویل'
+                        : accountMode === 'login'
+                          ? 'ورود و ادامه'
+                          : 'ساخت حساب و ادامه'}
                       <Icon name="chevronLeft" size={18} />
                     </button>
                   </div>
@@ -458,6 +514,12 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
                         type="button"
                         className="btn btn--primary"
                         onClick={() => {
+                          if (!isAuthenticated) {
+                            setAccountError('برای ادامه پرداخت ابتدا حساب کاربری خود را بسازید یا وارد شوید.');
+                            setError('');
+                            setStep(1);
+                            return;
+                          }
                           if (validateDelivery()) setStep(3);
                         }}
                       >

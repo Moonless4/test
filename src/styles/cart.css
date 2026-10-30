@@ -370,6 +370,24 @@
   line-height: 1.7;
 }
 
+.cart-account__switch {
+  justify-self: start;
+  margin: 2px 0 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 11.5px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.cart-account__switch:hover {
+  color: var(--primary-bright);
+}
+
 /* ===== Club points in the order summary ===== */
 .cart-summary--page > .cart-points {
   display: grid;

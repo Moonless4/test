@@ -63,7 +63,12 @@ sidebar reuses the `.cart-summary` styles and the page's own CSS is
 
 Step 1 of `/cart` also holds the account gate itself: a signed-out customer gets
 the inline `.cart-account` form (name, mobile, password → `register()`); it is
-not the `AuthModal`. Mobiles are typed through `src/lib/phone.js`
+not the `AuthModal`. The same card switches to a sign-in form
+(`login({ identifier })`) through its `.cart-account__switch` link — also
+automatically when the entered mobile already has an account — so an existing
+customer is never stuck. No account means no forward step: the step 1 → 2, the
+step 2 → 3 («ادامه: پرداخت») transitions and `submit()` all require
+`isAuthenticated` and bounce back to step 1 with a message. Mobiles are typed through `src/lib/phone.js`
 (`normalizePhone()` strips non-digits, converts Persian/Arabic digits and
 `+98`/`0098` to a Latin `09xxxxxxxxx`, `isValidPhone()` checks that shape); the
 same helpers validate the delivery phone and `AuthModal`. Club points are
