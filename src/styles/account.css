@@ -2665,13 +2665,13 @@ a.acct-stat:hover {
   content: '';
   position: absolute;
   inset-block-start: 3px;
-  inset-inline-end: 3px;
+  inset-inline-start: 3px;
   width: 18px;
   height: 18px;
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 2px 5px rgba(36, 0, 10, 0.2);
-  transition: transform 0.25s var(--ease);
+  transition: inset-inline-start 0.25s var(--ease);
 }
 
 .acct-toggle__control input:checked + i {
@@ -2679,7 +2679,7 @@ a.acct-stat:hover {
 }
 
 .acct-toggle__control input:checked + i::after {
-  transform: translateX(-18px);
+  inset-inline-start: calc(100% - 21px);
 }
 
 .acct-toggle__control input:focus-visible + i {
