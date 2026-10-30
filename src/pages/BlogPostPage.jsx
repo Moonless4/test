@@ -2,6 +2,7 @@ import { useSite } from '../site/SiteContent.jsx';
 import Breadcrumbs from '../components/Breadcrumbs.jsx';
 import Icon from '../components/Icons.jsx';
 import RelatedPosts from '../components/RelatedPosts.jsx';
+import Comments from '../components/Comments.jsx';
 
 export default function BlogPostPage({ id, onMenu, onBlog, onOpenPost }) {
   const { content } = useSite();
@@ -54,6 +55,8 @@ export default function BlogPostPage({ id, onMenu, onBlog, onOpenPost }) {
                 </div>
               </div>
             </div>
+
+            <Comments targetType="post" targetId={post.id} />
           </article>
 
           <RelatedPosts post={post} posts={content.posts} onOpenPost={onOpenPost} />

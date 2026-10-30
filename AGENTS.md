@@ -170,6 +170,19 @@ matched in one block in `matchRoute()` in `src/App.jsx`.
   browser's original customer/cart storage afterward. Never use the removed
   demo number or sign into an existing customer with guessed credentials.
 
+## Comments (food & blog)
+
+`src/components/Comments.jsx` is the comment box on `/food/:id` (with a star
+rating) and `/blog/:id`. Comments live in `localStorage` under
+`atrin-comments-v1` through `src/data/comments.js` (`listComments(targetType,
+targetId)`, `addComment(...)`, `commentStats(...)`); `targetType` is `product`
+or `post` and `targetId` is the product/post id. Guests may comment (a name is
+required); a signed-in customer's name is prefilled. The product page's rating
+badge counts real comments once any exist (the `onAdded` callback refreshes its
+stats) and otherwise keeps the shipped ۴٫۹ / ۱۲۴ display. Styles are the
+`.comments` block at the end of `src/styles/pages.css`. The admin panel does not
+list comments.
+
 ## Admin panel (`/admin`)
 
 The site content is editable at `/admin` (login required). There is no backend:

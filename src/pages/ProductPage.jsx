@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSite } from '../site/SiteContent.jsx';
 import Breadcrumbs from '../components/Breadcrumbs.jsx';
 import Icon from '../components/Icons.jsx';
 import ProductCard, { formatPrice } from '../components/ProductCard.jsx';
 import OrderSuggestions from '../components/OrderSuggestions.jsx';
+import Comments from '../components/Comments.jsx';
 import { useAccount } from '../account/AccountContext.jsx';
+import { commentStats } from '../data/comments.js';
+import { fa } from '../data/account.js';
 
 export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [], onToast }) {
   const { content } = useSite();
@@ -14,6 +17,7 @@ export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [], o
   const favorite = isFavorite(id);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+  const [reviewVersion, setReviewVersion] = useState(0);
 
   useEffect(() => {
     setQty(1);
@@ -21,6 +25,11 @@ export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [], o
   }, [id]);
 
   if (!product) return null;
+
+  const reviewStats = useMemo(
+    () => commentStats('product', product.id),
+    [product.id, reviewVersion]
+  );
 
   const related = products
     .filter((item) => item.category === product.category && item.id !== product.id)
@@ -50,8 +59,13 @@ export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [], o
                 <span className="product-modal__cat">{product.categoryLabel}</span>
                 <span className="product-modal__rating">
                   <Icon name="star" size={15} filled />
-                  ۴٫۹
-                  <small>(۱۲۴ نظر)</small>
+                  {reviewStats.rated > 0
+                    ? reviewStats.average.toLocaleString('fa-IR', {
+                        minimumFractionDigits: 1,
+                        maximumFractionDigits: 1,
+                      })
+                    : '۴٫۹'}
+                  <small>({fa(reviewStats.count || 124)} نظر)</small>
                 </span>
                 <button
                   type="button"
@@ -128,6 +142,13 @@ export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [], o
             </div>
           </div>
         </div>
+
+        <Comments
+          targetType="product"
+          targetId={product.id}
+          withRating
+          onAdded={() => setReviewVersion((prev) => prev + 1)}
+        />
 
         <div className="related">
           <div className="related__head">
