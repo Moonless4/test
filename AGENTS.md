@@ -106,6 +106,12 @@ in `localStorage` under `atrin-site-v1`, deep-merged over the defaults in
 Admins edit through `update()`; every public component reads the same provider
 via `useSite()`, so a saved change shows on the site immediately.
 
+Stored content never overrides a shipped change by itself: `SITE_CONTENT_VERSION`
+in `src/site/defaultContent.js` plus `migrateSavedContent()` in
+`src/site/contentStorage.js` (the plain-JS half of the provider, unit-testable in
+Node) syncs a saved copy forward once per version — an old hero slider lineup is
+replaced by the shipped one, other saved keys survive.
+
 - Sections (`src/admin/panels/`): dashboard, orders, products, categories, menu
   filters, header mega menu, hero slides, promo banners, blog posts, discount
   codes, newsletter subscribers, footer (link columns, socials, trust badges,

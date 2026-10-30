@@ -10,9 +10,14 @@ import {
   promoBanners,
 } from '../data/content.js';
 
+// Bump when a shipped content change (e.g. the hero slider lineup) must reach
+// browsers that already have an older copy stored; see contentStorage.js.
+export const SITE_CONTENT_VERSION = 2;
+
 // Everything the admin panel can edit. The public site renders these values
 // through <SiteProvider>, and the admin stores its changes on top of them.
 export const defaultContent = {
+  contentVersion: SITE_CONTENT_VERSION,
   identity: {
     prefix: 'رستوران',
     siteName: 'آترین',
