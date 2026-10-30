@@ -261,7 +261,9 @@ export default function App() {
       case 'blog':
         return <BlogPage onOpenPost={openPost} />;
       case 'post':
-        return <BlogPostPage id={route.id} onMenu={goMenu} onBlog={goBlog} />;
+        return (
+          <BlogPostPage id={route.id} onMenu={goMenu} onBlog={goBlog} onOpenPost={openPost} />
+        );
       case 'product':
         return (
           <ProductPage
