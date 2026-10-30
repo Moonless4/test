@@ -7,6 +7,12 @@ import OrderSuggestions from '../components/OrderSuggestions.jsx';
 import { addOrder } from '../data/records.js';
 import { useAccount } from '../account/AccountContext.jsx';
 import { fa } from '../data/account.js';
+import {
+  couponDiscount,
+  couponLabel,
+  couponProblem,
+  takePendingCoupon,
+} from '../data/rewardCoupons.js';
 import { isValidPhone, normalizePhone } from '../lib/phone.js';
 
 const deliveryFee = 35000;
@@ -25,7 +31,8 @@ const STEPS = [
 
 export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, onRequireAccount }) {
   const { navigate } = useRouter();
-  const { isAuthenticated, user, loyalty, spendPoints, earnPoints, recordOrder } = useAccount();
+  const { isAuthenticated, user, loyalty, spendPoints, earnPoints, recordOrder, useCoupon } =
+    useAccount();
   const [step, setStep] = useState(1);
   const [order, setOrder] = useState(null);
   const [error, setError] = useState('');
@@ -54,8 +61,29 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
     : 0;
   const pointsUsed = usePoints ? Math.min(Math.max(0, pointsInput), maxUsablePoints) : 0;
   const pointsDiscount = pointsUsed * POINT_VALUE;
-  const total = subtotal + delivery - pointsDiscount;
+
+  /* Claimed club rewards stay in the account as single-use codes */
+  const availableCoupons = isAuthenticated
+    ? (loyalty.coupons || []).filter((coupon) => !coupon.usedAt)
+    : [];
+  const [couponCode, setCouponCode] = useState('');
+  const appliedCoupon = availableCoupons.find((coupon) => coupon.code === couponCode) || null;
+  const couponIssue = appliedCoupon ? couponProblem(appliedCoupon, items, delivery) : '';
+  const couponValue = couponIssue ? 0 : couponDiscount(appliedCoupon, items, delivery);
+
+  const total = Math.max(0, subtotal + delivery - pointsDiscount - couponValue);
   const count = items.reduce((sum, item) => sum + item.qty, 0);
+
+  /* A reward picked on /account/rewards arrives as a pending code */
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const pending = takePendingCoupon();
+    if (!pending) return;
+    const known = (loyalty.coupons || []).some(
+      (coupon) => coupon.code === pending && !coupon.usedAt
+    );
+    if (known) setCouponCode(pending);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!order && (items.length === 0 || !isAuthenticated)) setStep(1);
@@ -116,8 +144,10 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
       total,
       subtotal,
       delivery,
-      discount: pointsDiscount,
+      discount: pointsDiscount + couponValue,
       pointsUsed,
+      couponCode: couponValue > 0 ? appliedCoupon.code : '',
+      couponDiscount: couponValue,
       count,
       name: form.name.trim(),
       phone: form.phone.trim(),
@@ -149,7 +179,8 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
       restaurant: 'رستوران آترین',
       items: savedOrder.items,
       deliveryFee: delivery,
-      discount: pointsDiscount,
+      discount: pointsDiscount + couponValue,
+      couponCode: couponValue > 0 ? appliedCoupon.code : '',
       payment: {
         label: payment,
         status: form.payment === 'online' ? 'paid' : 'pending',
@@ -157,10 +188,22 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
     });
 
     if (pointsUsed > 0) spendPoints(pointsUsed, `استفاده از امتیاز در سفارش ${code}`);
+    /* A reward code is single-use: spending it here retires it for good */
+    if (appliedCoupon && couponValue > 0) useCoupon(appliedCoupon.code, code);
     const pointsEarned = Math.floor(subtotal / ORDER_STEP) * POINTS_PER_ORDER;
     if (pointsEarned > 0) earnPoints(pointsEarned, `امتیاز سفارش ${code}`);
 
-    setOrder({ code, total, count, name: form.name.trim(), payment, time, pointsEarned });
+    setOrder({
+      code,
+      total,
+      count,
+      name: form.name.trim(),
+      payment,
+      time,
+      pointsEarned,
+      couponCode: couponValue > 0 ? appliedCoupon.code : '',
+      couponDiscount: couponValue,
+    });
     setError('');
     setStep(4);
     onComplete();
@@ -239,6 +282,12 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
                 <small>مبلغ کل</small>
                 <b>{formatPrice(order.total)} تومان</b>
               </span>
+              {order.couponDiscount > 0 && (
+                <span>
+                  <small>جایزه استفاده‌شده</small>
+                  <b dir="ltr">{order.couponCode}</b>
+                </span>
+              )}
               {order.pointsEarned > 0 && (
                 <span>
                   <small>امتیاز باشگاه</small>
@@ -547,6 +596,12 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
                     <b>−{formatPrice(pointsDiscount)} تومان</b>
                   </div>
                 )}
+                {couponValue > 0 && (
+                  <div>
+                    <span>جایزه: {couponLabel(appliedCoupon)}</span>
+                    <b>−{formatPrice(couponValue)} تومان</b>
+                  </div>
+                )}
                 {subtotal < freeDeliveryFrom && (
                   <p className="cart-summary__hint">
                     <Icon name="truck" size={15} />
@@ -613,6 +668,47 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
                     )}
                   </div>
                 )}
+
+                {availableCoupons.length > 0 && (
+                  <div className="cart-coupons">
+                    <div className="cart-coupons__head">
+                      <span>
+                        <Icon name="gift" size={14} />
+                        جایزه‌های آماده استفاده
+                      </span>
+                      <b>{fa(availableCoupons.length)} کد</b>
+                    </div>
+                    <ul className="cart-coupons__list">
+                      {availableCoupons.map((coupon) => (
+                        <li key={coupon.id}>
+                          <button
+                            type="button"
+                            className={`cart-coupon ${coupon.code === couponCode ? 'is-active' : ''}`}
+                            onClick={() => {
+                              setCouponCode(coupon.code === couponCode ? '' : coupon.code);
+                              setError('');
+                            }}
+                          >
+                            <span className="cart-coupon__copy">
+                              <b>{couponLabel(coupon)}</b>
+                              <small dir="ltr">{coupon.code}</small>
+                            </span>
+                            <span className="cart-coupon__state">
+                              {coupon.code === couponCode ? 'اعمال شد' : 'استفاده'}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                    {appliedCoupon && couponIssue && (
+                      <span className="form-hint form-hint--error">{couponIssue}</span>
+                    )}
+                    <small className="cart-points__hint">
+                      هر کد جایزه فقط یک بار و روی یک سفارش اعمال می‌شود.
+                    </small>
+                  </div>
+                )}
+
                 <div className="cart-summary__total">
                   <span>مبلغ قابل پرداخت</span>
                   <b>{formatPrice(total)} تومان</b>

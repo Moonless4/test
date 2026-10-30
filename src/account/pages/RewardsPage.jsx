@@ -1,12 +1,35 @@
 import Icon from '../../components/Icons.jsx';
+import { useRouter } from '../../router.jsx';
 import { useAccount } from '../AccountContext.jsx';
 import { PageHead, Panel } from '../ui.jsx';
 import { fa, formatDate } from '../../data/account.js';
+import { couponLabel, setPendingCoupon } from '../../data/rewardCoupons.js';
 
 export default function RewardsPage({ onToast }) {
+  const { navigate } = useRouter();
   const { loyalty, redeemReward } = useAccount();
   const remaining = Math.max(0, loyalty.nextRewardAt - loyalty.points);
   const progress = Math.min(100, Math.round((loyalty.points / loyalty.nextRewardAt) * 100));
+  const readyCoupons = (loyalty.coupons || []).filter((coupon) => !coupon.usedAt);
+
+  /* A claimed reward becomes a code the customer can spend in the cart */
+  const claim = (reward) => {
+    const coupon = redeemReward(reward);
+    if (!coupon) {
+      onToast('امتیاز کافی برای این جایزه ندارید.');
+      return;
+    }
+    onToast(`«${reward.title}» فعال شد؛ کد ${coupon.code} در جوایز آماده استفاده است.`);
+  };
+
+  const copyCode = async (code) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      onToast('کد جایزه کپی شد.');
+    } catch {
+      onToast(`کد جایزه: ${code}`);
+    }
+  };
 
   return (
     <div className="acct-page">
@@ -65,14 +88,7 @@ export default function RewardsPage({ onToast }) {
                     type="button"
                     className={`btn btn--sm ${affordable ? 'btn--primary' : 'btn--outline'}`}
                     disabled={!affordable}
-                    onClick={() => {
-                      const done = redeemReward(reward);
-                      onToast(
-                        done
-                          ? `«${reward.title}» فعال شد؛ در سفارش بعدی اعمال می‌شود.`
-                          : 'امتیاز کافی برای این جایزه ندارید.'
-                      );
-                    }}
+                    onClick={() => claim(reward)}
                   >
                     {affordable ? 'دریافت جایزه' : `${fa(reward.cost - loyalty.points)} امتیاز دیگر`}
                   </button>
@@ -81,6 +97,54 @@ export default function RewardsPage({ onToast }) {
             );
           })}
         </div>
+      </Panel>
+
+      <Panel
+        title="جوایز آماده استفاده"
+        subtitle="جایزه‌هایی که گرفته‌اید و هنوز استفاده نشده‌اند؛ یکی را انتخاب کنید."
+      >
+        {readyCoupons.length === 0 ? (
+          <p className="reward-empty">
+            جایزه فعالی ندارید. با امتیازهای خود یکی از جوایز بالا را بگیرید تا کد آن همین‌جا
+            نمایش داده شود.
+          </p>
+        ) : (
+          <ul className="reward-coupon-list">
+            {readyCoupons.map((coupon) => (
+              <li key={coupon.id} className="reward-coupon">
+                <span className="reward-coupon__icon">
+                  <Icon name="gift" size={18} />
+                </span>
+                <div className="reward-coupon__copy">
+                  <b>{couponLabel(coupon)}</b>
+                  <small>
+                    {coupon.title} · دریافت {formatDate(coupon.claimedAt)}
+                  </small>
+                  <code dir="ltr">{coupon.code}</code>
+                </div>
+                <div className="reward-coupon__actions">
+                  <button
+                    type="button"
+                    className="btn btn--primary btn--sm"
+                    onClick={() => {
+                      setPendingCoupon(coupon.code);
+                      navigate('/cart');
+                    }}
+                  >
+                    استفاده در سبد خرید
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--outline btn--sm"
+                    onClick={() => copyCode(coupon.code)}
+                  >
+                    کپی کد
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </Panel>
 
       <Panel title="تاریخچه امتیازها" subtitle="آخرین تغییرات امتیاز باشگاه شما">

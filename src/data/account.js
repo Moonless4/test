@@ -1,4 +1,5 @@
 import { products } from './content.js';
+import { REWARD_CATALOG } from './rewardCoupons.js';
 
 /* =========================================================
    Formatters — Persian numerals, Jalali dates, tomans
@@ -104,13 +105,7 @@ export const ORDER_FLOW = ['review', 'preparing', 'ready', 'delivered'];
 
 export const ACCOUNT_RESTAURANT = 'آترین — شعبه سعادت‌آباد';
 
-export const REWARDS = [
-  { id: 'rw-drink', title: 'نوشیدنی رایگان', description: 'یک نوشیدنی سرد دلخواه با هر سفارش', cost: 600, icon: 'cart' },
-  { id: 'rw-off', title: 'تخفیف ۱۵٪ سفارش', description: 'روی کل سفارش بعدی شما اعمال می‌شود', cost: 800, icon: 'sparkle' },
-  { id: 'rw-dessert', title: 'دسر رایگان', description: 'یک دسر از انتخاب سرآشپز', cost: 1200, icon: 'chef' },
-  { id: 'rw-ship', title: 'ارسال رایگان', description: 'ارسال سفارش بعدی بدون هزینه', cost: 400, icon: 'scooter' },
-  { id: 'rw-chef', title: 'تجربه ویژه سرآشپز', description: 'منوی اختصاصی برای دو نفر', cost: 2500, icon: 'star' },
-];
+export const REWARDS = REWARD_CATALOG;
 
 export const DEFAULT_SETTINGS = {
   notifications: { orders: true, reservations: true, offers: false, newsletter: true },
@@ -156,6 +151,7 @@ export const createAccount = ({ firstName = '', lastName = '', phone = '', email
     nextRewardAt: 500,
     tier: 'نقره‌ای',
     rewards: REWARDS,
+    coupons: [],
     history: [],
   },
 

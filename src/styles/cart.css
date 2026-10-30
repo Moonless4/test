@@ -728,3 +728,85 @@
     display: none;
   }
 }
+
+/* Claimed club rewards in the summary aside */
+.cart-coupons {
+  display: grid;
+  justify-content: stretch;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(36, 0, 10, 0.15);
+}
+
+.cart-coupons__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cart-coupons__head span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.cart-coupons__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.cart-coupon {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 12px;
+  border: 1px dashed rgba(36, 0, 10, 0.2);
+  background: #fff;
+  text-align: start;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.cart-coupon:hover {
+  border-color: rgba(203, 2, 54, 0.35);
+}
+
+.cart-coupon.is-active {
+  border-style: solid;
+  border-color: var(--primary);
+  background: #fff6f7;
+}
+
+.cart-coupon__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cart-coupon__copy b {
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.cart-coupon__copy small {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.cart-coupon__state {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--primary);
+  white-space: nowrap;
+}

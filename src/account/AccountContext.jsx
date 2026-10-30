@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { createAccount, createId, DEFAULT_SETTINGS, REWARDS } from '../data/account.js';
+import { createCoupon, markCouponUsed } from '../data/rewardCoupons.js';
 import { DEFAULT_AVATAR } from './Avatar.jsx';
 import { isRegisteredAccount, loginAccount } from './registration.js';
 
@@ -37,9 +38,11 @@ const normalize = (account) => ({
     points: 0,
     nextRewardAt: 500,
     tier: 'نقره‌ای',
-    rewards: REWARDS,
     history: [],
+    coupons: [],
     ...account.loyalty,
+    /* The reward catalog ships with the code, so stored copies never go stale */
+    rewards: REWARDS,
   },
   settings: { ...clone(DEFAULT_SETTINGS), ...account.settings },
 });
@@ -285,29 +288,47 @@ export function AccountProvider({ children }) {
     }));
   }, []);
 
-  const redeemReward = useCallback((reward) => {
-    let earned = false;
-    setState((prev) => {
-      if (prev.loyalty.points < reward.cost) return prev;
-      earned = true;
-      return {
-        ...prev,
-        loyalty: {
-          ...prev.loyalty,
-          points: prev.loyalty.points - reward.cost,
-          history: [
-            {
-              id: createId('h'),
-              label: reward.title,
-              points: -reward.cost,
-              date: new Date().toISOString(),
-            },
-            ...prev.loyalty.history,
-          ],
-        },
-      };
-    });
-    return earned;
+  /* Claiming a reward spends points and issues a single-use coupon code */
+  const redeemReward = useCallback(
+    (reward) => {
+      if (state.loyalty.points < reward.cost) return null;
+      const coupon = createCoupon(reward);
+      setState((prev) => {
+        if (prev.loyalty.points < reward.cost) return prev;
+        return {
+          ...prev,
+          loyalty: {
+            ...prev.loyalty,
+            points: prev.loyalty.points - reward.cost,
+            coupons: [coupon, ...(prev.loyalty.coupons || [])],
+            history: [
+              {
+                id: createId('h'),
+                label: `${reward.title} (${coupon.code})`,
+                points: -reward.cost,
+                date: coupon.claimedAt,
+              },
+              ...prev.loyalty.history,
+            ],
+          },
+        };
+      });
+      return coupon;
+    },
+    [state.loyalty.points]
+  );
+
+  /* A coupon is spent by the order that applied it */
+  const useCoupon = useCallback((code, orderCode = null) => {
+    if (!code) return false;
+    setState((prev) => ({
+      ...prev,
+      loyalty: {
+        ...prev.loyalty,
+        coupons: markCouponUsed(prev.loyalty.coupons || [], code, orderCode),
+      },
+    }));
+    return true;
   }, []);
 
   /* Points spent on an order (never more than the account holds) */
@@ -386,6 +407,7 @@ export function AccountProvider({ children }) {
       markAllRead,
       deleteNotification,
       redeemReward,
+      useCoupon,
       spendPoints,
       earnPoints,
       updateSettings,
@@ -411,6 +433,7 @@ export function AccountProvider({ children }) {
       markAllRead,
       deleteNotification,
       redeemReward,
+      useCoupon,
       spendPoints,
       earnPoints,
       updateSettings,

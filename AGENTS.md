@@ -148,6 +148,16 @@ matched in one block in `matchRoute()` in `src/App.jsx`.
   ≤ 6 MB) and saves it inside the account entry, so no upload server exists.
 - Favorites are product ids, so the heart buttons on `ProductCard`/`ProductPage`
   and the account favorites grid share one source of truth.
+- Club rewards are claimed on `/account/rewards` and stay in the account as
+  single-use coupons (`loyalty.coupons`, logic in `src/data/rewardCoupons.js`).
+  Claiming spends points and issues a code: the discount reward draws a random
+  10–30% off, so every claim is a different code; the free-drink / dessert / main
+  codes only cover one matching item (the cheapest in the cart), and the delivery
+  code covers the delivery fee. `/cart` lists the unused codes in the summary
+  aside, applies at most one, and the saved order retires it
+  (`useCoupon(code, orderCode)` sets `usedAt`/`orderCode`). The rewards page hands
+  a chosen code to the cart through `atrin-pending-coupon`. Coupon logic tests:
+  `node --test src/data/rewardCoupons.test.js`.
 - `src/styles/account.css` is the whole account design system (sidebar, panels,
   status pills, cards, modals, skeletons, breakpoints). Store-wide additions in
   it are only the favorite-heart styles.

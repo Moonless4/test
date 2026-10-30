@@ -3525,3 +3525,95 @@ a.acct-stat:hover {
   border-color: rgba(203, 2, 54, 0.45);
   box-shadow: 0 0 0 3px rgba(203, 2, 54, 0.08);
 }
+
+/* Claimed rewards waiting to be used in an order */
+.reward-empty {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 2;
+  color: var(--muted);
+}
+
+.reward-coupon-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.reward-coupon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px dashed rgba(203, 2, 54, 0.3);
+  background: linear-gradient(180deg, #fffdf8, #fff);
+}
+
+.reward-coupon__icon {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--cream-soft);
+  color: var(--primary);
+}
+
+.reward-coupon__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.reward-coupon__copy b {
+  font-size: 12.5px;
+  font-weight: 800;
+}
+
+.reward-coupon__copy small {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.reward-coupon__copy code {
+  margin-top: 3px;
+  font-family: 'YekanBakh', Tahoma, sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+}
+
+.reward-coupon__actions {
+  margin-inline-start: auto;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.reward-coupon__actions .btn {
+  font-size: 10.5px;
+  min-height: 34px;
+  padding: 0 11px;
+}
+
+@media (max-width: 640px) {
+  .reward-coupon {
+    flex-wrap: wrap;
+  }
+
+  .reward-coupon__actions {
+    margin-inline-start: 0;
+    width: 100%;
+  }
+
+  .reward-coupon__actions .btn {
+    flex: 1 1 auto;
+  }
+}
