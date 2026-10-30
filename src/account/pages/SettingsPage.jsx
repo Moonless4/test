@@ -5,7 +5,7 @@ import { useAccount } from '../AccountContext.jsx';
 import { ConfirmDialog, Field, PageHead, Panel, Toggle } from '../ui.jsx';
 
 export default function SettingsPage({ onToast }) {
-  const { settings, updateSettings, setLanguage, signOut } = useAccount();
+  const { settings, updateSettings, signOut } = useAccount();
   const { navigate } = useRouter();
 
   const [password, setPassword] = useState({ current: '', next: '', confirm: '' });
@@ -62,35 +62,6 @@ export default function SettingsPage({ onToast }) {
               checked={settings.notifications.newsletter}
               onChange={(value) => updateSettings('notifications', { newsletter: value })}
             />
-          </div>
-        </Panel>
-
-        <Panel title="زبان و نمایش" subtitle="زبان رابط کاربری و واحد پول نمایش داده‌شده.">
-          <div className="lang-options" role="radiogroup" aria-label="زبان">
-            <label className={`lang-option ${settings.language === 'fa' ? 'is-active' : ''}`}>
-              <input
-                type="radio"
-                name="language"
-                checked={settings.language === 'fa'}
-                onChange={() => {
-                  setLanguage('fa');
-                  onToast('زبان رابط روی فارسی تنظیم شد.');
-                }}
-              />
-              <span>
-                <b>فارسی</b>
-                <small>راست‌چین · تومان</small>
-              </span>
-              <Icon name="check" size={16} />
-            </label>
-
-            <label className="lang-option is-disabled">
-              <input type="radio" name="language" disabled />
-              <span>
-                <b>English</b>
-                <small>به‌زودی</small>
-              </span>
-            </label>
           </div>
         </Panel>
 

@@ -2687,58 +2687,6 @@ a.acct-stat:hover {
   outline-offset: 2px;
 }
 
-.lang-options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.lang-option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: #fff;
-  cursor: pointer;
-  transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
-}
-
-.lang-option input {
-  display: none;
-}
-
-.lang-option span {
-  display: flex;
-  flex-direction: column;
-}
-
-.lang-option b {
-  font-size: 12.5px;
-  font-weight: 700;
-}
-
-.lang-option small {
-  font-size: 10px;
-  color: var(--muted);
-}
-
-.lang-option > .icon {
-  margin-inline-start: auto;
-  color: var(--primary);
-}
-
-.lang-option.is-active {
-  border-color: rgba(203, 2, 54, 0.28);
-  background: #fffaf5;
-}
-
-.lang-option.is-disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
 .settings-danger {
   display: flex;
   align-items: center;
@@ -3471,8 +3419,7 @@ a.acct-stat:hover {
     justify-content: flex-start;
   }
 
-  .acct-form__grid,
-  .lang-options {
+  .acct-form__grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
