@@ -3,18 +3,49 @@
 
    The site keeps every record in localStorage, so seeding is a one-time write:
    when the fixture on disk is newer than what this browser already applied, the
-   demo customer, orders, and newsletter sign-ups are written before the app
-   mounts (see src/main.jsx). Applying once per generated fixture keeps later
-   test edits in place; run the script again to reseed.
+   orders and newsletter sign-ups are written before the app mounts (see
+   src/main.jsx). Applying once per generated fixture keeps later test edits in
+   place; run the script again to reseed.
+
+   The fixture never creates a customer account: the site opens signed out. Its
+   `purgeAccounts` list exists only to remove a ready-made customer that an older
+   fixture left signed in.
    Production builds are untouched — no fixture is written to storage. */
 
 import seed from './demoSeed.data.js';
 
 const MARKER_KEY = 'atrin-demo-seed';
+const ACCOUNTS_KEY = 'naval-accounts-v1';
+const SESSION_KEY = 'naval-account-session-v1';
 
 const write = (key, value) => {
   if (typeof value === 'string') localStorage.setItem(key, value);
   else localStorage.setItem(key, JSON.stringify(value));
+};
+
+/* Drops the accounts an older fixture pre-created and signs them out, leaving
+   every account this browser registered itself untouched. */
+const purgeDemoAccounts = (identifiers = []) => {
+  if (!identifiers.length) return;
+  try {
+    const raw = localStorage.getItem(ACCOUNTS_KEY);
+    const accounts = raw ? JSON.parse(raw) : null;
+    if (accounts && typeof accounts === 'object') {
+      let removed = false;
+      identifiers.forEach((identifier) => {
+        if (identifier in accounts) {
+          delete accounts[identifier];
+          removed = true;
+        }
+      });
+      if (removed) write(ACCOUNTS_KEY, accounts);
+    }
+    if (identifiers.includes(localStorage.getItem(SESSION_KEY))) {
+      localStorage.removeItem(SESSION_KEY);
+    }
+  } catch (error) {
+    console.warn('[seed] پاک‌سازی حساب نمونه ناموفق بود.', error);
+  }
 };
 
 /* Returns true when the demo records were written to storage. */
@@ -24,6 +55,7 @@ export function loadDemoSeed() {
 
   try {
     if (localStorage.getItem(MARKER_KEY) === seed.createdAt) return false;
+    purgeDemoAccounts(seed.purgeAccounts);
     Object.entries(seed.storage).forEach(([key, value]) => write(key, value));
     localStorage.setItem(MARKER_KEY, seed.createdAt);
     console.info(`[seed] دیتابیس نمونه بارگذاری شد (${seed.createdAt}).`);

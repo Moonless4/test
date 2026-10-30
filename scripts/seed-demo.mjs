@@ -10,10 +10,10 @@
  *   docker compose -f docker-compose.base44.yml exec -T web node scripts/seed-demo.mjs
  *   # then refresh the preview
  *
- * It seeds: one registered demo customer (order history, reservations,
- * notifications, club points), the orders list the admin panel reads, and a few
- * newsletter subscribers. Dates are relative to the moment the script runs, so
- * run it again whenever the sample data should feel current.
+ * It seeds the orders list the admin panel reads and a few newsletter
+ * subscribers — never a customer account: the site always starts signed out and
+ * every customer registers their own profile. Dates are relative to the moment
+ * the script runs, so run it again whenever the sample data should feel current.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -25,22 +25,10 @@ const OUTPUT = resolve(ROOT, 'src/dev/demoSeed.data.js');
 
 const CUSTOMER_PHONE = '09123456789';
 const CUSTOMER_NAME = 'سارا محمدی';
-const RESTAURANT = 'رستوران آترین';
 const DELIVERY_FEE = 35000;
 const FREE_DELIVERY_FROM = 500000;
 
 const hoursAgo = (hours) => new Date(Date.now() - hours * 3600 * 1000).toISOString();
-const dayAt = (offset, hour, minute = 0) => {
-  const date = new Date();
-  date.setDate(date.getDate() + offset);
-  date.setHours(hour, minute, 0, 0);
-  return date;
-};
-const dayKey = (offset) => {
-  const date = dayAt(offset, 12);
-  const pad = (value) => String(value).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-};
 
 const line = (id, qty) => {
   const product = products.find((item) => item.id === id);
@@ -48,24 +36,17 @@ const line = (id, qty) => {
   return { productId: product.id, name: product.name, price: product.price, qty };
 };
 
+/* Only the addresses that the demo orders carry, for the admin panel list. */
 const ADDRESSES = [
   {
     id: 'addr-home',
     title: 'خانه',
-    recipient: CUSTOMER_NAME,
-    phone: CUSTOMER_PHONE,
     full: 'تهران، سعادت‌آباد، بلوار دریا، خیابان مطهری، پلاک ۲۴، واحد ۵',
-    notes: 'زنگ واحد ۵',
-    isDefault: true,
   },
   {
     id: 'addr-work',
     title: 'محل کار',
-    recipient: CUSTOMER_NAME,
-    phone: CUSTOMER_PHONE,
     full: 'تهران، ونک، خیابان گاندی جنوبی، برج نگین، طبقه ۷، واحد ۷۰۲',
-    notes: 'تحویل به پذیرش طبقه همکف',
-    isDefault: false,
   },
 ];
 
@@ -73,7 +54,6 @@ const ADDRESSES = [
 const ORDERS = [
   {
     code: 'NW-418203',
-    customerStatus: 'review',
     adminStatus: 'new',
     type: 'delivery',
     createdAt: hoursAgo(1),
@@ -83,7 +63,6 @@ const ORDERS = [
   },
   {
     code: 'NW-417640',
-    customerStatus: 'preparing',
     adminStatus: 'preparing',
     type: 'delivery',
     createdAt: hoursAgo(4),
@@ -93,7 +72,6 @@ const ORDERS = [
   },
   {
     code: 'NW-409118',
-    customerStatus: 'delivered',
     adminStatus: 'done',
     type: 'delivery',
     createdAt: hoursAgo(24 * 6 + 3),
@@ -103,7 +81,6 @@ const ORDERS = [
   },
   {
     code: 'NW-405533',
-    customerStatus: 'delivered',
     adminStatus: 'done',
     type: 'pickup',
     createdAt: hoursAgo(24 * 19 + 5),
@@ -113,7 +90,6 @@ const ORDERS = [
   },
   {
     code: 'NW-401204',
-    customerStatus: 'cancelled',
     adminStatus: 'cancelled',
     type: 'delivery',
     createdAt: hoursAgo(24 * 27 + 8),
@@ -129,21 +105,6 @@ const orderTotals = (order) => {
     order.type === 'delivery' && subtotal < FREE_DELIVERY_FROM ? DELIVERY_FEE : 0;
   return { subtotal, delivery, total: subtotal + delivery };
 };
-
-const customerOrders = ORDERS.map((order, index) => ({
-  id: `ord-demo-${index + 1}`,
-  code: order.code,
-  type: order.type,
-  status: order.customerStatus,
-  createdAt: order.createdAt,
-  restaurant: RESTAURANT,
-  items: order.items,
-  deliveryFee: orderTotals(order).delivery,
-  discount: 0,
-  pointsUsed: 0,
-  payment: order.payment,
-  ...(order.addressId ? { addressId: order.addressId } : {}),
-}));
 
 const adminOrders = ORDERS.map((order, index) => {
   const { subtotal, delivery, total } = orderTotals(order);
@@ -170,100 +131,6 @@ const adminOrders = ORDERS.map((order, index) => {
   };
 });
 
-const RESERVATIONS = [
-  {
-    id: 'RS-2481',
-    status: 'confirmed',
-    date: dayKey(3),
-    time: '20:30',
-    guests: 2,
-    area: 'سالن اصلی',
-    restaurant: 'آترین — شعبه سعادت‌آباد',
-    note: 'میز کنار پنجره باشد، لطفاً.',
-  },
-  {
-    id: 'RS-2510',
-    status: 'pending',
-    date: dayKey(9),
-    time: '21:00',
-    guests: 5,
-    area: 'تراس',
-    restaurant: 'آترین — شعبه سعادت‌آباد',
-    note: 'جشن تولد؛ کیک را خودمان می‌آوریم.',
-  },
-  {
-    id: 'RS-2207',
-    status: 'completed',
-    date: dayKey(-18),
-    time: '21:00',
-    guests: 4,
-    area: 'تراس',
-    restaurant: 'آترین — شعبه سعادت‌آباد',
-    note: '',
-  },
-  {
-    id: 'RS-1980',
-    status: 'cancelled',
-    date: dayKey(-33),
-    time: '19:00',
-    guests: 3,
-    area: 'سالن اصلی',
-    restaurant: 'آترین — شعبه سعادت‌آباد',
-    note: '',
-  },
-];
-
-const NOTIFICATIONS = [
-  {
-    id: 'ntf-demo-1',
-    type: 'order',
-    title: 'سفارش شما در حال آماده‌سازی است',
-    body: 'سفارش NW-417640 توسط آشپزخانه تایید شد و تا حدود ۳۰ دقیقه دیگر به دستتان می‌رسد.',
-    createdAt: hoursAgo(3),
-    read: false,
-  },
-  {
-    id: 'ntf-demo-2',
-    type: 'reservation',
-    title: 'رزرو RS-2481 تایید شد',
-    body: 'میز ۲ نفره شما برای ساعت ۲۰:۳۰ رزرو شد. تا ۱۵ دقیقه پس از ساعت رزرو میز نگه داشته می‌شود.',
-    createdAt: hoursAgo(26),
-    read: false,
-  },
-  {
-    id: 'ntf-demo-3',
-    type: 'loyalty',
-    title: '۳۵۰ امتیاز جدید به باشگاه شما اضافه شد',
-    body: 'امتیاز سفارش NW-409118 به حساب باشگاه مشتریان آترین اضافه شد.',
-    createdAt: hoursAgo(24 * 6),
-    read: true,
-  },
-  {
-    id: 'ntf-demo-4',
-    type: 'offer',
-    title: 'پیشنهاد ویژه آخر هفته',
-    body: 'با خرید دو پیتزای مخصوص سرآشپز، نوشیدنی سرد هدیه بگیرید.',
-    createdAt: hoursAgo(24 * 11),
-    read: true,
-  },
-  {
-    id: 'ntf-demo-5',
-    type: 'system',
-    title: 'به آترین خوش آمدید',
-    body: 'حساب شما ساخته شد. سفارش‌ها، رزروها و امتیازهای باشگاه مشتریان از این پس همین‌جا نمایش داده می‌شوند.',
-    createdAt: hoursAgo(24 * 40),
-    read: true,
-  },
-];
-
-const LOYALTY_HISTORY = [
-  { id: 'h-demo-1', label: 'امتیاز سفارش NW-417640', points: 145, date: hoursAgo(4) },
-  { id: 'h-demo-2', label: 'امتیاز سفارش NW-409118', points: 350, date: hoursAgo(24 * 6) },
-  { id: 'h-demo-3', label: 'استفاده از امتیاز در سفارش NW-405533', points: -400, date: hoursAgo(24 * 19) },
-  { id: 'h-demo-4', label: 'امتیاز سفارش NW-405533', points: 305, date: hoursAgo(24 * 19) },
-  { id: 'h-demo-5', label: 'هدیه ثبت‌نام در باشگاه مشتریان', points: 500, date: hoursAgo(24 * 40) },
-];
-
 const NEWSLETTER = [
   'sara.mohammadi@example.com',
   'reza.karimi@example.com',
@@ -277,44 +144,13 @@ const NEWSLETTER = [
   createdAt: hoursAgo(24 * (index + 2)),
 }));
 
-const accounts = {
-  [CUSTOMER_PHONE]: {
-    registrationCompleted: true,
-    user: {
-      firstName: 'سارا',
-      lastName: 'محمدی',
-      phone: CUSTOMER_PHONE,
-      email: 'sara.mohammadi@example.com',
-      birthday: '1991-04-18',
-      avatar: 'graphic:rose',
-      memberSince: dayKey(-240),
-      tier: 'طلایی',
-    },
-    addresses: ADDRESSES,
-    orders: customerOrders,
-    reservations: RESERVATIONS,
-    favorites: ['royal-pizza', 'chef-pizza', 'season-salad'],
-    notifications: NOTIFICATIONS,
-    loyalty: {
-      points: 1240,
-      nextRewardAt: 1500,
-      tier: 'طلایی',
-      history: LOYALTY_HISTORY,
-    },
-  },
-};
-
 const seed = {
-  version: 1,
+  version: 2,
   createdAt: new Date().toISOString(),
-  demo: {
-    customer: CUSTOMER_PHONE,
-    customerName: CUSTOMER_NAME,
-    note: 'داده نمونه برای تست؛ با ?seed=demo در localStorage بارگذاری می‌شود.',
-  },
+  /* نسخه‌های قبلی این فایل یک مشتری آماده را در مرورگر وارد می‌کردند؛ لودر
+     توسعه این شناسه‌ها را از حافظه پاک می‌کند تا سایت همیشه مهمان باز شود. */
+  purgeAccounts: [CUSTOMER_PHONE],
   storage: {
-    'naval-accounts-v1': accounts,
-    'naval-account-session-v1': CUSTOMER_PHONE,
     'atrin-orders-v1': adminOrders,
     'atrin-newsletter-v1': NEWSLETTER,
   },
@@ -328,9 +164,8 @@ writeFileSync(
 );
 
 console.log(`دیتابیس نمونه ساخته شد: ${OUTPUT}`);
-console.log(`مشتری نمونه: ${CUSTOMER_NAME} — ${CUSTOMER_PHONE} (ورود با همین شماره)`);
 console.log(
-  `سفارش‌ها: ${adminOrders.length} · رزروها: ${RESERVATIONS.length} · اعضای خبرنامه: ${NEWSLETTER.length}`
+  `سفارش‌ها: ${adminOrders.length} · اعضای خبرنامه: ${NEWSLETTER.length} · حساب کاربری: هیچ (سایت مهمان باز می‌شود)`
 );
 console.log('صفحه را دوباره بارگذاری کنید؛ داده نمونه یک بار در localStorage نوشته می‌شود.');
-console.log('توجه: داده‌های فعلی همین مرورگر (سفارش‌ها، خبرنامه، مشتری نمونه) جایگزین می‌شوند.');
+console.log('توجه: داده‌های فعلی همین مرورگر (سفارش‌ها و خبرنامه) جایگزین می‌شوند.');

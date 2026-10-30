@@ -45,19 +45,20 @@ localStorage, so the script generates a fixture module
 it into storage once on the next start, before the providers mount
 (`src/dev/demoSeed.js`, called from `src/main.jsx`). It is gated on
 `import.meta.env.DEV` and on the `atrin-demo-seed` marker, so later test edits
-survive; run the script again to reseed. Seeding replaces
-`naval-accounts-v1`, `naval-account-session-v1`, `atrin-orders-v1` and
-`atrin-newsletter-v1` in that browser.
+survive; run the script again to reseed. Seeding replaces `atrin-orders-v1` and
+`atrin-newsletter-v1` in that browser and never writes an account: the site
+opens signed out, so a demo login has to be registered by hand. The fixture's
+`purgeAccounts` list is applied once per fixture and removes the customer that
+fixture v1 pre-created (`09123456789`) plus its session.
 
 ```bash
 docker compose -f docker-compose.base44.yml exec -T web npm run seed:demo
 ```
 
-Content: demo customer سارا محمدی / `09123456789` (signed in; 5 orders, 4
-reservations, 5 notifications, 1,240 club points, 2 addresses, 3 favorites), the
-same 5 orders in the admin list with mixed statuses, and 6 newsletter
-subscribers. Dates are relative to the run time. Verified: dashboard, orders,
-reservations, notifications and rewards all render the seeded records.
+Content: 5 orders in the admin list with mixed statuses (customer name/phone are
+plain text on the order, not a login) and 6 newsletter subscribers. Dates are
+relative to the run time. There is no seeded customer, so the dashboard flows are
+tested by registering a throwaway account.
 
 ## Sandbox-specific configuration
 
