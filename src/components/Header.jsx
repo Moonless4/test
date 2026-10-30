@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSite } from '../site/SiteContent.jsx';
 import Icon from './Icons.jsx';
+import CartPreview from './CartPreview.jsx';
 import { Link, useRouter } from '../router.jsx';
 
 function BrandMark({ variant = 'header' }) {
@@ -23,13 +24,38 @@ function BrandMark({ variant = 'header' }) {
   );
 }
 
-export default function Header({ cartCount, onCart, onSearch, onLogin, onMenu, onCategory }) {
+export default function Header({
+  cartCount,
+  cartItems = [],
+  onCart,
+  onRequireAccount,
+  onSearch,
+  onLogin,
+  onMenu,
+  onCategory,
+}) {
   const { path } = useRouter();
   const { content } = useSite();
   const { navLinks, categories, megaMenu } = content;
   const [scrolled, setScrolled] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const closeTimer = useRef(null);
+  const cartTimer = useRef(null);
+
+  const openCart = () => {
+    clearTimeout(cartTimer.current);
+    setCartOpen(true);
+  };
+  const closeCart = () => {
+    cartTimer.current = setTimeout(() => setCartOpen(false), 140);
+  };
+
+  useEffect(() => {
+    setCartOpen(false);
+  }, [path]);
+
+  useEffect(() => () => clearTimeout(cartTimer.current), []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -132,10 +158,20 @@ export default function Header({ cartCount, onCart, onSearch, onLogin, onMenu, o
             <button type="button" className="icon-btn" onClick={onSearch} aria-label="جستجو">
               <Icon name="search" />
             </button>
-            <button type="button" className="icon-btn cart-btn" onClick={onCart} aria-label={`سبد خرید، ${cartCount} آیتم`}>
-              <Icon name="cart" />
-              <span className="cart-count">{cartCount.toLocaleString('fa-IR')}</span>
-            </button>
+            <div className="cart-hover" onMouseEnter={openCart} onMouseLeave={closeCart}>
+              <button type="button" className="icon-btn cart-btn" onClick={onCart} aria-label={`سبد خرید، ${cartCount} آیتم`}>
+                <Icon name="cart" />
+                <span className="cart-count">{cartCount.toLocaleString('fa-IR')}</span>
+              </button>
+              {cartOpen && cartItems.length > 0 && (
+                <CartPreview
+                  items={cartItems}
+                  onCheckout={onCart}
+                  onRequireAccount={onRequireAccount}
+                  onFinish={() => setCartOpen(false)}
+                />
+              )}
+            </div>
             <button type="button" className="login-btn" onClick={onLogin}>
               <Icon name="user" size={18} />
               <span>ورود / ثبت نام</span>

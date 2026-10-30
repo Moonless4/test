@@ -49,7 +49,13 @@ interaction directly (cart, quick view, filters, FAQ, search, checkout).
 
 The cart is a page, not an overlay: `/cart` (`src/pages/CartPage.jsx`, route `cart`
 in `matchRoute()`) holds all four steps — سبد خرید، اطلاعات تحویل، پرداخت، تأیید —
-and the header cart button navigates there. Steps advance in place; the summary
+and the header cart button navigates there. Hovering the header cart icon (desktop,
+above 1080px) slides out `src/components/CartPreview.jsx` from the side with the
+items and a «تسویه حساب» button; that button needs a signed-in customer — signed
+out, it opens `AuthModal` in register mode and then lands on `/cart`. The same
+gate guards step 1 → 2 of the page (`useAccount().isAuthenticated`, exposed by
+`AccountContext` — the context exposes `isAuthenticated`, not `signedIn`).
+Steps advance in place; the summary
 sidebar reuses the `.cart-summary` styles and the page's own CSS is
 `src/styles/cart.css`. Submitting writes an order through `addOrder()` and clears
 the cart in `App.jsx`.

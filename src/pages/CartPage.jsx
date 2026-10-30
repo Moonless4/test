@@ -5,6 +5,7 @@ import Icon from '../components/Icons.jsx';
 import { formatPrice } from '../components/ProductCard.jsx';
 import OrderSuggestions from '../components/OrderSuggestions.jsx';
 import { addOrder } from '../data/records.js';
+import { useAccount } from '../account/AccountContext.jsx';
 
 const deliveryFee = 35000;
 const freeDeliveryFrom = 500000;
@@ -16,8 +17,9 @@ const STEPS = [
   { key: 4, title: 'تأیید سفارش', hint: 'ثبت نهایی' },
 ];
 
-export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) {
+export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, onRequireAccount }) {
   const { navigate } = useRouter();
+  const { isAuthenticated } = useAccount();
   const [step, setStep] = useState(1);
   const [order, setOrder] = useState(null);
   const [error, setError] = useState('');
@@ -253,8 +255,12 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
                     <button type="button" className="btn btn--outline" onClick={() => navigate('/menu')}>
                       افزودن غذای بیشتر
                     </button>
-                    <button type="button" className="btn btn--primary" onClick={() => setStep(2)}>
-                      ادامه: اطلاعات تحویل
+                    <button
+                      type="button"
+                      className="btn btn--primary"
+                      onClick={() => (isAuthenticated ? setStep(2) : onRequireAccount())}
+                    >
+                      {isAuthenticated ? 'ادامه: اطلاعات تحویل' : 'ساخت حساب و ادامه'}
                       <Icon name="chevronLeft" size={18} />
                     </button>
                   </div>

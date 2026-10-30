@@ -3,19 +3,19 @@ import Modal from './Modal.jsx';
 import Icon from './Icons.jsx';
 import { useAccount } from '../account/AccountContext.jsx';
 
-export default function AuthModal({ open, onClose, onToast, onSuccess }) {
+export default function AuthModal({ open, initialMode = 'login', onClose, onToast, onSuccess }) {
   const { login, register } = useAccount();
-  const [mode, setMode] = useState('login');
+  const [mode, setMode] = useState(initialMode);
   const [form, setForm] = useState({ name: '', phone: '', password: '' });
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (open) {
-      setMode('login');
+      setMode(initialMode);
       setForm({ name: '', phone: '', password: '' });
       setError('');
     }
-  }, [open]);
+  }, [open, initialMode]);
 
   const update = (key) => (event) => setForm((prev) => ({ ...prev, [key]: event.target.value }));
 

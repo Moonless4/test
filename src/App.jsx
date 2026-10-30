@@ -108,6 +108,8 @@ export default function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [reserveOpen, setReserveOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
+  const [authNext, setAuthNext] = useState('/account');
   const [toast, setToast] = useState('');
   const toastTimer = useRef(null);
 
@@ -215,6 +217,12 @@ export default function App() {
   const goBlog = useCallback(() => navigate('/blog'), [navigate]);
   const openReserve = useCallback(() => setReserveOpen(true), []);
 
+  const openAuth = useCallback((mode = 'login', next = '/account') => {
+    setAuthMode(mode);
+    setAuthNext(next);
+    setAuthOpen(true);
+  }, []);
+
   const route = matchRoute(path, site);
 
   useEffect(() => {
@@ -261,6 +269,7 @@ export default function App() {
             onQty={updateQty}
             onRemove={removeItem}
             onAdd={addToCart}
+            onRequireAccount={() => openAuth('register', '/cart')}
             onComplete={() => {
               setCart([]);
               showToast('سفارش شما با موفقیت ثبت شد.');
@@ -299,7 +308,7 @@ export default function App() {
           <AccountShell
             active={route.section}
             onToast={showToast}
-            onLogin={() => setAuthOpen(true)}
+            onLogin={() => openAuth()}
           >
             {sectionPages[route.section] || <AccountDashboard onMenu={goMenu} onReserve={openReserve} onReorder={reorder} />}
           </AccountShell>
@@ -327,8 +336,10 @@ export default function App() {
       <div className="app">
       <Header
         cartCount={cartCount}
+        cartItems={cartItems}
         onSearch={() => setSearchOpen(true)}
-        onLogin={() => setAuthOpen(true)}
+        onLogin={() => openAuth()}
+        onRequireAccount={() => openAuth('register', '/cart')}
         onMenu={() => setMobileOpen(true)}
         onCart={() => navigate('/cart')}
         onCategory={goMenu}
@@ -344,7 +355,7 @@ export default function App() {
         onClose={() => setMobileOpen(false)}
         onLogin={() => {
           setMobileOpen(false);
-          setAuthOpen(true);
+          openAuth();
         }}
         onCategory={goMenu}
       />
@@ -360,9 +371,10 @@ export default function App() {
 
       <AuthModal
         open={authOpen}
+        initialMode={authMode}
         onClose={() => setAuthOpen(false)}
         onToast={showToast}
-        onSuccess={() => navigate('/account')}
+        onSuccess={() => navigate(authNext)}
       />
 
       <Toast message={toast} />
