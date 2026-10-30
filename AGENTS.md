@@ -37,6 +37,28 @@ Registration and order-write regression tests run with Node's built-in test
 runner (command below). There is no comprehensive UI suite; load the preview
 and exercise changed interactions directly (cart, filters, search, checkout).
 
+## Demo seed (test data only)
+
+`scripts/seed-demo.mjs` creates the stand-in "database". Every record lives in
+localStorage, so the script generates a fixture module
+(`src/dev/demoSeed.data.js` — generated, do not hand-edit) and the dev app writes
+it into storage once on the next start, before the providers mount
+(`src/dev/demoSeed.js`, called from `src/main.jsx`). It is gated on
+`import.meta.env.DEV` and on the `atrin-demo-seed` marker, so later test edits
+survive; run the script again to reseed. Seeding replaces
+`naval-accounts-v1`, `naval-account-session-v1`, `atrin-orders-v1` and
+`atrin-newsletter-v1` in that browser.
+
+```bash
+docker compose -f docker-compose.base44.yml exec -T web npm run seed:demo
+```
+
+Content: demo customer سارا محمدی / `09123456789` (signed in; 5 orders, 4
+reservations, 5 notifications, 1,240 club points, 2 addresses, 3 favorites), the
+same 5 orders in the admin list with mixed statuses, and 6 newsletter
+subscribers. Dates are relative to the run time. Verified: dashboard, orders,
+reservations, notifications and rewards all render the seeded records.
+
 ## Sandbox-specific configuration
 
 - `vite.config.js` adds `.$BASE44_SANDBOX_HOST_DOMAIN` to `allowedHosts` only

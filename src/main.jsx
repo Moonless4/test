@@ -4,6 +4,7 @@ import App from './App.jsx';
 import { RouterProvider } from './router.jsx';
 import { SiteProvider } from './site/SiteContent.jsx';
 import { initSmoothScroll } from './lib/smoothScroll.js';
+import { loadDemoSeed } from './dev/demoSeed.js';
 import 'lenis/dist/lenis.css';
 import './styles/tokens.css';
 import './styles/base.css';
@@ -21,6 +22,9 @@ import './styles/account.css';
 import './styles/admin.css';
 
 initSmoothScroll();
+
+/* Dev-only: write the demo fixture (scripts/seed-demo.mjs) before the stores mount. */
+loadDemoSeed();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
