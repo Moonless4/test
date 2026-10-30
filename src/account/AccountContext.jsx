@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { createAccount, createId, DEFAULT_SETTINGS, REWARDS } from '../data/account.js';
 import { DEFAULT_AVATAR } from './Avatar.jsx';
+import { isRegisteredAccount, loginAccount } from './registration.js';
 
 const ACCOUNTS_KEY = 'naval-accounts-v1';
 const SESSION_KEY = 'naval-account-session-v1';
@@ -25,6 +26,7 @@ const normalizeAvatar = (avatar) =>
   LEGACY_AVATAR.test(avatar || '') ? DEFAULT_AVATAR : avatar;
 
 const normalize = (account) => ({
+  registrationCompleted: account.registrationCompleted === true,
   user: { ...account.user, avatar: normalizeAvatar(account.user.avatar) },
   addresses: account.addresses || [],
   orders: account.orders || [],
@@ -70,9 +72,13 @@ const readAccounts = () => {
   }
 };
 
-const readSession = () => {
+const readSession = (accounts) => {
   try {
-    return localStorage.getItem(SESSION_KEY) || null;
+    const key = localStorage.getItem(SESSION_KEY);
+    if (isRegisteredAccount(key, accounts[key])) return key;
+    /* Keep old account data, but never resume an auto-created login as registered. */
+    localStorage.removeItem(SESSION_KEY);
+    return null;
   } catch {
     return null;
   }
@@ -89,8 +95,8 @@ const writeSession = (key) => {
 
 export function AccountProvider({ children }) {
   const [accounts, setAccounts] = useState(readAccounts);
-  const [session, setSession] = useState(readSession);
-  const signedIn = Boolean(session && accounts[session]);
+  const [session, setSession] = useState(() => readSession(accounts));
+  const signedIn = isRegisteredAccount(session, accounts[session]);
   const activeKey = signedIn ? session : GUEST_KEY;
   const [state, setState] = useState(() => accounts[activeKey]);
   const [loading, setLoading] = useState(true);
@@ -132,29 +138,34 @@ export function AccountProvider({ children }) {
     });
   }, []);
 
-  /* Login never falls back to a prepared profile: an unknown number starts an empty account */
+  /* Login can only resume an explicitly registered account; it never creates one. */
   const login = useCallback(
     ({ identifier }) => {
       const key = normalizeDigits(identifier).trim().toLowerCase();
-      const existing = accounts[key];
-      const account = existing ? normalize(existing) : createAccount({ phone: key });
-
-      if (!existing) saveAccount(key, account);
-      activate(key, account);
-      return { created: !existing };
+      const result = loginAccount(accounts, key);
+      if (!result.ok) return result;
+      activate(key, normalize(result.account));
+      return { ok: true };
     },
-    [accounts, activate, saveAccount]
+    [accounts, activate]
   );
 
   const register = useCallback(
     ({ name, identifier }) => {
       const key = normalizeDigits(identifier).trim().toLowerCase();
-      if (accounts[key]) {
+      if (isRegisteredAccount(key, accounts[key])) {
         return { ok: false, error: 'این شماره قبلاً ثبت‌نام کرده است؛ از تب «ورود» وارد شوید.' };
       }
       const parts = name.trim().split(/\s+/);
       const firstName = parts.shift() || '';
-      const account = createAccount({ firstName, lastName: parts.join(' '), phone: key });
+      const lastName = parts.join(' ');
+      /* Completing an old automatic profile must not discard its orders or favorites. */
+      const previous = accounts[key] ? normalize(accounts[key]) : createAccount({ phone: key });
+      const account = {
+        ...previous,
+        registrationCompleted: true,
+        user: { ...previous.user, firstName, lastName },
+      };
 
       saveAccount(key, account);
       activate(key, account);

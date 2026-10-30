@@ -23,9 +23,9 @@ const STEPS = [
   { key: 4, title: 'تأیید سفارش', hint: 'ثبت نهایی' },
 ];
 
-export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) {
+export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, onRequireAccount }) {
   const { navigate } = useRouter();
-  const { isAuthenticated, user, loyalty, login, register, spendPoints, earnPoints } = useAccount();
+  const { isAuthenticated, user, loyalty, spendPoints, earnPoints } = useAccount();
   const [step, setStep] = useState(1);
   const [order, setOrder] = useState(null);
   const [error, setError] = useState('');
@@ -36,9 +36,14 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
     time: 'asap',
     payment: 'online',
   });
-  const [account, setAccount] = useState({ name: '', phone: '', password: '' });
-  const [accountMode, setAccountMode] = useState('register');
-  const [accountError, setAccountError] = useState('');
+  /* The cart page and header checkout share the same mandatory account window. */
+  const requireAccount = () => {
+    if (isAuthenticated) return true;
+    setStep(1);
+    setError('برای ادامه خرید ابتدا ثبت‌نام کنید یا وارد حساب ثبت‌شده خود شوید.');
+    onRequireAccount();
+    return false;
+  };
   const [usePoints, setUsePoints] = useState(false);
   const [pointsInput, setPointsInput] = useState(0);
 
@@ -53,8 +58,8 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
   const count = items.reduce((sum, item) => sum + item.qty, 0);
 
   useEffect(() => {
-    if (!order && items.length === 0) setStep(1);
-  }, [items.length, order]);
+    if (!order && (items.length === 0 || !isAuthenticated)) setStep(1);
+  }, [items.length, order, isAuthenticated]);
 
   /* A signed-in customer doesn't retype what the account already knows */
   useEffect(() => {
@@ -77,12 +82,6 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
     setError('');
   };
 
-  const updateAccount = (key) => (event) => {
-    const value = key === 'phone' ? normalizePhone(event.target.value) : event.target.value;
-    setAccount((prev) => ({ ...prev, [key]: value }));
-    setAccountError('');
-  };
-
   const validateDelivery = () => {
     if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
       setError('لطفاً نام، شماره تماس و آدرس را کامل کنید.');
@@ -96,84 +95,6 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
     return true;
   };
 
-  /* Before the payment steps a signed-out customer gets an account or signs in */
-  const createAccountAndContinue = () => {
-    const name = account.name.trim();
-    const phone = account.phone.trim();
-    if (!name) {
-      setAccountError('نام و نام خانوادگی را وارد کنید.');
-      return;
-    }
-    if (!isValidPhone(phone)) {
-      setAccountError('شماره موبایل را در قالب ۰۹۱۲۳۴۵۶۷۸۹ وارد کنید.');
-      return;
-    }
-    if (account.password.length < 6) {
-      setAccountError('رمز عبور باید حداقل ۶ کاراکتر باشد.');
-      return;
-    }
-    const result = register({ name, identifier: phone });
-    if (!result.ok) {
-      setAccountMode('login');
-      setAccountError('این شماره قبلاً ثبت‌نام کرده است؛ رمز عبور خود را وارد کنید تا وارد شوید.');
-      return;
-    }
-    setAccountError('');
-    setForm((prev) => ({ ...prev, name, phone }));
-    setStep(2);
-  };
-
-  const signInAndContinue = () => {
-    const phone = account.phone.trim();
-    if (!isValidPhone(phone)) {
-      setAccountError('شماره موبایل را در قالب ۰۹۱۲۳۴۵۶۷۸۹ وارد کنید.');
-      return;
-    }
-    if (account.password.length < 6) {
-      setAccountError('رمز عبور باید حداقل ۶ کاراکتر باشد.');
-      return;
-    }
-    login({ identifier: phone });
-    setAccountError('');
-    setForm((prev) => ({ ...prev, phone }));
-    setStep(2);
-  };
-
-  const handleAccountContinue = () =>
-    accountMode === 'login' ? signInAndContinue() : createAccountAndContinue();
-
-  const nameField = (
-    <label>
-      <span>نام و نام خانوادگی</span>
-      <input value={account.name} onChange={updateAccount('name')} placeholder="نام شما" />
-    </label>
-  );
-
-  const phoneField = (
-    <label>
-      <span>شماره موبایل</span>
-      <input
-        value={account.phone}
-        onChange={updateAccount('phone')}
-        placeholder="۰۹۱۲۳۴۵۶۷۸۹"
-        inputMode="tel"
-        dir="ltr"
-      />
-    </label>
-  );
-
-  const passwordField = (
-    <label>
-      <span>رمز عبور</span>
-      <input
-        type="password"
-        value={account.password}
-        onChange={updateAccount('password')}
-        placeholder="حداقل ۶ کاراکتر"
-      />
-    </label>
-  );
-
   const goStep = (key) => {
     if (key >= step) return;
     setError('');
@@ -181,12 +102,7 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
   };
 
   const submit = () => {
-    if (!isAuthenticated) {
-      setAccountError('برای ثبت سفارش ابتدا حساب کاربری خود را بسازید یا وارد شوید.');
-      setError('');
-      setStep(1);
-      return;
-    }
+    if (!requireAccount()) return;
     if (!validateDelivery()) {
       setStep(2);
       return;
@@ -195,7 +111,7 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
     const payment = form.payment === 'online' ? 'پرداخت آنلاین' : 'پرداخت در محل';
     const time = form.time === 'asap' ? 'در اولین فرصت' : form.time;
 
-    addOrder({
+    const savedOrder = addOrder({
       code,
       total,
       subtotal,
@@ -215,6 +131,13 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
         qty: item.qty,
       })),
     });
+
+    if (!savedOrder) {
+      setStep(1);
+      setError('برای ثبت سفارش ابتدا ثبت‌نام کنید یا دوباره وارد حساب خود شوید.');
+      onRequireAccount();
+      return;
+    }
 
     if (pointsUsed > 0) spendPoints(pointsUsed, `استفاده از امتیاز در سفارش ${code}`);
     const pointsEarned = Math.floor(subtotal / ORDER_STEP) * POINTS_PER_ORDER;
@@ -392,38 +315,13 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
                           <Icon name="user" size={17} />
                         </span>
                         <div>
-                          <b>{accountMode === 'login' ? 'ورود به حساب کاربری' : 'ساخت حساب کاربری'}</b>
+                          <b>ثبت‌نام یا ورود برای ادامه خرید الزامی است</b>
                           <small>
-                            {accountMode === 'login'
-                              ? 'برای ادامه سفارش با شماره موبایل و رمز عبور خود وارد شوید.'
-                              : 'برای ادامه سفارش و ثبت اطلاعات تحویل، ابتدا حساب خود را بسازید.'}
+                            با زدن «تسویه حساب»، ابتدا حساب خود را بسازید یا وارد حساب ثبت‌شده شوید.
                           </small>
                         </div>
                       </header>
 
-                      <div className="checkout__form">
-                        <div className="checkout__row">
-                          {accountMode === 'register' && nameField}
-                          {phoneField}
-                          {accountMode === 'login' && passwordField}
-                        </div>
-                        {accountMode === 'register' && passwordField}
-                        {accountError && (
-                          <span className="form-hint form-hint--error">{accountError}</span>
-                        )}
-                        <button
-                          type="button"
-                          className="cart-account__switch"
-                          onClick={() => {
-                            setAccountMode(accountMode === 'login' ? 'register' : 'login');
-                            setAccountError('');
-                          }}
-                        >
-                          {accountMode === 'login'
-                            ? 'حساب کاربری ندارم؛ ثبت‌نام می‌کنم'
-                            : 'قبلاً حساب ساخته‌ام؛ وارد می‌شوم'}
-                        </button>
-                      </div>
                     </div>
                   )}
 
@@ -434,13 +332,14 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
                     <button
                       type="button"
                       className="btn btn--primary"
-                      onClick={isAuthenticated ? () => setStep(2) : handleAccountContinue}
+                      onClick={() => {
+                        if (requireAccount()) {
+                          setError('');
+                          setStep(2);
+                        }
+                      }}
                     >
-                      {isAuthenticated
-                        ? 'ادامه: اطلاعات تحویل'
-                        : accountMode === 'login'
-                          ? 'ورود و ادامه'
-                          : 'ساخت حساب و ادامه'}
+                      {isAuthenticated ? 'ادامه: اطلاعات تحویل' : 'تسویه حساب'}
                       <Icon name="chevronLeft" size={18} />
                     </button>
                   </div>
@@ -515,12 +414,7 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) 
                         type="button"
                         className="btn btn--primary"
                         onClick={() => {
-                          if (!isAuthenticated) {
-                            setAccountError('برای ادامه پرداخت ابتدا حساب کاربری خود را بسازید یا وارد شوید.');
-                            setError('');
-                            setStep(1);
-                            return;
-                          }
+                          if (!requireAccount()) return;
                           if (validateDelivery()) setStep(3);
                         }}
                       >

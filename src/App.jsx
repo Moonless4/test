@@ -280,6 +280,7 @@ export default function App() {
       case 'cart':
         return (
           <CartPage
+            onRequireAccount={openAuthGate}
             items={cartItems}
             onQty={updateQty}
             onRemove={removeItem}

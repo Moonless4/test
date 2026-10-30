@@ -60,7 +60,11 @@ export default function AuthModal({
       onToast('حساب شما با موفقیت ایجاد شد.');
     } else {
       const result = login({ identifier });
-      onToast(result.created ? 'حساب جدیدی با این شماره ساخته شد.' : 'ورود شما با موفقیت انجام شد.');
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      onToast('ورود شما با موفقیت انجام شد.');
     }
 
     onClose();

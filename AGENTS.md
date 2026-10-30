@@ -33,8 +33,9 @@ docker compose -f docker-compose.base44.yml ps
 npm run build   # production build sanity check
 ```
 
-There is no test suite. For UI changes, load the preview and exercise the
-interaction directly (cart, quick view, filters, FAQ, search, checkout).
+Registration and order-write regression tests run with Node's built-in test
+runner (command below). There is no comprehensive UI suite; load the preview
+and exercise changed interactions directly (cart, filters, search, checkout).
 
 ## Sandbox-specific configuration
 
@@ -65,14 +66,12 @@ Steps advance in place; the summary
 sidebar reuses the `.cart-summary` styles and the page's own CSS is
 `src/styles/cart.css`.
 
-Step 1 of `/cart` also holds the account gate itself: a signed-out customer gets
-the inline `.cart-account` form (name, mobile, password → `register()`); it is
-not the `AuthModal`. The same card switches to a sign-in form
-(`login({ identifier })`) through its `.cart-account__switch` link — also
-automatically when the entered mobile already has an account — so an existing
-customer is never stuck. No account means no forward step: the step 1 → 2, the
-step 2 → 3 («ادامه: پرداخت») transitions and `submit()` all require
-`isAuthenticated` and bounce back to step 1 with a message. Mobiles are typed through `src/lib/phone.js`
+Step 1 of `/cart` shows a `.cart-account` notice to guests. Its «تسویه حساب»
+button calls the same `openAuthGate()` as the header checkout: there is no
+separate inline login/register implementation. `requireAccount()` guards step
+1 → 2, step 2 → 3 and final submission; losing authentication resets the step
+to 1. A failed login must leave the mandatory window open and must never advance
+checkout. Mobiles are typed through `src/lib/phone.js`
 (`normalizePhone()` strips non-digits, converts Persian/Arabic digits and
 `+98`/`0098` to a Latin `09xxxxxxxxx`, `isValidPhone()` checks that shape); the
 same helpers validate the delivery phone and `AuthModal`. Club points are
@@ -101,10 +100,16 @@ matched in one block in `matchRoute()` in `src/App.jsx`.
   only holds local favorites. Every mutation (favorites, addresses,
   reservations, notifications, rewards, settings) is an action on the provider,
   so swapping in a backend means replacing those bodies.
-- Auth is a local simulation (no server, passwords are not stored): a login with
-  an unknown number starts a brand-new empty account (from `createAccount()` in
-  `src/data/account.js`), registration is refused for an already-used number, and
-  sign-out clears the session. No sample/demo customer exists any more; the
+- Customer auth remains a local simulation (no server, passwords are not stored
+  or verified). Only explicit registration sets `registrationCompleted: true`;
+  `src/account/registration.js` is the shared policy. Unknown/legacy automatic
+  profiles cannot log in, and old sessions without completed registration no
+  longer authenticate. Completing registration for a legacy profile preserves
+  its saved data; duplicate completed registrations are refused. `normalize()`
+  must preserve the marker across profile/loyalty updates. `addOrder()` checks
+  persisted registration/session again before writing and returns `null` when
+  missing; checkout must not clear the cart or award points on that result.
+  Sign-out clears the session. No sample/demo customer exists any more; the
   provider also purges the removed `09121234567` entry from stored accounts.
 - `/account/*` is gated: signed-out visitors get the sign-in card in
   `AccountShell` (it opens `AuthModal` through the `onLogin` prop from
@@ -119,12 +124,13 @@ matched in one block in `matchRoute()` in `src/App.jsx`.
 - `src/styles/account.css` is the whole account design system (sidebar, panels,
   status pills, cards, modals, skeletons, breakpoints). Store-wide additions in
   it are only the favorite-heart styles.
-- Verification: the account pages have no test suite — drive them in the preview
-  (reorder, reschedule/cancel a reservation, add/delete an address, save the
-  profile, mark notifications, redeem a reward, toggle settings). Reset the
-  `naval-accounts-v1` / `naval-account-session-v1` keys afterwards if a check
-  registers an account or mutates seed data; sign in as `09121234567` (any
-  6+ character password) to get the demo customer back.
+- Registration/order regression checks: `docker compose -f
+  docker-compose.base44.yml exec -T web node --test src/account/registration.test.js
+  src/data/records.test.js`. UI checks must exercise unknown login rejection,
+  direct `/cart` checkout, explicit registration, then delivery/payment. Use a
+  unique throwaway account and remove only its own test orders; restore the
+  browser's original customer/cart storage afterward. Never use the removed
+  demo number or sign into an existing customer with guessed credentials.
 
 ## Admin panel (`/admin`)
 

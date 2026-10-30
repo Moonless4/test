@@ -2,6 +2,8 @@
 // There is no backend, so both lists live in localStorage and the admin panel
 // reads the same keys.
 
+import { isRegisteredAccount } from '../account/registration.js';
+
 const ORDERS_KEY = 'atrin-orders-v1';
 const SUBSCRIBERS_KEY = 'atrin-newsletter-v1';
 
@@ -41,6 +43,14 @@ export const listOrders = () =>
   readList(ORDERS_KEY).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
 export const addOrder = (order) => {
+  /* Re-check at the write boundary as well: a stale checkout screen is not a session. */
+  try {
+    const key = localStorage.getItem('naval-account-session-v1');
+    const accounts = JSON.parse(localStorage.getItem('naval-accounts-v1') || '{}');
+    if (!isRegisteredAccount(key, accounts?.[key])) return null;
+  } catch {
+    return null;
+  }
   const entry = {
     id: createId('ord'),
     status: 'new',
