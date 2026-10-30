@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { key: 'orders', to: '/account/orders', label: 'سفارش‌های من', icon: 'cart' },
   { key: 'reservations', to: '/account/reservations', label: 'رزروهای من', icon: 'calendar' },
   { key: 'favorites', to: '/account/favorites', label: 'علاقه‌مندی‌ها', icon: 'heart' },
+  { key: 'comments', to: '/account/comments', label: 'نظرات من', icon: 'quote' },
   { key: 'addresses', to: '/account/addresses', label: 'آدرس‌ها', icon: 'pin' },
   { key: 'profile', to: '/account/profile', label: 'اطلاعات شخصی', icon: 'user' },
   { key: 'notifications', to: '/account/notifications', label: 'اعلان‌ها', icon: 'bell' },

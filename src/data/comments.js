@@ -35,11 +35,12 @@ export const listComments = (targetType, targetId) =>
     .filter((item) => item.targetType === targetType && item.targetId === targetId)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-export const addComment = ({ targetType, targetId, name, text, rating = 0 }) => {
+export const addComment = ({ targetType, targetId, name, text, rating = 0, authorKey = null }) => {
   const entry = {
     id: createId('cmt'),
     targetType,
     targetId,
+    authorKey: authorKey || null,
     name: (name || '').trim(),
     text: (text || '').trim(),
     rating: targetType === COMMENT_TARGETS.product ? Number(rating) || 0 : 0,
@@ -48,6 +49,16 @@ export const addComment = ({ targetType, targetId, name, text, rating = 0 }) => 
   writeAll([entry, ...readAll()]);
   return entry;
 };
+
+export const listCommentsByAuthor = (authorKey) =>
+  authorKey
+    ? readAll()
+        .filter((item) => item.authorKey === authorKey)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    : [];
+
+export const deleteComment = (id, authorKey) =>
+  writeAll(readAll().filter((item) => !(item.id === id && item.authorKey === authorKey)));
 
 export const commentStats = (targetType, targetId) => {
   const list = listComments(targetType, targetId);

@@ -183,6 +183,13 @@ stats) and otherwise keeps the shipped ۴٫۹ / ۱۲۴ display. Styles are the
 `.comments` block at the end of `src/styles/pages.css`. The admin panel does not
 list comments.
 
+A signed-in customer's comment stores `authorKey` (the account identifier from
+`useAccount().accountKey`, exposed by `AccountContext`); guests post with
+`authorKey: null` and never appear in the account area. `/account/comments`
+(`src/account/pages/CommentsPage.jsx`, nav entry «نظرات من») lists
+`listCommentsByAuthor(accountKey)` with the linked food/post title, rating and
+date, and deletes only its own entries through `deleteComment(id, authorKey)`.
+
 ## Admin panel (`/admin`)
 
 The site content is editable at `/admin` (login required). There is no backend:

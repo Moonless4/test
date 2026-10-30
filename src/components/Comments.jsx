@@ -9,7 +9,7 @@ const fullName = (user) => [user?.firstName, user?.lastName].filter(Boolean).joi
 const initial = (name) => (name || '').trim().charAt(0) || '؟';
 
 export default function Comments({ targetType, targetId, withRating = false, onAdded }) {
-  const { user, isAuthenticated } = useAccount();
+  const { user, isAuthenticated, accountKey } = useAccount();
   const [version, setVersion] = useState(0);
   const comments = useMemo(
     () => listComments(targetType, targetId),
@@ -41,6 +41,7 @@ export default function Comments({ targetType, targetId, withRating = false, onA
       name: cleanName,
       text: cleanText,
       rating: withRating ? rating : 0,
+      authorKey: accountKey,
     });
     setVersion((prev) => prev + 1);
     setText('');

@@ -23,6 +23,7 @@ import AccountOrderDetail from './account/pages/OrderDetailPage.jsx';
 import AccountReservations from './account/pages/ReservationsPage.jsx';
 import AccountReservationDetail from './account/pages/ReservationDetailPage.jsx';
 import AccountFavorites from './account/pages/FavoritesPage.jsx';
+import AccountComments from './account/pages/CommentsPage.jsx';
 import AccountAddresses from './account/pages/AddressesPage.jsx';
 import AccountProfile from './account/pages/ProfilePage.jsx';
 import AccountNotifications from './account/pages/NotificationsPage.jsx';
@@ -69,7 +70,7 @@ const matchRoute = (path, site) => {
   if (path === '/account') return { name: 'account', section: 'dashboard' };
 
   const accountMatch = path.match(
-    /^\/account\/(orders|reservations|favorites|addresses|profile|notifications|rewards|settings)(?:\/([\w-]+))?$/
+    /^\/account\/(orders|reservations|favorites|comments|addresses|profile|notifications|rewards|settings)(?:\/([\w-]+))?$/
   );
   if (accountMatch) {
     return { name: 'account', section: accountMatch[1], id: accountMatch[2] };
@@ -314,6 +315,7 @@ export default function App() {
             <AccountReservations onToast={showToast} onReserve={openReserve} />
           ),
           favorites: <AccountFavorites onAdd={addToCart} onMenu={goMenu} onToast={showToast} />,
+          comments: <AccountComments onToast={showToast} />,
           addresses: <AccountAddresses onToast={showToast} />,
           profile: <AccountProfile onToast={showToast} />,
           notifications: <AccountNotifications onToast={showToast} />,
