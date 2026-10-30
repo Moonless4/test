@@ -27,10 +27,11 @@ export default function AuthModal({
 
   const update = (key) => (event) => setForm((prev) => ({ ...prev, [key]: event.target.value }));
 
-  /* Keep the phone in one standard shape while typing; emails pass through untouched */
+  /* Keep the phone in one standard shape while typing; emails (letters or @) pass through untouched */
   const updateIdentifier = (event) => {
     const raw = event.target.value;
-    setForm((prev) => ({ ...prev, phone: raw.includes('@') ? raw : normalizePhone(raw) }));
+    const isEmail = /[a-zA-Z@]/.test(raw);
+    setForm((prev) => ({ ...prev, phone: isEmail ? raw : normalizePhone(raw) }));
     setError('');
   };
 
@@ -41,8 +42,13 @@ export default function AuthModal({
       setError('لطفاً همه فیلدها را تکمیل کنید.');
       return;
     }
-    if (!identifier.includes('@') && !isValidPhone(identifier)) {
-      setError('شماره موبایل را در قالب ۰۹۱۲۳۴۵۶۷۸۹ وارد کنید.');
+    const isEmail = identifier.includes('@');
+    if (isEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier)) {
+      setError('ایمیل را به شکل name@example.com وارد کنید.');
+      return;
+    }
+    if (!isEmail && !isValidPhone(identifier)) {
+      setError('شماره موبایل را در قالب ۰۹۱۲۳۴۵۶۷۸۹ یا ایمیل معتبر وارد کنید.');
       return;
     }
     if (form.password.length < 6) {
@@ -129,9 +135,10 @@ export default function AuthModal({
             <input
               value={form.phone}
               onChange={updateIdentifier}
-              placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+              placeholder="۰۹۱۲۳۴۵۶۷۸۹ یا name@example.com"
               dir="ltr"
-              inputMode="tel"
+              inputMode="email"
+              autoComplete="username"
               maxLength={64}
             />
           </label>
