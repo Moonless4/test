@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useSite } from '../site/SiteContent.jsx';
+import { useAccount } from '../account/AccountContext.jsx';
 import Icon from './Icons.jsx';
 import { BrandMark } from './Header.jsx';
 import { Link } from '../router.jsx';
@@ -8,6 +9,8 @@ import { lockScroll, unlockScroll } from '../lib/smoothScroll.js';
 export default function MobileMenu({ open, onClose, onLogin, onCategory }) {
   const { content } = useSite();
   const { navLinks, categories, identity } = content;
+  const { isAuthenticated, user } = useAccount();
+  const accountLabel = user.firstName || user.lastName || 'حساب من';
 
   useEffect(() => {
     if (!open) return undefined;
@@ -64,10 +67,17 @@ export default function MobileMenu({ open, onClose, onLogin, onCategory }) {
         </div>
 
         <div className="mobile-menu__footer">
-          <button type="button" className="btn btn--primary btn--block" onClick={onLogin}>
-            <Icon name="user" size={18} />
-            ورود / ثبت نام
-          </button>
+          {isAuthenticated ? (
+            <Link className="btn btn--primary btn--block" to="/account" onClick={onClose}>
+              <Icon name="user" size={18} />
+              {accountLabel}
+            </Link>
+          ) : (
+            <button type="button" className="btn btn--primary btn--block" onClick={onLogin}>
+              <Icon name="user" size={18} />
+              ورود / ثبت نام
+            </button>
+          )}
           <a className="mobile-menu__phone" href={`tel:${identity.phoneHref}`} dir="ltr">
             <Icon name="phone" size={18} />
             {identity.phone}

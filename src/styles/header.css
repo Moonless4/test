@@ -376,6 +376,27 @@
   color: var(--wine);
 }
 
+/* Signed-in customer: the button becomes a link to their own panel */
+a.login-btn {
+  text-decoration: none;
+}
+
+.login-btn__avatar {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  object-fit: cover;
+}
+
+.login-btn--account span {
+  max-width: 96px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .cart-btn {
   position: relative;
 }

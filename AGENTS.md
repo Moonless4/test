@@ -136,6 +136,11 @@ matched in one block in `matchRoute()` in `src/App.jsx`.
 - `/account/*` is gated: signed-out visitors get the sign-in card in
   `AccountShell` (it opens `AuthModal` through the `onLogin` prop from
   `src/App.jsx`) instead of the demo dashboard.
+- The header (and the mobile menu footer) read `useAccount()` directly: a
+  signed-out visitor gets «ورود / ثبت نام», a signed-in customer gets their
+  avatar plus first name as a link to `/account`. Never render the guest button
+  while `isAuthenticated` is true, or a signed-in customer is sent back to the
+  login window every time they leave the account pages.
 - `src/account/Avatar.jsx` renders `user.avatar`: either a `graphic:<id>` key
   (the SVG avatars in `AVATAR_STYLES`, default `graphic:gold`) or a plain image
   URL / data URL. Profile → «آپلود عکس من» turns the picked file into a 320px

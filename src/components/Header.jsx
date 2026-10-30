@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSite } from '../site/SiteContent.jsx';
+import { useAccount } from '../account/AccountContext.jsx';
+import Avatar from '../account/Avatar.jsx';
 import Icon from './Icons.jsx';
 import CartPreview from './CartPreview.jsx';
 import { Link, useRouter } from '../router.jsx';
@@ -36,6 +38,8 @@ export default function Header({
 }) {
   const { path } = useRouter();
   const { content } = useSite();
+  const { isAuthenticated, user } = useAccount();
+  const accountLabel = user.firstName || user.lastName || 'حساب من';
   const { navLinks, categories, megaMenu } = content;
   const [scrolled, setScrolled] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
@@ -172,10 +176,17 @@ export default function Header({
                 />
               )}
             </div>
-            <button type="button" className="login-btn" onClick={onLogin}>
-              <Icon name="user" size={18} />
-              <span>ورود / ثبت نام</span>
-            </button>
+            {isAuthenticated ? (
+              <Link className="login-btn login-btn--account" to="/account" aria-label="حساب کاربری من">
+                <Avatar value={user.avatar} name={accountLabel} className="login-btn__avatar" />
+                <span>{accountLabel}</span>
+              </Link>
+            ) : (
+              <button type="button" className="login-btn" onClick={onLogin}>
+                <Icon name="user" size={18} />
+                <span>ورود / ثبت نام</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
