@@ -110,6 +110,7 @@ export default function App() {
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [authNext, setAuthNext] = useState('/account');
+  const [authMandatory, setAuthMandatory] = useState(false);
   const [toast, setToast] = useState('');
   const toastTimer = useRef(null);
 
@@ -220,7 +221,21 @@ export default function App() {
   const openAuth = useCallback((mode = 'login', next = '/account') => {
     setAuthMode(mode);
     setAuthNext(next);
+    setAuthMandatory(false);
     setAuthOpen(true);
+  }, []);
+
+  /* Checkout needs an account, so this window can't be dismissed by the visitor */
+  const openAuthGate = useCallback(() => {
+    setAuthMode('register');
+    setAuthNext('/cart');
+    setAuthMandatory(true);
+    setAuthOpen(true);
+  }, []);
+
+  const closeAuth = useCallback(() => {
+    setAuthOpen(false);
+    setAuthMandatory(false);
   }, []);
 
   const route = matchRoute(path, site);
@@ -338,7 +353,7 @@ export default function App() {
         cartItems={cartItems}
         onSearch={() => setSearchOpen(true)}
         onLogin={() => openAuth()}
-        onRequireAccount={() => openAuth('register', '/cart')}
+        onRequireAccount={openAuthGate}
         onMenu={() => setMobileOpen(true)}
         onCart={() => navigate('/cart')}
         onCategory={goMenu}
@@ -371,7 +386,8 @@ export default function App() {
       <AuthModal
         open={authOpen}
         initialMode={authMode}
-        onClose={() => setAuthOpen(false)}
+        mandatory={authMandatory}
+        onClose={closeAuth}
         onToast={showToast}
         onSuccess={() => navigate(authNext)}
       />

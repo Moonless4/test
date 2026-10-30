@@ -4,7 +4,14 @@ import Icon from './Icons.jsx';
 import { useAccount } from '../account/AccountContext.jsx';
 import { isValidPhone, normalizePhone } from '../lib/phone.js';
 
-export default function AuthModal({ open, initialMode = 'login', onClose, onToast, onSuccess }) {
+export default function AuthModal({
+  open,
+  initialMode = 'login',
+  onClose,
+  onToast,
+  onSuccess,
+  mandatory = false,
+}) {
   const { login, register } = useAccount();
   const [mode, setMode] = useState(initialMode);
   const [form, setForm] = useState({ name: '', phone: '', password: '' });
@@ -61,13 +68,23 @@ export default function AuthModal({ open, initialMode = 'login', onClose, onToas
   };
 
   return (
-    <Modal open={open} onClose={onClose} className="modal--auth" label="ورود یا ثبت‌نام">
+    <Modal
+      open={open}
+      onClose={onClose}
+      className="modal--auth"
+      label="ورود یا ثبت‌نام"
+      closable={!mandatory}
+    >
       <div className="auth">
         <span className="auth__logo">
           <Icon name="user" size={30} />
         </span>
         <h2>{mode === 'login' ? 'خوش برگشتید' : 'به آترین خوش آمدید'}</h2>
-        <p>برای پیگیری سفارش‌ها و رزروهای خود وارد شوید.</p>
+        <p>
+          {mandatory
+            ? 'برای تسویه حساب ابتدا حساب کاربری بسازید یا وارد شوید.'
+            : 'برای پیگیری سفارش‌ها و رزروهای خود وارد شوید.'}
+        </p>
 
         <div className="auth__tabs" role="tablist">
           <button

@@ -52,7 +52,11 @@ in `matchRoute()`) holds all four steps — سبد خرید، اطلاعات ت�
 and the header cart button navigates there. Hovering the header cart icon (desktop,
 above 1080px) slides out `src/components/CartPreview.jsx` from the side with the
 items and a «تسویه حساب» button; that button needs a signed-in customer — signed
-out, it opens `AuthModal` in register mode and then lands on `/cart`. It opens
+out, it opens `AuthModal` in register mode as a mandatory window
+(`<AuthModal mandatory>`, i.e. `<Modal closable={false}>`: no close button, the
+backdrop is inert and Escape does nothing) and lands on `/cart` after the
+visitor registers or switches to the sign-in tab. Every other `openAuth()` caller
+(`/account` gate, header login) stays dismissible. It opens
 even with an empty cart, showing the «سبد خرید شما خالی است» state with a
 «مشاهده منو» shortcut. The same
 gate guards step 1 → 2 of the page (`useAccount().isAuthenticated`, exposed by
