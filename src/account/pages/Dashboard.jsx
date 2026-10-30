@@ -14,6 +14,7 @@ import {
   ORDER_STATUS,
   ORDER_TYPE,
   orderItemCount,
+  orderNumber,
   orderTotal,
   relativeTime,
   resolveItems,
@@ -55,7 +56,7 @@ export default function Dashboard({ onMenu, onReserve, onReorder }) {
   const progress = Math.min(100, Math.round((loyalty.points / loyalty.nextRewardAt) * 100));
 
   const message = currentOrder
-    ? `سفارش شماره ${fa(currentOrder.id)} شما در حال آماده‌سازی است؛ امروز چه چیزی میل دارید؟`
+    ? `سفارش شماره ${orderNumber(currentOrder)} شما در حال آماده‌سازی است؛ امروز چه چیزی میل دارید؟`
     : nextReservation
       ? `میز شما برای ${formatDate(nextReservation.date)} ساعت ${nextReservation.time} رزرو شده است.`
       : 'منوی تازه امروز آماده است؛ اولین سفارش این هفته با ارسال رایگان ثبت می‌شود.';
@@ -114,7 +115,7 @@ export default function Dashboard({ onMenu, onReserve, onReorder }) {
         <StatTile
           icon="box"
           label="سفارش جاری"
-          value={currentOrder ? `#${fa(currentOrder.id)}` : 'ندارد'}
+          value={currentOrder ? `#${orderNumber(currentOrder)}` : 'ندارد'}
           hint={currentOrder ? ORDER_STATUS[currentOrder.status].label : 'همه سفارش‌ها تحویل شده'}
           to="/account/orders"
         />
@@ -158,7 +159,7 @@ export default function Dashboard({ onMenu, onReserve, onReorder }) {
             <article className="order-preview">
               <div className="order-preview__top">
                 <div>
-                  <b>سفارش #{fa(lastOrder.id)}</b>
+                  <b>سفارش #{orderNumber(lastOrder)}</b>
                   <small>
                     {ORDER_TYPE[lastOrder.type]} · {fa(orderItemCount(lastOrder))} آیتم
                   </small>

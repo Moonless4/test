@@ -198,6 +198,11 @@ export function AccountProvider({ children }) {
     return added;
   }, []);
 
+  /* A completed checkout lands in this customer's own order history */
+  const recordOrder = useCallback((order) => {
+    setState((prev) => ({ ...prev, orders: [order, ...prev.orders] }));
+  }, []);
+
   const saveProfile = useCallback((patch) => {
     setState((prev) => ({ ...prev, user: { ...prev.user, ...patch } }));
   }, []);
@@ -370,6 +375,7 @@ export function AccountProvider({ children }) {
       login,
       register,
       signOut,
+      recordOrder,
       saveProfile,
       saveAddress,
       deleteAddress,
@@ -394,6 +400,7 @@ export function AccountProvider({ children }) {
       login,
       register,
       signOut,
+      recordOrder,
       saveProfile,
       saveAddress,
       deleteAddress,

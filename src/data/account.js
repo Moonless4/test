@@ -180,6 +180,9 @@ export const orderTotal = (order) =>
 export const orderItemCount = (order) =>
   (order.items || []).reduce((sum, item) => sum + item.qty, 0);
 
+/* The number a customer knows their order by: the checkout code when there is one */
+export const orderNumber = (order) => order.code || fa(order.id);
+
 export const activeOrder = (orders) =>
   orders.find((order) => ['review', 'preparing', 'ready'].includes(order.status)) || null;
 

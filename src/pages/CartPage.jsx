@@ -25,7 +25,7 @@ const STEPS = [
 
 export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, onRequireAccount }) {
   const { navigate } = useRouter();
-  const { isAuthenticated, user, loyalty, spendPoints, earnPoints } = useAccount();
+  const { isAuthenticated, user, loyalty, spendPoints, earnPoints, recordOrder } = useAccount();
   const [step, setStep] = useState(1);
   const [order, setOrder] = useState(null);
   const [error, setError] = useState('');
@@ -138,6 +138,23 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
       onRequireAccount();
       return;
     }
+
+    /* Also keep it in the customer's own history, so /account/orders lists it */
+    recordOrder({
+      id: savedOrder.id,
+      code,
+      type: 'delivery',
+      status: 'review',
+      createdAt: savedOrder.createdAt,
+      restaurant: 'رستوران آترین',
+      items: savedOrder.items,
+      deliveryFee: delivery,
+      discount: pointsDiscount,
+      payment: {
+        label: payment,
+        status: form.payment === 'online' ? 'paid' : 'pending',
+      },
+    });
 
     if (pointsUsed > 0) spendPoints(pointsUsed, `استفاده از امتیاز در سفارش ${code}`);
     const pointsEarned = Math.floor(subtotal / ORDER_STEP) * POINTS_PER_ORDER;

@@ -11,6 +11,7 @@ import {
   money,
   ORDER_STATUS,
   ORDER_TYPE,
+  orderNumber,
   orderSubtotal,
   orderTotal,
   PAYMENT_STATUS,
@@ -67,7 +68,7 @@ export default function OrderDetailPage({ id, onReorder, onToast, onMenu }) {
       <section className="order-hero">
         <div className="order-hero__copy">
           <span className="order-hero__eyebrow">{ORDER_TYPE[order.type]}</span>
-          <h1>سفارش #{fa(order.id)}</h1>
+          <h1>سفارش #{orderNumber(order)}</h1>
           <p>
             {formatDate(order.createdAt)} · ساعت {formatTime(order.createdAt)} · {order.restaurant}
           </p>

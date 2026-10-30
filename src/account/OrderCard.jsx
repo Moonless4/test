@@ -9,6 +9,7 @@ import {
   ORDER_STATUS,
   ORDER_TYPE,
   orderItemCount,
+  orderNumber,
   orderTotal,
   PAYMENT_STATUS,
   resolveItems,
@@ -26,7 +27,7 @@ export default function OrderCard({ order, onReorder }) {
             <Icon name="box" size={17} />
           </span>
           <div>
-            <b>سفارش #{fa(order.id)}</b>
+            <b>سفارش #{orderNumber(order)}</b>
             <small>
               {formatDate(order.createdAt)} · ساعت {formatTime(order.createdAt)} · {ORDER_TYPE[order.type]}
             </small>
