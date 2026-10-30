@@ -163,7 +163,7 @@ export default function Header({
                 <Icon name="cart" />
                 <span className="cart-count">{cartCount.toLocaleString('fa-IR')}</span>
               </button>
-              {cartOpen && cartItems.length > 0 && (
+              {cartOpen && (
                 <CartPreview
                   items={cartItems}
                   onCheckout={onCart}

@@ -52,7 +52,9 @@ in `matchRoute()`) holds all four steps — سبد خرید، اطلاعات ت�
 and the header cart button navigates there. Hovering the header cart icon (desktop,
 above 1080px) slides out `src/components/CartPreview.jsx` from the side with the
 items and a «تسویه حساب» button; that button needs a signed-in customer — signed
-out, it opens `AuthModal` in register mode and then lands on `/cart`. The same
+out, it opens `AuthModal` in register mode and then lands on `/cart`. It opens
+even with an empty cart, showing the «سبد خرید شما خالی است» state with a
+«مشاهده منو» shortcut. The same
 gate guards step 1 → 2 of the page (`useAccount().isAuthenticated`, exposed by
 `AccountContext` — the context exposes `isAuthenticated`, not `signedIn`).
 Steps advance in place; the summary
