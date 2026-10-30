@@ -294,6 +294,46 @@ export function AccountProvider({ children }) {
     return earned;
   }, []);
 
+  /* Points spent on an order (never more than the account holds) */
+  const spendPoints = useCallback((points, label = 'استفاده از امتیاز در سفارش') => {
+    let spent = 0;
+    setState((prev) => {
+      const available = Math.min(Math.max(0, Math.round(points)), prev.loyalty.points);
+      if (available <= 0) return prev;
+      spent = available;
+      return {
+        ...prev,
+        loyalty: {
+          ...prev.loyalty,
+          points: prev.loyalty.points - available,
+          history: [
+            { id: createId('h'), label, points: -available, date: new Date().toISOString() },
+            ...prev.loyalty.history,
+          ],
+        },
+      };
+    });
+    return spent;
+  }, []);
+
+  /* Points earned by a completed order */
+  const earnPoints = useCallback((points, label = 'امتیاز سفارش') => {
+    const amount = Math.max(0, Math.round(points));
+    if (!amount) return false;
+    setState((prev) => ({
+      ...prev,
+      loyalty: {
+        ...prev.loyalty,
+        points: prev.loyalty.points + amount,
+        history: [
+          { id: createId('h'), label, points: amount, date: new Date().toISOString() },
+          ...prev.loyalty.history,
+        ],
+      },
+    }));
+    return true;
+  }, []);
+
   const setLanguage = useCallback((language) => {
     setState((prev) => ({ ...prev, settings: { ...prev.settings, language } }));
   }, []);
@@ -329,6 +369,8 @@ export function AccountProvider({ children }) {
       markAllRead,
       deleteNotification,
       redeemReward,
+      spendPoints,
+      earnPoints,
       updateSettings,
       setLanguage,
     }),
@@ -351,6 +393,8 @@ export function AccountProvider({ children }) {
       markAllRead,
       deleteNotification,
       redeemReward,
+      spendPoints,
+      earnPoints,
       updateSettings,
       setLanguage,
     ]

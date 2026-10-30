@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Modal from './Modal.jsx';
 import Icon from './Icons.jsx';
 import { useAccount } from '../account/AccountContext.jsx';
+import { isValidPhone, normalizePhone } from '../lib/phone.js';
 
 export default function AuthModal({ open, initialMode = 'login', onClose, onToast, onSuccess }) {
   const { login, register } = useAccount();
@@ -19,11 +20,22 @@ export default function AuthModal({ open, initialMode = 'login', onClose, onToas
 
   const update = (key) => (event) => setForm((prev) => ({ ...prev, [key]: event.target.value }));
 
+  /* Keep the phone in one standard shape while typing; emails pass through untouched */
+  const updateIdentifier = (event) => {
+    const raw = event.target.value;
+    setForm((prev) => ({ ...prev, phone: raw.includes('@') ? raw : normalizePhone(raw) }));
+    setError('');
+  };
+
   const submit = (event) => {
     event.preventDefault();
     const identifier = form.phone.trim();
     if ((mode === 'register' && !form.name.trim()) || !identifier || !form.password) {
       setError('لطفاً همه فیلدها را تکمیل کنید.');
+      return;
+    }
+    if (!identifier.includes('@') && !isValidPhone(identifier)) {
+      setError('شماره موبایل را در قالب ۰۹۱۲۳۴۵۶۷۸۹ وارد کنید.');
       return;
     }
     if (form.password.length < 6) {
@@ -95,10 +107,11 @@ export default function AuthModal({ open, initialMode = 'login', onClose, onToas
             <span>شماره موبایل یا ایمیل</span>
             <input
               value={form.phone}
-              onChange={update('phone')}
+              onChange={updateIdentifier}
               placeholder="۰۹۱۲۳۴۵۶۷۸۹"
               dir="ltr"
               inputMode="tel"
+              maxLength={64}
             />
           </label>
           <label>

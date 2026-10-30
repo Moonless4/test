@@ -57,7 +57,19 @@ gate guards step 1 → 2 of the page (`useAccount().isAuthenticated`, exposed by
 `AccountContext` — the context exposes `isAuthenticated`, not `signedIn`).
 Steps advance in place; the summary
 sidebar reuses the `.cart-summary` styles and the page's own CSS is
-`src/styles/cart.css`. Submitting writes an order through `addOrder()` and clears
+`src/styles/cart.css`.
+
+Step 1 of `/cart` also holds the account gate itself: a signed-out customer gets
+the inline `.cart-account` form (name, mobile, password → `register()`); it is
+not the `AuthModal`. Mobiles are typed through `src/lib/phone.js`
+(`normalizePhone()` strips non-digits, converts Persian/Arabic digits and
+`+98`/`0098` to a Latin `09xxxxxxxxx`, `isValidPhone()` checks that shape); the
+same helpers validate the delivery phone and `AuthModal`. Club points are
+redeemable in the summary aside (`.cart-points`, only for a signed-in customer):
+1 point = 100 تومان off, capped by the balance and the food subtotal, recorded
+as `pointsUsed`/`discount` on the order and deducted with
+`AccountContext.spendPoints()`. A completed order then earns
+`floor(subtotal / 10,000) × 10` points through `earnPoints()`. Submitting writes an order through `addOrder()` and clears
 the cart in `App.jsx`.
 
 ## Customer account area

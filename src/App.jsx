@@ -269,7 +269,6 @@ export default function App() {
             onQty={updateQty}
             onRemove={removeItem}
             onAdd={addToCart}
-            onRequireAccount={() => openAuth('register', '/cart')}
             onComplete={() => {
               setCart([]);
               showToast('سفارش شما با موفقیت ثبت شد.');

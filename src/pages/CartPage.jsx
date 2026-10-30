@@ -6,9 +6,15 @@ import { formatPrice } from '../components/ProductCard.jsx';
 import OrderSuggestions from '../components/OrderSuggestions.jsx';
 import { addOrder } from '../data/records.js';
 import { useAccount } from '../account/AccountContext.jsx';
+import { fa } from '../data/account.js';
+import { isValidPhone, normalizePhone } from '../lib/phone.js';
 
 const deliveryFee = 35000;
 const freeDeliveryFrom = 500000;
+/* Club points: each point is 100 تومان off, and every 10,000 تومان of food earns 10 points */
+const POINT_VALUE = 100;
+const ORDER_STEP = 10000;
+const POINTS_PER_ORDER = 10;
 
 const STEPS = [
   { key: 1, title: 'سبد خرید', hint: 'انتخاب غذاها' },
@@ -17,9 +23,9 @@ const STEPS = [
   { key: 4, title: 'تأیید سفارش', hint: 'ثبت نهایی' },
 ];
 
-export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, onRequireAccount }) {
+export default function CartPage({ items, onQty, onRemove, onAdd, onComplete }) {
   const { navigate } = useRouter();
-  const { isAuthenticated } = useAccount();
+  const { isAuthenticated, user, loyalty, register, spendPoints, earnPoints } = useAccount();
   const [step, setStep] = useState(1);
   const [order, setOrder] = useState(null);
   const [error, setError] = useState('');
@@ -30,19 +36,49 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
     time: 'asap',
     payment: 'online',
   });
+  const [account, setAccount] = useState({ name: '', phone: '', password: '' });
+  const [accountError, setAccountError] = useState('');
+  const [usePoints, setUsePoints] = useState(false);
+  const [pointsInput, setPointsInput] = useState(0);
 
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.qty, 0);
   const delivery = subtotal === 0 || subtotal >= freeDeliveryFrom ? 0 : deliveryFee;
-  const total = subtotal + delivery;
+  const maxUsablePoints = isAuthenticated
+    ? Math.min(loyalty.points, Math.floor(subtotal / POINT_VALUE))
+    : 0;
+  const pointsUsed = usePoints ? Math.min(Math.max(0, pointsInput), maxUsablePoints) : 0;
+  const pointsDiscount = pointsUsed * POINT_VALUE;
+  const total = subtotal + delivery - pointsDiscount;
   const count = items.reduce((sum, item) => sum + item.qty, 0);
 
   useEffect(() => {
     if (!order && items.length === 0) setStep(1);
   }, [items.length, order]);
 
+  /* A signed-in customer doesn't retype what the account already knows */
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    setForm((prev) => ({
+      ...prev,
+      name: prev.name || [user.firstName, user.lastName].filter(Boolean).join(' '),
+      phone: prev.phone || user.phone || '',
+    }));
+  }, [isAuthenticated, user.firstName, user.lastName, user.phone]);
+
   const update = (key) => (event) => {
     setForm((prev) => ({ ...prev, [key]: event.target.value }));
     setError('');
+  };
+
+  const updatePhone = (event) => {
+    setForm((prev) => ({ ...prev, phone: normalizePhone(event.target.value) }));
+    setError('');
+  };
+
+  const updateAccount = (key) => (event) => {
+    const value = key === 'phone' ? normalizePhone(event.target.value) : event.target.value;
+    setAccount((prev) => ({ ...prev, [key]: value }));
+    setAccountError('');
   };
 
   const validateDelivery = () => {
@@ -50,12 +86,38 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
       setError('لطفاً نام، شماره تماس و آدرس را کامل کنید.');
       return false;
     }
-    if (!/^[0-9\u06F0-\u06F9+\-\s]{8,}$/.test(form.phone.trim())) {
-      setError('شماره تماس معتبر نیست.');
+    if (!isValidPhone(form.phone)) {
+      setError('شماره موبایل را در قالب ۰۹۱۲۳۴۵۶۷۸۹ وارد کنید.');
       return false;
     }
     setError('');
     return true;
+  };
+
+  /* Before leaving the cart a signed-out customer gets an account */
+  const createAccountAndContinue = () => {
+    const name = account.name.trim();
+    const phone = account.phone.trim();
+    if (!name) {
+      setAccountError('نام و نام خانوادگی را وارد کنید.');
+      return;
+    }
+    if (!isValidPhone(phone)) {
+      setAccountError('شماره موبایل را در قالب ۰۹۱۲۳۴۵۶۷۸۹ وارد کنید.');
+      return;
+    }
+    if (account.password.length < 6) {
+      setAccountError('رمز عبور باید حداقل ۶ کاراکتر باشد.');
+      return;
+    }
+    const result = register({ name, identifier: phone });
+    if (!result.ok) {
+      setAccountError(result.error);
+      return;
+    }
+    setAccountError('');
+    setForm((prev) => ({ ...prev, name, phone }));
+    setStep(2);
   };
 
   const goStep = (key) => {
@@ -78,6 +140,8 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
       total,
       subtotal,
       delivery,
+      discount: pointsDiscount,
+      pointsUsed,
       count,
       name: form.name.trim(),
       phone: form.phone.trim(),
@@ -92,7 +156,11 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
       })),
     });
 
-    setOrder({ code, total, count, name: form.name.trim(), payment, time });
+    if (pointsUsed > 0) spendPoints(pointsUsed, `استفاده از امتیاز در سفارش ${code}`);
+    const pointsEarned = Math.floor(subtotal / ORDER_STEP) * POINTS_PER_ORDER;
+    if (pointsEarned > 0) earnPoints(pointsEarned, `امتیاز سفارش ${code}`);
+
+    setOrder({ code, total, count, name: form.name.trim(), payment, time, pointsEarned });
     setError('');
     setStep(4);
     onComplete();
@@ -171,6 +239,12 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
                 <small>مبلغ کل</small>
                 <b>{formatPrice(order.total)} تومان</b>
               </span>
+              {order.pointsEarned > 0 && (
+                <span>
+                  <small>امتیاز باشگاه</small>
+                  <b>+{fa(order.pointsEarned)} امتیاز</b>
+                </span>
+              )}
             </div>
             <div className="cart-actions cart-actions--center">
               <button type="button" className="btn btn--outline" onClick={() => navigate('/menu')}>
@@ -251,6 +325,55 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
                     <OrderSuggestions exclude={items.map((item) => item.product.id)} onAdd={onAdd} />
                   </div>
 
+                  {!isAuthenticated && (
+                    <div className="cart-account">
+                      <header className="cart-account__head">
+                        <span className="cart-account__icon">
+                          <Icon name="user" size={17} />
+                        </span>
+                        <div>
+                          <b>ساخت حساب کاربری</b>
+                          <small>برای ادامه سفارش و استفاده از امتیازهای باشگاه، حساب خود را بسازید.</small>
+                        </div>
+                      </header>
+
+                      <div className="checkout__form">
+                        <div className="checkout__row">
+                          <label>
+                            <span>نام و نام خانوادگی</span>
+                            <input
+                              value={account.name}
+                              onChange={updateAccount('name')}
+                              placeholder="نام شما"
+                            />
+                          </label>
+                          <label>
+                            <span>شماره موبایل</span>
+                            <input
+                              value={account.phone}
+                              onChange={updateAccount('phone')}
+                              placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                              inputMode="tel"
+                              dir="ltr"
+                            />
+                          </label>
+                        </div>
+                        <label>
+                          <span>رمز عبور</span>
+                          <input
+                            type="password"
+                            value={account.password}
+                            onChange={updateAccount('password')}
+                            placeholder="حداقل ۶ کاراکتر"
+                          />
+                        </label>
+                        {accountError && (
+                          <span className="form-hint form-hint--error">{accountError}</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="cart-actions">
                     <button type="button" className="btn btn--outline" onClick={() => navigate('/menu')}>
                       افزودن غذای بیشتر
@@ -258,7 +381,7 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
                     <button
                       type="button"
                       className="btn btn--primary"
-                      onClick={() => (isAuthenticated ? setStep(2) : onRequireAccount())}
+                      onClick={() => (isAuthenticated ? setStep(2) : createAccountAndContinue())}
                     >
                       {isAuthenticated ? 'ادامه: اطلاعات تحویل' : 'ساخت حساب و ادامه'}
                       <Icon name="chevronLeft" size={18} />
@@ -288,7 +411,7 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
                         <span>شماره تماس</span>
                         <input
                           value={form.phone}
-                          onChange={update('phone')}
+                          onChange={updatePhone}
                           placeholder="۰۹۱۲۳۴۵۶۷۸۹"
                           inputMode="tel"
                           dir="ltr"
@@ -444,11 +567,77 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
                   <span>هزینه ارسال</span>
                   <b>{delivery === 0 ? 'رایگان' : `${formatPrice(delivery)} تومان`}</b>
                 </div>
+                {pointsDiscount > 0 && (
+                  <div>
+                    <span>تخفیف امتیازها</span>
+                    <b>−{formatPrice(pointsDiscount)} تومان</b>
+                  </div>
+                )}
                 {subtotal < freeDeliveryFrom && (
                   <p className="cart-summary__hint">
                     <Icon name="truck" size={15} />
                     با {formatPrice(freeDeliveryFrom - subtotal)} تومان خرید بیشتر، ارسال رایگان می‌شود.
                   </p>
+                )}
+                {isAuthenticated && (
+                  <div className="cart-points">
+                    <div className="cart-points__head">
+                      <span>
+                        <Icon name="star" size={14} filled />
+                        امتیاز باشگاه
+                      </span>
+                      <b>{fa(loyalty.points)} امتیاز</b>
+                    </div>
+
+                    {maxUsablePoints > 0 ? (
+                      <>
+                        <label className="checkline cart-points__toggle">
+                          <input
+                            type="checkbox"
+                            checked={usePoints}
+                            onChange={(event) => {
+                              setUsePoints(event.target.checked);
+                              setPointsInput(event.target.checked ? maxUsablePoints : 0);
+                            }}
+                          />
+                          استفاده از امتیازها
+                        </label>
+                        {usePoints && (
+                          <div className="cart-points__row">
+                            <input
+                              type="number"
+                              min="0"
+                              max={maxUsablePoints}
+                              value={pointsUsed}
+                              onChange={(event) =>
+                                setPointsInput(
+                                  Math.min(
+                                    maxUsablePoints,
+                                    Math.max(0, Number(event.target.value) || 0)
+                                  )
+                                )
+                              }
+                              aria-label="تعداد امتیاز مصرفی"
+                            />
+                            <button
+                              type="button"
+                              className="text-link"
+                              onClick={() => setPointsInput(maxUsablePoints)}
+                            >
+                              بیشترین ({fa(maxUsablePoints)})
+                            </button>
+                          </div>
+                        )}
+                        <small className="cart-points__hint">
+                          هر امتیاز {formatPrice(POINT_VALUE)} تومان تخفیف است.
+                        </small>
+                      </>
+                    ) : (
+                      <small className="cart-points__hint">
+                        با هر ۱۰٬۰۰۰ تومان سفارش، ۱۰ امتیاز باشگاه بگیرید.
+                      </small>
+                    )}
+                  </div>
                 )}
                 <div className="cart-summary__total">
                   <span>مبلغ قابل پرداخت</span>
