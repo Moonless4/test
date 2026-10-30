@@ -41,18 +41,6 @@
   bottom: -76%;
 }
 
-.delivery-banner__dots {
-  position: absolute;
-  z-index: 1;
-  left: 40%;
-  top: 24%;
-  width: 150px;
-  height: 90px;
-  background: url('/assets/yellow-dots.png') center / contain no-repeat;
-  opacity: 0.9;
-  pointer-events: none;
-}
-
 .delivery-banner__leaf {
   position: absolute;
   z-index: 1;
@@ -197,11 +185,5 @@
     padding-bottom: 0;
     align-items: center;
     justify-content: center;
-  }
-
-  .delivery-banner__dots {
-    left: auto;
-    right: -30px;
-    top: 10px;
   }
 }

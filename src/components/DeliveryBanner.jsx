@@ -5,7 +5,6 @@ export default function DeliveryBanner({ onMenu }) {
     <section className="delivery-banner" aria-labelledby="delivery-banner-title">
       <div className="container">
         <div className="delivery-banner__panel">
-          <span className="delivery-banner__dots" aria-hidden="true" />
           <span className="delivery-banner__leaf" aria-hidden="true" />
 
           <div className="delivery-banner__copy">
