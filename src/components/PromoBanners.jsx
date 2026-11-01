@@ -15,7 +15,7 @@ export default function PromoBanners({ onMenu, onProduct, onReserve }) {
       <div className="container promo-grid">
         {promoBanners.map((banner) => (
           <article className={`promo-card promo-card--${banner.size}`} key={banner.id}>
-            <img className="promo-card__bg" src={banner.image} alt="" loading="lazy" />
+            <img className="promo-card__bg" src={banner.image} alt="" loading="lazy" decoding="async" />
             <span className="promo-card__wash" aria-hidden="true" />
             <span className="promo-card__ring" aria-hidden="true" />
             <div className="promo-card__body">

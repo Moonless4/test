@@ -104,7 +104,7 @@ export default function SearchOverlay({ open, onClose, onOpenProduct, onOpenPost
                       onOpenProduct(product);
                     }}
                   >
-                    <img src={product.image} alt="" loading="lazy" />
+                    <img src={product.image} alt="" loading="lazy" decoding="async" />
                     <span>
                       <b>{product.name}</b>
                       <small>{formatPrice(product.price)} تومان</small>
@@ -137,7 +137,7 @@ export default function SearchOverlay({ open, onClose, onOpenProduct, onOpenPost
                         onOpenProduct(product);
                       }}
                     >
-                      <img src={product.image} alt="" loading="lazy" />
+                      <img src={product.image} alt="" loading="lazy" decoding="async" />
                       <span>
                         <b>{product.name}</b>
                         <small>{product.categoryLabel} · {formatPrice(product.price)} تومان</small>
@@ -163,7 +163,7 @@ export default function SearchOverlay({ open, onClose, onOpenProduct, onOpenPost
                         onOpenPost(post);
                       }}
                     >
-                      <img src={post.image} alt="" loading="lazy" />
+                      <img src={post.image} alt="" loading="lazy" decoding="async" />
                       <span>
                         <b>{post.title}</b>
                         <small>{post.category} · {post.readTime}</small>

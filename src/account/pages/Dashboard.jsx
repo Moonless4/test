@@ -175,7 +175,7 @@ export default function Dashboard({ onMenu, onReserve, onReorder }) {
                   .map((item) => (
                     <li key={item.productId}>
                       <span className="order-preview__thumb">
-                        <img src={item.product?.image} alt={item.product?.name || ''} loading="lazy" />
+                        <img src={item.product?.image} alt={item.product?.name || ''} loading="lazy" decoding="async" />
                       </span>
                       <span className="order-preview__name">
                         {item.product?.name || 'آیتم حذف‌شده'}
@@ -289,7 +289,7 @@ export default function Dashboard({ onMenu, onReserve, onReorder }) {
                 <li key={product.id}>
                   <Link to={`/food/${product.id}`} className="fav-strip__item">
                     <span className="fav-strip__thumb">
-                      <img src={product.image} alt={product.name} loading="lazy" />
+                      <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
                     </span>
                     <span className="fav-strip__copy">
                       <b>{product.name}</b>

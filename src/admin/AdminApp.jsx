@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+// Admin styles are only needed on the panel route, so they load with its chunk.
+import '../styles/admin.css';
 import { useSite } from '../site/SiteContent.jsx';
 import { useRouter } from '../router.jsx';
 import Icon from '../components/Icons.jsx';

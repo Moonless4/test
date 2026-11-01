@@ -46,7 +46,7 @@ export default function OrderCard({ order, onReorder }) {
           <li key={item.productId}>
             <span className="order-card__thumb">
               {item.product ? (
-                <img src={item.product.image} alt={item.product.name} loading="lazy" />
+                <img src={item.product.image} alt={item.product.name} loading="lazy" decoding="async" />
               ) : (
                 <Icon name="fork" size={16} />
               )}

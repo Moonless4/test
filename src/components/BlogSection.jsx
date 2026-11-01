@@ -38,7 +38,7 @@ export default function BlogSection({ items, onOpenPost, onViewAll }) {
                 }}
                 aria-label={`خواندن مقاله ${post.title}`}
               >
-                <img src={post.image} alt={post.title} loading="lazy" />
+                <img src={post.image} alt={post.title} loading="lazy" decoding="async" />
                 <span className="blog-card__chip">{post.category}</span>
               </button>
               <div className="blog-card__body">

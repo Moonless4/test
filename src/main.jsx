@@ -18,13 +18,13 @@ import './styles/content.css';
 import './styles/pages.css';
 import './styles/cart.css';
 import './styles/overlays.css';
-import './styles/account.css';
-import './styles/admin.css';
 
 initSmoothScroll();
 
-/* Dev-only: write the demo fixture (scripts/seed-demo.mjs) before the stores mount. */
-loadDemoSeed();
+/* Dev-only: write the demo fixture (scripts/seed-demo.mjs) before the stores
+   mount. The flag is inlined at build time, so the fixture is dropped from a
+   production bundle. */
+if (import.meta.env.DEV) loadDemoSeed();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -61,7 +61,7 @@ export default function OrderSuggestions({ exclude = [], title, onAdd }) {
       <ul className="order-suggest__list">
         {items.slice(0, 3).map((item) => (
           <li className="order-suggest__item" key={item.id}>
-            <img src={item.image} alt={item.name} loading="lazy" />
+            <img src={item.image} alt={item.name} loading="lazy" decoding="async" />
             <div className="order-suggest__copy">
               <b>{item.name}</b>
               <small>

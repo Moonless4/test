@@ -37,7 +37,7 @@ export default function BenefitsSection() {
 
             <div className="benefits__visual">
               <span className="benefits__plate" aria-hidden="true" />
-              <img src="/assets/intro-burger.webp" alt="برگر مخصوص رستوران آترین" loading="lazy" />
+              <img src="/assets/intro-burger.webp" alt="برگر مخصوص رستوران آترین" loading="lazy" decoding="async" />
               <span className="benefits__seal">
                 <Icon name="fork" size={17} />
                 دست‌ساز و تازه

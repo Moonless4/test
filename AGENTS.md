@@ -302,3 +302,30 @@ into `public/assets/` (the origin is not reachable from the sandbox; images were
 fetched through the wsrv.nl image proxy and converted to WebP where useful).
 The exact reference font, YekanBakh FaNum, is vendored in `public/fonts/` (plus
 Caveat Brush for the English script accents). Keep both when editing the design.
+
+## Performance
+
+The site is tuned for mobile Lighthouse. Keep these invariants when editing:
+
+- **Images** in `public/assets/` are all WebP and sized for their largest real
+  render (products ≤760px, photos ≤1200px, decorative art much smaller). Nothing
+  above ~50 KB belongs there any more; re-encode before adding a new image. Every
+  `<img>` below the fold needs `loading="lazy" decoding="async"`; the hero artwork
+  (`/assets/hero-bg.webp`, the first slider plate `slide3.webp`) is deliberately
+  eager with `fetchPriority="high"` because it is the LCP paint.
+- **Preloads** live in `index.html`: the two font weights used on the first
+  screen (400, 700) and those two hero images. Don't preload anything else —
+  extra preloads compete with the JS bundle.
+- **Code splitting**: `src/main.jsx` imports only the always-needed stylesheets
+  (tokens/base/header/hero/sections/delivery-banner/products/newest-menu/content/
+  pages/cart/overlays). `account.css` and `admin.css` are imported by
+  `account/AccountShell.jsx` and `admin/AdminApp.jsx` so they ship with their
+  route chunk, and every route except the home page is a `React.lazy()` import in
+  `src/App.jsx`. A new page must follow that pattern, and a new always-loaded
+  component must import its own stylesheet.
+- `vite.config.js` splits `react` and `lenis` into their own long-lived chunks;
+  `npm run build` is the real performance profile (the dev server serves hundreds
+  of unbundled modules). Production needs Brotli/gzip + immutable caching for
+  `/assets/*` and `/fonts/*`, whose filenames are not content-hashed.
+- The demo seed stays behind `import.meta.env.DEV`, so the fixture is dead-code
+  eliminated from a production build — keep it that way.

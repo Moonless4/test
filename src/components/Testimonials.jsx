@@ -12,15 +12,15 @@ export default function Testimonials() {
     <section className="testimonials section" aria-labelledby="testimonials-title">
       <div className="container">
         <div className="testimonials__panel">
-          <img className="testimonials__pattern" src="/assets/testimonials-bg.png" alt="" aria-hidden="true" />
+          <img className="testimonials__pattern" src="/assets/testimonials-bg.webp" alt="" aria-hidden="true" />
 
           <div className="testimonials__side testimonials__side--right">
             <span className="testimonials__blob" aria-hidden="true" />
-            <img src="/assets/testimonial-salad.webp" alt="" loading="lazy" />
+            <img src="/assets/testimonial-salad.webp" alt="" loading="lazy" decoding="async" />
           </div>
           <div className="testimonials__side testimonials__side--left">
             <span className="testimonials__blob" aria-hidden="true" />
-            <img src="/assets/testimonial-img2.webp" alt="" loading="lazy" />
+            <img src="/assets/testimonial-img2.webp" alt="" loading="lazy" decoding="async" />
           </div>
 
           <div className="testimonials__head">
@@ -44,7 +44,7 @@ export default function Testimonials() {
             </div>
             <blockquote>{current.quote}</blockquote>
             <div className="testimonials__author">
-              <img src={current.avatar} alt={current.name} loading="lazy" />
+              <img src={current.avatar} alt={current.name} loading="lazy" decoding="async" />
               <span>
                 <b>{current.name}</b>
                 <small>{current.role}</small>
@@ -66,7 +66,7 @@ export default function Testimonials() {
                     onClick={() => setIndex(itemIndex)}
                     aria-label={item.name}
                   >
-                    <img src={item.avatar} alt="" loading="lazy" />
+                    <img src={item.avatar} alt="" loading="lazy" decoding="async" />
                   </button>
                 ))}
               </div>

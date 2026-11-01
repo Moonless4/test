@@ -5,6 +5,9 @@ import { useAccount } from './AccountContext.jsx';
 import Avatar from './Avatar.jsx';
 import { ConfirmDialog } from './ui.jsx';
 import { fa } from '../data/account.js';
+// The account design system only styles this area, so it ships with the
+// lazily-loaded account chunk instead of the first visit to the site.
+import '../styles/account.css';
 
 const NAV_ITEMS = [
   { key: 'dashboard', to: '/account', label: 'داشبورد', icon: 'home' },

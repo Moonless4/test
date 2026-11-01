@@ -47,7 +47,7 @@ export default function CartPreview({ items, onCheckout, onRequireAccount, onFin
           <ul className="cart-preview__list">
             {items.map(({ product, qty }) => (
               <li key={product.id}>
-                <img src={product.image} alt="" loading="lazy" />
+                <img src={product.image} alt="" loading="lazy" decoding="async" />
                 <span className="cart-preview__copy">
                   <b>{product.name}</b>
                   <small>

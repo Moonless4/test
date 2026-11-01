@@ -107,7 +107,7 @@ export default function OrderDetailPage({ id, onReorder, onToast, onMenu }) {
               <li key={item.productId}>
                 <span className="order-detail-items__thumb">
                   {item.product ? (
-                    <img src={item.product.image} alt={item.product.name} loading="lazy" />
+                    <img src={item.product.image} alt={item.product.name} loading="lazy" decoding="async" />
                   ) : (
                     <Icon name="fork" size={18} />
                   )}

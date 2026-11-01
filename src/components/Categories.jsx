@@ -29,7 +29,7 @@ export default function Categories({ onCategory }) {
               onClick={() => onCategory(cat.id)}
             >
               <span className="category-card__icon">
-                <img src={cat.icon} alt="" loading="lazy" />
+                <img src={cat.icon} alt="" loading="lazy" decoding="async" />
               </span>
               <span className="category-card__title">{cat.title}</span>
               <span className="category-card__hint">مشاهده غذاها</span>

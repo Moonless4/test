@@ -32,7 +32,7 @@ export default function FavoritesPage({ onAdd, onMenu, onToast }) {
             <article key={product.id} className="fav-card">
               <div className="fav-card__media">
                 <Link to={`/food/${product.id}`} aria-label={`مشاهده ${product.name}`}>
-                  <img src={product.image} alt={product.name} loading="lazy" />
+                  <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
                 </Link>
                 {product.discount > 0 && (
                   <span className="fav-card__discount">{fa(product.discount)}٪</span>

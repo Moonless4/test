@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Header from './components/Header.jsx';
 import MobileMenu from './components/MobileMenu.jsx';
 import Footer from './components/Footer.jsx';
@@ -8,30 +8,34 @@ import ReservationModal from './components/ReservationModal.jsx';
 import AuthModal from './components/AuthModal.jsx';
 import Toast from './components/Toast.jsx';
 import HomePage from './pages/HomePage.jsx';
-import MenuPage from './pages/MenuPage.jsx';
-import BlogPage from './pages/BlogPage.jsx';
-import BlogPostPage from './pages/BlogPostPage.jsx';
-import ProductPage from './pages/ProductPage.jsx';
-import AboutPage from './pages/AboutPage.jsx';
-import ContactPage from './pages/ContactPage.jsx';
-import CartPage from './pages/CartPage.jsx';
-import NotFoundPage from './pages/NotFoundPage.jsx';
-import AccountShell from './account/AccountShell.jsx';
-import AccountDashboard from './account/pages/Dashboard.jsx';
-import AccountOrders from './account/pages/OrdersPage.jsx';
-import AccountOrderDetail from './account/pages/OrderDetailPage.jsx';
-import AccountReservations from './account/pages/ReservationsPage.jsx';
-import AccountReservationDetail from './account/pages/ReservationDetailPage.jsx';
-import AccountFavorites from './account/pages/FavoritesPage.jsx';
-import AccountComments from './account/pages/CommentsPage.jsx';
-import AccountAddresses from './account/pages/AddressesPage.jsx';
-import AccountProfile from './account/pages/ProfilePage.jsx';
-import AccountNotifications from './account/pages/NotificationsPage.jsx';
-import AccountRewards from './account/pages/RewardsPage.jsx';
-import AccountSettings from './account/pages/SettingsPage.jsx';
 import { AccountProvider } from './account/AccountContext.jsx';
-import InfoPage from './pages/InfoPage.jsx';
-import AdminApp from './admin/AdminApp.jsx';
+
+/* Only the home page is needed for the first paint; every other route (and the
+   account/admin areas with their large stylesheets) is split into its own chunk
+   and fetched when that route is opened. */
+const MenuPage = lazy(() => import('./pages/MenuPage.jsx'));
+const BlogPage = lazy(() => import('./pages/BlogPage.jsx'));
+const BlogPostPage = lazy(() => import('./pages/BlogPostPage.jsx'));
+const ProductPage = lazy(() => import('./pages/ProductPage.jsx'));
+const AboutPage = lazy(() => import('./pages/AboutPage.jsx'));
+const ContactPage = lazy(() => import('./pages/ContactPage.jsx'));
+const CartPage = lazy(() => import('./pages/CartPage.jsx'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage.jsx'));
+const InfoPage = lazy(() => import('./pages/InfoPage.jsx'));
+const AccountShell = lazy(() => import('./account/AccountShell.jsx'));
+const AccountDashboard = lazy(() => import('./account/pages/Dashboard.jsx'));
+const AccountOrders = lazy(() => import('./account/pages/OrdersPage.jsx'));
+const AccountOrderDetail = lazy(() => import('./account/pages/OrderDetailPage.jsx'));
+const AccountReservations = lazy(() => import('./account/pages/ReservationsPage.jsx'));
+const AccountReservationDetail = lazy(() => import('./account/pages/ReservationDetailPage.jsx'));
+const AccountFavorites = lazy(() => import('./account/pages/FavoritesPage.jsx'));
+const AccountComments = lazy(() => import('./account/pages/CommentsPage.jsx'));
+const AccountAddresses = lazy(() => import('./account/pages/AddressesPage.jsx'));
+const AccountProfile = lazy(() => import('./account/pages/ProfilePage.jsx'));
+const AccountNotifications = lazy(() => import('./account/pages/NotificationsPage.jsx'));
+const AccountRewards = lazy(() => import('./account/pages/RewardsPage.jsx'));
+const AccountSettings = lazy(() => import('./account/pages/SettingsPage.jsx'));
+const AdminApp = lazy(() => import('./admin/AdminApp.jsx'));
 import { adminPathOf } from './lib/adminPath.js';
 import { useSite } from './site/SiteContent.jsx';
 import { useRouter } from './router.jsx';
@@ -250,7 +254,11 @@ export default function App() {
   }, [route.name, site.identity.siteName, site.identity.prefix]);
 
   if (route.name === 'admin') {
-    return <AdminApp section={route.section} adminPath={route.adminPath} />;
+    return (
+      <Suspense fallback={null}>
+        <AdminApp section={route.section} adminPath={route.adminPath} />
+      </Suspense>
+    );
   }
 
   const page = (() => {
@@ -364,7 +372,9 @@ export default function App() {
         onCategory={goMenu}
       />
 
-      <main>{page}</main>
+      <main>
+        <Suspense fallback={null}>{page}</Suspense>
+      </main>
 
       <Footer onToast={showToast} onReserve={openReserve} />
       <ScrollTop />

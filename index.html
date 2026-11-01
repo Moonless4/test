@@ -9,6 +9,13 @@
       content="رستوران آترین؛ جایی که طعم و کیفیت کنار هم کامل می‌شوند. منوی متنوع غذاهای ایرانی و فرنگی، سفارش آنلاین و رزرو میز."
     />
     <link rel="icon" type="image/png" href="/assets/favicon.svg" />
+    <!-- Fonts used on the first screen: body copy (400) and headings (700). -->
+    <link rel="preload" href="/fonts/YekanBakhFaNum-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/YekanBakhFaNum-Bold.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Hero artwork is the largest above-the-fold paint, so it must not wait
+         for the JS bundle to be parsed. -->
+    <link rel="preload" as="image" href="/assets/hero-bg.webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/assets/slide3.webp" fetchpriority="high" />
     <title>رستوران آترین | طعمی که به یاد می‌ماند</title>
   </head>
   <body>

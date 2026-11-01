@@ -57,7 +57,7 @@ export default function LatestFood({ products, onOpen, onAdd, onViewAll }) {
               className={`filter-chip ${active === cat.id ? 'is-active' : ''}`}
               onClick={() => setActive(cat.id)}
             >
-              <img className="filter-chip__icon" src={cat.icon} alt="" loading="lazy" />
+              <img className="filter-chip__icon" src={cat.icon} alt="" loading="lazy" decoding="async" />
               {cat.title}
             </button>
           ))}

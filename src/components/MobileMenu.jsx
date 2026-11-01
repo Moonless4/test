@@ -59,7 +59,7 @@ export default function MobileMenu({ open, onClose, onLogin, onCategory }) {
                   onCategory(cat.id);
                 }}
               >
-                <img src={cat.icon} alt="" loading="lazy" />
+                <img src={cat.icon} alt="" loading="lazy" decoding="async" />
                 <span>{cat.title}</span>
               </button>
             ))}

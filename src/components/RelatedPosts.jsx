@@ -10,7 +10,7 @@ const PostItem = ({ post, onOpenPost }) => (
       onClick={() => onOpenPost(post)}
       aria-label={`خواندن مقاله ${post.title}`}
     >
-      <img src={post.image} alt="" loading="lazy" />
+      <img src={post.image} alt="" loading="lazy" decoding="async" />
       <span className="aside-post__text">
         <span className="aside-post__cat">{post.category}</span>
         <strong className="aside-post__title">{post.title}</strong>

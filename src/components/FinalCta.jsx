@@ -5,10 +5,10 @@ export default function FinalCta({ onReserve, onMenu }) {
     <section className="final-cta section" aria-labelledby="final-cta-title">
       <div className="container">
         <div className="final-cta__panel">
-          <img className="final-cta__frame" src="/assets/hero-bg.png" alt="" aria-hidden="true" />
+          <img className="final-cta__frame" src="/assets/hero-bg.webp" alt="" aria-hidden="true" />
           <span className="final-cta__wash" aria-hidden="true" />
-          <img className="final-cta__dish final-cta__dish--right" src="/assets/slide1.webp" alt="" loading="lazy" />
-          <img className="final-cta__dish final-cta__dish--left" src="/assets/slide3.webp" alt="" loading="lazy" />
+          <img className="final-cta__dish final-cta__dish--right" src="/assets/slide1.webp" alt="" loading="lazy" decoding="async" />
+          <img className="final-cta__dish final-cta__dish--left" src="/assets/slide3.webp" alt="" loading="lazy" decoding="async" />
           <img className="final-cta__dots" src="/assets/yellow-dots.png" alt="" aria-hidden="true" />
 
           <div className="final-cta__copy">

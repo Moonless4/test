@@ -32,7 +32,7 @@ export default function FoodCard({ product, onAdd, onOpen }) {
             }}
             aria-label={`مشاهده ${product.name}`}
           >
-            <img src={product.image} alt={product.name} loading="lazy" />
+            <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
           </button>
           {product.discount > 0 && (
             <span className="food-card__badge">

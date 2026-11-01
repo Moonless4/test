@@ -21,7 +21,7 @@ export default function ProductCard({ product, onAdd, onOpen, onToast, rating })
           }}
           aria-label={`مشاهده ${product.name}`}
         >
-          <img src={product.image} alt={product.name} loading="lazy" />
+          <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
         </button>
         {product.badge && <span className="product-card__badge">{product.badge}</span>}
         {product.discount > 0 && (

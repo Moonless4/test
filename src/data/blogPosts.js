@@ -6,7 +6,7 @@ export const blogExtraPosts = [
     category: 'نوشیدنی',
     date: '۲۵ مهر ۱۴۰۴',
     readTime: '۷ دقیقه مطالعه',
-    image: '/assets/blog-espresso.jpg',
+    image: '/assets/blog-espresso.webp',
     excerpt:
       'یک اسپرسوی خوب نتیجه چند تصمیم کوچک است: انتخاب دانه، درجه آسیاب، دما و زمان استخراج. راهنمای کامل فنجان بهتر.',
     body: [
@@ -27,7 +27,7 @@ export const blogExtraPosts = [
     category: 'آشپزی',
     date: '۲۲ مهر ۱۴۰۴',
     readTime: '۸ دقیقه مطالعه',
-    image: '/assets/blog-fresh-pasta.jpg',
+    image: '/assets/blog-fresh-pasta.webp',
     excerpt:
       'با سه ماده ساده می‌توانید پاستای تازه خانگی بسازید. راهنمای گام‌به‌گام خمیر، شکل‌دهی و انتخاب سس مناسب.',
     body: [
@@ -48,7 +48,7 @@ export const blogExtraPosts = [
     category: 'دسر',
     date: '۱۹ مهر ۱۴۰۴',
     readTime: '۶ دقیقه مطالعه',
-    image: '/assets/blog-apple-dessert.jpg',
+    image: '/assets/blog-apple-dessert.webp',
     excerpt:
       'فصل سیب و دارچین است؛ سه دستور ساده که با کمترین امکانات، دسری گرم و خانگی روی میز می‌آورند.',
     body: [

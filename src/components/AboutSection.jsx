@@ -7,7 +7,7 @@ export default function AboutSection({ onMenu, onReserve }) {
         <div className="about__visual">
           <span className="about__blob" aria-hidden="true" />
           <img className="about__bg" src="/assets/intro-section-bg.png" alt="" aria-hidden="true" />
-          <img className="about__chef" src="/assets/contact-chef.webp" alt="سرآشپز رستوران آترین" loading="lazy" />
+          <img className="about__chef" src="/assets/contact-chef.webp" alt="سرآشپز رستوران آترین" loading="lazy" decoding="async" />
           <span className="about__exp">
             <b>۱۲+</b>
             <small>سال تجربه</small>

@@ -11,6 +11,24 @@ if (process.env.BASE44_PREVIEW_MODE === '1' && process.env.BASE44_SANDBOX_HOST_D
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    target: 'es2020',
+    cssCodeSplit: true,
+    reportCompressedSize: false,
+    rollupOptions: {
+      output: {
+        // Framework code changes far less often than app code: keeping it in
+        // stable chunks lets repeat visits reuse it from the browser cache.
+        manualChunks(id) {
+          if (id.includes('node_modules/scheduler') || id.includes('node_modules/react')) {
+            return 'react';
+          }
+          if (id.includes('node_modules/lenis')) return 'lenis';
+          return undefined;
+        },
+      },
+    },
+  },
   server: {
     host: '0.0.0.0',
     port: 3000,

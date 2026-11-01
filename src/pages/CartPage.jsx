@@ -335,7 +335,7 @@ export default function CartPage({ items, onQty, onRemove, onAdd, onComplete, on
                     {items.map(({ product, qty }) => (
                       <article className="cart-item" key={product.id}>
                         <span className="cart-item__media">
-                          <img src={product.image} alt={product.name} loading="lazy" />
+                          <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
                         </span>
                         <div className="cart-item__copy">
                           <h3>{product.name}</h3>

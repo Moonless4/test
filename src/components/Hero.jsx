@@ -82,7 +82,13 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
     <section className="hero" id="home" aria-label="خوش‌آمدگویی رستوران آترین">
       <div className="hero__inner">
         <div className="hero__bg" aria-hidden="true">
-          <img className="hero__frame" src="/assets/hero-bg.png" alt="" />
+          <img
+            className="hero__frame"
+            src="/assets/hero-bg.webp"
+            alt=""
+            fetchPriority="high"
+            decoding="async"
+          />
         </div>
 
         <img className="hero__leaf" src="/assets/yellow-leaf.png" alt="" aria-hidden="true" />
@@ -156,6 +162,8 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
                       src={product.image}
                       alt={product.name}
                       loading={index > 1 ? 'lazy' : 'eager'}
+                      fetchPriority={index === 0 ? 'high' : 'auto'}
+                      decoding={index > 1 ? 'async' : 'sync'}
                       draggable="false"
                     />
                     {product.discount > 0 && (

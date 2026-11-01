@@ -62,7 +62,12 @@ export default function Header({
   useEffect(() => () => clearTimeout(cartTimer.current), []);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    // Fires on every scroll frame: bail out instead of re-rendering the header
+    // each time, since only crossing the threshold changes anything.
+    const onScroll = () => {
+      const next = window.scrollY > 24;
+      setScrolled((current) => (current === next ? current : next));
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -114,7 +119,7 @@ export default function Header({
                                 onCategory(cat.id);
                               }}
                             >
-                              <img src={cat.icon} alt="" loading="lazy" />
+                              <img src={cat.icon} alt="" loading="lazy" decoding="async" />
                               <span>{cat.title}</span>
                             </button>
                           ))}
@@ -125,7 +130,7 @@ export default function Header({
                         className="mega__promo"
                         onClick={() => setMegaOpen(false)}
                       >
-                        <img src={megaMenu.promo.image} alt={megaMenu.promo.title} loading="lazy" />
+                        <img src={megaMenu.promo.image} alt={megaMenu.promo.title} loading="lazy" decoding="async" />
                         <span className="mega__promo-copy">
                           <small>{megaMenu.promo.kicker}</small>
                           <strong>{megaMenu.promo.title}</strong>
