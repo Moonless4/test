@@ -19,13 +19,13 @@ export function useOverlay(open, onClose) {
   }, [open, onClose]);
 }
 
-export default function Modal({ open, onClose, children, className = '', label, closable = true }) {
+export default function Modal({ open, onClose, children, className = '', label, closable = true, backdropClosable = closable }) {
   useOverlay(open, closable ? onClose : undefined);
   if (!open) return null;
 
   return (
     <div className="modal-root">
-      {closable ? (
+      {backdropClosable ? (
         <button type="button" className="modal-backdrop" onClick={onClose} aria-label="بستن پنجره" />
       ) : (
         <span className="modal-backdrop" aria-hidden="true" />

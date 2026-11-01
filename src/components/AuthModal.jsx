@@ -77,6 +77,8 @@ export default function AuthModal({
     onSuccess?.();
   };
 
+  // The checkout window hides its close button, but clicking outside still takes
+  // the visitor back to the cart; checkout stays blocked until they register.
   return (
     <Modal
       open={open}
@@ -84,6 +86,7 @@ export default function AuthModal({
       className="modal--auth"
       label="ورود یا ثبت‌نام"
       closable={!mandatory}
+      backdropClosable
     >
       <div className="auth">
         <span className="auth__logo">
