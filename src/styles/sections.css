@@ -562,14 +562,6 @@
   border-radius: inherit;
 }
 
-.about__bg {
-  position: absolute;
-  top: 10%;
-  right: 2%;
-  width: 46%;
-  opacity: 0.7;
-}
-
 .about__chef {
   position: relative;
   z-index: 2;
