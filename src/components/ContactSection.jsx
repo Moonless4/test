@@ -43,7 +43,6 @@ export default function ContactSection({ onToast }) {
           <img className="contact__bg" src="/assets/contact-bg.png" alt="" aria-hidden="true" />
 
           <div className="contact__visual">
-            <span className="contact__blob" aria-hidden="true" />
             <img src="/assets/contact-chef.webp" alt="پذیرایی سرآشپز آترین" loading="lazy" />
             <span className="contact__note">
               <Icon name="check" size={18} />

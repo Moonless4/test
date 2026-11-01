@@ -33,14 +33,6 @@
   z-index: 2;
 }
 
-.contact__blob {
-  position: absolute;
-  inset: 6% 0 0;
-  border-radius: 48% 52% 40% 60% / 55% 45% 55% 45%;
-  background: radial-gradient(circle at 50% 40%, #fff 0%, #fbeedb 60%, #f3dfbd 100%);
-  border: 1px solid rgba(203, 2, 54, 0.08);
-}
-
 .contact__visual > img {
   position: relative;
   z-index: 2;
