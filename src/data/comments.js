@@ -60,6 +60,25 @@ export const listCommentsByAuthor = (authorKey) =>
 export const deleteComment = (id, authorKey) =>
   writeAll(readAll().filter((item) => !(item.id === id && item.authorKey === authorKey)));
 
+// Star ratings grouped by target in one storage read, so a listing page can
+// score many items without parsing localStorage once per card.
+export const commentRatingsByTarget = (targetType) => {
+  const grouped = {};
+  readAll().forEach((item) => {
+    if (item.targetType !== targetType || !(item.rating > 0)) return;
+    const entry = grouped[item.targetId] || (grouped[item.targetId] = { sum: 0, rated: 0, count: 0 });
+    entry.sum += item.rating;
+    entry.rated += 1;
+  });
+  readAll().forEach((item) => {
+    if (item.targetType === targetType && grouped[item.targetId]) grouped[item.targetId].count += 1;
+  });
+  Object.values(grouped).forEach((entry) => {
+    entry.average = Math.round((entry.sum / entry.rated) * 10) / 10;
+  });
+  return grouped;
+};
+
 export const commentStats = (targetType, targetId) => {
   const list = listComments(targetType, targetId);
   const rated = list.filter((item) => item.rating > 0);

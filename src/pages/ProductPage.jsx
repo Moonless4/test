@@ -7,6 +7,7 @@ import OrderSuggestions from '../components/OrderSuggestions.jsx';
 import Comments from '../components/Comments.jsx';
 import { useAccount } from '../account/AccountContext.jsx';
 import { commentStats } from '../data/comments.js';
+import { productRating, productReviewCount } from '../data/productRatings.js';
 import { fa } from '../data/account.js';
 
 export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [], onToast }) {
@@ -64,8 +65,11 @@ export default function ProductPage({ id, onAdd, onOpen, onMenu, cartIds = [], o
                         minimumFractionDigits: 1,
                         maximumFractionDigits: 1,
                       })
-                    : '۴٫۹'}
-                  <small>({fa(reviewStats.count || 124)} نظر)</small>
+                    : productRating(product.id).toLocaleString('fa-IR', {
+                        minimumFractionDigits: 1,
+                        maximumFractionDigits: 1,
+                      })}
+                  <small>({fa(reviewStats.count || productReviewCount(product.id))} نظر)</small>
                 </span>
                 <button
                   type="button"

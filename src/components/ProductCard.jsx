@@ -3,7 +3,7 @@ import { useAccount } from '../account/AccountContext.jsx';
 
 export const formatPrice = (value) => Number(value || 0).toLocaleString('fa-IR');
 
-export default function ProductCard({ product, onAdd, onOpen, onToast }) {
+export default function ProductCard({ product, onAdd, onOpen, onToast, rating }) {
   const { isFavorite, toggleFavorite } = useAccount();
   const favorite = isFavorite(product.id);
 
@@ -50,7 +50,19 @@ export default function ProductCard({ product, onAdd, onOpen, onToast }) {
       </div>
 
       <div className="product-card__body">
-        <span className="product-card__cat">{product.categoryLabel}</span>
+        <div className="product-card__meta">
+          <span className="product-card__cat">{product.categoryLabel}</span>
+          {rating && (
+            <span
+              className="product-card__rating"
+              aria-label={`امتیاز ${rating.average.toLocaleString('fa-IR')} از ۵`}
+            >
+              <Icon name="star" size={13} filled />
+              {rating.average.toLocaleString('fa-IR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+              <small>({rating.reviews.toLocaleString('fa-IR')})</small>
+            </span>
+          )}
+        </div>
         <h3>
           <button type="button" onClick={() => onOpen(product)}>
             {product.name}

@@ -190,6 +190,28 @@ A signed-in customer's comment stores `authorKey` (the account identifier from
 `listCommentsByAuthor(accountKey)` with the linked food/post title, rating and
 date, and deletes only its own entries through `deleteComment(id, authorKey)`.
 
+## Ratings & the menu rating filter
+
+Every dish has a shipped «house» rating in `src/data/productRatings.js`
+(`productRating(id)` / `productReviewCount(id)`, values `[average, count]`;
+unknown/admin-created ids fall back to the defaults). Real star ratings left in
+the comment box on `/food/:id` override it — `commentRatingsByTarget('product')`
+in `src/data/comments.js` reads them in one pass. Both the menu page and the
+food page's rating badge use the same source.
+
+`/menu` (`src/components/ProductGrid.jsx`) has two filters that combine: the
+category chips from the site content, and a second chip row «امتیاز کاربران»
+(همه / ۴٫۵ و بالاتر / ۴ و بالاتر / ۳٫۵ و بالاتر). Rating state is local to the
+grid; the empty state under a rating filter offers «حذف فیلتر امتیاز». Menu
+cards show the rating in the category row (`.product-card__rating`), passed in
+by the grid as the `rating` prop — cards elsewhere render without it.
+
+The featured carousel on the home page (`.specials-band .product-track`) shows
+4 cards per view on desktop, 3 at ≤1200px and 2 at ≤1000px (shortened cards);
+its own `.specials-band .product-track__item` rule is more specific than the
+generic `.product-track__item` one, so each band breakpoint must be written for
+that selector too.
+
 ## Admin panel (`/admin`)
 
 The site content is editable at `/admin` (login required). There is no backend:

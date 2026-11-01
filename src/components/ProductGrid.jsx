@@ -1,13 +1,36 @@
+import { useState } from 'react';
 import { useSite } from '../site/SiteContent.jsx';
 import ProductCard from './ProductCard.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import Icon from './Icons.jsx';
+import { commentRatingsByTarget } from '../data/comments.js';
+import { productRating, productReviewCount } from '../data/productRatings.js';
+
+const RATING_FILTERS = [
+  { value: 0, title: 'همه امتیازها' },
+  { value: 4.5, title: '۴٫۵ و بالاتر' },
+  { value: 4, title: '۴ و بالاتر' },
+  { value: 3.5, title: '۳٫۵ و بالاتر' },
+];
 
 export default function ProductGrid({ filter, onFilter, onAdd, onOpen, onViewAll }) {
   const { content } = useSite();
   const { menuFilters, products } = content;
-  const visible =
-    filter === 'all' ? products : products.filter((product) => product.category === filter);
+  const [minRating, setMinRating] = useState(0);
+  const [reviews] = useState(() => commentRatingsByTarget('product'));
+
+  // A dish shows the average of the star ratings customers left on its page;
+  // until someone rates it, it keeps the shipped house rating.
+  const ratingOf = (product) => {
+    const live = reviews[product.id];
+    return live && live.rated > 0
+      ? { average: live.average, reviews: live.count }
+      : { average: productRating(product.id), reviews: productReviewCount(product.id) };
+  };
+
+  const visible = products
+    .filter((product) => filter === 'all' || product.category === filter)
+    .filter((product) => minRating === 0 || ratingOf(product).average >= minRating);
 
   return (
     <section className="menu-section section" id="menu" aria-labelledby="menu-title">
@@ -41,11 +64,46 @@ export default function ProductGrid({ filter, onFilter, onAdd, onOpen, onViewAll
           ))}
         </div>
 
+        <div className="menu-rating-filters" role="group" aria-label="فیلتر بر اساس امتیاز کاربران">
+          <span className="menu-rating-filters__label">
+            <Icon name="star" size={14} filled />
+            امتیاز کاربران
+          </span>
+          {RATING_FILTERS.map((item) => (
+            <button
+              type="button"
+              key={item.value}
+              aria-pressed={minRating === item.value}
+              className={`filter-chip ${minRating === item.value ? 'is-active' : ''}`}
+              onClick={() => setMinRating(item.value)}
+            >
+              {item.title}
+            </button>
+          ))}
+        </div>
+
         {visible.length > 0 ? (
           <div className="menu-grid">
             {visible.map((product) => (
-              <ProductCard key={product.id} product={product} onAdd={onAdd} onOpen={onOpen} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                rating={ratingOf(product)}
+                onAdd={onAdd}
+                onOpen={onOpen}
+              />
             ))}
+          </div>
+        ) : minRating > 0 ? (
+          <div className="menu-empty">
+            <span className="menu-empty__icon">
+              <Icon name="star" size={30} />
+            </span>
+            <h3>غذایی با این امتیاز پیدا نشد</h3>
+            <p>با حذف فیلتر امتیاز، همه غذاهای این دسته را دوباره می‌بینید.</p>
+            <button type="button" className="btn btn--primary" onClick={() => setMinRating(0)}>
+              حذف فیلتر امتیاز
+            </button>
           </div>
         ) : (
           <div className="menu-empty">
