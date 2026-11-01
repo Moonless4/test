@@ -699,8 +699,7 @@
   gap: 30px;
   padding: 56px 52px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, #fffaf0 0%, var(--cream-soft) 55%, #f7ead5 100%);
-  border: 1px solid rgba(203, 2, 54, 0.07);
+  background: none;
   color: var(--ink);
   overflow: hidden;
   isolation: isolate;
