@@ -1062,10 +1062,7 @@
   }
 
   .contact__visual {
-    max-width: 360px;
-    margin: 0 auto;
-    width: 100%;
-    min-height: 280px;
+    display: none;
   }
 
   .testimonials__side {
@@ -1161,11 +1158,6 @@
     padding: 26px 16px;
     border-radius: 28px;
     gap: 18px;
-  }
-
-  .contact__visual {
-    min-height: 240px;
-    max-width: 300px;
   }
 
   .contact__cards {
