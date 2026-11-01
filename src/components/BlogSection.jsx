@@ -28,11 +28,14 @@ export default function BlogSection({ items, onOpenPost, onViewAll }) {
 
         <div className="blog-grid">
           {posts.map((post) => (
-            <article className="blog-card" key={post.id}>
+            <article className="blog-card" key={post.id} onClick={() => onOpenPost(post)}>
               <button
                 type="button"
                 className="blog-card__media"
-                onClick={() => onOpenPost(post)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onOpenPost(post);
+                }}
                 aria-label={`خواندن مقاله ${post.title}`}
               >
                 <img src={post.image} alt={post.title} loading="lazy" />
@@ -50,12 +53,25 @@ export default function BlogSection({ items, onOpenPost, onViewAll }) {
                   </span>
                 </div>
                 <h3>
-                  <button type="button" onClick={() => onOpenPost(post)}>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onOpenPost(post);
+                    }}
+                  >
                     {post.title}
                   </button>
                 </h3>
                 <p>{post.excerpt}</p>
-                <button type="button" className="text-link text-link--button" onClick={() => onOpenPost(post)}>
+                <button
+                  type="button"
+                  className="text-link text-link--button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onOpenPost(post);
+                  }}
+                >
                   ادامه مطلب
                   <Icon name="chevronLeft" size={16} />
                 </button>

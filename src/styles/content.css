@@ -521,6 +521,7 @@
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
+  cursor: pointer;
   transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
 }
 

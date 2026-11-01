@@ -6,15 +6,19 @@ export const formatPrice = (value) => Number(value || 0).toLocaleString('fa-IR')
 export default function ProductCard({ product, onAdd, onOpen, onToast, rating }) {
   const { isFavorite, toggleFavorite } = useAccount();
   const favorite = isFavorite(product.id);
+  const open = () => onOpen(product);
 
   return (
-    <article className="product-card">
+    <article className="product-card" onClick={open}>
       <div className="product-card__media">
         <span className="product-card__halo" aria-hidden="true" />
         <button
           type="button"
           className="product-card__image"
-          onClick={() => onOpen(product)}
+          onClick={(event) => {
+            event.stopPropagation();
+            open();
+          }}
           aria-label={`مشاهده ${product.name}`}
         >
           <img src={product.image} alt={product.name} loading="lazy" />
@@ -26,7 +30,10 @@ export default function ProductCard({ product, onAdd, onOpen, onToast, rating })
         <button
           type="button"
           className="product-card__quick"
-          onClick={() => onOpen(product)}
+          onClick={(event) => {
+            event.stopPropagation();
+            open();
+          }}
           aria-label={`جزئیات ${product.name}`}
         >
           <Icon name="plus" size={17} />
@@ -36,7 +43,8 @@ export default function ProductCard({ product, onAdd, onOpen, onToast, rating })
           className={`product-card__fav ${favorite ? 'is-on' : ''}`}
           aria-label={favorite ? `حذف ${product.name} از علاقه‌مندی‌ها` : `افزودن ${product.name} به علاقه‌مندی‌ها`}
           aria-pressed={favorite}
-          onClick={() => {
+          onClick={(event) => {
+            event.stopPropagation();
             const added = toggleFavorite(product.id);
             onToast?.(
               added
@@ -64,7 +72,13 @@ export default function ProductCard({ product, onAdd, onOpen, onToast, rating })
           )}
         </div>
         <h3>
-          <button type="button" onClick={() => onOpen(product)}>
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              open();
+            }}
+          >
             {product.name}
           </button>
         </h3>
@@ -78,7 +92,14 @@ export default function ProductCard({ product, onAdd, onOpen, onToast, rating })
             </span>
             {product.oldPrice && <del className="price__old">{formatPrice(product.oldPrice)}</del>}
           </div>
-          <button type="button" className="add-btn" onClick={() => onAdd(product)}>
+          <button
+            type="button"
+            className="add-btn"
+            onClick={(event) => {
+              event.stopPropagation();
+              onAdd(product);
+            }}
+          >
             <Icon name="cart" size={17} />
             افزودن
           </button>

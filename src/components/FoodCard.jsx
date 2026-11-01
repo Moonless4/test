@@ -2,12 +2,20 @@ import Icon from './Icons.jsx';
 import { formatPrice } from './ProductCard.jsx';
 
 export default function FoodCard({ product, onAdd, onOpen }) {
+  const open = () => onOpen(product);
+
   return (
-    <article className="food-card">
+    <article className="food-card" onClick={open}>
       <div className="food-card__top">
         <div className="food-card__info">
           <h3>
-            <button type="button" onClick={() => onOpen(product)}>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                open();
+              }}
+            >
               {product.name}
             </button>
           </h3>
@@ -18,7 +26,10 @@ export default function FoodCard({ product, onAdd, onOpen }) {
           <button
             type="button"
             className="food-card__thumb"
-            onClick={() => onOpen(product)}
+            onClick={(event) => {
+              event.stopPropagation();
+              open();
+            }}
             aria-label={`مشاهده ${product.name}`}
           >
             <img src={product.image} alt={product.name} loading="lazy" />
@@ -49,7 +60,10 @@ export default function FoodCard({ product, onAdd, onOpen }) {
           <button
             type="button"
             className="food-card__add"
-            onClick={() => onAdd(product)}
+            onClick={(event) => {
+              event.stopPropagation();
+              onAdd(product);
+            }}
             aria-label={`افزودن ${product.name} به سبد`}
           >
             <Icon name="cart" size={17} />

@@ -2,13 +2,18 @@ import Icon from './Icons.jsx';
 import { formatPrice } from './ProductCard.jsx';
 
 export default function StripFoodCard({ product, onAdd, onOpen }) {
+  const open = () => onOpen(product);
+
   return (
-    <article className="strip-card">
+    <article className="strip-card" onClick={open}>
       <div className="strip-card__media">
         <button
           type="button"
           className="strip-card__thumb"
-          onClick={() => onOpen(product)}
+          onClick={(event) => {
+            event.stopPropagation();
+            open();
+          }}
           aria-label={`مشاهده ${product.name}`}
         >
           <img src={product.image} alt={product.name} loading="lazy" />
@@ -22,7 +27,13 @@ export default function StripFoodCard({ product, onAdd, onOpen }) {
 
       <div className="strip-card__body">
         <h3>
-          <button type="button" onClick={() => onOpen(product)}>
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              open();
+            }}
+          >
             {product.name}
           </button>
         </h3>
@@ -43,7 +54,10 @@ export default function StripFoodCard({ product, onAdd, onOpen }) {
       <button
         type="button"
         className="strip-card__add"
-        onClick={() => onAdd(product)}
+        onClick={(event) => {
+          event.stopPropagation();
+          onAdd(product);
+        }}
         aria-label={`افزودن ${product.name} به سبد`}
       >
         <Icon name="cart" size={18} />
