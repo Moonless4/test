@@ -7,7 +7,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
-  scrollbar-color: var(--primary) var(--cream-soft);
+  scrollbar-color: var(--primary) #fff;
   scrollbar-width: thin;
 }
 
@@ -17,13 +17,13 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--cream-soft);
+  background: #fff;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--primary);
   border-radius: 999px;
-  border: 2px solid var(--cream-soft);
+  border: 2px solid #fff;
 }
 
 ::-webkit-scrollbar-thumb:hover {
