@@ -1152,7 +1152,7 @@ a.acct-stat:hover {
 
 .order-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(203, 2, 54, 0.16);
+  border-color: rgba(203, 2, 54, 0.45);
   box-shadow: 0 26px 44px -40px rgba(36, 0, 10, 0.8);
 }
 
@@ -1588,7 +1588,7 @@ a.acct-stat:hover {
 
 .reserve-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(203, 2, 54, 0.16);
+  border-color: rgba(203, 2, 54, 0.45);
   box-shadow: 0 26px 44px -40px rgba(36, 0, 10, 0.8);
 }
 
@@ -1792,7 +1792,7 @@ a.acct-stat:hover {
 
 .fav-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(203, 2, 54, 0.16);
+  border-color: rgba(203, 2, 54, 0.45);
   box-shadow: 0 30px 46px -38px rgba(36, 0, 10, 0.85);
 }
 
@@ -1952,7 +1952,7 @@ a.acct-stat:hover {
 
 .addr-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(203, 2, 54, 0.16);
+  border-color: rgba(203, 2, 54, 0.45);
   box-shadow: 0 26px 44px -40px rgba(36, 0, 10, 0.8);
 }
 

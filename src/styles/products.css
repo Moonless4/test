@@ -89,7 +89,7 @@
 .product-card:hover {
   transform: translateY(-7px);
   box-shadow: 0 30px 60px -42px rgba(36, 0, 10, 0.55);
-  border-color: rgba(203, 2, 54, 0.16);
+  border-color: rgba(203, 2, 54, 0.45);
 }
 
 .product-card__media {
