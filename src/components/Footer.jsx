@@ -105,35 +105,28 @@ export default function Footer({ onToast }) {
 
           <div className="footer__col footer__contact">
             <h3>اطلاعات تماس</h3>
-            <a href={`tel:${identity.phoneHref}`}>
-              <Icon name="phone" size={17} />
-              <span dir="ltr">{identity.phone}</span>
-            </a>
-            <a href={`mailto:${identity.email}`}>
-              <Icon name="mail" size={17} />
-              <span>{identity.email}</span>
-            </a>
-            <p>
-              <Icon name="pin" size={17} />
-              {identity.address}
-            </p>
-            <p>
-              <Icon name="clock" size={17} />
-              {identity.hours}
-            </p>
+            <div className="footer__contact-list">
+              <a href={`tel:${identity.phoneHref}`}>
+                <Icon name="phone" size={17} />
+                <span dir="ltr">{identity.phone}</span>
+              </a>
+              <a href={`mailto:${identity.email}`}>
+                <Icon name="mail" size={17} />
+                <span>{identity.email}</span>
+              </a>
+              <p>
+                <Icon name="pin" size={17} />
+                {identity.address}
+              </p>
+              <p>
+                <Icon name="clock" size={17} />
+                {identity.hours}
+              </p>
+            </div>
+            <div className="footer__enamad">
+              <img src="/assets/enamad.png" alt="نماد اعتماد الکترونیکی" width="88" height="96" />
+            </div>
           </div>
-        </div>
-
-        <div className="footer__trust">
-          {footer.badges.map((badge) => (
-            <span className="trust-badge" key={badge.id}>
-              <Icon name={badge.icon} size={22} />
-              <span>
-                <b>{badge.title}</b>
-                <small>{badge.subtitle}</small>
-              </span>
-            </span>
-          ))}
         </div>
 
         <div className="footer__bottom">
