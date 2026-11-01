@@ -5,7 +5,9 @@ const OPTIONS = {
   wheelMultiplier: 1.2,
   smoothWheel: true,
   syncTouch: true,
-  syncTouchLerp: 0.06,
+  // Touch easing follows the finger a little faster than desktop wheel smoothing,
+  // which keeps phone scrolling from feeling sluggish.
+  syncTouchLerp: 0.12,
   respectReducedMotion: false,
   allowNestedScroll: true,
   stopInertiaOnNavigate: true,
