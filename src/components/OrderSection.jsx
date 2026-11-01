@@ -19,18 +19,6 @@ export default function OrderSection({ onMenu }) {
               دقیقاً همان‌طور که دوست دارید.
             </p>
 
-            <div className="order__steps">
-              {orderSteps.map((step) => (
-                <div className="order-step" key={step.num}>
-                  <span className="order-step__num">{step.num}</span>
-                  <div>
-                    <h3>{step.title}</h3>
-                    <p>{step.text}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
             <div className="order__actions">
               <button type="button" className="btn btn--gold" onClick={onMenu}>
                 همین حالا سفارش دهید
@@ -54,6 +42,15 @@ export default function OrderSection({ onMenu }) {
               <b>ارسال سریع</b>
               <small>۳۰ تا ۴۵ دقیقه</small>
             </span>
+          </div>
+
+          <div className="order__steps">
+            {orderSteps.map((step) => (
+              <div className="order-step" key={step.num}>
+                <span className="order-step__num">{step.num}</span>
+                <h3>{step.title}</h3>
+              </div>
+            ))}
           </div>
         </div>
       </div>
