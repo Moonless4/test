@@ -166,6 +166,8 @@
 .food-carousel__stage {
   position: relative;
   height: 292px;
+  touch-action: pan-y;
+  cursor: grab;
 }
 
 .food-carousel__glow {

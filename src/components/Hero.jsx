@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import Icon from './Icons.jsx';
 
 const formatPrice = (value) => value.toLocaleString('fa-IR');
@@ -19,6 +19,41 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
   );
 
   const activeProduct = slides[active];
+
+  // Drag / swipe on the stage moves to the previous or next dish.
+  const dragRef = useRef(null);
+  const swipedRef = useRef(false);
+
+  const onPointerDown = (event) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    swipedRef.current = false;
+    dragRef.current = { x: event.clientX, y: event.clientY, swiping: false };
+  };
+
+  const onPointerMove = (event) => {
+    const drag = dragRef.current;
+    if (!drag) return;
+    const dx = event.clientX - drag.x;
+    const dy = event.clientY - drag.y;
+    if (!drag.swiping && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) drag.swiping = true;
+  };
+
+  const onPointerEnd = (event) => {
+    const drag = dragRef.current;
+    dragRef.current = null;
+    if (!drag || !drag.swiping) return;
+    const dx = event.clientX - drag.x;
+    if (Math.abs(dx) < 40) return;
+    swipedRef.current = true;
+    go(dx < 0 ? 1 : -1);
+  };
+
+  const onStageClickCapture = (event) => {
+    if (!swipedRef.current) return;
+    swipedRef.current = false;
+    event.preventDefault();
+    event.stopPropagation();
+  };
 
   return (
     <section className="hero" id="home" aria-label="خوش‌آمدگویی رستوران آترین">
@@ -58,7 +93,16 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
 
         <div className="hero__carousel" aria-label="پیشنهادهای ویژه امروز">
           <div className="food-carousel" role="group" aria-roledescription="carousel">
-            <div className="food-carousel__stage">
+            <div
+              className="food-carousel__stage"
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={onPointerEnd}
+              onPointerCancel={() => {
+                dragRef.current = null;
+              }}
+              onClickCapture={onStageClickCapture}
+            >
               <span className="food-carousel__glow" aria-hidden="true" />
               {slides.map((product, index) => {
                 let diff = index - active;
