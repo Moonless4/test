@@ -78,7 +78,7 @@ export default function FooterPanel() {
                 }
                 rows={6}
                 wide
-                hint="هر لینک در یک خط. برای آدرس دلخواه از قالب «برچسب|/menu» استفاده کنید."
+                hint="هر لینک در یک خط. برای آدرس دلخواه از قالب «برچسب|/menu» و برای دکمه رزرو میز از «رزرو میز|reserve» استفاده کنید."
               />
             </div>
           </EditorCard>

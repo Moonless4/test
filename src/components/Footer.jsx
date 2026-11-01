@@ -10,7 +10,7 @@ const splitLink = (value) => {
   return { label, href };
 };
 
-export default function Footer({ onToast }) {
+export default function Footer({ onToast, onReserve }) {
   const { content } = useSite();
   const { identity, footer } = content;
   const [email, setEmail] = useState('');
@@ -93,9 +93,19 @@ export default function Footer({ onToast }) {
               <ul>
                 {column.links.map((raw) => {
                   const { label, href } = splitLink(raw);
+                  const key = `${column.title}-${label}`;
+                  if (href === 'reserve') {
+                    return (
+                      <li key={key}>
+                        <button type="button" onClick={onReserve}>
+                          {label}
+                        </button>
+                      </li>
+                    );
+                  }
                   return (
-                    <li key={`${column.title}-${label}`}>
-                      <a href={href || '#menu'}>{label}</a>
+                    <li key={key}>
+                      {href?.startsWith('/') ? <Link to={href}>{label}</Link> : <a href={href || '/menu'}>{label}</a>}
                     </li>
                   );
                 })}

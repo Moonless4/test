@@ -915,13 +915,21 @@
   gap: 8px;
 }
 
-.footer__col ul a {
+.footer__col ul a,
+.footer__col ul button {
   color: rgba(255, 255, 255, 0.55);
   font-size: 12px;
+  font-family: inherit;
+  text-align: right;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
   transition: color 0.2s var(--ease), padding-right 0.2s var(--ease);
 }
 
-.footer__col ul a:hover {
+.footer__col ul a:hover,
+.footer__col ul button:hover {
   color: var(--gold);
   padding-right: 3px;
 }

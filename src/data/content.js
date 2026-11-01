@@ -471,22 +471,48 @@ export const posts = [
   ...blogExtraPosts,
 ];
 
+// Each entry is `label|href`. `href` is a site route (`/menu`), an external
+// link, or `reserve` for the reservation window.
 export const footerColumns = [
   {
     title: 'محبوب‌ترین غذاها',
-    links: ['پیتزای گوشت و قارچ', 'استیک گریل دو نفره', 'سینی مرغ ذغالی', 'پاستا آلفردو', 'جوجه کباب زعفرانی'],
+    links: [
+      'پیتزای گوشت و قارچ|/food/royal-pizza',
+      'استیک گریل دو نفره|/food/double-steak',
+      'سینی مرغ ذغالی|/food/charcoal-chicken',
+      'پاستا آلفردو|/food/alfredo-pasta',
+      'جوجه کباب زعفرانی|/food/saffron-kebab',
+    ],
   },
   {
     title: 'راهنمای خرید',
-    links: ['ثبت سفارش', 'روش‌های پرداخت', 'پیگیری سفارش', 'شرایط بازگشت', 'سوالات متداول'],
+    links: [
+      'ثبت سفارش|/menu',
+      'روش‌های پرداخت|/p/terms',
+      'پیگیری سفارش|/p/tracking',
+      'شرایط بازگشت|/p/terms',
+      'سوالات متداول|/contact',
+    ],
   },
   {
     title: 'خدمات سریع',
-    links: ['منوی غذا', 'رزرو میز', 'شعبه‌های ما', 'فرصت‌های شغلی', 'همکاری با ما'],
+    links: [
+      'منوی غذا|/menu',
+      'رزرو میز|reserve',
+      'شعبه‌های ما|/contact',
+      'فرصت‌های شغلی|/p/careers',
+      'همکاری با ما|/p/collaboration',
+    ],
   },
   {
     title: 'پشتیبانی',
-    links: ['تماس با ما', 'حریم خصوصی', 'شرایط و ضوابط', 'قوانین رستوران', 'درخواست پشتیبانی'],
+    links: [
+      'تماس با ما|/contact',
+      'حریم خصوصی|/p/privacy',
+      'شرایط و ضوابط|/p/terms',
+      'قوانین رستوران|/p/terms',
+      'درخواست پشتیبانی|/contact',
+    ],
   },
 ];
 

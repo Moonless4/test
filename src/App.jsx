@@ -366,7 +366,7 @@ export default function App() {
 
       <main>{page}</main>
 
-      <Footer onToast={showToast} />
+      <Footer onToast={showToast} onReserve={openReserve} />
       <ScrollTop />
 
       <MobileMenu
