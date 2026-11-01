@@ -161,6 +161,9 @@
 
 .food-carousel {
   position: relative;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .food-carousel__stage {
@@ -168,6 +171,13 @@
   height: 292px;
   touch-action: pan-y;
   cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.food-carousel__stage img {
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .food-carousel__glow {

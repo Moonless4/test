@@ -32,10 +32,18 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
 
   const onPointerMove = (event) => {
     const drag = dragRef.current;
-    if (!drag) return;
+    if (!drag || drag.swiping) return;
     const dx = event.clientX - drag.x;
     const dy = event.clientY - drag.y;
-    if (!drag.swiping && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) drag.swiping = true;
+    if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+      drag.swiping = true;
+      // Keep receiving the gesture even when the pointer leaves the stage.
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch {
+        /* the pointer was already released */
+      }
+    }
   };
 
   const onPointerEnd = (event) => {
@@ -92,17 +100,19 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
         </div>
 
         <div className="hero__carousel" aria-label="پیشنهادهای ویژه امروز">
-          <div className="food-carousel" role="group" aria-roledescription="carousel">
-            <div
-              className="food-carousel__stage"
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerEnd}
-              onPointerCancel={() => {
-                dragRef.current = null;
-              }}
-              onClickCapture={onStageClickCapture}
-            >
+          <div
+            className="food-carousel"
+            role="group"
+            aria-roledescription="carousel"
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerEnd}
+            onPointerCancel={() => {
+              dragRef.current = null;
+            }}
+            onClickCapture={onStageClickCapture}
+          >
+            <div className="food-carousel__stage">
               <span className="food-carousel__glow" aria-hidden="true" />
               {slides.map((product, index) => {
                 let diff = index - active;
@@ -127,7 +137,12 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
                     tabIndex={abs === 0 ? 0 : -1}
                   >
                     <span className="dish__shadow" aria-hidden="true" />
-                    <img src={product.image} alt={product.name} loading={index > 1 ? 'lazy' : 'eager'} />
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      loading={index > 1 ? 'lazy' : 'eager'}
+                      draggable="false"
+                    />
                     {product.discount > 0 && (
                       <span className="hero__discount" aria-hidden="true">
                         <b>{product.discount.toLocaleString('fa-IR')}٪</b>
