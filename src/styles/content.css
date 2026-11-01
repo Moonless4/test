@@ -1043,11 +1043,24 @@
   }
 
   .footer__contact {
-    grid-column: span 2;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: start;
+    column-gap: 36px;
+    align-items: center;
+  }
+
+  .footer__contact > h3 {
+    grid-column: 1 / -1;
+  }
+
+  .footer__enamad {
+    margin-top: 0;
   }
 
   .footer__brand {
-    grid-row: span 2;
+    grid-column: span 2;
   }
 }
 
@@ -1118,19 +1131,6 @@
 
   .footer__contact {
     grid-column: span 2;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    column-gap: 28px;
-    align-items: center;
-  }
-
-  .footer__contact > h3 {
-    grid-column: 1 / -1;
-  }
-
-  .footer__enamad {
-    margin-top: 0;
-    justify-self: end;
   }
 
   .testimonials__panel {
