@@ -20,22 +20,25 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
 
   const activeProduct = slides[active];
 
-  // Drag / swipe on the stage moves to the previous or next dish.
+  // Drag / swipe on the stage rotates the queue: every DRAG_STEP pixels of
+  // travel move one dish, so a longer drag spins through several at once.
+  const DRAG_STEP = 110;
   const dragRef = useRef(null);
   const swipedRef = useRef(false);
 
   const onPointerDown = (event) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     swipedRef.current = false;
-    dragRef.current = { x: event.clientX, y: event.clientY, swiping: false };
+    dragRef.current = { x: event.clientX, y: event.clientY, swiping: false, steps: 0 };
   };
 
   const onPointerMove = (event) => {
     const drag = dragRef.current;
-    if (!drag || drag.swiping) return;
+    if (!drag) return;
     const dx = event.clientX - drag.x;
-    const dy = event.clientY - drag.y;
-    if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+    if (!drag.swiping) {
+      const dy = event.clientY - drag.y;
+      if (Math.abs(dx) <= 8 || Math.abs(dx) <= Math.abs(dy)) return;
       drag.swiping = true;
       // Keep receiving the gesture even when the pointer leaves the stage.
       try {
@@ -44,6 +47,15 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
         /* the pointer was already released */
       }
     }
+    const steps = Math.trunc(-dx / DRAG_STEP);
+    if (steps !== drag.steps) {
+      const delta = steps - drag.steps;
+      drag.steps = steps;
+      setActive((current) => {
+        const next = (current + delta) % count;
+        return next < 0 ? next + count : next;
+      });
+    }
   };
 
   const onPointerEnd = (event) => {
@@ -51,9 +63,12 @@ export default function Hero({ products, slides: heroSlides, onProduct, onReserv
     dragRef.current = null;
     if (!drag || !drag.swiping) return;
     const dx = event.clientX - drag.x;
-    if (Math.abs(dx) < 40) return;
+    if (drag.steps === 0) {
+      // A short flick that never crossed a step still moves a single dish.
+      if (Math.abs(dx) < 40) return;
+      go(dx < 0 ? 1 : -1);
+    }
     swipedRef.current = true;
-    go(dx < 0 ? 1 : -1);
   };
 
   const onStageClickCapture = (event) => {
