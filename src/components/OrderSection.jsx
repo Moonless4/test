@@ -18,20 +18,6 @@ export default function OrderSection({ onMenu }) {
               از انتخاب غذا تا تحویل درِ خانه؛ همه‌چیز سریع، امن و بدون دردسر. غذای داغ و تازه،
               دقیقاً همان‌طور که دوست دارید.
             </p>
-
-            <div className="order__actions">
-              <button type="button" className="btn btn--gold" onClick={onMenu}>
-                همین حالا سفارش دهید
-                <Icon name="chevronLeft" size={18} />
-              </button>
-              <a className="order__phone" href="tel:+982188776655">
-                <span>
-                  <small>سفارش تلفنی</small>
-                  <b dir="ltr">۰۲۱-۸۸۷۷۶۶۵۵</b>
-                </span>
-                <Icon name="phone" size={22} />
-              </a>
-            </div>
           </div>
 
           <div className="order__visual">
@@ -42,6 +28,20 @@ export default function OrderSection({ onMenu }) {
               <b>ارسال سریع</b>
               <small>۳۰ تا ۴۵ دقیقه</small>
             </span>
+          </div>
+
+          <div className="order__actions">
+            <button type="button" className="btn btn--gold" onClick={onMenu}>
+              همین حالا سفارش دهید
+              <Icon name="chevronLeft" size={18} />
+            </button>
+            <a className="order__phone" href="tel:+982188776655">
+              <span>
+                <small>سفارش تلفنی</small>
+                <b dir="ltr">۰۲۱-۸۸۷۷۶۶۵۵</b>
+              </span>
+              <Icon name="phone" size={22} />
+            </a>
           </div>
 
           <div className="order__steps">
