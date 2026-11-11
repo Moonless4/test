@@ -194,8 +194,14 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   and the button off. `Hero` names both crops as `<picture>` sources with `media="(max-width: 639px)"`
   so the browser swaps them on its own — choosing the crop once in JS (`matchMedia` in state) kept
   the desktop banner in the phone-shaped box after a resize or rotation. The
-  Turkish banner's wide export is 3:1, so `turkish-wide` is centre-cropped to 1920×465 at build
-  time; its copy and CTA survive, but check the full frame before swapping in new artwork.
+  Turkish banner's wide export is 3:1 (2880×960), so `turkish-wide` is cropped to 1920×465 at build
+  time — from the **top** of the frame, because a centred crop cut the models' heads off. Check the
+  full frame before swapping in new artwork.
+  **The sale banner near the foot of the page is local artwork too** — `public/promo/men-rack.avif` /
+  `.webp` (1920×364, its headline and «خرید تا ۸۰٪ تخفیف» pill drawn into the picture), rendered by
+  `PromoCollection` at the artwork's own ratio with no olive wash and no hover zoom: the shared
+  `BannerTile` crops to a fixed height, which cut this banner's copy. The seasonal tiles beside it
+  still use `BannerTile`.
 - **Layout must not scroll horizontally.** `body` uses `overflow-x: clip` (not `hidden`, which
   breaks the sticky header).
 - **Bottom-bar cutoff is 769px** (`min-[769px]:`, deliberately 1px above Tailwind's `md`, so a 768px
