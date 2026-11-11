@@ -176,8 +176,8 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   `DiscountBadge`. Both are driven by `price` / `originalPrice` in `src/lib/data.ts`.
 - **Images**: product photography is **local** — `/catalog/<photo>.webp`, transparent and already
   4:5 (`public/catalog`, written by the catalogue seeder), so a product card needs no crop and no
-  third-party CDN. **The hero is local too** (`public/hero/<id>-<crop>.avif` + a `.webp` fallback,
-  written by hand from the same Unsplash photo): it is the page's LCP, so it is the one piece of
+  third-party CDN. **The hero is local too** (`public/hero/<campaign>-<wide|phone>.avif` + a `.webp`
+  fallback, from the supplied campaign banners — hoodie, turkish, bornos): it is the page's LCP, so it is the one piece of
   artwork that must not sit behind a third-party connection, and AVIF is ~45% smaller than the WebP
   it falls back to. Everything else editorial — category tiles, promo tiles, the newsletter, avatars,
   blog photos — is still hotlinked from `images.unsplash.com` and needs network access in the
@@ -187,11 +187,13 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   needs, so a tile drawn at 136px was downloading 800×1000 and a promo tile drawn at 343px was
   downloading 1600×1100. `unsplashSrcSet(url, width)` (same file) emits a right-sized crop, a 2× one
   and the source, and the call site passes the layout `sizes` — a fixed `src` alone is the old
-  behaviour. Product cards assume a 4:5 image area. The hero slider carries two crops per slide: `image` (1800×780, tablets and desktop)
-  and `imagePhone` (1100×1000). The wide crop inside a phone-height box is zoomed in ~2.6× (only a
-  third of the photo survives `object-cover`), so `Hero` picks `imagePhone` under
-  `matchMedia('(max-width: 639px)')` and its box keeps that ~11:10 shape (`aspect-[11/10]`,
-  `sm:aspect-auto sm:min-h-[420px]`), which is what sizes the slider on a phone.
+  behaviour. Product cards assume a 4:5 image area. The hero slider carries two crops per slide: `image` (1920×465, tablets and desktop)
+  and `imagePhone` (640×501). These are finished campaign banners with their headline and CTA baked
+  into the artwork, so the box takes each crop's own shape (`aspect-[640/501]`,
+  `sm:aspect-[1920/465]`) and `object-cover` has nothing to crop — a fixed taller box cut the copy
+  and the button off. `Hero` picks `imagePhone` under `matchMedia('(max-width: 639px)')`. The
+  Turkish banner's wide export is 3:1, so `turkish-wide` is centre-cropped to 1920×465 at build
+  time; its copy and CTA survive, but check the full frame before swapping in new artwork.
 - **Layout must not scroll horizontally.** `body` uses `overflow-x: clip` (not `hidden`, which
   breaks the sticky header).
 - **Bottom-bar cutoff is 769px** (`min-[769px]:`, deliberately 1px above Tailwind's `md`, so a 768px

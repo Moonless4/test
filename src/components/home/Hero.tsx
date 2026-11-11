@@ -42,9 +42,10 @@ export default function Hero() {
   return (
     <section className="pt-3 sm:pt-4" aria-label="بنر اصلی">
       <div className="relative overflow-hidden bg-beige">
-        {/* On a phone the box keeps the crop's own ~11:10 shape, so the photo is shown as shot
-            instead of zoomed; tablets and desktop keep the fixed heights. */}
-        <div className="relative aspect-[11/10] sm:aspect-auto sm:min-h-[420px] lg:min-h-[520px]">
+        {/* The banners carry their copy baked into the artwork, so the box takes each crop's own
+            shape — 640×501 on a phone, 1920×465 above it — and nothing is cropped away. The old
+            fixed heights would have cut the headlines and the CTA button off these wide banners. */}
+        <div className="relative aspect-[640/501] sm:aspect-[1920/465]">
           {heroSlides.map((slide, i) => (
             <div
               key={slide.eyebrow}
