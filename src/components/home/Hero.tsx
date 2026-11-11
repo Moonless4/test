@@ -9,9 +9,6 @@ const SLIDE_MS = 7000;
 /** Full-bleed editorial image slider — photos only, arrows on the sides. */
 export default function Hero() {
   const [index, setIndex] = useState(0);
-  // The wide desktop crop inside a phone-height box zooms in ~2.6×, so phones take their own
-  // crop, shaped like the box they fill.
-  const [phone] = useState(() => window.matchMedia('(max-width: 639px)').matches);
   // Only the first slide is on screen at load, and it is the page's LCP image: the two that
   // rotate in are fetched once the browser is idle, so they cannot compete with it for
   // bandwidth. The timeout keeps that from ever being later than the first rotation.
@@ -58,11 +55,20 @@ export default function Hero() {
                   well, so without a low priority they would compete with it. */}
               {i === 0 || followers ? (
                 <picture className="block h-full w-full">
-                  {/* AVIF is ~45% smaller than the WebP fallback and is what the LCP preload in
-                      `index.html` names; the WebP is what a browser without AVIF renders. */}
-                  <source type="image/avif" srcSet={phone ? slide.imagePhoneAvif : slide.imageAvif} />
+                  {/* Both crops are named as sources, so the browser itself swaps them when the
+                      viewport crosses 640px — a crop chosen once in JS stayed on screen after a
+                      resize or a rotation. AVIF is ~45% smaller than the WebP fallback and is
+                      what the LCP preload in `index.html` names per breakpoint; the WebP sources
+                      are what a browser without AVIF renders. */}
+                  <source
+                    media="(max-width: 639px)"
+                    type="image/avif"
+                    srcSet={slide.imagePhoneAvif}
+                  />
+                  <source media="(max-width: 639px)" type="image/webp" srcSet={slide.imagePhone} />
+                  <source type="image/avif" srcSet={slide.imageAvif} />
                   <Img
-                    src={phone ? slide.imagePhone : slide.image}
+                    src={slide.image}
                     alt=""
                     loading={i === 0 ? 'eager' : 'lazy'}
                     priority={i === 0 ? 'high' : 'low'}

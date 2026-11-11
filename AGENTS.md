@@ -191,7 +191,9 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   and `imagePhone` (640×501). These are finished campaign banners with their headline and CTA baked
   into the artwork, so the box takes each crop's own shape (`aspect-[640/501]`,
   `sm:aspect-[1920/465]`) and `object-cover` has nothing to crop — a fixed taller box cut the copy
-  and the button off. `Hero` picks `imagePhone` under `matchMedia('(max-width: 639px)')`. The
+  and the button off. `Hero` names both crops as `<picture>` sources with `media="(max-width: 639px)"`
+  so the browser swaps them on its own — choosing the crop once in JS (`matchMedia` in state) kept
+  the desktop banner in the phone-shaped box after a resize or rotation. The
   Turkish banner's wide export is 3:1, so `turkish-wide` is centre-cropped to 1920×465 at build
   time; its copy and CTA survive, but check the full frame before swapping in new artwork.
 - **Layout must not scroll horizontally.** `body` uses `overflow-x: clip` (not `hidden`, which
