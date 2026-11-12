@@ -7,7 +7,7 @@ export default function PromoCollection() {
     <section className="container mt-12 sm:mt-16" aria-label="پیشنهاد ویژه">
       <Reveal>
         <CampaignBanner
-          to="/shop?discount=true"
+          to="/shop/men"
           label="پیشنهادهای ویژه"
           avif="/promo/men-rack.avif"
           webp="/promo/men-rack.webp"

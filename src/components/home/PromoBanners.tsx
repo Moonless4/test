@@ -7,7 +7,7 @@ export default function PromoBanners() {
     <section className="container mt-12 sm:mt-16" aria-label="پیشنهادهای فصلی">
       <Reveal>
         <CampaignBanner
-          to="/shop?discount=true"
+          to="/shop/women"
           label="پوشاک اقتصادی زنانه"
           avif="/promo/women-rack.avif"
           webp="/promo/women-rack.webp"
