@@ -16,3 +16,4 @@ npm-debug.log*
 # The project archive is a build artefact (tens of MB): regenerate it with `npm run pack:project`
 # rather than storing it. It is still served from the preview at /styleon-project.zip.
 public/styleon-project.zip
+public/styleon-frontend-src.zip
