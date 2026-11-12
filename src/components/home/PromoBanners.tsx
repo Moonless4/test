@@ -1,27 +1,18 @@
-import { promoArt } from '../../lib/data';
+import CampaignBanner from './CampaignBanner';
 import Reveal from '../ui/Reveal';
-import BannerTile from './BannerTile';
 
-const BANNERS = [
-  { id: 'men', image: promoArt.men, label: 'کالکشن مردانه', to: '/shop/men' },
-  { id: 'women', image: promoArt.women, label: 'کالکشن زنانه', to: '/shop/women' },
-];
-
+/** A single full-width campaign tile, drawn at the artwork's own ratio like the sale banner below. */
 export default function PromoBanners() {
   return (
     <section className="container mt-12 sm:mt-16" aria-label="پیشنهادهای فصلی">
-      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
-        {BANNERS.map((banner, i) => (
-          <Reveal key={banner.id} delay={i * 100}>
-            <BannerTile
-              to={banner.to}
-              image={banner.image}
-              label={banner.label}
-              sizes="(min-width: 640px) 50vw, 100vw"
-            />
-          </Reveal>
-        ))}
-      </div>
+      <Reveal>
+        <CampaignBanner
+          to="/shop?discount=true"
+          label="پوشاک اقتصادی زنانه"
+          avif="/promo/women-rack.avif"
+          webp="/promo/women-rack.webp"
+        />
+      </Reveal>
     </section>
   );
 }

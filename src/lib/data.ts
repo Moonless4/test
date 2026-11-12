@@ -1,4 +1,4 @@
-import { avatarImg, heroImg, img, wideImg } from './images';
+import { avatarImg, img, wideImg } from './images';
 import type {
   BlogPost,
   CategoryId,
@@ -442,8 +442,6 @@ export const promises = [
 ];
 
 export const promoArt = {
-  men: heroImg('1519085360753-af0119f7cbe7'),
-  women: heroImg('1490481651871-ab68de25d43d'),
   newsletter: wideImg('1521334884684-d80222895322', 1000, 800),
   testimonials: img('1483985988355-763728e1935b', 700, 900),
   floatingOne: img('1542291026-7eec264c27ff', 300, 300),

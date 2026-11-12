@@ -197,11 +197,13 @@ finish is recorded here, which is what puts it on the admin panel's orders scree
   Turkish banner's wide export is 3:1 (2880×960), so `turkish-wide` is cropped to 1920×465 at build
   time — from the **top** of the frame, because a centred crop cut the models' heads off. Check the
   full frame before swapping in new artwork.
-  **The sale banner near the foot of the page is local artwork too** — `public/promo/men-rack.avif` /
-  `.webp` (1920×364, its headline and «خرید تا ۸۰٪ تخفیف» pill drawn into the picture), rendered by
-  `PromoCollection` at the artwork's own ratio with no olive wash and no hover zoom: the shared
-  `BannerTile` crops to a fixed height, which cut this banner's copy. The seasonal tiles beside it
-  still use `BannerTile`.
+  **Both promo banners are single full-width local artwork** — `public/promo/men-rack.avif` / `.webp`
+  (the sale banner near the foot, rendered by `PromoCollection`) and `public/promo/women-rack.*` (the
+  «پوشاک اقتصادی زنانه» tile under the discount section, rendered by `PromoBanners`). Both are
+  1920×364 with their headline and «خرید تا ۸۰٪ تخفیف» pill drawn into the picture, and both go
+  through `CampaignBanner`, which draws the <picture> at the artwork's own ratio with no olive wash
+  and no hover zoom — a fixed tile height (the retired `BannerTile`) cropped that copy. Swapping the
+  artwork means exporting it at the same 1920×364 frame, otherwise the copy inside it gets cropped.
 - **Layout must not scroll horizontally.** `body` uses `overflow-x: clip` (not `hidden`, which
   breaks the sticky header).
 - **Bottom-bar cutoff is 769px** (`min-[769px]:`, deliberately 1px above Tailwind's `md`, so a 768px
